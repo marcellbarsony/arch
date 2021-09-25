@@ -53,7 +53,7 @@ sleep 5
 clear
 
 # --------------------------------------------------
-# Logical volumes
+# Logical volumes (LVM)
 # --------------------------------------------------
 
 echo "------------------------------"
@@ -72,21 +72,21 @@ vgcreate volgroup0 /dev/mapper/cryptlvm
 sleep 5
 echo -ne $newline
 
-echo "Creating root filesystem: 30GBs - volgroup 0 - cryptroot"
+echo "Creating ROOT filesystem: 30GBs - volgroup 0 - cryptroot"
 lvcreate -L 30GB volgroup0 -n cryptroot
 sleep 5
 echo -ne $newline
 
-echo "Creating Home filesystem: 100%FREE - volgroup 0 - crypthome"
+echo "Creating HOME filesystem: 100%FREE - volgroup 0 - crypthome"
 lvcreate -l 100%FREE volgroup0 -n crypthome
 echo -ne $newline
 
-echo "Activating volume groups (modrprobe)"
+echo "Activating volume groups (modprobe)"
 modprobe dm_mod
 sleep 5
 echo -ne $newline
 
-echo "Scanning for available volume groups"
+echo "Scanning available volume groups"
 vgscan
 sleep 5
 echo -ne $newline
@@ -97,26 +97,32 @@ sleep 5
 clear
 
 # --------------------------------------------------
-# Mounting
+# Formatting & Mounting LVM
 # --------------------------------------------------
 
 echo "------------------------------"
-echo "# Mounting"
+echo "# Formatting & Mounting /ROOT"
 echo "------------------------------"
 sleep 5
 echo -ne $newline
 
-echo "Formatting /ROOT logical volume (ext4 - /dev/volgroup0/cryptroot)"
+echo "Formatting /ROOT (ext4 - /dev/volgroup0/cryptroot)"
 mkfs.ext4 /dev/volgroup0/cryptroot
 sleep 5
 echo -ne $newline
 
-echo "Formatting /HOME logical volume (ext4 - /dev/volgroup0/crypthome)"
-mkfs.ext4 /dev/volgroup0/crypthome
+echo "Mounting cryptroot >> /mnt"
+mount /dev/volgroup0/cryptroot /mnt
+sleep 5
+clear
+
+echo "------------------------------"
+echo "# Formatting & Mounting /BOOT"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
-echo "Creating mount directory for /boot"
+echo "Creating mountpoint directory for /boot"
 mkdir /mnt/boot
 sleep 5
 echo -ne $newline
@@ -124,12 +130,18 @@ echo -ne $newline
 echo "Mounting EFI partition >> /mnt/boot"
 mount /dev/nvme0n1p2 /mnt/boot
 sleep 5
-echo -ne $newline
+clear
 
-echo "Mounting cryptroot >> /mnt"
-mount /dev/volgroup0/cryptroot /mnt
+echo "------------------------------"
+echo "# Formatting & Mounting /HOME"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
+
+echo "Formatting /HOME logical volume (ext4 - /dev/volgroup0/crypthome)"
+mkfs.ext4 /dev/volgroup0/crypthome
+sleep 5
+clear
 
 echo "Creating mount directory for /home"
 mkdir /mnt/home
