@@ -2,13 +2,19 @@
 
 clear
 
+# --------------------------------------------------
 # Variables
+# --------------------------------------------------
 
 newline="\n"
 
+# --------------------------------------------------
 # Formatting disks I.
+# --------------------------------------------------
 
-echo "# Formatting disks I."
+echo "------------------------------"
+echo "# Formatting disks"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
@@ -22,26 +28,37 @@ mkfs.ext4 /dev/nvme0n1p2
 sleep 5
 clear
 
+# --------------------------------------------------
 # Encrypted container
+# --------------------------------------------------
 
+echo "------------------------------"
 echo "# Encrypted container"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
 echo "Creating LUKS container on P3: /dev/nvme0n1p3"
 cryptsetup luksFormat /dev/nvme0n1p3
-    # Enter encryption password
+
+    # LUKS container setup interactive menu
 
 echo -ne $newline
 echo "Unlocking the encrypted container (cryptlvm)"
 cryptsetup open --type luks /dev/nvme0n1p3 cryptlvm
+
     # Enter encryption password
+
 sleep 5
 clear
 
+# --------------------------------------------------
 # Logical volumes
+# --------------------------------------------------
 
+echo "------------------------------"
 echo "# Logical volumes"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
@@ -64,7 +81,7 @@ echo "Creating Home filesystem: 100%FREE - volgroup 0 - crypthome"
 lvcreate -l 100%FREE volgroup0 -n crypthome
 echo -ne $newline
 
-echo "Activating volume groups (modrprobe dm_mod)"
+echo "Activating volume groups (modrprobe)"
 modprobe dm_mod
 sleep 5
 echo -ne $newline
@@ -74,49 +91,23 @@ vgscan
 sleep 5
 echo -ne $newline
 
-
 echo "Activating volume groups"
 vgchange -ay
 sleep 5
 clear
 
-# Formatting disks II.
+# --------------------------------------------------
+# Mounting
+# --------------------------------------------------
 
-echo "# Formatting disks II."
+echo "------------------------------"
+echo "# Mounting"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
-
-echo "Formatting /ROOT"
-sleep 5
-echo -ne $newline
-
-echo "Formatting ROOT file system logical volume (ext4 - /dev/volgroup0/cryptroot)"
-mkfs.ext4 /dev/volgroup0/cryptroot
-sleep 5
-echo -ne $newline
-
-echo "Mounting cryptroot to /mnt"
-mount /dev/volgroup0/cryptroot /mnt
-sleep 5
-echo -ne $newline
-
-echo "Formatting /BOOT"
-sleep 5
-echo -ne $newline
-
-echo "Creating directory"
+echo "Creating mount directory for /boot"
 mkdir /mnt/boot
-sleep 5
-echo -ne $newline
-
-echo "Mounting EFI partition"
-mount /dev/nvme0n1p2 /mnt/boot
-sleep 5
-echo -ne $newline
-
-echo "formatting /HOME"
-mkfs.ext4 /dev/volgroup0/crypthome
 sleep 5
 echo -ne $newline
 
@@ -125,23 +116,49 @@ mkdir /mnt/home
 sleep 5
 echo -ne $newline
 
-echo "Mounting /home"
+echo "Formatting /ROOT logical volume (ext4 - /dev/volgroup0/cryptroot)"
+mkfs.ext4 /dev/volgroup0/cryptroot
+sleep 5
+echo -ne $newline
+
+echo "Formatting /HOME logical volume (ext4 - /dev/volgroup0/crypthome)"
+mkfs.ext4 /dev/volgroup0/crypthome
+sleep 5
+echo -ne $newline
+
+echo "Mounting EFI partition >> /mnt/boot"
+mount /dev/nvme0n1p2 /mnt/boot
+sleep 5
+echo -ne $newline
+
+echo "Mounting cryptroot >> /mnt"
+mount /dev/volgroup0/cryptroot /mnt
+sleep 5
+echo -ne $newline
+
+echo "Mounting crypthome >> /mnt/home"
 mount /dev/volgroup0/crypthome /mnt/home
 sleep 5
 clear
 
+# --------------------------------------------------
 # fstab
+# --------------------------------------------------
 
+echo "------------------------------"
 echo "# fstab"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
 echo "Creating fstab directory: /mnt/etc"
 mkdir /mnt/etc
+sleep 5
 echo -ne $newline
 
 echo "Generating fstab config"
 genfstab -U -p /mnt >> /mnt/etc/fstab
+sleep 5
 echo -ne $newline
 
 echo "Checking fstab"
@@ -149,9 +166,13 @@ cat /mnt/etc/fstab
 sleep 5
 clear
 
+# --------------------------------------------------
 # Kernel
+# --------------------------------------------------
 
+echo "------------------------------"
 echo "# Kernel"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
@@ -160,12 +181,229 @@ pacstrap -i /mnt base linux linux-firmware bash-completion linux-headers base-de
 sleep 5
 clear
 
-# Chroot
 
+# --------------------------------------------------
+# Chroot
+# --------------------------------------------------
+
+echo "------------------------------"
 echo "# Chroot"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 
 echo "Changing root to the new Arch system"
 sleep 5
 arch-chroot /mnt
+
+# --------------------------------------------------
+# Installing packages
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Installing git & nano"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+pacman -Sy git nano lvm2
+sleep 5
+clear
+
+# --------------------------------------------------
+# Cloning git repo
+# --------------------------------------------------
+
+echo "# Fetching configs"
+sleep 5
+echo -ne $newline
+git pull https://github.com/marcellbarsony/linux.git
+sleep 5
+clear
+
+# --------------------------------------------------
+# LVM support
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Enable LVM support"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+
+echo "Installing lvm2"
+sleep 5
+echo -ne $newline
+
+pacman -S lvm2
+sleep 5
+clear
+
+echo "------------------------------"
+echo "# Enable LVM support"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Copying mkinitcpio.conf"
+cp /path/to/copy/linux/cfg/mkinitcpio.conf /etc/mkinitcpio.conf # !!!
+sleep 5
+echo -ne $newline
+
+echo "Initramfs"
+mkinitcpio -p linux
+sleep 5
+clear
+
+# --------------------------------------------------
+# Network configuration
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Enable LVM support"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+
+echo "Copying hosts file"
+cp /path/to/copy/linux/cfg/hosts /etc/hosts # !!!
+sleep 5
+echo -ne $newline
+
+echo "Setting host name: arch"
+hostnamectl set-hostname arch
+sleep 5
+echo -ne $newline
+
+echo "Checking hostname"
+hostnamectl set-hostname arch
+sleep 5
+clear
+
+# --------------------------------------------------
+# Locale
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Locale"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+
+echo "Copying locale.gen"
+cp /path/to/copy/linux/cfg/locale.gen /etc/locale.gen # !!!
+sleep 5
+echo -ne $newline
+
+echo "Copying locale.conf"
+cp /path/to/copy/linux/cfg/locale.conf /etc/locale.conf # !!!
+sleep 5
+echo -ne $newline
+
+echo "Generating locale"
+locale-gen
+sleep 5
+clear
+
+# --------------------------------------------------
+# Boot loader
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Install GRUB and other tools"
+echo "------------------------------"
+echo -ne $newline
+pacman -S grub efibootmgr dosfstools os-prober mtools
+sleep 5
+clear
+
+echo "------------------------------"
+echo "# Install GRUB and other tools"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Creating EFI directory for boot"
+mkdir /boot/EFI
+sleep 5
+echo -ne $newline
+
+echo "Mounting EFI partition"
+mount /dev/nvme0n1p1 /boot/EFI
+sleep 5
+echo -ne $newline
+
+echo "Installing grub on the MBR"
+grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+sleep 5
+echo -ne $newline
+
+echo "Copying GRUB config snippet"
+cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+sleep 5
+echo -ne $newline
+
+echo "Copying GRUB config"
+cp /path/to/copy/linux/cfg/grub /etc/default/grub # !!!
+sleep 5
+echo -ne $newline
+
+echo "Creating a GRUB config file"
+echo -ne $newline
+grub-mkconfig -o /boot/grub/grub.cfg
+sleep 5
+clear
+
+# --------------------------------------------------
+# Root password
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Root password"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+
+echo "Set root password"
+sleep 5
+echo -ne $newline
+passwd
+clear
+
+# --------------------------------------------------
+# Exit chroot environment
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Exit chroot environment"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+
+exit
+sleep 3
+clear
+
+# --------------------------------------------------
+# Umount & Reboot
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Umount & Reboot"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+
+echo "Umount partitions"
+umount -l /mnt
+sleep 5
+
+echo "Reboot in 5..."
+sleep 1
+echo "Reboot in 4..."
+sleep 1
+echo "Reboot in 3..."
+sleep 1
+echo "Reboot in 2..."
+sleep 1
+echo "Reboot in 1..."
+sleep 1
+
+reboot
