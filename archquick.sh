@@ -189,7 +189,7 @@ sleep 5
 echo -ne $newline
 
 echo "Installing essential packages"
-pacstrap -i /mnt base linux linux-firmware bash-completion linux-headers base-devel
+pacstrap -i /mnt base linux linux-firmware bash-completion linux-headers base-devel git nano
 sleep 5
 clear
 
@@ -206,7 +206,7 @@ echo -ne $newline
 
 echo "Changing root to the new Arch system"
 sleep 5
-arch-chroot /mnt
+arch-chroot /mnt /bin/bash <<END
 
 # --------------------------------------------------
 # Installing packages
@@ -217,7 +217,7 @@ echo "# Installing git & nano"
 echo "------------------------------"
 sleep 5
 echo -ne $newline
-pacman -Sy git nano lvm2
+pacman -Sy git nano
 sleep 5
 clear
 
@@ -228,7 +228,7 @@ clear
 echo "# Fetching configs"
 sleep 5
 echo -ne $newline
-git pull https://github.com/marcellbarsony/linux.git
+git clone https://github.com/marcellbarsony/linux.git
 sleep 5
 clear
 
@@ -389,6 +389,7 @@ echo "------------------------------"
 sleep 5
 echo -ne $newline
 
+END
 exit
 sleep 3
 clear
