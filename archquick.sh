@@ -244,7 +244,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying mkinitcpio.conf"
-cp /path/to/copy/linux/cfg/mkinitcpio.conf /etc/mkinitcpio.conf # !!!
+cp /linux/cfg/mkinitcpio.conf /etc/mkinitcpio.conf
 sleep 5
 echo -ne $newline
 
@@ -264,7 +264,7 @@ sleep 5
 echo -ne $newline
 
 echo "Copying hosts file"
-cp /path/to/copy/linux/cfg/hosts /etc/hosts # !!!
+cp /linux/cfg/hosts /etc/hosts
 sleep 5
 echo -ne $newline
 
@@ -289,12 +289,12 @@ sleep 5
 echo -ne $newline
 
 echo "Copying locale.gen"
-cp /path/to/copy/linux/cfg/locale.gen /etc/locale.gen # !!!
+cp /linux/cfg/locale.gen /etc/locale.gen
 sleep 5
 echo -ne $newline
 
 echo "Copying locale.conf"
-cp /path/to/copy/linux/cfg/locale.conf /etc/locale.conf # !!!
+cp /linux/cfg/locale.conf /etc/locale.conf
 sleep 5
 echo -ne $newline
 
@@ -341,7 +341,7 @@ sleep 5
 echo -ne $newline
 
 echo "Copying GRUB config"
-cp /path/to/copy/linux/cfg/grub /etc/default/grub # !!!
+cp /linux/cfg/grub /etc/default/grub
 sleep 5
 echo -ne $newline
 
