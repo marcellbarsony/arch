@@ -106,16 +106,6 @@ echo "------------------------------"
 sleep 5
 echo -ne $newline
 
-echo "Creating mount directory for /boot"
-mkdir /mnt/boot
-sleep 5
-echo -ne $newline
-
-echo "Creating mount directory for /home"
-mkdir /mnt/home
-sleep 5
-echo -ne $newline
-
 echo "Formatting /ROOT logical volume (ext4 - /dev/volgroup0/cryptroot)"
 mkfs.ext4 /dev/volgroup0/cryptroot
 sleep 5
@@ -126,6 +116,11 @@ mkfs.ext4 /dev/volgroup0/crypthome
 sleep 5
 echo -ne $newline
 
+echo "Creating mount directory for /boot"
+mkdir /mnt/boot
+sleep 5
+echo -ne $newline
+
 echo "Mounting EFI partition >> /mnt/boot"
 mount /dev/nvme0n1p2 /mnt/boot
 sleep 5
@@ -133,6 +128,11 @@ echo -ne $newline
 
 echo "Mounting cryptroot >> /mnt"
 mount /dev/volgroup0/cryptroot /mnt
+sleep 5
+echo -ne $newline
+
+echo "Creating mount directory for /home"
+mkdir /mnt/home
 sleep 5
 echo -ne $newline
 
