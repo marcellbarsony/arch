@@ -46,13 +46,16 @@ sleep 5
 echo -ne $newline
 
 echo "Creating physical volume on the top of the opened LUKS container"
-
 pvcreate /dev/mapper/cryptlvm
 sleep 5
 echo -ne $newline
 
-echo "Creating root filesystem: 30GBs - volgroup 0 - cryptroot"
+echo "Creating volume gorup: volgroup0"
+vgcreate volgroup0 /dev/mapper/cryptlvm
+sleep 5
+echo -ne $newline
 
+echo "Creating root filesystem: 30GBs - volgroup 0 - cryptroot"
 lvcreate -L 30GB volgroup0 -n cryptroot
 sleep 5
 echo -ne $newline
