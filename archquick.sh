@@ -141,7 +141,6 @@ echo -ne $newline
 echo "Formatting /HOME logical volume (ext4 - /dev/volgroup0/crypthome)"
 mkfs.ext4 /dev/volgroup0/crypthome
 sleep 5
-clear
 
 echo "Creating mount directory for /home"
 mkdir /mnt/home
