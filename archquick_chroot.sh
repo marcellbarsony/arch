@@ -4,7 +4,9 @@
 # Cloning git repo
 # --------------------------------------------------
 
+echo "------------------------------"
 echo "# Fetching configs"
+echo "------------------------------"
 sleep 5
 echo -ne $newline
 git clone https://github.com/marcellbarsony/linux.git
@@ -30,12 +32,20 @@ sleep 5
 clear
 
 echo "------------------------------"
-echo "# Enable LVM support"
+echo "# Mkinitcpio & Initramfs"
 echo "------------------------------"
 echo -ne $newline
 
 echo "Copying mkinitcpio.conf"
+echo -ne $newline
 cp /linux/cfg/mkinitcpio.conf /etc/mkinitcpio.conf
+
+if [ "$?" -eq "0" ]
+	then
+	    echo "Copying mkinitcpio.conf - Successful"
+	else
+	    echo "Copying mkinitcpio.conf - Unsuccessful: exit code $?"
+fi
 sleep 5
 echo -ne $newline
 
@@ -49,23 +59,30 @@ clear
 # --------------------------------------------------
 
 echo "------------------------------"
-echo "# Enable LVM support"
+echo "# Hosts & Hostname"
 echo "------------------------------"
 sleep 5
 echo -ne $newline
 
 echo "Copying hosts file"
 cp /linux/cfg/hosts /etc/hosts
+if [ "$?" -eq "0" ]
+	then
+	    echo "Copying hosts file - Successful"
+	else
+	    echo "Copying hosts file - Unsuccessful: exit code $?"
+fi
 sleep 5
 echo -ne $newline
 
-echo "Setting host name: arch"
+echo "Setting hostname (arch)"
 hostnamectl set-hostname arch
 sleep 5
 echo -ne $newline
 
 echo "Checking hostname"
-hostnamectl set-hostname arch
+echo -ne $newline
+hostnamectl
 sleep 5
 clear
 
@@ -81,11 +98,23 @@ echo -ne $newline
 
 echo "Copying locale.gen"
 cp /linux/cfg/locale.gen /etc/locale.gen
+if [ "$?" -eq "0" ]
+	then
+	    echo "Copying locale.gen - Successful"
+	else
+	    echo "Copying locale.gen - Unsuccessful: exit code $?"
+fi
 sleep 5
 echo -ne $newline
 
 echo "Copying locale.conf"
 cp /linux/cfg/locale.conf /etc/locale.conf
+if [ "$?" -eq "0" ]
+	then
+	    echo "Copying locale.conf - Successful"
+	else
+	    echo "Copying locale.conf - Unsuccessful: exit code $?"
+fi
 sleep 5
 echo -ne $newline
 
@@ -101,6 +130,7 @@ clear
 echo "------------------------------"
 echo "# Install GRUB and other tools"
 echo "------------------------------"
+sleep 5
 echo -ne $newline
 pacman -S grub efibootmgr dosfstools os-prober mtools
 sleep 5
@@ -133,6 +163,12 @@ echo -ne $newline
 
 echo "Copying GRUB config"
 cp /linux/cfg/grub /etc/default/grub
+if [ "$?" -eq "0" ]
+	then
+	    echo "Copying GRUB config - Successful"
+	else
+	    echo "Copying GRUB config - Unsuccessful: exit code $?"
+fi
 sleep 5
 echo -ne $newline
 
@@ -149,7 +185,6 @@ clear
 echo "------------------------------"
 echo "# Root password"
 echo "------------------------------"
-sleep 5
 echo -ne $newline
 
 echo "Set root password"
