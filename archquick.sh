@@ -206,3 +206,20 @@ echo -ne $newline
 echo "Changing root to the new Arch system"
 sleep 5
 arch-chroot /mnt
+
+# --------------------------------------------------
+# Cloning git repo
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Fetching configs"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+arch-chroot /mnt git clone https://github.com/marcellbarsony/archqick.git
+arch-chroot /mnt sleep 5
+arch-chroot /mnt clear
+
+arch-chroot /mnt echo "This is the end of the script"
+arch-chroot /mnt sleep 5
+arch-chroot /mnt clear

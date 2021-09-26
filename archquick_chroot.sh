@@ -86,6 +86,37 @@ hostnamectl
 sleep 5
 clear
 
+echo "------------------------------"
+echo "# Network tools"
+echo "------------------------------"
+sleep 5
+echo -ne $newline
+
+echo "Network tools"
+sleep 3
+echo -ne $newline
+pacman -S networkmanager
+# pacman -S wpa_supplicant
+# pacman -S wireless_tools
+# pacman -S netctl
+# pacman -S dialog
+sleep 3
+clear
+
+echo "Enabling Network manager"
+echo -ne $newline
+sleep 3
+systemctl enable NetworkManager
+if [ "$?" -eq "0" ]
+	then
+	    echo "Network manager has been enabled"
+	else
+	    echo "Network manager has not been enabled: exit code $?"
+fi
+sleep 5
+echo -ne $newline
+clear
+
 # --------------------------------------------------
 # Locale
 # --------------------------------------------------

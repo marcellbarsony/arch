@@ -119,24 +119,6 @@ clear
 	# pacman -S alsa alsa-utils alsa-firmware alsa-ucm-conf alsamixer
 #clear
 
-echo "Network tools"
-sleep 3
-echo -ne $newline
-pacman -S networkmanager
-# pacman -S wpa_supplicant
-# pacman -S wireless_tools
-# pacman -S netctl
-# pacman -S dialog
-sleep 3
-clear
-
-echo "Enabling Network manager"
-sleep 3
-echo -ne $newline
-systemctl enable NetworkManager
-sleep 3
-clear
-
 echo "Intel firmware"
 sleep 3
 echo -ne $newline
