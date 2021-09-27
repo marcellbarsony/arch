@@ -184,45 +184,47 @@ echo -ne $newline
 # --------------------------------------------------
 # Suckless software
 # --------------------------------------------------
+
 # SRC: https://www.chrisatmachine.com/Linux/07-dwm/
+# SRC: https://wiki.archlinux.org/title/dwm
 
-echo "Create a config directory"
-mkdir ~./config
-$sleep
-clear
+#echo "Create a config directory"
+#mkdir ~./config
+#$sleep
+#clear
 
-echo "Cloning DWM repository"
-$sleep
-git clone git://git.suckless.org/dwm ~/.config/dwm
-clear
+#echo "Cloning DWM repository"
+#$sleep
+#git clone git://git.suckless.org/dwm ~/.config/dwm
+#clear
 
-echo "Cloning st repository"
-$sleep
-git clone git://git.suckless.org/st ~/.config/st
-clear
+#echo "Cloning st repository"
+#$sleep
+#git clone git://git.suckless.org/st ~/.config/st
+#clear
 
-echo "Cloning dmenu repository"
-$sleep
-git clone git://git.suckless.org/dmenu ~/.config/dmenu
-clear
+#echo "Cloning dmenu repository"
+#$sleep
+#git clone git://git.suckless.org/dmenu ~/.config/dmenu
+#clear
 
-echo "Changing directory to ~/.config/dwm & installing"
-cd ~/.config/dwm && make install
-# makepkg -si
-$sleep
-clear
+#echo "Changing directory to ~/.config/dwm & installing"
+#cd ~/.config/dwm && make install
+## makepkg -si
+#$sleep
+#clear
 
-echo "Changing directory to ~/.config/st & installing"
-cd ~/.config/st && make install
-# makepkg -si
-$sleep
-clear
+#echo "Changing directory to ~/.config/st & installing"
+#cd ~/.config/st && make install
+## makepkg -si
+#$sleep
+#clear
 
-echo "Changing directory to ~/.config/dmenu & installing"
-cd ~/.config/dmenu && make install
-# makepkg -si
-$sleep
-clear
+#echo "Changing directory to ~/.config/dmenu & installing"
+#cd ~/.config/dmenu && make install
+## makepkg -si
+#$sleep
+#clear
 
 # --------------------------------------------------
 # End of script
@@ -234,7 +236,7 @@ echo "------------------------------"
 $sleep
 echo -ne $newline
 
-echo "Don't forget to edit the ~/.xinitrc file."
+echo "Don't forget to check the ~/.xinitrc file."
 $sleep
 echo "This is the end of the installation"
 $sleep
