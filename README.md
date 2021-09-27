@@ -1,9 +1,8 @@
-# archquick
-Simple Arch Linux install script
+A simple Arch Linux install script
 
 ## Important note
 
-This script is **under development** and it is **not production-ready**. It is recommended to not to use it in its current state.
+This script is currently **under development** and it is **not production-ready**. It is recommended to not to use it in its current state.
 
 Please note that this script is **hard-coded** for the time being.
 
@@ -23,29 +22,29 @@ Please note that this script is **hard-coded** for the time being.
 
 5.) Clone this repository
 
-`git clone https://github.com/marcellbarsony/archquick.git`
+`git clone https://github.com/marcellbarsony/arch.git`
 
 6.) Change directory to the arch folder
 
-`cd archquick`
+`cd arch`
 
 7.) Launch the installation script
 
-`bash archquick.sh`
+`bash arch.sh`
 
 ### Chroot environment
 
 1.) Clone this repository
 
-`git clone https://github.com/marcellbarsony/archquick.git`
+`git clone https://github.com/marcellbarsony/arch.git`
 
 2.) Change directory to the arch folder
 
-`cd archquick`
+`cd arch`
 
 3.) Launch the chroot script
 
-`bash archquick_chroot.sh`
+`bash arch.sh`
 
 ### Post-installation
 
@@ -55,4 +54,4 @@ Please note that this script is **hard-coded** for the time being.
 
 3.) Launch the post-installation script to finish the installation
 
-`bash archquick_post.sh`
+`bash arch_post.sh`
