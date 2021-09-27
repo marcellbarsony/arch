@@ -15,7 +15,8 @@ clear
 # --------------------------------------------------
 
 newline="\n"
-echo -p "Enter the amount of sleep in seconds: " sleep
+echo -p "Enter the amount of wait in seconds: " waitseconds
+wait=sleep $waitseconds
 clear
 
 # --------------------------------------------------
@@ -23,14 +24,14 @@ clear
 # --------------------------------------------------
 
 echo "Checking for available disk"
-$sleep
+$wait
 echo -ne $newline
 disk=$(lsblk -d -p -n -l -o NAME -e 7,11)
 echo "The current disk is ${disk}"
-$sleep
+$wait
 echo -ne $newline
 echo "Formatting disk with <fdisk> manually"
-$sleep
+$wait
 fdisk ${disk}
 
 clear
@@ -42,17 +43,17 @@ clear
 echo "------------------------------"
 echo "# Formatting disks"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Formatting P1: /dev/nvme0n1p1 (FAT32)"
 mkfs.fat -F32 /dev/nvme0n1p1
-$sleep
+$wait
 echo -ne $newline
 
 echo "Formatting P2: /dev/nvme0n1p2 (ext4)"
 mkfs.ext4 /dev/nvme0n1p2
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -62,7 +63,7 @@ clear
 echo "------------------------------"
 echo "# Encrypted container"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating LUKS container on P3: /dev/nvme0n1p3"
@@ -76,7 +77,7 @@ cryptsetup open --type luks /dev/nvme0n1p3 cryptlvm
 
     # Enter encryption password
 
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -86,42 +87,42 @@ clear
 echo "------------------------------"
 echo "# Logical volumes"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating physical volume on the top of the opened LUKS container"
 pvcreate /dev/mapper/cryptlvm
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating volume gorup: volgroup0"
 vgcreate volgroup0 /dev/mapper/cryptlvm
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating ROOT filesystem: 30GBs - volgroup 0 - cryptroot"
 lvcreate -L 30GB volgroup0 -n cryptroot
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating HOME filesystem: 100%FREE - volgroup 0 - crypthome"
 lvcreate -l 100%FREE volgroup0 -n crypthome
-$sleep
+$wait
 echo -ne $newline
 
 echo "Activating volume groups (modprobe)"
 modprobe dm_mod
-$sleep
+$wait
 echo -ne $newline
 
 echo "Scanning available volume groups"
 vgscan
-$sleep
+$wait
 echo -ne $newline
 
 echo "Activating volume groups"
 vgchange -ay
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -131,54 +132,54 @@ clear
 echo "------------------------------"
 echo "# Formatting & Mounting /ROOT"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Formatting /ROOT (ext4 - /dev/volgroup0/cryptroot)"
 mkfs.ext4 /dev/volgroup0/cryptroot
-$sleep
+$wait
 echo -ne $newline
 
 echo "Mounting cryptroot >> /mnt"
 mount /dev/volgroup0/cryptroot /mnt
-$sleep
+$wait
 clear
 
 echo "------------------------------"
 echo "# Formatting & Mounting /BOOT"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating mountpoint directory for /boot"
 mkdir /mnt/boot
-$sleep
+$wait
 echo -ne $newline
 
 echo "Mounting EFI partition >> /mnt/boot"
 mount /dev/nvme0n1p2 /mnt/boot
-$sleep
+$wait
 clear
 
 echo "------------------------------"
 echo "# Formatting & Mounting /HOME"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Formatting /HOME logical volume (ext4 - /dev/volgroup0/crypthome)"
 mkfs.ext4 /dev/volgroup0/crypthome
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating mount directory for /home"
 mkdir /mnt/home
-$sleep
+$wait
 echo -ne $newline
 
 echo "Mounting crypthome >> /mnt/home"
 mount /dev/volgroup0/crypthome /mnt/home
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -188,22 +189,22 @@ clear
 echo "------------------------------"
 echo "# fstab"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating fstab directory: /mnt/etc"
 mkdir /mnt/etc
-$sleep
+$wait
 echo -ne $newline
 
 echo "Generating fstab config"
 genfstab -U -p /mnt >> /mnt/etc/fstab
-$sleep
+$wait
 echo -ne $newline
 
 echo "Checking fstab"
 cat /mnt/etc/fstab
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -213,12 +214,12 @@ clear
 echo "------------------------------"
 echo "# Kernel"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Installing essential packages"
 pacstrap -i /mnt base linux linux-firmware bash-completion linux-headers base-devel git nano
-$sleep
+$wait
 clear
 
 
@@ -229,9 +230,9 @@ clear
 echo "------------------------------"
 echo "# Chroot"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Changing root to the new Arch system"
-$sleep
+$wait
 arch-chroot /mnt
