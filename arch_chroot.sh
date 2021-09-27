@@ -15,19 +15,23 @@ clear
 # --------------------------------------------------
 
 newline="\n"
-echo -p "Enter the amount of sleep in seconds: " sleep
+read -p "Enter the amount of wait time in seconds: " waitseconds
+wait="sleep ${waitseconds}"
+$wait
 clear
 
 # --------------------------------------------------
 # Helper functions
 # --------------------------------------------------
 
-copycheck () {}
+copycheck(){
 	if [ "$?" -eq "0" ]
 		then
 			echo "Copying process successful"
+			$wait
 		else
-			echo "Copying process successful - exit code $?"
+			echo "Copying unsuccessful - exit code $?"
+			$wait
 	fi
 }
 
@@ -38,10 +42,10 @@ copycheck () {}
 echo "------------------------------"
 echo "# Fetching configs"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 git clone https://github.com/marcellbarsony/linux.git
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -51,15 +55,14 @@ clear
 echo "------------------------------"
 echo "# Enable LVM support"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Installing lvm2"
-$sleep
+$wait
 echo -ne $newline
 
 pacman -S lvm2
-$sleep
+$wait
 clear
 
 echo "------------------------------"
@@ -69,15 +72,15 @@ echo -ne $newline
 
 echo "Copying mkinitcpio.conf"
 echo -ne $newline
-$sleep
+$wait
 cp /linux/cfg/mkinitcpio.conf /etc/mkinitcpio.conf
 copycheck
-$sleep
+$wait
 echo -ne $newline
 
 echo "Initramfs"
 mkinitcpio -p linux
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -87,7 +90,6 @@ clear
 echo "------------------------------"
 echo "# Hosts & Hostname"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Copying hosts file"
@@ -98,40 +100,43 @@ if [ "$?" -eq "0" ]
 	else
 	    echo "Copying hosts file - Unsuccessful: exit code $?"
 fi
-$sleep
+$wait
 echo -ne $newline
 
-echo "Setting hostname (arch)"
-hostnamectl set-hostname arch
-$sleep
+read -p "Enter hostname: " hostname
+$wait
+echo -ne $newline
+
+echo "Setting hostname ${hostname}"
+hostnamectl set-hostname ${hostname}
+$wait
 echo -ne $newline
 
 echo "Checking hostname"
 echo -ne $newline
 hostnamectl
-$sleep
+$wait
 clear
 
 echo "------------------------------"
 echo "# Network tools"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Network tools"
-$sleep
+$wait
 echo -ne $newline
 pacman -S networkmanager
 # pacman -S wpa_supplicant
 # pacman -S wireless_tools
 # pacman -S netctl
 # pacman -S dialog
-$sleep
+$wait
 clear
 
 echo "Enabling Network manager"
 echo -ne $newline
-$sleep
+$wait
 systemctl enable NetworkManager
 if [ "$?" -eq "0" ]
 	then
@@ -139,7 +144,7 @@ if [ "$?" -eq "0" ]
 	else
 	    echo "Failed to enable Network manager: exit code $?"
 fi
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -149,27 +154,25 @@ clear
 echo "------------------------------"
 echo "# Locale"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Copying locale.gen"
+$wait
 echo -ne $newline
 cp /linux/cfg/locale.gen /etc/locale.gen
 copycheck
-$sleep
 echo -ne $newline
 
 echo "Copying locale.conf"
 echo -ne $newline
 cp /linux/cfg/locale.conf /etc/locale.conf
 copycheck
-$sleep
 echo -ne $newline
 
 echo "Generating locale"
 echo -ne $newline
 locale-gen
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -179,49 +182,48 @@ clear
 echo "------------------------------"
 echo "# Install GRUB and other tools"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 pacman -S grub efibootmgr dosfstools os-prober mtools
-$sleep
+$wait
 clear
 
 echo "------------------------------"
 echo "# Install GRUB and other tools"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Creating EFI directory for boot"
 mkdir /boot/EFI
-$sleep
+$wait
 echo -ne $newline
 
 echo "Mounting EFI partition"
 mount /dev/nvme0n1p1 /boot/EFI
-$sleep
+$wait
 echo -ne $newline
 
 echo "Installing grub on the MBR"
 grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
-$sleep
+$wait
 echo -ne $newline
 
 echo "Copying GRUB config snippet"
 cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
-$sleep
+$wait
 echo -ne $newline
 
 echo "Copying GRUB config"
 cp /linux/cfg/grub /etc/default/grub
 copycheck
-$sleep
+$wait
 echo -ne $newline
 
 echo "Creating a GRUB config file"
 echo -ne $newline
 grub-mkconfig -o /boot/grub/grub.cfg
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -231,11 +233,10 @@ clear
 echo "------------------------------"
 echo "# Root password"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Set root password"
-$sleep
+$wait
 echo -ne $newline
 passwd
 clear
@@ -247,7 +248,7 @@ clear
 echo "------------------------------"
 echo "# Exit chroot environment"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 exit
@@ -256,25 +257,25 @@ exit
 # Umount & Reboot
 # --------------------------------------------------
 
-echo "------------------------------"
-echo "# Umount & Reboot"
-echo "------------------------------"
-$sleep
-echo -ne $newline
+# echo "------------------------------"
+# echo "# Umount & Reboot"
+# echo "------------------------------"
+# $wait
+# echo -ne $newline
 
-echo "Umount partitions"
-umount -l /mnt
-$sleep
+# echo "Umount partitions"
+# umount -l /mnt
+# $wait
 
-echo "Reboot in 5..."
-sleep 1
-echo "Reboot in 4..."
-sleep 1
-echo "Reboot in 3..."
-sleep 1
-echo "Reboot in 2..."
-sleep 1
-echo "Reboot in 1..."
-sleep 1
+# echo "Reboot in 5..."
+# wait
+# echo "Reboot in 4..."
+# wait
+# echo "Reboot in 3..."
+# wait
+# echo "Reboot in 2..."
+# wait
+# echo "Reboot in 1..."
+# wait
 
-reboot
+# reboot

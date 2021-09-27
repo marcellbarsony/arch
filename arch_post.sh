@@ -15,19 +15,23 @@ clear
 # --------------------------------------------------
 
 newline="\n"
-echo -p "Enter the amount of sleep in seconds: " sleep
+read -p "Enter the amount of sleep time in seconds: " waitseconds
+wait="sleep ${waitseconds}"
+$wait
 clear
 
 # --------------------------------------------------
 # Helper functions
 # --------------------------------------------------
 
-copycheck () {}
+copycheck(){
 	if [ "$?" -eq "0" ]
 		then
 			echo "Copying process successful"
+			$wait
 		else
-			echo "Copying process successful - exit code $?"
+			echo "Copying unsuccessful - exit code $?"
+			$wait
 	fi
 }
 
@@ -38,18 +42,18 @@ copycheck () {}
 echo "------------------------------"
 echo "# Create user account"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 read -p "Enter your username: " username
+echo -ne $newline
 echo "Add new user ${username}"
 useradd -m ${username}
-$sleep
+$wait
 echo -ne $newline
 
 echo "Enter the password of ${username}"
 passwd ${username}
-$sleep
+$wait
 clear
 
 # --------------------------------------------------
@@ -59,25 +63,24 @@ clear
 echo "------------------------------"
 echo "# User group management"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Adding ${username} to basic groups"
 usermod -aG wheel,audio,video,optical,storage ${username}
-$sleep
+$wait
 echo -ne $newline
 
 echo "Verifying group memebership"
 id ${username}
-$sleep
+$wait
 echo -ne $newline
 
 echo "Visudo: Allowing standard users to run commands as root"
 echo -ne $newline
-$sleep
+$wait
 cp /linux/cfg/sudoers.tmp /etc/sudoers.tmp
 copycheck
-$sleep
+$wait
 echo -ne $newline
 
 # --------------------------------------------------
@@ -89,41 +92,40 @@ echo -ne $newline
 echo "------------------------------"
 echo "# Installing applications"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Suckless software - dwm & dmenu & st"
-$sleep
+$wait
 #echo -ne $newline
 #pacman -S dwm dmenu st
 #clear
 
 echo "dmenu"
-#$sleep
+#$wait
 #echo -ne $newline
 #pacman -S dmenu
 #clear
 
 echo "Display server: Xorg-xinit"
-$sleep
+$wait
 echo -ne $newline
 pacman -S xorg-xinit
 clear
 
 echo "Display server: Xorg"
-$sleep
+$wait
 echo -ne $newline
 pacman -S xorg
 clear
 
 echo "Browser"
-$sleep
+$wait
 echo -ne $newline
 pacman -S firefox
 clear
 
 #echo "Sound tools: Alsa, Pulse, Sof"
-#sleep 3
+#wait
 #echo -ne $newline
 # Pulseaudio
 	# pacman -S pulseaudio pulseaudio-alsa pavucontrol sof-firmware
@@ -132,30 +134,30 @@ clear
 #clear
 
 echo "Intel firmware"
-$sleep
+$wait
 echo -ne $newline
 pacman -S intel-ucode xf86-video-intel mesa
 clear
 
 echo "AUR helper: PARU"
 # https://github.com/Morganamilo/paru
-$sleep
+$wait
 echo -ne $newline
 echo"Cloning Git repository"
 echo -ne $newline
 git clone https://aur.archlinux.org/paru.git
-$sleep
+$wait
 echo"Changing directoy to paru"
 cd paru
-$sleep
+$wait
 echo "Building package"
 echo -ne $newline
 makepkg -si
-$sleep
+$wait
 clear
 
 echo "Additional tools"
-$sleep
+$wait
 echo -ne $newline
 pacman -S htop neofetch
 clear
@@ -167,7 +169,6 @@ clear
 echo "------------------------------"
 echo "# Xorg - xinit"
 echo "------------------------------"
-$sleep
 echo -ne $newline
 
 echo "Copying xinitrc"
@@ -178,7 +179,7 @@ if [ "$?" -eq "0" ]
 	else
 	    echo "Copying xinitrc - Unsuccessful: exit code $?"
 fi
-$sleep
+$wait
 echo -ne $newline
 
 # --------------------------------------------------
@@ -190,40 +191,40 @@ echo -ne $newline
 
 #echo "Create a config directory"
 #mkdir ~./config
-#$sleep
+#$wait
 #clear
 
 #echo "Cloning DWM repository"
-#$sleep
+#$wait
 #git clone git://git.suckless.org/dwm ~/.config/dwm
 #clear
 
 #echo "Cloning st repository"
-#$sleep
+#$wait
 #git clone git://git.suckless.org/st ~/.config/st
 #clear
 
 #echo "Cloning dmenu repository"
-#$sleep
+#$wait
 #git clone git://git.suckless.org/dmenu ~/.config/dmenu
 #clear
 
 #echo "Changing directory to ~/.config/dwm & installing"
 #cd ~/.config/dwm && make install
 ## makepkg -si
-#$sleep
+#$wait
 #clear
 
 #echo "Changing directory to ~/.config/st & installing"
 #cd ~/.config/st && make install
 ## makepkg -si
-#$sleep
+#$wait
 #clear
 
 #echo "Changing directory to ~/.config/dmenu & installing"
 #cd ~/.config/dmenu && make install
 ## makepkg -si
-#$sleep
+#$wait
 #clear
 
 # --------------------------------------------------
@@ -233,12 +234,12 @@ echo -ne $newline
 echo "------------------------------"
 echo "# End of script"
 echo "------------------------------"
-$sleep
+$wait
 echo -ne $newline
 
 echo "Don't forget to check the ~/.xinitrc file."
-$sleep
+$wait
 echo "This is the end of the installation"
-$sleep
+$wait
 echo "You can now reboot the system, login as a normal user and start the X server"
-$sleep
+$wait

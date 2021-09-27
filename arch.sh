@@ -15,24 +15,25 @@ clear
 # --------------------------------------------------
 
 newline="\n"
-read -p "Enter the amount of wait in seconds: " waitseconds
+read -p "Enter the amount of sleep time in seconds: " waitseconds
 wait="sleep ${waitseconds}"
+$wait
 clear
 
 # --------------------------------------------------
 # Disk partitioning
 # --------------------------------------------------
 
-echo "Checking for available disk"
-$wait
-echo -ne $newline
-disk=$(lsblk -d -p -n -l -o NAME -e 7,11)
-echo "The current disk is ${disk}"
-$wait
-echo -ne $newline
-echo "Formatting disk with <fdisk> manually"
-$wait
-fdisk ${disk}
+# echo "Checking for available disk"
+# $wait
+# echo -ne $newline
+# disk=$(lsblk -d -p -n -l -o NAME -e 7,11)
+# echo "The current disk is ${disk}"
+# $wait
+# echo -ne $newline
+# echo "Formatting disk with <fdisk> manually"
+# $wait
+fdisk /dev/nvme0n1
 
 clear
 
@@ -214,10 +215,11 @@ clear
 echo "------------------------------"
 echo "# Kernel"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Installing essential packages"
+$wait
+echo -ne $newline
 pacstrap -i /mnt base linux linux-firmware bash-completion linux-headers base-devel git nano
 $wait
 clear
@@ -230,7 +232,6 @@ clear
 echo "------------------------------"
 echo "# Chroot"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Changing root to the new Arch system"
