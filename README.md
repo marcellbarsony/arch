@@ -46,3 +46,13 @@ Please note that this script is **hard-coded** for the time being.
 3.) Launch the chroot script
 
 `bash archquick_chroot.sh`
+
+### Post-installation
+
+1.) Reboot the machine and detach the installation disk
+
+2.) Log in the system as root
+
+3.) Launch the post-installation script to finish the installation
+
+`bash archquick_post.sh`
