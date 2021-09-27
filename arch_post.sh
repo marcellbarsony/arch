@@ -92,17 +92,17 @@ echo "------------------------------"
 $sleep
 echo -ne $newline
 
-echo "Window manager: DWM"
+echo "Suckless: dwm & dmenu & st"
 $sleep
-echo -ne $newline
-pacman -S dwm
+#echo -ne $newline
+#pacman -S dwm dmenu st
 clear
 
 echo "dmenu"
-$sleep
-echo -ne $newline
-pacman -S dmenu
-clear
+#$sleep
+#echo -ne $newline
+#pacman -S dmenu
+#clear
 
 echo "Display server: Xorg-xinit"
 $sleep
@@ -114,12 +114,6 @@ echo "Display server: Xorg"
 $sleep
 echo -ne $newline
 pacman -S xorg
-clear
-
-echo "Terminal emulator: st"
-$sleep
-echo -ne $newline
-pacman -S st
 clear
 
 echo "Browser"
