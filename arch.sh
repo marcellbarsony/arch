@@ -19,6 +19,23 @@ echo -p "Enter the amount of sleep in seconds: " sleep
 clear
 
 # --------------------------------------------------
+# Disk partitioning
+# --------------------------------------------------
+
+echo "Checking for available disk"
+$sleep
+echo -ne $newline
+disk=$(lsblk -d -p -n -l -o NAME -e 7,11)
+echo "The current disk is ${disk}"
+$sleep
+echo -ne $newline
+echo "Formatting disk with <fdisk> manually"
+$sleep
+fdisk ${disk}
+
+clear
+
+# --------------------------------------------------
 # Formatting disks I.
 # --------------------------------------------------
 
