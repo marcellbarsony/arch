@@ -92,11 +92,11 @@ echo "------------------------------"
 $sleep
 echo -ne $newline
 
-echo "Suckless: dwm & dmenu & st"
+echo "Suckless software - dwm & dmenu & st"
 $sleep
 #echo -ne $newline
 #pacman -S dwm dmenu st
-clear
+#clear
 
 echo "dmenu"
 #$sleep
@@ -137,6 +137,23 @@ echo -ne $newline
 pacman -S intel-ucode xf86-video-intel mesa
 clear
 
+echo "AUR helper: PARU"
+# https://github.com/Morganamilo/paru
+$sleep
+echo -ne $newline
+echo"Cloning Git repository"
+echo -ne $newline
+git clone https://aur.archlinux.org/paru.git
+$sleep
+echo"Changing directoy to paru"
+cd paru
+$sleep
+echo "Building package"
+echo -ne $newline
+makepkg -si
+$sleep
+clear
+
 echo "Additional tools"
 $sleep
 echo -ne $newline
@@ -154,7 +171,7 @@ $sleep
 echo -ne $newline
 
 echo "Copying xinitrc"
-cp /etc/X11/xinit/xinitrc /home/marci/.xinitrc
+cp /etc/X11/xinit/xinitrc /home/$username/.xinitrc
 if [ "$?" -eq "0" ]
 	then
 	    echo "Copying xinitrc - Successful"
@@ -163,6 +180,49 @@ if [ "$?" -eq "0" ]
 fi
 $sleep
 echo -ne $newline
+
+# --------------------------------------------------
+# Suckless software
+# --------------------------------------------------
+# SRC: https://www.chrisatmachine.com/Linux/07-dwm/
+
+echo "Create a config directory"
+mkdir ~./config
+$sleep
+clear
+
+echo "Cloning DWM repository"
+$sleep
+git clone git://git.suckless.org/dwm ~/.config/dwm
+clear
+
+echo "Cloning st repository"
+$sleep
+git clone git://git.suckless.org/st ~/.config/st
+clear
+
+echo "Cloning dmenu repository"
+$sleep
+git clone git://git.suckless.org/dmenu ~/.config/dmenu
+clear
+
+echo "Changing directory to ~/.config/dwm & installing"
+cd ~/.config/dwm && make install
+# makepkg -si
+$sleep
+clear
+
+echo "Changing directory to ~/.config/st & installing"
+cd ~/.config/st && make install
+# makepkg -si
+$sleep
+clear
+
+echo "Changing directory to ~/.config/dmenu & installing"
+cd ~/.config/dmenu && make install
+# makepkg -si
+$sleep
+clear
 
 # --------------------------------------------------
 # End of script
