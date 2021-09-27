@@ -15,7 +15,7 @@ clear
 # --------------------------------------------------
 
 newline="\n"
-echo -p "Enter the amount of wait in seconds: " waitseconds
+read -p "Enter the amount of wait in seconds: " waitseconds
 wait="sleep ${waitseconds}"
 clear
 
