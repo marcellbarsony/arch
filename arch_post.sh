@@ -48,8 +48,8 @@ read -p "Enter your username: " username
 echo -ne $newline
 echo "Add new user ${username}"
 useradd -m ${username}
-$wait
 echo -ne $newline
+$wait
 
 echo "Enter the password of ${username}"
 passwd ${username}
@@ -67,13 +67,13 @@ echo -ne $newline
 
 echo "Adding ${username} to basic groups"
 usermod -aG wheel,audio,video,optical,storage ${username}
-$wait
 echo -ne $newline
+$wait
 
 echo "Verifying group memebership"
 id ${username}
-$wait
 echo -ne $newline
+$wait
 
 echo "Visudo: Allowing standard users to run commands as root"
 echo -ne $newline
@@ -81,7 +81,6 @@ $wait
 cp /linux/cfg/sudoers.tmp /etc/sudoers.tmp
 copycheck
 $wait
-echo -ne $newline
 
 # --------------------------------------------------
 # Install necessary applications
@@ -136,7 +135,13 @@ clear
 echo "Intel firmware"
 $wait
 echo -ne $newline
-pacman -S intel-ucode xf86-video-intel mesa
+pacman -S intel-ucode xf86-video-intel
+clear
+
+echo "Mesa"
+$wait
+echo -ne $newline
+pacman -S mesa
 clear
 
 echo "AUR helper: PARU"
@@ -153,6 +158,8 @@ $wait
 echo "Building package"
 echo -ne $newline
 makepkg -si
+$wait
+cd ~
 $wait
 clear
 
@@ -194,10 +201,10 @@ echo -ne $newline
 #$wait
 #clear
 
-#echo "Cloning DWM repository"
-#$wait
-#git clone git://git.suckless.org/dwm ~/.config/dwm
-#clear
+# echo "Cloning DWM repository"
+# $wait
+# git clone git://git.suckless.org/dwm ~/.config/dwm
+# clear
 
 #echo "Cloning st repository"
 #$wait
@@ -209,11 +216,11 @@ echo -ne $newline
 #git clone git://git.suckless.org/dmenu ~/.config/dmenu
 #clear
 
-#echo "Changing directory to ~/.config/dwm & installing"
-#cd ~/.config/dwm && make install
-## makepkg -si
-#$wait
-#clear
+# echo "Changing directory to ~/.config/dwm & installing"
+# cd ~/.config/dwm && make install
+# # makepkg -si
+# $wait
+# clear
 
 #echo "Changing directory to ~/.config/st & installing"
 #cd ~/.config/st && make install
@@ -226,20 +233,3 @@ echo -ne $newline
 ## makepkg -si
 #$wait
 #clear
-
-# --------------------------------------------------
-# End of script
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# End of script"
-echo "------------------------------"
-$wait
-echo -ne $newline
-
-echo "Don't forget to check the ~/.xinitrc file."
-$wait
-echo "This is the end of the installation"
-$wait
-echo "You can now reboot the system, login as a normal user and start the X server"
-$wait
