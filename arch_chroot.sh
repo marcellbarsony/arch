@@ -42,9 +42,11 @@ copycheck(){
 echo "------------------------------"
 echo "# Fetching configs"
 echo "------------------------------"
-$wait
 echo -ne $newline
-git clone https://github.com/marcellbarsony/linux.git
+
+echo "Cloning configs to the /linux directory"
+echo -ne $newline
+git clone https://github.com/marcellbarsony/linux.git /
 $wait
 clear
 
@@ -108,6 +110,7 @@ $wait
 echo -ne $newline
 
 echo "Setting hostname ${hostname}"
+echo -ne $newline
 hostnamectl set-hostname ${hostname}
 $wait
 echo -ne $newline
@@ -182,7 +185,6 @@ clear
 echo "------------------------------"
 echo "# Install GRUB and other tools"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 pacman -S grub efibootmgr dosfstools os-prober mtools
@@ -211,6 +213,7 @@ echo -ne $newline
 
 echo "Copying GRUB config snippet"
 cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+copycheck
 $wait
 echo -ne $newline
 
@@ -255,7 +258,6 @@ echo -ne $newline
 echo "Add new user ${username}"
 useradd -m ${username}
 echo -ne $newline
-$wait
 
 echo "Enter the password of ${username}"
 passwd ${username}
@@ -295,7 +297,6 @@ $wait
 echo "------------------------------"
 echo "# Exit chroot environment"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 # --------------------------------------------------
