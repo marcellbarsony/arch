@@ -5,7 +5,7 @@
 # WARNING: script is under development & hard-coded
 # https://wiki.archlinux.org/
 # by Marcell Barsony
-# Last major update: 9/28/2021
+# Last major update: 9/29/2021
 # --------------------------------------------------
 
 clear
@@ -44,9 +44,13 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Cloning configs to the /linux directory"
+echo "mkdir /config"
+$wait
 echo -ne $newline
-git clone https://github.com/marcellbarsony/linux.git /
+
+echo "Cloning configs to /config directory"
+echo -ne $newline
+git clone https://github.com/marcellbarsony/linux.git /config
 $wait
 clear
 
@@ -75,7 +79,7 @@ echo -ne $newline
 echo "Copying mkinitcpio.conf"
 echo -ne $newline
 $wait
-cp /linux/cfg/mkinitcpio.conf /etc/mkinitcpio.conf
+cp /config/cfg/mkinitcpio.conf /etc/mkinitcpio.conf
 copycheck
 $wait
 echo -ne $newline
@@ -95,7 +99,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying hosts file"
-cp /linux/cfg/hosts /etc/hosts
+cp /config/cfg/hosts /etc/hosts
 if [ "$?" -eq "0" ]
 	then
 	    echo "Copying hosts file - Successful"
@@ -162,13 +166,13 @@ echo -ne $newline
 echo "Copying locale.gen"
 $wait
 echo -ne $newline
-cp /linux/cfg/locale.gen /etc/locale.gen
+cp /config/cfg/locale.gen /etc/locale.gen
 copycheck
 echo -ne $newline
 
 echo "Copying locale.conf"
 echo -ne $newline
-cp /linux/cfg/locale.conf /etc/locale.conf
+cp /config/cfg/locale.conf /etc/locale.conf
 copycheck
 echo -ne $newline
 
@@ -179,7 +183,7 @@ $wait
 clear
 
 # --------------------------------------------------
-# Boot loader
+# GRUB boot loader
 # --------------------------------------------------
 
 echo "------------------------------"
@@ -218,7 +222,7 @@ $wait
 echo -ne $newline
 
 echo "Copying GRUB config"
-cp /linux/cfg/grub /etc/default/grub
+cp /config/cfg/grub /etc/default/grub
 copycheck
 $wait
 echo -ne $newline
@@ -238,9 +242,6 @@ echo "# Root password"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Set root password"
-$wait
-echo -ne $newline
 passwd
 clear
 
@@ -255,7 +256,6 @@ echo -ne $newline
 
 read -p "Enter your username: " username
 echo -ne $newline
-echo "Add new user ${username}"
 useradd -m ${username}
 echo -ne $newline
 
@@ -283,19 +283,31 @@ id ${username}
 echo -ne $newline
 $wait
 
-echo "Visudo: Allowing standard users to run commands as root [FAIL]"
+# --------------------------------------------------
+# Sudoers
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Sudoers"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Uncomment the %wheel group from sudoers"
 echo -ne $newline
 $wait
-cp /linux/cfg/sudoers.tmp /etc/sudoers.tmp
-copycheck
+sed 's/# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers > /etc/sudoers.new
+export EDITOR="cp /etc/sudoers.new"
+visudo
+rm /etc/sudoers.new
 $wait
+clear
 
 # --------------------------------------------------
 # Exit chroot environment
 # --------------------------------------------------
 
 echo "------------------------------"
-echo "# Exit chroot environment"
+echo "# Exit chroot & reboot"
 echo "------------------------------"
 echo -ne $newline
 

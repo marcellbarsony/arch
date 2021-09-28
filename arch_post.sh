@@ -38,34 +38,19 @@ echo -ne $newline
 echo "Display server: Xorg-xinit"
 $wait
 echo -ne $newline
-pacman -S xorg-xinit
+sudo pacman -S xorg-xinit xorg
 clear
-
-echo "Display server: Xorg"
-$wait
-echo -ne $newline
-pacman -S xorg
-clear
-
-# echo "Browser"
-# $wait
-# echo -ne $newline
-# pacman -S firefox
-# clear
-
-#echo "Sound tools: Alsa, Pulse, Sof"
-#wait
-#echo -ne $newline
-# Pulseaudio
-	# pacman -S pulseaudio pulseaudio-alsa pavucontrol sof-firmware
-# ALSA
-	# pacman -S alsa alsa-utils alsa-firmware alsa-ucm-conf alsamixer
-#clear
 
 echo "Intel firmware"
 $wait
 echo -ne $newline
-pacman -S intel-ucode xf86-video-intel mesa
+sudo pacman -S intel-ucode xf86-video-intel mesa
+clear
+
+echo "Additional tools"
+$wait
+echo -ne $newline
+sudo pacman -S htop neofetch
 clear
 
 # echo "AUR helper: PARU"
@@ -87,31 +72,60 @@ clear
 # $wait
 # clear
 
-echo "Additional tools"
+# echo "Browser"
+# $wait
+# echo -ne $newline
+# sudo pacman -S firefox
+# clear
+
+#echo "Sound tools: Alsa, Pulse, Sof"
+#wait
+#echo -ne $newline
+# Pulseaudio
+	# sudo pacman -S pulseaudio pulseaudio-alsa pavucontrol sof-firmware
+# ALSA
+	# sudo pacman -S alsa alsa-utils alsa-firmware alsa-ucm-conf alsamixer
+#clear
+
+# --------------------------------------------------
+# Configs
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Fetching configs"
+echo "------------------------------"
+echo -ne $newline
+
+echo "mkdir /config"
 $wait
 echo -ne $newline
-pacman -S htop neofetch
+
+echo "Cloning configs to /home/marci/configs directory"
+echo -ne $newline
+git clone https://github.com/marcellbarsony/linux.git /home/marci/configs
+$wait
 clear
 
 # --------------------------------------------------
-# Xorg - xinit
+# Xorg - xinit config
 # --------------------------------------------------
 
-# echo "------------------------------"
-# echo "# Xorg - xinit"
-# echo "------------------------------"
-# echo -ne $newline
+echo "------------------------------"
+echo "# Xorg - xinit"
+echo "------------------------------"
+echo -ne $newline
 
-# echo "Copying xinitrc"
+echo "Copying .xinitrc"
+cp /home/marci/configs/.xinitrc /home/marci
 # cp /etc/X11/xinit/xinitrc ~/.xinitrc
-# if [ "$?" -eq "0" ]
-# 	then
-# 	    echo "Copying xinitrc - Successful"
-# 	else
-# 	    echo "Copying xinitrc - Unsuccessful: exit code $?"
-# fi
-# $wait
-# echo -ne $newline
+if [ "$?" -eq "0" ]
+	then
+	    echo "Copying .xinitrc - Successful"
+	else
+	    echo "Copying .xinitrc - Unsuccessful: exit code $?"
+fi
+$wait
+echo -ne $newline
 
 # --------------------------------------------------
 # Suckless software
