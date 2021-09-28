@@ -5,7 +5,7 @@
 # WARNING: script is under development & hard-coded
 # https://wiki.archlinux.org/
 # by Marcell Barsony
-# Last major update: 9/27/2021
+# Last major update: 9/28/2021
 # --------------------------------------------------
 
 clear
@@ -242,6 +242,53 @@ passwd
 clear
 
 # --------------------------------------------------
+# User creation
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Create user account"
+echo "------------------------------"
+echo -ne $newline
+
+read -p "Enter your username: " username
+echo -ne $newline
+echo "Add new user ${username}"
+useradd -m ${username}
+echo -ne $newline
+$wait
+
+echo "Enter the password of ${username}"
+passwd ${username}
+$wait
+clear
+
+# --------------------------------------------------
+# User group management
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# User group management"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Adding ${username} to basic groups"
+usermod -aG wheel,audio,video,optical,storage ${username}
+echo -ne $newline
+$wait
+
+echo "Verifying group memebership"
+id ${username}
+echo -ne $newline
+$wait
+
+echo "Visudo: Allowing standard users to run commands as root [FAIL]"
+echo -ne $newline
+$wait
+cp /linux/cfg/sudoers.tmp /etc/sudoers.tmp
+copycheck
+$wait
+
+# --------------------------------------------------
 # Exit chroot environment
 # --------------------------------------------------
 
@@ -250,8 +297,6 @@ echo "# Exit chroot environment"
 echo "------------------------------"
 $wait
 echo -ne $newline
-
-exit
 
 # --------------------------------------------------
 # Umount & Reboot
