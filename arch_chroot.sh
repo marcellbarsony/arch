@@ -107,22 +107,6 @@ if [ "$?" -eq "0" ]
 	    echo "Copying hosts file - Unsuccessful: exit code $?"
 fi
 $wait
-echo -ne $newline
-
-read -p "Enter hostname: " hostname
-$wait
-echo -ne $newline
-
-echo "Setting hostname ${hostname}"
-echo -ne $newline
-hostnamectl set-hostname ${hostname}
-$wait
-echo -ne $newline
-
-echo "Checking hostname"
-echo -ne $newline
-hostnamectl
-$wait
 clear
 
 echo "------------------------------"
@@ -295,7 +279,7 @@ echo -ne $newline
 echo "Uncomment the %wheel group from sudoers"
 echo -ne $newline
 $wait
-sed 's/# %wheel ALL=(ALL) NOPASSWD: ALL/%wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers > /etc/sudoers.new
+sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
 export EDITOR="cp /etc/sudoers.new"
 visudo
 rm /etc/sudoers.new

@@ -88,6 +88,31 @@ clear
 #clear
 
 # --------------------------------------------------
+# Hostname
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Hostname"
+echo "------------------------------"
+echo -ne $newline
+
+read -p "Enter hostname: " hostname
+$wait
+echo -ne $newline
+
+echo "Setting hostname ${hostname}"
+echo -ne $newline
+hostnamectl set-hostname ${hostname}
+$wait
+echo -ne $newline
+
+echo "Checking hostname"
+echo -ne $newline
+hostnamectl
+$wait
+clear
+
+# --------------------------------------------------
 # Configs
 # --------------------------------------------------
 
