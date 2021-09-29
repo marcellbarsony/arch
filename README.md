@@ -10,7 +10,7 @@ Please note that this script is **hard-coded** for the time being.
 
 This script ships an automated installation sequence that follows the [Arch Installation guide](https://wiki.archlinux.org/title/installation_guide) and the [Arch Principles](https://wiki.archlinux.org/title/Arch_Linux#Principles). 
 
-It is designed to install a minimal, lightweight, simple and secure Arch system.
+It is designed to install a minimal, lightweight and secuity-focused Arch system.
 
 ## Features
 
