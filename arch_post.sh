@@ -116,7 +116,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying .xinitrc"
-cp /home/marci/configs/.xinitrc /home/marci
+cp /home/marci/configs/xinit/.xinitrc /home/marci
 # cp /etc/X11/xinit/xinitrc ~/.xinitrc
 if [ "$?" -eq "0" ]
 	then
