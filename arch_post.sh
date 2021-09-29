@@ -148,7 +148,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying .xinitrc"
-cp /home/marci/configs/xinit/.xinitrc /home/marci
+cp /home/marci/configs/xorg/.xinitrc /home/marci
 # cp /etc/X11/xinit/xinitrc ~/.xinitrc
 if [ "$?" -eq "0" ]
 	then
@@ -197,40 +197,43 @@ cd ~/.config
 $wait
 echo -ne $newline
 
-echo "Cloning DWM repository"
+echo "Cloning 'DWM' repository"
 $wait
 echo -ne $newline
 git clone https://git.suckless.org/dwm
 $wait
 echo -ne $newline
 
-echo "Cloning st repository"
+echo "Cloning 'st' repository"
 $wait
 echo -ne $newline
 git clone https://git.suckless.org/st
 $wait
 echo -ne $newline
 
-echo "Cloning dmenu repository"
+echo "Cloning 'dmenu' repository"
 $wait
 echo -ne $newline
 git clone https://git.suckless.org/dmenu
 $wait
 echo -ne $newline
 
-echo "Changing directory to ~/.config/dwm & installing"
+echo "Changing directory to ~/.config/dwm & compiling"
+echo -ne $newline
 cd ~/.config/dwm
 sudo make clean install
 $wait
 clear
 
-echo "Changing directory to ~/.config/st & installing"
+echo "Changing directory to ~/.config/st & compiling"
+echo -ne $newline
 cd ~/.config/st
 sudo make clean install
 $wait
 clear
 
-echo "Changing directory to ~/.config/dmenu & installing"
+echo "Changing directory to ~/.config/dmenu & compiling"
+echo -ne $newline
 cd ~/.config/dmenu
 sudo make clean install
 $wait
