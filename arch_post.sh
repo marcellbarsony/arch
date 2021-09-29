@@ -78,14 +78,21 @@ clear
 # sudo pacman -S firefox
 # clear
 
-#echo "Sound tools: Alsa, Pulse, Sof"
-#wait
-#echo -ne $newline
-# Pulseaudio
-	# sudo pacman -S pulseaudio pulseaudio-alsa pavucontrol sof-firmware
+echo "Sound system: ALSA"
+wait
+echo -ne $newline
 # ALSA
-	# sudo pacman -S alsa alsa-utils alsa-firmware alsa-ucm-conf alsamixer
-#clear
+	sudo pacman -S alsa alsa-utils alsa-firmware
+clear
+
+echo "Sound system: Pulse Audio, Sof"
+wait
+echo -ne $newline
+# Pulseaudio
+	sudo pacman -S pulseaudio pulseaudio-alsa pavucontrol sof-firmware
+clear
+
+clear
 
 # --------------------------------------------------
 # Hostname
@@ -148,6 +155,26 @@ if [ "$?" -eq "0" ]
 	    echo "Copying .xinitrc - Successful"
 	else
 	    echo "Copying .xinitrc - Unsuccessful: exit code $?"
+fi
+$wait
+echo -ne $newline
+
+# --------------------------------------------------
+# Logind
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Power management - logind"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Copying logind.conf"
+cp /home/marci/configs/logind/logind.conf /etc/systemd/logind.conf
+if [ "$?" -eq "0" ]
+	then
+	    echo "Copying logind.conf - Successful"
+	else
+	    echo "Copying logind.conf - Unsuccessful: exit code $?"
 fi
 $wait
 echo -ne $newline
