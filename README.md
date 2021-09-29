@@ -19,9 +19,9 @@ It is designed to install a minimal, lightweight and secuity-focused Arch system
 - LVM on LUKS
 - Network Manager
 - Xorg
-- Window manager: dwm
-- Terminal: st
-- Application launcher: dmenu
+- dwm window manager
+- st terminal
+- dmenu app launcher
 
 
 ## Installation guide
