@@ -47,12 +47,12 @@ echo "------------------------------"
 $wait
 echo -ne $newline
 
-echo "Formatting P1: /dev/nvme0n1p1 (FAT32)"
+echo "Formatting EFI: /dev/nvme0n1p1 (FAT32)"
 mkfs.fat -F32 /dev/nvme0n1p1
 $wait
 echo -ne $newline
 
-echo "Formatting P2: /dev/nvme0n1p2 (ext4)"
+echo "Formatting BOOT: /dev/nvme0n1p2 (ext4)"
 mkfs.ext4 /dev/nvme0n1p2
 $wait
 clear
@@ -67,7 +67,7 @@ echo "------------------------------"
 $wait
 echo -ne $newline
 
-echo "Creating LUKS container on P3: /dev/nvme0n1p3"
+echo "Creating LUKS container on LVM: /dev/nvme0n1p3"
 cryptsetup luksFormat /dev/nvme0n1p3
 
     # LUKS container setup interactive menu
@@ -157,7 +157,7 @@ mkdir /mnt/boot
 $wait
 echo -ne $newline
 
-echo "Mounting EFI partition >> /mnt/boot"
+echo "Mounting BOOT >> /mnt/boot"
 mount /dev/nvme0n1p2 /mnt/boot
 $wait
 clear
