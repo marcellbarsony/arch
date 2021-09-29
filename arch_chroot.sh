@@ -79,7 +79,7 @@ echo -ne $newline
 echo "Copying mkinitcpio.conf"
 echo -ne $newline
 $wait
-cp /config/cfg/mkinitcpio.conf /etc/mkinitcpio.conf
+cp /config/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
 copycheck
 $wait
 echo -ne $newline
@@ -99,7 +99,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying hosts file"
-cp /config/cfg/hosts /etc/hosts
+cp /config/hosts/hosts /etc/hosts
 if [ "$?" -eq "0" ]
 	then
 	    echo "Copying hosts file - Successful"
@@ -150,13 +150,13 @@ echo -ne $newline
 echo "Copying locale.gen"
 $wait
 echo -ne $newline
-cp /config/cfg/locale.gen /etc/locale.gen
+cp /config/locale/locale.gen /etc/locale.gen
 copycheck
 echo -ne $newline
 
 echo "Copying locale.conf"
 echo -ne $newline
-cp /config/cfg/locale.conf /etc/locale.conf
+cp /config/locale/locale.conf /etc/locale.conf
 copycheck
 echo -ne $newline
 
@@ -206,7 +206,7 @@ $wait
 echo -ne $newline
 
 echo "Copying GRUB config"
-cp /config/cfg/grub /etc/default/grub
+cp /config/grub/grub /etc/default/grub
 copycheck
 $wait
 echo -ne $newline
