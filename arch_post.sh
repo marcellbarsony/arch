@@ -169,7 +169,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
-cp /home/marci/configs/logind/logind.conf /etc/systemd/logind.conf
+cp /home/marci/configs/logind/logind.conf /etc/systemd/
 if [ "$?" -eq "0" ]
 	then
 	    echo "Copying logind.conf - Successful"
