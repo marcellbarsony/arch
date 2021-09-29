@@ -10,7 +10,7 @@ Please note that this script is **hard-coded** for the time being.
 
 This script ships an automated installation sequence that follows the [Arch Installation guide](https://wiki.archlinux.org/title/installation_guide) and the [Arch Principles](https://wiki.archlinux.org/title/Arch_Linux#Principles). 
 
-It is designed to install a minimal, lightweight and secuity-focused Arch system.
+It is designed to install a minimal, lightweight and security-focused Arch system.
 
 ## Features
 
@@ -19,9 +19,9 @@ It is designed to install a minimal, lightweight and secuity-focused Arch system
 - LVM on LUKS
 - Network Manager
 - Xorg
-- dwm window manager
-- st terminal
-- dmenu app launcher
+- dwm: window manager
+- st: terminal
+- dmenu: app launcher
 
 
 ## Installation guide
@@ -60,6 +60,6 @@ It is designed to install a minimal, lightweight and secuity-focused Arch system
 
 2.) Log in as a normal user
 
-3.) Launch the post-installation script to finish the installation
+3.) Launch the post-installation script
 
 `bash arch_post.sh`
