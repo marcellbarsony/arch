@@ -12,6 +12,8 @@ This script ships an automated installation sequence that follows the [Arch Inst
 
 It is designed to install a minimal, lightweight and security-focused Arch system.
 
+For the documentation, please refer to the [Wiki page](https://github.com/marcellbarsony/linux/wiki "Wiki - Marci's Arch config") of my config.
+
 ## Features
 
 - UEFI
