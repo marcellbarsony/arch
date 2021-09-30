@@ -8,23 +8,11 @@ Please note that this script is **hard-coded** for the time being.
 
 ## Philosophy
 
-This script ships an automated installation sequence that follows the [Arch Installation guide](https://wiki.archlinux.org/title/installation_guide) and the [Arch Principles](https://wiki.archlinux.org/title/Arch_Linux#Principles). 
+This automated installation sequence follows the [Arch Installation guide](https://wiki.archlinux.org/title/installation_guide) and the [Arch Principles](https://wiki.archlinux.org/title/Arch_Linux#Principles). 
 
 Designed to ship a minimal, lightweight and security-focused Arch system.
 
 For the documentation, please refer to the [Wiki page](https://github.com/marcellbarsony/linux/wiki "Wiki - Marci's Arch config") of my config.
-
-## Features
-
-- UEFI
-- GRUB
-- LVM on LUKS
-- Network Manager
-- Xorg
-- dwm: window manager
-- st: terminal
-- dmenu: app launcher
-
 
 ## Installation guide
 
@@ -65,3 +53,12 @@ For the documentation, please refer to the [Wiki page](https://github.com/marcel
 3.) Launch the post-installation script
 
 `bash arch_post.sh`
+
+## Features
+
+- UEFI
+- GRUB
+- LVM on LUKS
+- Network Manager
+- Xorg
+- Systemd
