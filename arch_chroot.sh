@@ -27,7 +27,7 @@ clear
 copycheck(){
 	if [ "$?" -eq "0" ]
 		then
-			echo "Copying process successful"
+			echo "Copying successful"
 			$wait
 		else
 			echo "Copying unsuccessful - exit code $?"
@@ -81,6 +81,7 @@ $wait
 echo -ne $newline
 
 echo "Initramfs"
+echo -ne $newline
 mkinitcpio -p linux
 $wait
 clear

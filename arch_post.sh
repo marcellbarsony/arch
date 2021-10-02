@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 
 # --------------------------------------------------
 # Arch Linux post script
@@ -23,6 +23,15 @@ clear
 # --------------------------------------------------
 # Helper functions
 # --------------------------------------------------
+
+copycheck(){
+	if [ "$?" -eq "0" ]
+		then
+			echo "Successful"
+		else
+			echo "Unsuccessful: exit code $?"
+	fi
+}
 
 # --------------------------------------------------
 # Hostname
@@ -60,7 +69,7 @@ echo "# Installing applications"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Display server: Xorg-xinit"
+echo "Display server: Xorg"
 $wait
 echo -ne $newline
 sudo pacman -S --noconfirm xorg-server xorg-xinit
@@ -97,25 +106,15 @@ clear
 # $wait
 # clear
 
-# echo "Browser"
-# $wait
-# echo -ne $newline
-# sudo pacman -S firefox
-# clear
+# Browser
 
 echo "Sound system: ALSA"
 wait
 echo -ne $newline
 # ALSA
 	sudo pacman -S --noconfirm alsa alsa-utils alsa-firmware
-clear
-
-echo "Sound system: Pulse Audio, Sof"
-wait
-echo -ne $newline
-# Pulseaudio
+# Pulseaudio, sof
 	sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa pavucontrol sof-firmware
-clear
 
 clear
 
@@ -126,10 +125,6 @@ clear
 echo "------------------------------"
 echo "# Fetching configs"
 echo "------------------------------"
-echo -ne $newline
-
-echo "mkdir /config"
-$wait
 echo -ne $newline
 
 echo "Cloning configs to /home/marci/dotfiles directory"
@@ -146,28 +141,37 @@ echo -ne $newline
 echo "Copying .xinitrc"
 cp /home/marci/dotfiles/xorg/.xinitrc /home/marci
 # cp /etc/X11/xinit/xinitrc ~/.xinitrc
-if [ "$?" -eq "0" ]
-	then
-	    echo "Successful"
-	else
-	    echo "Unsuccessful: exit code $?"
-fi
+copycheck
 $wait
 clear
 
 echo "------------------------------"
-echo "# Logind - power management"
+echo "# Logind"
 echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
 sudo cp /home/marci/dotfiles/logind/logind.conf /etc/systemd/
-if [ "$?" -eq "0" ]
-	then
-	    echo "Successful"
-	else
-	    echo "Unsuccessful: exit code $?"
-fi
+copycheck
+$wait
+clear
+
+echo "------------------------------"
+echo "# ZSH"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Changing shell to ZSH"
+$wait
+echo -ne $newline
+
+chsh -s /usr/bin/zsh
+$wait
+echo -ne $newline
+
+echo "Copying .zshrc"
+cp /home/marci/dotfiles/zsh/.zshrc /home/marci/
+copycheck
 $wait
 clear
 
@@ -178,12 +182,7 @@ echo -ne $newline
 
 echo "Copying pacman.conf"
 sudo cp /home/marci/dotfiles/pacman/pacman.conf /etc/
-if [ "$?" -eq "0" ]
-	then
-	    echo "Successful"
-	else
-	    echo "Unsuccessful: exit code $?"
-fi
+copycheck
 $wait
 clear
 
@@ -192,7 +191,7 @@ echo "# Suckless software"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Create a config directory"
+echo "Create a .config directory"
 mkdir ~/.config
 $wait
 echo -ne $newline
