@@ -148,9 +148,9 @@ cp /home/marci/dotfiles/xorg/.xinitrc /home/marci
 # cp /etc/X11/xinit/xinitrc ~/.xinitrc
 if [ "$?" -eq "0" ]
 	then
-	    echo "Copying .xinitrc - Successful"
+	    echo "Successful"
 	else
-	    echo "Copying .xinitrc - Unsuccessful: exit code $?"
+	    echo "Unsuccessful: exit code $?"
 fi
 $wait
 clear
@@ -164,9 +164,25 @@ echo "Copying logind.conf"
 cp /home/marci/dotfiles/logind/logind.conf /etc/systemd/
 if [ "$?" -eq "0" ]
 	then
-	    echo "Copying logind.conf - Successful"
+	    echo "Successful"
 	else
-	    echo "Copying logind.conf - Unsuccessful: exit code $?"
+	    echo "Unsuccessful: exit code $?"
+fi
+$wait
+clear
+
+echo "------------------------------"
+echo "# Pacman"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Copying pacman.conf"
+cp /home/marci/dotfiles/pacman/pacman.conf /etc/
+if [ "$?" -eq "0" ]
+	then
+	    echo "Successful"
+	else
+	    echo "Unsuccessful: exit code $?"
 fi
 $wait
 clear
