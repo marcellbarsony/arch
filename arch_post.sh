@@ -63,19 +63,19 @@ echo -ne $newline
 echo "Display server: Xorg-xinit"
 $wait
 echo -ne $newline
-sudo pacman -S xorg-server xorg-xinit
+sudo pacman -S --noconfirm xorg-server xorg-xinit
 clear
 
 echo "Intel firmware"
 $wait
 echo -ne $newline
-sudo pacman -S intel-ucode xf86-video-intel mesa
+sudo pacman -S --noconfirm intel-ucode xf86-video-intel mesa
 clear
 
 echo "Additional tools"
 $wait
 echo -ne $newline
-sudo pacman -S htop neofetch
+sudo pacman -S --noconfirm htop neofetch
 clear
 
 # echo "AUR helper: PARU"
@@ -107,14 +107,14 @@ echo "Sound system: ALSA"
 wait
 echo -ne $newline
 # ALSA
-	sudo pacman -S alsa alsa-utils alsa-firmware
+	sudo pacman -S --noconfirm alsa alsa-utils alsa-firmware
 clear
 
 echo "Sound system: Pulse Audio, Sof"
 wait
 echo -ne $newline
 # Pulseaudio
-	sudo pacman -S pulseaudio pulseaudio-alsa pavucontrol sof-firmware
+	sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa pavucontrol sof-firmware
 clear
 
 clear

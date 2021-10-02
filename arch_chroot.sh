@@ -44,13 +44,9 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "mkdir /config"
-$wait
+echo "Cloning dotfiles to /dotfiles directory"
 echo -ne $newline
-
-echo "Cloning configs to /dotfiles directory"
-echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiless.git /dotfiles
+git clone https://github.com/marcellbarsony/dotfiles.git /dotfiles
 $wait
 clear
 
@@ -67,7 +63,7 @@ echo "Installing lvm2"
 $wait
 echo -ne $newline
 
-pacman -S lvm2
+pacman -S --noconfirm lvm2
 $wait
 clear
 
@@ -117,7 +113,7 @@ echo -ne $newline
 echo "Network tools"
 $wait
 echo -ne $newline
-pacman -S networkmanager
+pacman -S ---noconfirm networkmanager
 # pacman -S wpa_supplicant
 # pacman -S wireless_tools
 # pacman -S netctl
@@ -175,7 +171,7 @@ echo "# Install GRUB and other tools"
 echo "------------------------------"
 echo -ne $newline
 
-pacman -S grub efibootmgr dosfstools os-prober mtools
+pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 $wait
 clear
 
