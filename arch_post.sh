@@ -161,7 +161,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
-cp /home/marci/dotfiles/logind/logind.conf /etc/systemd/
+sudo cp /home/marci/dotfiles/logind/logind.conf /etc/systemd/
 if [ "$?" -eq "0" ]
 	then
 	    echo "Successful"
@@ -177,7 +177,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying pacman.conf"
-cp /home/marci/dotfiles/pacman/pacman.conf /etc/
+sudo cp /home/marci/dotfiles/pacman/pacman.conf /etc/
 if [ "$?" -eq "0" ]
 	then
 	    echo "Successful"

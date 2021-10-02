@@ -113,7 +113,7 @@ echo -ne $newline
 echo "Network tools"
 $wait
 echo -ne $newline
-pacman -S ---noconfirm networkmanager
+pacman -S --noconfirm networkmanager
 # pacman -S wpa_supplicant
 # pacman -S wireless_tools
 # pacman -S netctl
