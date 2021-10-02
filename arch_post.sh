@@ -173,6 +173,12 @@ echo "Copying .zshrc"
 cp /home/marci/dotfiles/zsh/.zshrc /home/marci/
 copycheck
 $wait
+echo -ne $newline
+
+echo "Copying .zlogin"
+cp /home/marci/dotfiles/zsh/.zlogin /home/marci/
+copycheck
+$wait
 clear
 
 echo "------------------------------"
