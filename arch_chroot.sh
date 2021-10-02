@@ -48,9 +48,9 @@ echo "mkdir /config"
 $wait
 echo -ne $newline
 
-echo "Cloning configs to /config directory"
+echo "Cloning configs to /dotfiles directory"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/linux.git /config
+git clone https://github.com/marcellbarsony/dotfiless.git /dotfiles
 $wait
 clear
 
@@ -79,7 +79,7 @@ echo -ne $newline
 echo "Copying mkinitcpio.conf"
 echo -ne $newline
 $wait
-cp /config/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
+cp /dotfiles/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
 copycheck
 $wait
 echo -ne $newline
@@ -99,7 +99,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying hosts file"
-cp /config/hosts/hosts /etc/hosts
+cp /dotfiles/hosts/hosts /etc/hosts
 if [ "$?" -eq "0" ]
 	then
 	    echo "Copying hosts file - Successful"
@@ -150,13 +150,13 @@ echo -ne $newline
 echo "Copying locale.gen"
 $wait
 echo -ne $newline
-cp /config/locale/locale.gen /etc/locale.gen
+cp /dotfiles/locale/locale.gen /etc/locale.gen
 copycheck
 echo -ne $newline
 
 echo "Copying locale.conf"
 echo -ne $newline
-cp /config/locale/locale.conf /etc/locale.conf
+cp /dotfiles/locale/locale.conf /etc/locale.conf
 copycheck
 echo -ne $newline
 
@@ -206,7 +206,7 @@ $wait
 echo -ne $newline
 
 echo "Copying GRUB config"
-cp /config/grub/grub /etc/default/grub
+cp /dotfiles/grub/grub /etc/default/grub
 copycheck
 $wait
 echo -ne $newline

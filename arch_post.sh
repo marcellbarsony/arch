@@ -38,7 +38,7 @@ echo -ne $newline
 echo "Display server: Xorg-xinit"
 $wait
 echo -ne $newline
-sudo pacman -S xorg-xinit xorg
+sudo pacman -S xorg-server xorg-xinit
 clear
 
 echo "Intel firmware"
@@ -132,9 +132,9 @@ echo "mkdir /config"
 $wait
 echo -ne $newline
 
-echo "Cloning configs to /home/marci/configs directory"
+echo "Cloning configs to /home/marci/dotfiles directory"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/linux.git /home/marci/configs
+git clone https://github.com/marcellbarsony/dotfiles.git /home/marci/dotfiles
 $wait
 clear
 
@@ -148,7 +148,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying .xinitrc"
-cp /home/marci/configs/xorg/.xinitrc /home/marci
+cp /home/marci/dotfiles/xorg/.xinitrc /home/marci
 # cp /etc/X11/xinit/xinitrc ~/.xinitrc
 if [ "$?" -eq "0" ]
 	then
@@ -169,7 +169,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
-cp /home/marci/configs/logind/logind.conf /etc/systemd/
+cp /home/marci/dotfiles/logind/logind.conf /etc/systemd/
 if [ "$?" -eq "0" ]
 	then
 	    echo "Copying logind.conf - Successful"
