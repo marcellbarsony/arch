@@ -25,6 +25,31 @@ clear
 # --------------------------------------------------
 
 # --------------------------------------------------
+# Hostname
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Hostname"
+echo "------------------------------"
+echo -ne $newline
+
+read -p "Enter hostname: " hostname
+$wait
+echo -ne $newline
+
+echo "Setting hostname ${hostname}"
+echo -ne $newline
+hostnamectl set-hostname ${hostname}
+$wait
+echo -ne $newline
+
+echo "Checking hostname"
+echo -ne $newline
+hostnamectl
+$wait
+clear
+
+# --------------------------------------------------
 # Install necessary applications
 # --------------------------------------------------
 
@@ -95,31 +120,6 @@ clear
 clear
 
 # --------------------------------------------------
-# Hostname
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Hostname"
-echo "------------------------------"
-echo -ne $newline
-
-read -p "Enter hostname: " hostname
-$wait
-echo -ne $newline
-
-echo "Setting hostname ${hostname}"
-echo -ne $newline
-hostnamectl set-hostname ${hostname}
-$wait
-echo -ne $newline
-
-echo "Checking hostname"
-echo -ne $newline
-hostnamectl
-$wait
-clear
-
-# --------------------------------------------------
 # Configs
 # --------------------------------------------------
 
@@ -138,10 +138,6 @@ git clone https://github.com/marcellbarsony/dotfiles.git /home/marci/dotfiles
 $wait
 clear
 
-# --------------------------------------------------
-# Xorg - xinit config
-# --------------------------------------------------
-
 echo "------------------------------"
 echo "# Xorg - xinit"
 echo "------------------------------"
@@ -157,14 +153,10 @@ if [ "$?" -eq "0" ]
 	    echo "Copying .xinitrc - Unsuccessful: exit code $?"
 fi
 $wait
-echo -ne $newline
-
-# --------------------------------------------------
-# Logind
-# --------------------------------------------------
+clear
 
 echo "------------------------------"
-echo "# Power management - logind"
+echo "# Logind - power management"
 echo "------------------------------"
 echo -ne $newline
 
@@ -177,11 +169,7 @@ if [ "$?" -eq "0" ]
 	    echo "Copying logind.conf - Unsuccessful: exit code $?"
 fi
 $wait
-echo -ne $newline
-
-# --------------------------------------------------
-# Suckless software
-# --------------------------------------------------
+clear
 
 echo "------------------------------"
 echo "# Suckless software"
