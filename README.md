@@ -23,27 +23,28 @@ For the documentation, please refer to the [Wiki page](https://github.com/marcel
 2.) Verify the signature and boot the live environment
 
 3.) Install Git   
-
-`pacman -Sy git`
-
+```
+pacman -Sy git
+```
 4.) Clone this repository
-
-`git clone https://github.com/marcellbarsony/arch.git`
-
+```
+git clone https://github.com/marcellbarsony/arch.git
+```
 5.) Launch the installation script
-
-`bash arch.sh`
+```
+bash arch.sh
+```
 
 ### Chroot environment
 
 1.) Clone this repository
-
-`git clone https://github.com/marcellbarsony/arch.git`
-
+```
+git clone https://github.com/marcellbarsony/arch.git
+```
 2.) Launch the chroot script
-
-`bash arch_chroot.sh`
-
+```
+bash arch_chroot.sh
+```
 ### Post-installation
 
 1.) Reboot the machine and detach the installation disk
@@ -51,8 +52,9 @@ For the documentation, please refer to the [Wiki page](https://github.com/marcel
 2.) Log in as a normal user
 
 3.) Launch the post-installation script
-
-`bash arch_post.sh`
+```
+bash arch_post.sh
+```
 
 ## Features
 
