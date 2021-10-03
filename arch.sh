@@ -1,11 +1,11 @@
-#!/bin/zsh
+#!/bin/bash
 
 # --------------------------------------------------
 # Arch Linux installation script
 # WARNING: script is under development & hard-coded
 # https://wiki.archlinux.org/
 # by Marcell Barsony
-# Last major update: 9/27/2021
+# Last major update: 9/28/2021
 # --------------------------------------------------
 
 clear
@@ -33,6 +33,7 @@ clear
 # echo -ne $newline
 # echo "Formatting disk with <fdisk> manually"
 # $wait
+
 fdisk /dev/nvme0n1
 
 clear
@@ -88,7 +89,6 @@ clear
 echo "------------------------------"
 echo "# Logical volumes"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Creating physical volume on the top of the opened LUKS container"
@@ -133,7 +133,6 @@ clear
 echo "------------------------------"
 echo "# Formatting & Mounting /ROOT"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Formatting /ROOT (ext4 - /dev/volgroup0/cryptroot)"
@@ -149,7 +148,6 @@ clear
 echo "------------------------------"
 echo "# Formatting & Mounting /BOOT"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Creating mountpoint directory for /boot"
@@ -165,7 +163,6 @@ clear
 echo "------------------------------"
 echo "# Formatting & Mounting /HOME"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Formatting /HOME logical volume (ext4 - /dev/volgroup0/crypthome)"
@@ -190,7 +187,6 @@ clear
 echo "------------------------------"
 echo "# fstab"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Creating fstab directory: /mnt/etc"
@@ -236,4 +232,6 @@ echo -ne $newline
 
 echo "Changing root to the new Arch system"
 $wait
+clear
+
 arch-chroot /mnt

@@ -1,11 +1,11 @@
-#!/bin/zsh
+#!/bin/bash
 
 # --------------------------------------------------
 # Arch Linux chroot script
 # WARNING: script is under development & hard-coded
 # https://wiki.archlinux.org/
 # by Marcell Barsony
-# Last major update: 9/29/2021
+# Last major update: 10/3/2021
 # --------------------------------------------------
 
 clear
@@ -263,6 +263,7 @@ echo "Verifying group memebership"
 id ${username}
 echo -ne $newline
 $wait
+clear
 
 # --------------------------------------------------
 # Sudoers
@@ -275,7 +276,6 @@ echo -ne $newline
 
 echo "Uncomment the %wheel group from sudoers"
 echo -ne $newline
-$wait
 sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
 export EDITOR="cp /etc/sudoers.new"
 visudo

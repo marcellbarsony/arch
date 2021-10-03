@@ -5,7 +5,7 @@
 # WARNING: script is under development & hard-coded
 # https://wiki.archlinux.org/
 # by Marcell Barsony
-# Last major update: 9/28/2021
+# Last major update: 10/3/2021
 # --------------------------------------------------
 
 clear
@@ -69,19 +69,34 @@ echo "# Installing applications"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Display server: Xorg"
+echo "# ZSH"
+$wait
+echo -ne $newline
+sudo pacman -S --noconfirm zsh
+clear
+
+echo "# X11 - Xorg"
 $wait
 echo -ne $newline
 sudo pacman -S --noconfirm xorg-server xorg-xinit
 clear
 
-echo "Intel firmware"
+echo "# Intel firmware"
 $wait
 echo -ne $newline
 sudo pacman -S --noconfirm intel-ucode xf86-video-intel mesa
 clear
 
-echo "Additional tools"
+echo "# Sound system - ALSA & Pulseaudio & Sof"
+$wait
+echo -ne $newline
+# ALSA
+	sudo pacman -S --noconfirm alsa alsa-utils alsa-firmware
+# Pulseaudio, sof
+	sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa pavucontrol sof-firmware
+clear
+
+echo "# Additional tools"
 $wait
 echo -ne $newline
 sudo pacman -S --noconfirm htop neofetch
@@ -106,18 +121,6 @@ clear
 # $wait
 # clear
 
-# Browser
-
-echo "Sound system: ALSA"
-wait
-echo -ne $newline
-# ALSA
-	sudo pacman -S --noconfirm alsa alsa-utils alsa-firmware
-# Pulseaudio, sof
-	sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa pavucontrol sof-firmware
-
-clear
-
 # --------------------------------------------------
 # Configs
 # --------------------------------------------------
@@ -127,7 +130,7 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Cloning configs to /home/marci/dotfiles directory"
+echo "Cloning dotfiles to /home/marci/dotfiles directory"
 echo -ne $newline
 git clone https://github.com/marcellbarsony/dotfiles.git /home/marci/dotfiles
 $wait
