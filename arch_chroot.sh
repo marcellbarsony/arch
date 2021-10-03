@@ -73,7 +73,6 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying mkinitcpio.conf"
-echo -ne $newline
 $wait
 cp /dotfiles/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
 copycheck
@@ -146,19 +145,16 @@ echo -ne $newline
 
 echo "Copying locale.gen"
 $wait
-echo -ne $newline
 cp /dotfiles/locale/locale.gen /etc/locale.gen
 copycheck
 echo -ne $newline
 
 echo "Copying locale.conf"
-echo -ne $newline
 cp /dotfiles/locale/locale.conf /etc/locale.conf
 copycheck
 echo -ne $newline
 
 echo "Generating locale"
-echo -ne $newline
 locale-gen
 $wait
 clear
@@ -291,6 +287,9 @@ echo "------------------------------"
 echo "# Exit chroot & reboot"
 echo "------------------------------"
 echo -ne $newline
+
+$wait
+sudo reboot now
 
 # --------------------------------------------------
 # Umount & Reboot

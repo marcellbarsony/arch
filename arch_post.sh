@@ -78,13 +78,13 @@ clear
 echo "# X11 - Xorg"
 $wait
 echo -ne $newline
-sudo pacman -S --noconfirm xorg-server xorg-xinit
+sudo pacman -S --noconfirm xorg-server xorg-xinit arandr
 clear
 
 echo "# Intel firmware"
 $wait
 echo -ne $newline
-sudo pacman -S --noconfirm intel-ucode xf86-video-intel mesa
+sudo pacman -S --noconfirm intel-ucode xf86-video-intel
 clear
 
 echo "# Sound system - ALSA & Pulseaudio & Sof"
@@ -117,7 +117,7 @@ clear
 # echo -ne $newline
 # makepkg -si
 # $wait
-# cd ~
+# cd $HOME
 # $wait
 # clear
 
@@ -130,9 +130,9 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Cloning dotfiles to /home/marci/dotfiles directory"
+echo "Cloning dotfiles to ~/dotfiles directory"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git /home/marci/dotfiles
+git clone https://github.com/marcellbarsony/dotfiles.git $HOME/dotfiles
 $wait
 clear
 
@@ -142,8 +142,8 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying .xinitrc"
-cp /home/marci/dotfiles/xorg/.xinitrc /home/marci
-# cp /etc/X11/xinit/xinitrc ~/.xinitrc
+cp $HOME/dotfiles/xorg/.xinitrc $HOME
+# cp /etc/X11/xinit/xinitrc $HOME/.xinitrc
 copycheck
 $wait
 clear
@@ -154,7 +154,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
-sudo cp /home/marci/dotfiles/logind/logind.conf /etc/systemd/
+sudo cp $HOME/dotfiles/logind/logind.conf /etc/systemd/
 copycheck
 $wait
 clear
@@ -173,13 +173,13 @@ $wait
 echo -ne $newline
 
 echo "Copying .zshrc"
-cp /home/marci/dotfiles/zsh/.zshrc /home/marci/
+cp $HOME/dotfiles/zsh/.zshrc $HOME
 copycheck
 $wait
 echo -ne $newline
 
 echo "Copying .zlogin"
-cp /home/marci/dotfiles/zsh/.zlogin /home/marci/
+cp $HOME/dotfiles/zsh/.zlogin $HOME
 copycheck
 $wait
 clear
@@ -190,7 +190,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying pacman.conf"
-sudo cp /home/marci/dotfiles/pacman/pacman.conf /etc/
+sudo cp $HOME/dotfiles/pacman/pacman.conf /etc/
 copycheck
 $wait
 clear
@@ -201,11 +201,11 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Create a .config directory"
-mkdir ~/.config
+mkdir $HOME/.config
 $wait
 echo -ne $newline
 echo "Changing to .config directory"
-cd ~/.config
+cd $HOME/.config
 $wait
 echo -ne $newline
 
@@ -232,21 +232,53 @@ echo -ne $newline
 
 echo "Changing directory to ~/.config/dwm & compiling"
 echo -ne $newline
-cd ~/.config/dwm
+cd $HOME/.config/dwm
 sudo make clean install
 $wait
 clear
 
 echo "Changing directory to ~/.config/st & compiling"
 echo -ne $newline
-cd ~/.config/st
+cd $HOME/.config/st
 sudo make clean install
 $wait
 clear
 
 echo "Changing directory to ~/.config/dmenu & compiling"
 echo -ne $newline
-cd ~/.config/dmenu
+cd $HOME/.config/dmenu
 sudo make clean install
 $wait
 clear
+
+# --------------------------------------------------
+# Cleaning up installation
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Bash files"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Moving .bash_history"
+mv $HOME/.bash_history $HOME/dotfiles/_legacy/bash
+copycheck
+echo -ne $newline
+
+echo "Moving .bash_logout"
+mv $HOME/.bash_logout $HOME/dotfiles/_legacy/bash
+copycheck
+echo -ne $newline
+
+echo "Removing .bash_profile"
+mv $HOME/.bash_profile $HOME/dotfiles/_legacy/bash
+copycheck
+echo -ne $newline
+
+echo "Removing .bashrc"
+mv $HOME/.bashrc $HOME/dotfiles/_legacy/bash
+copycheck
+echo -ne $newline
+
+$wait
+sudo reboot now

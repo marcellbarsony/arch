@@ -45,7 +45,6 @@ clear
 echo "------------------------------"
 echo "# Formatting disks"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Formatting EFI: /dev/nvme0n1p1 (FAT32)"
@@ -65,7 +64,6 @@ clear
 echo "------------------------------"
 echo "# Encrypted container"
 echo "------------------------------"
-$wait
 echo -ne $newline
 
 echo "Creating LUKS container on LVM: /dev/nvme0n1p3"
