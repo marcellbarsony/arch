@@ -1,4 +1,6 @@
-A personal Arch Linux installation script
+**A personal Arch Linux installation script**
+
+For the documentation please refer to the [Wiki page](https://github.com/marcellbarsony/linux/wiki "Wiki - Installation script").
 
 ## Important note
 
@@ -12,8 +14,6 @@ This automated installation sequence follows the [Arch Installation guide](https
 
 Designed to ship a minimal, lightweight and security-focused Arch system.
 
-For the documentation, please refer to the [Wiki page](https://github.com/marcellbarsony/linux/wiki "Wiki - Marci's Arch config") of my config.
-
 ## Installation guide
 
 ### Base system
@@ -23,27 +23,28 @@ For the documentation, please refer to the [Wiki page](https://github.com/marcel
 2.) Verify the signature and boot the live environment
 
 3.) Install Git   
-
-`pacman -Sy git`
-
+```
+pacman -Sy git
+```
 4.) Clone this repository
-
-`git clone https://github.com/marcellbarsony/arch.git`
-
+```
+git clone https://github.com/marcellbarsony/arch.git
+```
 5.) Launch the installation script
-
-`bash arch.sh`
+```
+bash arch.sh
+```
 
 ### Chroot environment
 
 1.) Clone this repository
-
-`git clone https://github.com/marcellbarsony/arch.git`
-
+```
+git clone https://github.com/marcellbarsony/arch.git
+```
 2.) Launch the chroot script
-
-`bash arch_chroot.sh`
-
+```
+bash arch_chroot.sh
+```
 ### Post-installation
 
 1.) Reboot the machine and detach the installation disk
@@ -51,14 +52,16 @@ For the documentation, please refer to the [Wiki page](https://github.com/marcel
 2.) Log in as a normal user
 
 3.) Launch the post-installation script
-
-`bash arch_post.sh`
+```
+bash arch_post.sh
+```
 
 ## Features
 
 - UEFI
 - GRUB
-- LVM on LUKS
-- Network Manager
-- Xorg
 - Systemd
+- Hardened kernel
+- LVM on LUKS
+- Xorg
+- Network Manager
