@@ -99,7 +99,7 @@ clear
 echo "# Additional tools"
 $wait
 echo -ne $newline
-sudo pacman -S --noconfirm htop neofetch
+sudo pacman -S --noconfirm htop neofetch man-db
 clear
 
 # echo "AUR helper: PARU"
@@ -149,12 +149,12 @@ $wait
 clear
 
 echo "------------------------------"
-echo "# Logind"
+echo "# Systemd"
 echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
-sudo cp $HOME/dotfiles/logind/logind.conf /etc/systemd/
+sudo cp $HOME/dotfiles/systemd/logind/logind.conf /etc/systemd/
 copycheck
 $wait
 clear
