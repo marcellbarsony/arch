@@ -5,7 +5,6 @@
 # WARNING: script is under development & hard-coded
 # https://wiki.archlinux.org/
 # by Marcell Barsony
-# Last major update: 9/28/2021
 # --------------------------------------------------
 
 clear

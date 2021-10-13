@@ -5,7 +5,6 @@
 # WARNING: script is under development & hard-coded
 # https://wiki.archlinux.org/
 # by Marcell Barsony
-# Last major update: 10/3/2021
 # --------------------------------------------------
 
 clear
@@ -72,7 +71,7 @@ echo -ne $newline
 echo "# ZSH"
 $wait
 echo -ne $newline
-sudo pacman -S --noconfirm zsh
+sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
 clear
 
 echo "# X11 - Xorg"
