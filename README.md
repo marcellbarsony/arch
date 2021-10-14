@@ -12,7 +12,7 @@ Please note that this script is **hard-coded** for the time being.
 
 This automated installation sequence follows the [Arch Installation guide](https://wiki.archlinux.org/title/installation_guide) and the [Arch Principles](https://wiki.archlinux.org/title/Arch_Linux#Principles). 
 
-Designed to ship a minimal, lightweight and security-focused Arch system.
+Designed to ship a minimal, lightweight, privacy and security-focused Arch system.
 
 ## Installation guide
 
