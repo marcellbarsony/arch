@@ -153,7 +153,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
-sudo cp $HOME/dotfiles/systemd/logind/logind.conf /etc/systemd/
+sudo cp $HOME/dotfiles/systemd/logind.conf /etc/systemd/
 copycheck
 $wait
 clear
@@ -179,6 +179,16 @@ echo -ne $newline
 
 echo "Copying .zlogin"
 cp $HOME/dotfiles/zsh/.zlogin $HOME
+copycheck
+$wait
+
+echo "Copying .zshenv"
+cp $HOME/dotfiles/zsh/.zshenv $HOME
+copycheck
+$wait
+
+echo "Copying .zlogout"
+cp $HOME/dotfiles/zsh/.zlogout $HOME
 copycheck
 $wait
 clear
