@@ -106,7 +106,7 @@ echo -ne $newline
 
 echo "Cloning dotfiles to ~/dotfiles directory"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git $HOME/dotfiles
+git clone https://github.com/marcellbarsony/dotfiles.git $HOME
 $wait
 clear
 
@@ -116,7 +116,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying .xinitrc"
-cp $HOME/dotfiles/xorg/.xinitrc $HOME
+# cp $HOME/dotfiles/xorg/.xinitrc $HOME
 # cp /etc/X11/xinit/xinitrc $HOME/.xinitrc
 copycheck
 $wait
@@ -138,13 +138,13 @@ echo "# ZSH"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Changing shell to ZSH"
-$wait
-echo -ne $newline
+#echo "Changing shell to ZSH"
+#$wait
+#echo -ne $newline
 
-chsh -s /usr/bin/zsh
-$wait
-echo -ne $newline
+#chsh -s /usr/bin/zsh
+#$wait
+#echo -ne $newline
 
 #echo "Copying .zshrc"
 #cp $HOME/dotfiles/zsh/.zshrc $HOME
@@ -157,9 +157,9 @@ echo -ne $newline
 #copycheck
 #$wait
 
-echo "Copying .zshenv"
-cp $HOME/dotfiles/zsh/.zshenv /etc/zsh/zprofile
-copycheck
+#echo "Copying .zshenv"
+#cp $HOME/dotfiles/zsh/.zshenv /etc/zsh/zprofile
+#copycheck
 $wait
 
 #echo "Copying .zlogout"
@@ -239,30 +239,30 @@ clear
 # Cleaning up installation
 # --------------------------------------------------
 
-echo "------------------------------"
-echo "# Bash files"
-echo "------------------------------"
-echo -ne $newline
+# echo "------------------------------"
+# echo "# Bash files"
+# echo "------------------------------"
+# echo -ne $newline
 
-echo "Moving .bash_history"
-mv $HOME/.bash_history $HOME/dotfiles/_legacy/bash
-copycheck
-echo -ne $newline
+# echo "Moving .bash_history"
+# mv $HOME/.bash_history $HOME/dotfiles/_legacy/bash
+# copycheck
+# echo -ne $newline
 
-echo "Moving .bash_logout"
-mv $HOME/.bash_logout $HOME/dotfiles/_legacy/bash
-copycheck
-echo -ne $newline
+# echo "Moving .bash_logout"
+# mv $HOME/.bash_logout $HOME/dotfiles/_legacy/bash
+# copycheck
+# echo -ne $newline
 
-echo "Removing .bash_profile"
-mv $HOME/.bash_profile $HOME/dotfiles/_legacy/bash
-copycheck
-echo -ne $newline
+# echo "Removing .bash_profile"
+# mv $HOME/.bash_profile $HOME/dotfiles/_legacy/bash
+# copycheck
+# echo -ne $newline
 
-echo "Removing .bashrc"
-mv $HOME/.bashrc $HOME/dotfiles/_legacy/bash
-copycheck
-echo -ne $newline
+# echo "Removing .bashrc"
+# mv $HOME/.bashrc $HOME/dotfiles/_legacy/bash
+# copycheck
+# echo -ne $newline
 
 $wait
 sudo reboot now
