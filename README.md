@@ -61,7 +61,8 @@ bash arch_post.sh
 - UEFI
 - GRUB
 - Systemd
-- Hardened kernel
 - LVM on LUKS
 - Xorg
 - Network Manager
+- Vim & Neovim
+- TBA: _Hardened kernel_
