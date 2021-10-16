@@ -26,10 +26,10 @@ clear
 copycheck(){
 	if [ "$?" -eq "0" ]
 		then
-			echo "Copying successful"
+			echo "Successful"
 			$wait
 		else
-			echo "Copying unsuccessful - exit code $?"
+			echo "Unsuccessful - exit code $?"
 			$wait
 	fi
 }
@@ -95,12 +95,7 @@ echo -ne $newline
 
 echo "Copying hosts file"
 cp /dotfiles/hosts/hosts /etc/hosts
-if [ "$?" -eq "0" ]
-	then
-	    echo "Copying hosts file - Successful"
-	else
-	    echo "Copying hosts file - Unsuccessful: exit code $?"
-fi
+copycheck
 $wait
 clear
 
@@ -124,13 +119,7 @@ echo "Enabling Network manager"
 echo -ne $newline
 $wait
 systemctl enable NetworkManager
-if [ "$?" -eq "0" ]
-	then
-	    echo "Network manager has been enabled"
-	else
-	    echo "Failed to enable Network manager: exit code $?"
-fi
-$wait
+copycheck
 clear
 
 # --------------------------------------------------
@@ -303,16 +292,5 @@ sudo reboot now
 # echo "Umount partitions"
 # umount -l /mnt
 # $wait
-
-# echo "Reboot in 5..."
-# wait
-# echo "Reboot in 4..."
-# wait
-# echo "Reboot in 3..."
-# wait
-# echo "Reboot in 2..."
-# wait
-# echo "Reboot in 1..."
-# wait
 
 # reboot

@@ -33,31 +33,6 @@ copycheck(){
 }
 
 # --------------------------------------------------
-# Hostname
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Hostname"
-echo "------------------------------"
-echo -ne $newline
-
-read -p "Enter hostname: " hostname
-$wait
-echo -ne $newline
-
-echo "Setting hostname ${hostname}"
-echo -ne $newline
-hostnamectl set-hostname ${hostname}
-$wait
-echo -ne $newline
-
-echo "Checking hostname"
-echo -ne $newline
-hostnamectl
-$wait
-clear
-
-# --------------------------------------------------
 # Install necessary applications
 # --------------------------------------------------
 
@@ -171,27 +146,27 @@ chsh -s /usr/bin/zsh
 $wait
 echo -ne $newline
 
-echo "Copying .zshrc"
-cp $HOME/dotfiles/zsh/.zshrc $HOME
-copycheck
-$wait
-echo -ne $newline
+#echo "Copying .zshrc"
+#cp $HOME/dotfiles/zsh/.zshrc $HOME
+#copycheck
+#$wait
+#echo -ne $newline
 
-echo "Copying .zlogin"
-cp $HOME/dotfiles/zsh/.zlogin $HOME
-copycheck
-$wait
+#echo "Copying .zlogin"
+#cp $HOME/dotfiles/zsh/.zlogin $HOME
+#copycheck
+#$wait
 
 echo "Copying .zshenv"
-cp $HOME/dotfiles/zsh/.zshenv $HOME
+cp $HOME/dotfiles/zsh/.zshenv /etc/zsh/zprofile
 copycheck
 $wait
 
-echo "Copying .zlogout"
-cp $HOME/dotfiles/zsh/.zlogout $HOME
-copycheck
-$wait
-clear
+#echo "Copying .zlogout"
+#cp $HOME/dotfiles/zsh/.zlogout $HOME
+#copycheck
+#$wait
+#clear
 
 echo "------------------------------"
 echo "# Pacman"
