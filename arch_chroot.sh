@@ -87,6 +87,8 @@ clear
 # --------------------------------------------------
 # Network configuration
 # --------------------------------------------------
+# https://man.archlinux.org/man/machine-info.5
+# /etc/machine-info
 
 echo "------------------------------"
 echo "# Hosts & Hostname"
