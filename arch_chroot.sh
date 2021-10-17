@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/binbash
 
 # --------------------------------------------------
 # Arch Linux chroot script
@@ -103,11 +103,6 @@ $wait
 echo "Copying hostname"
 cp /dotfiles/hosts/hostname /etc/hostname
 copycheck
-$wait
-
-echo "Checking hostname" # Test check
-echo -ne $newline
-hostnamectl
 $wait
 
 read -p "Enter hostname: " hostname
