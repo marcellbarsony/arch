@@ -104,9 +104,11 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Cloning dotfiles to ~/dotfiles directory"
-echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git $HOME
+echo "Moving dotfiles to the HOME directory"
+# echo -ne $newline
+mv /dotfiles $HOME
+copycheck
+# git clone https://github.com/marcellbarsony/dotfiles.git $HOME/dotfiles
 $wait
 clear
 
@@ -188,29 +190,25 @@ echo "Create a .config directory"
 mkdir $HOME/.config
 $wait
 echo -ne $newline
-echo "Changing to .config directory"
-cd $HOME/.config
-$wait
-echo -ne $newline
 
 echo "Cloning 'DWM' repository"
 $wait
 echo -ne $newline
-git clone https://git.suckless.org/dwm
+git clone https://git.suckless.org/dwm $HOME/.config/dwm
 $wait
 echo -ne $newline
 
 echo "Cloning 'st' repository"
 $wait
 echo -ne $newline
-git clone https://git.suckless.org/st
+git clone https://git.suckless.org/st $HOME/.config/st
 $wait
 echo -ne $newline
 
 echo "Cloning 'dmenu' repository"
 $wait
 echo -ne $newline
-git clone https://git.suckless.org/dmenu
+git clone https://git.suckless.org/dmenu $HOME/.config/dmenu
 $wait
 echo -ne $newline
 
@@ -264,5 +262,9 @@ clear
 # copycheck
 # echo -ne $newline
 
-$wait
-sudo reboot now
+# --------------------------------------------------
+# REBOOT
+# --------------------------------------------------
+
+# $wait
+# sudo reboot now
