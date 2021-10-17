@@ -76,7 +76,7 @@ echo -ne $newline
 sudo pacman -S --noconfirm htop neofetch man-db
 clear
 
-# echo "AUR helper: PARU"
+# echo "# AUR helper - PARU"
 # # https://github.com/Morganamilo/paru
 # $wait
 # echo -ne $newline
@@ -111,16 +111,16 @@ $wait
 clear
 
 echo "------------------------------"
-echo "# Xorg - xinit"
+echo "# X11: Xorg - xinit"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Copying .xinitrc"
+# echo "Copying .xinitrc"
 # cp $HOME/dotfiles/xorg/.xinitrc $HOME
 # cp /etc/X11/xinit/xinitrc $HOME/.xinitrc
-copycheck
-$wait
-clear
+# copycheck
+# $wait
+# clear
 
 echo "------------------------------"
 echo "# Systemd"
@@ -138,35 +138,35 @@ echo "# ZSH"
 echo "------------------------------"
 echo -ne $newline
 
-#echo "Changing shell to ZSH"
-#$wait
-#echo -ne $newline
+# echo "Changing shell to ZSH"
+# $wait
+# echo -ne $newline
 
-#chsh -s /usr/bin/zsh
-#$wait
-#echo -ne $newline
+# chsh -s /usr/bin/zsh
+# $wait
+# echo -ne $newline
 
-#echo "Copying .zshrc"
-#cp $HOME/dotfiles/zsh/.zshrc $HOME
-#copycheck
-#$wait
-#echo -ne $newline
+# echo "Copying .zshrc"
+# cp $HOME/dotfiles/zsh/.zshrc $HOME
+# copycheck
+# $wait
+# echo -ne $newline
 
-#echo "Copying .zlogin"
-#cp $HOME/dotfiles/zsh/.zlogin $HOME
-#copycheck
-#$wait
+# echo "Copying .zlogin"
+# cp $HOME/dotfiles/zsh/.zlogin $HOME
+# copycheck
+# $wait
 
-#echo "Copying .zshenv"
-#cp $HOME/dotfiles/zsh/.zshenv /etc/zsh/zprofile
-#copycheck
-$wait
+# echo "Copying .zshenv"
+# cp $HOME/dotfiles/zsh/.zshenv /etc/zsh/zprofile
+# copycheck
+# $wait
 
-#echo "Copying .zlogout"
-#cp $HOME/dotfiles/zsh/.zlogout $HOME
-#copycheck
-#$wait
-#clear
+# echo "Copying .zlogout"
+# cp $HOME/dotfiles/zsh/.zlogout $HOME
+# copycheck
+# $wait
+# clear
 
 echo "------------------------------"
 echo "# Pacman"

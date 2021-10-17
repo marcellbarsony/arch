@@ -50,31 +50,6 @@ $wait
 clear
 
 # --------------------------------------------------
-# Hostname
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Hostname"
-echo "------------------------------"
-echo -ne $newline
-
-read -p "Enter hostname: " hostname
-$wait
-echo -ne $newline
-
-echo "Setting hostname ${hostname}"
-echo -ne $newline
-hostnamectl set-hostname ${hostname}
-$wait
-echo -ne $newline
-
-echo "Checking hostname"
-echo -ne $newline
-hostnamectl
-$wait
-clear
-
-# --------------------------------------------------
 # LVM support
 # --------------------------------------------------
 
@@ -118,9 +93,19 @@ echo "# Hosts & Hostname"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Copying hosts file"
+echo "Copying hosts"
 cp /dotfiles/hosts/hosts /etc/hosts
 copycheck
+$wait
+
+echo "Copying hostname"
+cp /dotfiles/hosts/hostname /etc/hostname
+copycheck
+$wait
+
+echo "Checking hostname" # Test check
+echo -ne $newline
+hostnamectl
 $wait
 
 read -p "Enter hostname: " hostname
@@ -317,11 +302,7 @@ echo "------------------------------"
 echo -ne $newline
 
 $wait
-sudo reboot now
-
-# --------------------------------------------------
-# Umount & Reboot
-# --------------------------------------------------
+reboot now
 
 # echo "------------------------------"
 # echo "# Umount & Reboot"
@@ -333,4 +314,4 @@ sudo reboot now
 # umount -l /mnt
 # $wait
 
-# reboot
+# reboot now
