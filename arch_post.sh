@@ -115,12 +115,12 @@ echo "# X11: Xorg - xinit"
 echo "------------------------------"
 echo -ne $newline
 
-# echo "Copying .xinitrc"
-# cp $HOME/dotfiles/xorg/.xinitrc $HOME
+echo "Copying .xinitrc"
+cp $HOME/dotfiles/xorg/.xinitrc $HOME
 # cp /etc/X11/xinit/xinitrc $HOME/.xinitrc
-# copycheck
-# $wait
-# clear
+copycheck
+$wait
+clear
 
 echo "------------------------------"
 echo "# Systemd"
@@ -138,19 +138,19 @@ echo "# ZSH"
 echo "------------------------------"
 echo -ne $newline
 
-# echo "Changing shell to ZSH"
-# $wait
-# echo -ne $newline
+echo "Changing shell to ZSH"
+$wait
+echo -ne $newline
 
-# chsh -s /usr/bin/zsh
-# $wait
-# echo -ne $newline
+chsh -s /usr/bin/zsh
+$wait
+echo -ne $newline
 
-# echo "Copying .zshrc"
-# cp $HOME/dotfiles/zsh/.zshrc $HOME
-# copycheck
-# $wait
-# echo -ne $newline
+echo "Copying .zshrc"
+cp $HOME/dotfiles/zsh/.zshrc $HOME
+copycheck
+$wait
+echo -ne $newline
 
 # echo "Copying .zlogin"
 # cp $HOME/dotfiles/zsh/.zlogin $HOME
