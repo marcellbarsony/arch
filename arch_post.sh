@@ -105,10 +105,8 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Moving dotfiles to the HOME directory"
-# echo -ne $newline
-mv /dotfiles $HOME
-copycheck
-# git clone https://github.com/marcellbarsony/dotfiles.git $HOME/dotfiles
+echo -ne $newline
+git clone https://github.com/marcellbarsony/dotfiles.git $HOME/dotfiles
 $wait
 clear
 
@@ -233,9 +231,16 @@ sudo make clean install
 $wait
 clear
 
-# --------------------------------------------------
-# Cleaning up installation
-# --------------------------------------------------
+echo "--------------------------------------------------"
+echo "# Cleaning up installation"
+echo "--------------------------------------------------"
+echo -ne $newline
+
+echo "Removing dotfiles from /ROOT"
+sudo rm -rf /dotfiles
+copycheck
+$wait
+
 
 # echo "------------------------------"
 # echo "# Bash files"
