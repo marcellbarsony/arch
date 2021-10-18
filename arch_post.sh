@@ -111,18 +111,6 @@ $wait
 clear
 
 echo "------------------------------"
-echo "# X11: Xorg - xinit"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Copying .xinitrc"
-cp $HOME/dotfiles/xorg/.xinitrc $HOME
-# cp /etc/X11/xinit/xinitrc $HOME/.xinitrc
-copycheck
-$wait
-clear
-
-echo "------------------------------"
 echo "# Systemd"
 echo "------------------------------"
 echo -ne $newline
@@ -139,7 +127,6 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Changing shell to ZSH"
-$wait
 echo -ne $newline
 
 chsh -s /usr/bin/zsh
@@ -157,16 +144,17 @@ echo -ne $newline
 # copycheck
 # $wait
 
-# echo "Copying .zshenv"
-# cp $HOME/dotfiles/zsh/.zshenv /etc/zsh/zprofile
-# copycheck
-# $wait
+echo "Copying .zprofile"
+cp $HOME/dotfiles/zsh/.zprofile /etc/zsh/zprofile
+copycheck
+$wait
 
 # echo "Copying .zlogout"
 # cp $HOME/dotfiles/zsh/.zlogout $HOME
 # copycheck
 # $wait
-# clear
+
+clear
 
 echo "------------------------------"
 echo "# Pacman"
