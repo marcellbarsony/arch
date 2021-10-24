@@ -44,36 +44,42 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "# ZSH"
-$wait
 echo -ne $newline
 sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
+$wait
 clear
 
 echo "# X11 - Xorg"
-$wait
 echo -ne $newline
 sudo pacman -S --noconfirm xorg-server xorg-xinit arandr
+$wait
+clear
+
+echo "# Browser"
+echo -ne $newline
+sudo pacman -S noconfirm firefox
+$wait
 clear
 
 echo "# Intel firmware"
-$wait
 echo -ne $newline
 sudo pacman -S --noconfirm intel-ucode xf86-video-intel
+$wait
 clear
 
 echo "# Sound system - ALSA & Pulseaudio & Sof"
-$wait
 echo -ne $newline
 # ALSA
 	sudo pacman -S --noconfirm alsa alsa-utils alsa-firmware
 # Pulseaudio, sof
 	sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa pavucontrol sof-firmware
+$wait
 clear
 
 echo "# Additional tools"
-$wait
 echo -ne $newline
 sudo pacman -S --noconfirm htop neofetch man-db
+$wait
 clear
 
 # echo "# AUR helper - PARU"
@@ -188,32 +194,29 @@ $wait
 echo -ne $newline
 
 echo "Cloning 'DWM' repository"
-$wait
 echo -ne $newline
 git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
 $wait
 echo -ne $newline
 
 echo "Cloning 'st' repository"
-$wait
 echo -ne $newline
 git clone https://github.com/marcellbarsony/st.git $HOME/.config/st
 $wait
 echo -ne $newline
 
 echo "Cloning 'dmenu' repository"
-$wait
 echo -ne $newline
 git clone https://github.com/marcellbarsony/dmenu.git $HOME/.config/dmenu
 $wait
 echo -ne $newline
 
 echo "Cloning 'slstatus' repository"
-$wait
 echo -ne $newline
 git clone https://git.suckless.org/slstatus $HOME/.config/slstatus
 $wait
 echo -ne $newline
+clear
 
 echo "Changing directory to ~/.config/dwm & compiling"
 echo -ne $newline
@@ -253,6 +256,11 @@ sudo rm -rf /dotfiles
 copycheck
 $wait
 
+echo "Removing installation script from /ROOT"
+sudo rm -rf /arch
+copycheck
+$wait
+clear
 
 # echo "------------------------------"
 # echo "# Bash files"
