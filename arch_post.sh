@@ -198,6 +198,13 @@ git clone https://git.suckless.org/dmenu $HOME/.config/dmenu
 $wait
 echo -ne $newline
 
+echo "Cloning 'slstatus' repository"
+$wait
+echo -ne $newline
+git clone https://git.suckless.org/slstatus $HOME/.config/slstatus
+$wait
+echo -ne $newline
+
 echo "Changing directory to ~/.config/dwm & compiling"
 echo -ne $newline
 cd $HOME/.config/dwm
@@ -215,6 +222,13 @@ clear
 echo "Changing directory to ~/.config/dmenu & compiling"
 echo -ne $newline
 cd $HOME/.config/dmenu
+sudo make clean install
+$wait
+clear
+
+echo "Changing directory to ~/.config/slstatus & compiling"
+echo -ne $newline
+cd $HOME/.config/slstatus
 sudo make clean install
 $wait
 clear

@@ -280,9 +280,14 @@ echo "# Sudoers"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Uncomment the %wheel group from sudoers"
+echo "Uncomment %wheel group"
 echo -ne $newline
 sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
+
+echo "Add insults"
+echo -ne $newline
+sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
+
 export EDITOR="cp /etc/sudoers.new"
 visudo
 rm /etc/sudoers.new
