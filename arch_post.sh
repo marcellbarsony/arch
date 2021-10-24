@@ -145,7 +145,7 @@ echo -ne $newline
 # $wait
 
 echo "Copying .zprofile"
-cp $HOME/dotfiles/zsh/.zprofile /etc/zsh/zprofile
+sudo cp $HOME/dotfiles/zsh/.zprofile /etc/zsh/zprofile
 copycheck
 $wait
 
@@ -168,6 +168,16 @@ $wait
 clear
 
 echo "------------------------------"
+echo "# VIM"
+echo "------------------------------"
+
+echo "Copying .vimrc"
+cp $HOME/dotfiles/vim/.vimrc $HOME
+copycheck
+$wait
+clear
+
+echo "------------------------------"
 echo "# Suckless software"
 echo "------------------------------"
 echo -ne $newline
@@ -180,21 +190,21 @@ echo -ne $newline
 echo "Cloning 'DWM' repository"
 $wait
 echo -ne $newline
-git clone https://git.suckless.org/dwm $HOME/.config/dwm
+git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
 $wait
 echo -ne $newline
 
 echo "Cloning 'st' repository"
 $wait
 echo -ne $newline
-git clone https://git.suckless.org/st $HOME/.config/st
+git clone https://github.com/marcellbarsony/st.git $HOME/.config/st
 $wait
 echo -ne $newline
 
 echo "Cloning 'dmenu' repository"
 $wait
 echo -ne $newline
-git clone https://git.suckless.org/dmenu $HOME/.config/dmenu
+git clone https://github.com/marcellbarsony/dmenu.git $HOME/.config/dmenu
 $wait
 echo -ne $newline
 

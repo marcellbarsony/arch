@@ -99,11 +99,13 @@ echo "Copying hosts"
 cp /dotfiles/hosts/hosts /etc/hosts
 copycheck
 $wait
+echo -ne $newline
 
 echo "Copying hostname"
 cp /dotfiles/hosts/hostname /etc/hostname
 copycheck
 $wait
+echo -ne $newline
 
 read -p "Enter hostname: " hostname
 $wait
