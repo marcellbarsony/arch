@@ -55,6 +55,12 @@ sudo pacman -S --noconfirm xorg-server xorg-xinit arandr
 $wait
 clear
 
+echo "# Xmonad & Xmobar"
+echo -ne $newline
+sudo pacman -S --noconfirm xmonad xmobar
+$wait
+clear
+
 echo "# Browser"
 echo -ne $newline
 sudo pacman -S noconfirm firefox
@@ -155,10 +161,10 @@ sudo cp $HOME/dotfiles/zsh/.zprofile /etc/zsh/zprofile
 copycheck
 $wait
 
-# echo "Copying .zlogout"
-# cp $HOME/dotfiles/zsh/.zlogout $HOME
-# copycheck
-# $wait
+echo "Copying .zlogout"
+cp $HOME/dotfiles/zsh/.zlogout $HOME
+copycheck
+$wait
 
 clear
 
@@ -193,11 +199,11 @@ mkdir $HOME/.config
 $wait
 echo -ne $newline
 
-echo "Cloning 'DWM' repository"
-echo -ne $newline
-git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
-$wait
-echo -ne $newline
+# echo "Cloning 'DWM' repository"
+# echo -ne $newline
+# git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
+# $wait
+# echo -ne $newline
 
 echo "Cloning 'st' repository"
 echo -ne $newline
@@ -211,19 +217,19 @@ git clone https://github.com/marcellbarsony/dmenu.git $HOME/.config/dmenu
 $wait
 echo -ne $newline
 
-echo "Cloning 'slstatus' repository"
-echo -ne $newline
-git clone https://git.suckless.org/slstatus $HOME/.config/slstatus
-$wait
-echo -ne $newline
-clear
+# echo "Cloning 'slstatus' repository"
+# echo -ne $newline
+# git clone https://git.suckless.org/slstatus $HOME/.config/slstatus
+# $wait
+# echo -ne $newline
+# clear
 
-echo "Changing directory to ~/.config/dwm & compiling"
-echo -ne $newline
-cd $HOME/.config/dwm
-sudo make clean install
-$wait
-clear
+# echo "Changing directory to ~/.config/dwm & compiling"
+# echo -ne $newline
+# cd $HOME/.config/dwm
+# sudo make clean install
+# $wait
+# clear
 
 echo "Changing directory to ~/.config/st & compiling"
 echo -ne $newline
@@ -239,12 +245,12 @@ sudo make clean install
 $wait
 clear
 
-echo "Changing directory to ~/.config/slstatus & compiling"
-echo -ne $newline
-cd $HOME/.config/slstatus
-sudo make clean install
-$wait
-clear
+# echo "Changing directory to ~/.config/slstatus & compiling"
+# echo -ne $newline
+# cd $HOME/.config/slstatus
+# sudo make clean install
+# $wait
+# clear
 
 echo "--------------------------------------------------"
 echo "# Cleaning up installation"
