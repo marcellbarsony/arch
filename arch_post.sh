@@ -193,11 +193,15 @@ mkdir $HOME/.config
 $wait
 echo -ne $newline
 
-echo "Cloning 'DWM' repository"
+# echo "Cloning 'DWM' repository"
+# echo -ne $newline
+# git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
+# $wait
+# echo -ne $newline
+
+echo "Cloning 'DWM - flexipatch' repository"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
-$wait
-echo -ne $newline
+git clone https://github.com/bakkeby/dwm-flexipatch.git $HOME/.config/dwm_flexipatch
 
 echo "Cloning 'st' repository"
 echo -ne $newline
