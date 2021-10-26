@@ -220,9 +220,9 @@ $wait
 echo -ne $newline
 clear
 
-echo "Changing directory to ~/.config/dwm & compiling"
+echo "Changing directory to ~/.config/dwm_flexipatch & compiling"
 echo -ne $newline
-cd $HOME/.config/dwm
+cd $HOME/.config/dwm_flexipatch
 sudo make clean install
 $wait
 clear
