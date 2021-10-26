@@ -30,9 +30,13 @@ pacman -Sy git
 ```
 git clone https://github.com/marcellbarsony/arch.git
 ```
-5.) Launch the installation script
+5.) Change to arch directory
 ```
-bash arch.sh
+cd arch
+```
+6.) Launch the installation script
+```
+sh arch.sh
 ```
 
 ### Chroot environment
@@ -40,6 +44,10 @@ bash arch.sh
 1.) Clone this repository
 ```
 git clone https://github.com/marcellbarsony/arch.git
+```
+2.) Change to arch directoy
+```
+cd arch
 ```
 2.) Launch the chroot script
 ```
@@ -51,10 +59,11 @@ bash arch_chroot.sh
 
 2.) Log in as a normal user
 
-3.) Launch the post-installation script
+3.) Change to arch directory
 ```
-bash arch_post.sh
+cd arch
 ```
+4.) Launch the post script
 
 ## Features
 
@@ -62,7 +71,11 @@ bash arch_post.sh
 - GRUB
 - Systemd
 - LVM on LUKS
-- Xorg
+- X11
 - Network Manager
 - Vim & Neovim
-- TBA: _Hardened kernel_
+- dwm
+- st
+- dmenu
+- slstatus
+- **TBA**: _Hardened kernel_
