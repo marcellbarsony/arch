@@ -193,11 +193,9 @@ mkdir $HOME/.config
 $wait
 echo -ne $newline
 
-# echo "Cloning 'DWM' repository"
-echo "Cloning 'DWM - flexipatch' repository"
+echo "Cloning 'dwm' repository"
 echo -ne $newline
-# git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
-git clone https://github.com/marcellbarsony/dwm_flexipatch.git $HOME/.config/dwm_flexipatch
+git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
 $wait
 echo -ne $newline
 
@@ -220,9 +218,9 @@ $wait
 echo -ne $newline
 clear
 
-echo "Changing directory to ~/.config/dwm_flexipatch & compiling"
+echo "Changing directory to ~/.config/dwm & compiling"
 echo -ne $newline
-cd $HOME/.config/dwm_flexipatch
+cd $HOME/.config/dwm
 sudo make clean install
 $wait
 clear
