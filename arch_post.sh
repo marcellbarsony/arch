@@ -67,6 +67,12 @@ sudo pacman -S --noconfirm intel-ucode xf86-video-intel
 $wait
 clear
 
+echo "# OpenSSH"
+echo -ne $newline
+sudo pacman -S --noconfirm openssh
+$wait
+clear
+
 echo "# Sound system - ALSA & Pulseaudio & Sof"
 echo -ne $newline
 # ALSA
