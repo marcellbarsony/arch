@@ -51,7 +51,7 @@ cd arch
 ```
 2.) Launch the chroot script
 ```
-bash arch_chroot.sh
+sh arch_chroot.sh
 ```
 ### Post-installation
 
@@ -64,6 +64,9 @@ bash arch_chroot.sh
 cd arch
 ```
 4.) Launch the post script
+```
+sh arch_post.sh
+```
 
 ## Features
 
@@ -72,10 +75,14 @@ cd arch
 - Systemd
 - LVM on LUKS
 - X11
+- ZSH
 - Network Manager
 - Vim & Neovim
-- dwm
-- st
-- dmenu
-- slstatus
+- Suckless
+  - dwm
+  - dmenu
+  - st
+  - slstatus
+- Git
+- OpenSSH
 - **TBA**: _Hardened kernel_
