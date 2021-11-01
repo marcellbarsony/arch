@@ -219,7 +219,7 @@ echo -ne $newline
 
 echo "Cloning 'slstatus' repository"
 echo -ne $newline
-git clone https://git.suckless.org/slstatus $HOME/.config/slstatus
+git clone https://github.com/marcellbarsony/slstatus.git $HOME/.config/slstatus
 $wait
 echo -ne $newline
 clear
