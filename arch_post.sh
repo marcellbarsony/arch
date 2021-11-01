@@ -84,7 +84,7 @@ clear
 
 echo "# Additional tools"
 echo -ne $newline
-sudo pacman -S --noconfirm htop neofetch man-db
+sudo pacman -S --noconfirm htop neofetch man-db feh
 $wait
 clear
 
@@ -151,10 +151,10 @@ copycheck
 $wait
 echo -ne $newline
 
-# echo "Copying .zlogin"
-# cp $HOME/dotfiles/zsh/.zlogin $HOME
-# copycheck
-# $wait
+echo "Copying .zshenv"
+sudo cp $HOME/dotfiles/zsh/.zshenv /usr/local/etc
+copycheck
+$wait
 
 echo "Copying .zprofile"
 sudo cp $HOME/dotfiles/zsh/.zprofile /etc/zsh/zprofile
