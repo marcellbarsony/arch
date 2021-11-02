@@ -154,17 +154,18 @@ echo "Copying .zshenv"
 sudo cp $HOME/.config/zsh/.zshenv /usr/local/etc
 copycheck
 $wait
+echo -ne $newline
 
 echo "Copying .zprofile"
 sudo cp $HOME/.config/zsh/.zprofile /etc/zsh/zprofile
 copycheck
 $wait
+echo -ne $newline
 
 echo "Copying .zlogout"
 cp $HOME/.config/zsh/.zlogout $HOME
 copycheck
 $wait
-
 clear
 
 echo "------------------------------"
@@ -189,13 +190,8 @@ $wait
 clear
 
 echo "------------------------------"
-echo "# Suckless software"
+echo "# Suckless"
 echo "------------------------------"
-echo -ne $newline
-
-echo "Create a .config directory"
-mkdir $HOME/.config
-$wait
 echo -ne $newline
 
 echo "Cloning 'dwm' repository"
