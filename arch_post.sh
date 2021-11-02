@@ -84,7 +84,7 @@ clear
 
 echo "# Additional tools"
 echo -ne $newline
-sudo pacman -S --noconfirm htop neofetch man-db feh
+sudo pacman -S --noconfirm htop neofetch man-db python-pywal
 $wait
 clear
 
