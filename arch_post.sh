@@ -118,8 +118,7 @@ echo -ne $newline
 
 echo "Moving dotfiles to the HOME directory"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git $HOME/dotfiles
-$wait
+git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
 clear
 
 echo "------------------------------"
@@ -128,7 +127,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying logind.conf"
-sudo cp $HOME/dotfiles/systemd/logind.conf /etc/systemd/
+sudo cp $HOME/.config/systemd/logind.conf /etc/systemd/
 copycheck
 $wait
 clear
@@ -146,23 +145,23 @@ $wait
 echo -ne $newline
 
 echo "Copying .zshrc"
-cp $HOME/dotfiles/zsh/.zshrc $HOME
+cp $HOME/.config/zsh/.zshrc $HOME
 copycheck
 $wait
 echo -ne $newline
 
 echo "Copying .zshenv"
-sudo cp $HOME/dotfiles/zsh/.zshenv /usr/local/etc
+sudo cp $HOME/.config/zsh/.zshenv /usr/local/etc
 copycheck
 $wait
 
 echo "Copying .zprofile"
-sudo cp $HOME/dotfiles/zsh/.zprofile /etc/zsh/zprofile
+sudo cp $HOME/.config/zsh/.zprofile /etc/zsh/zprofile
 copycheck
 $wait
 
 echo "Copying .zlogout"
-cp $HOME/dotfiles/zsh/.zlogout $HOME
+cp $HOME/.config/zsh/.zlogout $HOME
 copycheck
 $wait
 
@@ -174,7 +173,7 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying pacman.conf"
-sudo cp $HOME/dotfiles/pacman/pacman.conf /etc/
+sudo cp $HOME/.config/pacman/pacman.conf /etc/
 copycheck
 $wait
 clear
@@ -184,7 +183,7 @@ echo "# VIM"
 echo "------------------------------"
 
 echo "Copying .vimrc"
-cp $HOME/dotfiles/vim/.vimrc $HOME
+cp $HOME/.config/vim/.vimrc $HOME
 copycheck
 $wait
 clear
@@ -201,53 +200,53 @@ echo -ne $newline
 
 echo "Cloning 'dwm' repository"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dwm.git $HOME/.config/dwm
+git clone https://github.com/marcellbarsony/dwm.git $HOME/.local/src/dwm
 $wait
 echo -ne $newline
 
 echo "Cloning 'st' repository"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/st.git $HOME/.config/st
+git clone https://github.com/marcellbarsony/st.git $HOME/.local/src/st
 $wait
 echo -ne $newline
 
 echo "Cloning 'dmenu' repository"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dmenu.git $HOME/.config/dmenu
+git clone https://github.com/marcellbarsony/dmenu.git $HOME/.local/src/dmenu
 $wait
 echo -ne $newline
 
 echo "Cloning 'slstatus' repository"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/slstatus.git $HOME/.config/slstatus
+git clone https://github.com/marcellbarsony/slstatus.git $HOME/.local/src/slstatus
 $wait
 echo -ne $newline
 clear
 
-echo "Changing directory to ~/.config/dwm & compiling"
+echo "Changing directory to ~/.local/src/dwm & compiling"
 echo -ne $newline
-cd $HOME/.config/dwm
+cd $HOME/.local/src/dwm
 sudo make clean install
 $wait
 clear
 
-echo "Changing directory to ~/.config/st & compiling"
+echo "Changing directory to ~/.local/src/st & compiling"
 echo -ne $newline
-cd $HOME/.config/st
+cd $HOME/.local/src/st
 sudo make clean install
 $wait
 clear
 
-echo "Changing directory to ~/.config/dmenu & compiling"
+echo "Changing directory to ~/.local/src/dmenu & compiling"
 echo -ne $newline
-cd $HOME/.config/dmenu
+cd $HOME/.local/src/dmenu
 sudo make clean install
 $wait
 clear
 
-echo "Changing directory to ~/.config/slstatus & compiling"
+echo "Changing directory to ~/.local/src/slstatus & compiling"
 echo -ne $newline
-cd $HOME/.config/slstatus
+cd $HOME/.local/src/slstatus
 sudo make clean install
 $wait
 clear
@@ -274,22 +273,22 @@ clear
 # echo -ne $newline
 
 # echo "Moving .bash_history"
-# mv $HOME/.bash_history $HOME/dotfiles/_legacy/bash
+# mv $HOME/.bash_history $HOME/.config/_legacy/bash
 # copycheck
 # echo -ne $newline
 
 # echo "Moving .bash_logout"
-# mv $HOME/.bash_logout $HOME/dotfiles/_legacy/bash
+# mv $HOME/.bash_logout $HOME/.config/_legacy/bash
 # copycheck
 # echo -ne $newline
 
 # echo "Removing .bash_profile"
-# mv $HOME/.bash_profile $HOME/dotfiles/_legacy/bash
+# mv $HOME/.bash_profile $HOME/.config/_legacy/bash
 # copycheck
 # echo -ne $newline
 
 # echo "Removing .bashrc"
-# mv $HOME/.bashrc $HOME/dotfiles/_legacy/bash
+# mv $HOME/.bashrc $HOME/.config/_legacy/bash
 # copycheck
 # echo -ne $newline
 
