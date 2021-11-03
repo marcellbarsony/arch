@@ -73,6 +73,12 @@ sudo pacman -S --noconfirm openssh
 $wait
 clear
 
+echo "# CLI Tools"
+echo -ne $newline
+sudo pacman -S --noconfirm github-cli bitwarden-cli
+$wait
+clear
+
 echo "# Sound system - ALSA & Pulseaudio & Sof"
 echo -ne $newline
 # ALSA
