@@ -122,8 +122,8 @@ echo "# Bitwarden"
 echo "------------------------------"
 echo -ne $newline
 
-read -p "Bitwarden - Enter 2FA code: " bw2fa
-bwsession=`bw login --method 0 --code bw2fa | grep "BW_SESSION"`
+read -p "Enter 2FA code: " bw2fa
+bwsession=`bw login --method 0 --code bw2fa | grep "BW_SESSION" | cut -c 2-`
 $bwsession
 
 # --------------------------------------------------
