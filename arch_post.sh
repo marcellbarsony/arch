@@ -122,9 +122,9 @@ echo "# Bitwarden"
 echo "------------------------------"
 echo -ne $newline
 
-read -p "Enter 2FA code: " bw2fa
-bwsession=`bw login --method 0 --code bw2fa | grep "BW_SESSION" | cut -c 2-`
-$bwsession
+read -p "? 2FA code: " bw2fa
+bwsession=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -c 3-`
+eval $bwsession
 
 # --------------------------------------------------
 # Configs
