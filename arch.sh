@@ -213,7 +213,7 @@ echo -ne $newline
 echo "Installing essential packages"
 $wait
 echo -ne $newline
-pacstrap /mnt base linux linux-firmware bash-completion linux-headers base-devel git nano vim
+pacstrap /mnt base linux linux-firmware linux-headers base-devel bash-completion git nano vim
 $wait
 clear
 

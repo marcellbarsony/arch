@@ -79,28 +79,30 @@ sudo pacman -S --noconfirm github-cli bitwarden-cli
 $wait
 clear
 
+echo "Python"
+echo -ne $newline
+sudo pacman -S -noconfirm python pip python-pywal bpytop
+$wait
+clear
+
 echo "# Sound system - ALSA & Pulseaudio & Sof"
 echo -ne $newline
-# ALSA
-	sudo pacman -S --noconfirm alsa alsa-utils alsa-firmware
-# Pulseaudio, sof
-	sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa pavucontrol sof-firmware
+sudo pacman -S --noconfirm alsa alsa-utils alsa-firmware # ALSA
+sudo pacman -S --noconfirm pulseaudio pulseaudio-alsa pavucontrol sof-firmware # Pulesaudio - sof
 $wait
 clear
 
 echo "# Additional tools"
 echo -ne $newline
-sudo pacman -S --noconfirm htop neofetch man-db python-pywal
+sudo pacman -S --noconfirm htop neofetch man-db tldr
 $wait
 clear
 
-# echo "# AUR helper - PARU"
-# # https://github.com/Morganamilo/paru
-# $wait
-# echo -ne $newline
-# echo "Cloning Git repository"
-# echo -ne $newline
-# git clone https://aur.archlinux.org/paru.git
+echo "# AUR helper - PARU"
+# https://github.com/Morganamilo/paru
+echo -ne $newline
+
+git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
 # $wait
 # echo"Changing directoy to paru"
 # cd paru
@@ -110,7 +112,6 @@ clear
 # makepkg -si
 # $wait
 # cd $HOME
-# $wait
 # clear
 
 # --------------------------------------------------
