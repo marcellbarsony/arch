@@ -43,9 +43,9 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Cloning dotfiles to HOME/.config directory"
+echo "Cloning dotfiles to /dotfiles directory"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
+git clone https://github.com/marcellbarsony/dotfiles.git /dotfiles
 $wait
 clear
 
@@ -69,7 +69,7 @@ echo -ne $newline
 
 echo "Copying mkinitcpio.conf"
 $wait
-cp $HOME/.config/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
+cp /dotfiles/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
 copycheck
 $wait
 echo -ne $newline
@@ -92,12 +92,12 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying hosts"
-cp $HOME/.config/hosts/hosts /etc/hosts
+cp /dotfiles/hosts/hosts /etc/hosts
 copycheck
 echo -ne $newline
 
 echo "Copying hostname"
-cp $HOME/.config/hosts/hostname /etc/hostname
+cp /dotfiles/hosts/hostname /etc/hostname
 copycheck
 echo -ne $newline
 
@@ -148,12 +148,12 @@ echo -ne $newline
 
 echo "Copying locale.gen"
 $wait
-cp $HOME/.config/locale/locale.gen /etc/locale.gen
+cp /dotfiles/locale/locale.gen /etc/locale.gen
 copycheck
 echo -ne $newline
 
 echo "Copying locale.conf"
-cp $HOME/.config/locale/locale.conf /etc/locale.conf
+cp /dotfiles/locale/locale.conf /etc/locale.conf
 copycheck
 echo -ne $newline
 
@@ -202,7 +202,7 @@ $wait
 echo -ne $newline
 
 echo "Copying GRUB config"
-cp $HOME/.config/grub/grub /etc/default/grub
+cp /dotfiles/grub/grub /etc/default/grub
 copycheck
 $wait
 echo -ne $newline
