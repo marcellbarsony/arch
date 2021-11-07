@@ -102,13 +102,11 @@ copycheck
 echo -ne $newline
 
 read -p "Enter hostname: " hostname
-$wait
 echo -ne $newline
 
 echo "Setting hostname ${hostname}"
 echo -ne $newline
 hostnamectl set-hostname ${hostname}
-$wait
 echo -ne $newline
 
 echo "Checking hostname"
@@ -132,9 +130,9 @@ clear
 
 echo "Enabling Network manager"
 echo -ne $newline
-$wait
 systemctl enable NetworkManager
 copycheck
+$wait
 clear
 
 # --------------------------------------------------
@@ -147,7 +145,6 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying locale.gen"
-$wait
 cp /dotfiles/locale/locale.gen /etc/locale.gen
 copycheck
 echo -ne $newline
@@ -182,29 +179,24 @@ echo -ne $newline
 
 echo "Creating EFI directory for boot"
 mkdir /boot/EFI
-$wait
 echo -ne $newline
 
 echo "Mounting EFI partition"
 mount /dev/nvme0n1p1 /boot/EFI
-$wait
 echo -ne $newline
 
 echo "Installing grub on the MBR"
 grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
-$wait
 echo -ne $newline
 
 echo "Copying GRUB config snippet"
 cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
 copycheck
-$wait
 echo -ne $newline
 
 echo "Copying GRUB config"
 cp /dotfiles/grub/grub /etc/default/grub
 copycheck
-$wait
 echo -ne $newline
 
 echo "Creating a GRUB config file"
