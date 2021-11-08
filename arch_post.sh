@@ -94,7 +94,7 @@ clear
 
 echo "# Additional tools"
 echo -ne $newline
-sudo pacman -S --noconfirm htop neofetch man-db tldr
+sudo pacman -S --noconfirm htop bpytop neofetch man-db tldr
 $wait
 clear
 
@@ -118,14 +118,14 @@ git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
 # Bitwarden
 # --------------------------------------------------
 
-echo "------------------------------"
-echo "# Bitwarden"
-echo "------------------------------"
-echo -ne $newline
+# echo "------------------------------"
+# echo "# Bitwarden"
+# echo "------------------------------"
+# echo -ne $newline
 
-read -p "? 2FA code: " bw2fa
-bwsession=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -c 3-`
-eval $bwsession
+# read -p "? 2FA code: " bw2fa
+# bwsession=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -c 3-`
+# eval $bwsession
 
 # --------------------------------------------------
 # Configs
