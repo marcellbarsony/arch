@@ -94,7 +94,7 @@ clear
 
 echo "# Additional tools"
 echo -ne $newline
-sudo pacman -S --noconfirm htop bpytop neofetch man-db tldr
+sudo pacman -S --noconfirm htop bpytop neofetch unclutter man-db tldr
 $wait
 clear
 
@@ -103,16 +103,10 @@ echo "# AUR helper - PARU"
 echo -ne $newline
 
 git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
-# $wait
-# echo"Changing directoy to paru"
-# cd paru
-# $wait
-# echo "Building package"
-# echo -ne $newline
-# makepkg -si
-# $wait
-# cd $HOME
-# clear
+cd $HOME/.local/src/paru
+makepkg -si --noconfirm
+cd $HOME
+clear
 
 # --------------------------------------------------
 # Bitwarden
