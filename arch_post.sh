@@ -112,10 +112,13 @@ clear
 # Bitwarden
 # --------------------------------------------------
 
-# echo "------------------------------"
-# echo "# Bitwarden"
-# echo "------------------------------"
-# echo -ne $newline
+echo "------------------------------"
+echo "# Bitwarden"
+echo "------------------------------"
+echo -ne $newline
+
+# RBW b y doy - https://github.com/doy/rbw
+sudo pacman -S --noconfirm rbw
 
 # read -p "? 2FA code: " bw2fa
 # bwsession=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -c 3-`
@@ -153,7 +156,6 @@ echo -ne $newline
 
 echo "Changing shell to ZSH"
 echo -ne $newline
-
 chsh -s /usr/bin/zsh
 $wait
 echo -ne $newline
@@ -266,6 +268,11 @@ echo "# Cleaning up installation"
 echo "--------------------------------------------------"
 echo -ne $newline
 
+echo "Removing bash files form HOME"
+rm -rf bash*
+copycheck
+$wait
+
 echo "Removing dotfiles from /ROOT"
 sudo rm -rf /dotfiles
 copycheck
@@ -276,31 +283,6 @@ sudo rm -rf /arch
 copycheck
 $wait
 clear
-
-# echo "------------------------------"
-# echo "# Bash files"
-# echo "------------------------------"
-# echo -ne $newline
-
-# echo "Moving .bash_history"
-# mv $HOME/.bash_history $HOME/.config/_legacy/bash
-# copycheck
-# echo -ne $newline
-
-# echo "Moving .bash_logout"
-# mv $HOME/.bash_logout $HOME/.config/_legacy/bash
-# copycheck
-# echo -ne $newline
-
-# echo "Removing .bash_profile"
-# mv $HOME/.bash_profile $HOME/.config/_legacy/bash
-# copycheck
-# echo -ne $newline
-
-# echo "Removing .bashrc"
-# mv $HOME/.bashrc $HOME/.config/_legacy/bash
-# copycheck
-# echo -ne $newline
 
 # --------------------------------------------------
 # REBOOT
