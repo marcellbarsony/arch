@@ -55,7 +55,13 @@ sudo pacman -S --noconfirm xorg-server xorg-xinit arandr
 $wait
 clear
 
-echo "# Browser"
+echo "# Terminal - Alacritty"
+echo -ne $newline
+sudo pacman -s --noconfirm alacritty
+$wait
+clear
+
+echo "# Browser - Firefox"
 echo -ne $newline
 sudo pacman -S --noconfirm firefox
 $wait
@@ -79,9 +85,9 @@ sudo pacman -S --noconfirm github-cli bitwarden-cli
 $wait
 clear
 
-echo "Python"
+echo "Programming languages"
 echo -ne $newline
-sudo pacman -S -noconfirm python pip python-pywal bpytop
+sudo pacman -S -noconfirm python pip python-pywal rust
 $wait
 clear
 
