@@ -73,12 +73,6 @@ sudo pacman -S --noconfirm intel-ucode xf86-video-intel
 $wait
 clear
 
-echo "# OpenSSH"
-echo -ne $newline
-sudo pacman -S --noconfirm openssh
-$wait
-clear
-
 echo "# CLI Tools"
 echo -ne $newline
 sudo pacman -S --noconfirm github-cli bitwarden-cli

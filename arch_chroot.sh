@@ -135,6 +135,22 @@ copycheck
 $wait
 clear
 
+echo "------------------------------"
+echo "# Open SSH"
+echo "------------------------------"
+echo -ne $newline
+
+pacman -S --noconfirm openssh
+$wait
+clear
+
+echo "Enabling OpenSSH"
+echo -ne $newline
+systemctl enable OpenSSH
+copycheck
+$wait
+clear
+
 # --------------------------------------------------
 # Locale
 # --------------------------------------------------
