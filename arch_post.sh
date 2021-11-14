@@ -108,6 +108,10 @@ makepkg -si --noconfirm
 cd $HOME
 clear
 
+echo "VS Codium"
+echo -ne $newline
+sudo paru -S --noconfirm vscodium
+
 # --------------------------------------------------
 # Bitwarden
 # --------------------------------------------------
@@ -117,8 +121,8 @@ echo "# Bitwarden"
 echo "------------------------------"
 echo -ne $newline
 
-# RBW b y doy - https://github.com/doy/rbw
-sudo pacman -S --noconfirm rbw
+# RBW by doy - https://github.com/doy/rbw
+# sudo pacman -S --noconfirm rbw
 
 # read -p "? 2FA code: " bw2fa
 # bwsession=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -c 3-`
