@@ -146,7 +146,7 @@ clear
 
 echo "Enabling OpenSSH"
 echo -ne $newline
-systemctl enable OpenSSH
+systemctl enable sshd.service
 copycheck
 $wait
 clear

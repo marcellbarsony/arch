@@ -81,7 +81,7 @@ clear
 
 echo "Programming languages"
 echo -ne $newline
-sudo pacman -S -noconfirm python pip python-pywal rust
+sudo pacman -S --noconfirm python pip python-pywal rust
 $wait
 clear
 
