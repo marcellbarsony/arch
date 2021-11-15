@@ -81,7 +81,7 @@ clear
 
 echo "Programming languages"
 echo -ne $newline
-sudo pacman -S --noconfirm python pip python-pywal rust
+sudo pacman -S --noconfirm python pip rust
 $wait
 clear
 
@@ -98,10 +98,15 @@ sudo pacman -S --noconfirm htop bpytop neofetch unclutter man-db tldr
 $wait
 clear
 
+echo "# Wallpaper & Colors"
+echo -ne $newline
+sudo pacman -S --noconfirm python-pywal xwallpaper
+$wait
+clear
+
 echo "# AUR helper - PARU"
 # https://github.com/Morganamilo/paru
 echo -ne $newline
-
 git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
 cd $HOME/.local/src/paru
 makepkg -si --noconfirm
