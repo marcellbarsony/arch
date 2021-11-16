@@ -115,7 +115,13 @@ clear
 
 echo "VS Codium"
 echo -ne $newline
-sudo paru -S --noconfirm vscodium
+paru -S --noconfirm vscodium
+clear
+
+echo "Joplin"
+echo -ne $newline
+paru -S --noconfirm joplin-desktop
+clear
 
 # --------------------------------------------------
 # Bitwarden
@@ -211,8 +217,7 @@ echo "------------------------------"
 echo "Copying .vimrc"
 cp $HOME/.config/vim/.vimrc $HOME
 copycheck
-$wait
-clear
+echo -ne $newline
 
 echo "------------------------------"
 echo "# Suckless"
@@ -277,10 +282,10 @@ echo "# Cleaning up installation"
 echo "--------------------------------------------------"
 echo -ne $newline
 
-echo "Removing bash files form HOME"
-rm -rf bash*
-copycheck
-$wait
+#echo "Removing bash files form HOME"
+#rm -rf .bash*
+#copycheck
+#$wait
 
 echo "Removing dotfiles from /ROOT"
 sudo rm -rf /dotfiles
