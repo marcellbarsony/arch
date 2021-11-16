@@ -283,10 +283,10 @@ echo "# Cleaning up installation"
 echo "--------------------------------------------------"
 echo -ne $newline
 
-#echo "Removing bash files form HOME"
-#rm -rf .bash*
-#copycheck
-#$wait
+echo "Removing bash files form HOME"
+rm -rf .bash*
+copycheck
+$wait
 
 echo "Removing dotfiles from /ROOT"
 sudo rm -rf /dotfiles
