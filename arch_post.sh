@@ -81,7 +81,7 @@ clear
 
 echo "Programming languages"
 echo -ne $newline
-sudo pacman -S --noconfirm python pip python-pywal rust
+sudo pacman -S --noconfirm python pip rust
 $wait
 clear
 
@@ -98,10 +98,15 @@ sudo pacman -S --noconfirm htop bpytop neofetch unclutter man-db tldr
 $wait
 clear
 
+echo "# Wallpaper & Colors"
+echo -ne $newline
+sudo pacman -S --noconfirm python-pywal xwallpaper
+$wait
+clear
+
 echo "# AUR helper - PARU"
 # https://github.com/Morganamilo/paru
 echo -ne $newline
-
 git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
 cd $HOME/.local/src/paru
 makepkg -si --noconfirm
@@ -110,7 +115,13 @@ clear
 
 echo "VS Codium"
 echo -ne $newline
-sudo paru -S --noconfirm vscodium
+paru -S --noconfirm vscodium
+clear
+
+echo "Joplin"
+echo -ne $newline
+paru -S --noconfirm joplin-desktop
+clear
 
 # --------------------------------------------------
 # Bitwarden
@@ -207,8 +218,7 @@ echo "------------------------------"
 echo "Copying .vimrc"
 cp $HOME/.config/vim/.vimrc $HOME
 copycheck
-$wait
-clear
+echo -ne $newline
 
 echo "------------------------------"
 echo "# Suckless"
@@ -273,10 +283,10 @@ echo "# Cleaning up installation"
 echo "--------------------------------------------------"
 echo -ne $newline
 
-echo "Removing bash files form HOME"
-rm -rf bash*
-copycheck
-$wait
+#echo "Removing bash files form HOME"
+#rm -rf .bash*
+#copycheck
+#$wait
 
 echo "Removing dotfiles from /ROOT"
 sudo rm -rf /dotfiles
