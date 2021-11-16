@@ -127,6 +127,7 @@ echo -ne $newline
 # read -p "? 2FA code: " bw2fa
 # bwsession=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -c 3-`
 # eval $bwsession
+clear
 
 # --------------------------------------------------
 # Configs
@@ -170,14 +171,14 @@ copycheck
 $wait
 echo -ne $newline
 
-echo "Copying .zshenv"
-sudo cp $HOME/.config/zsh/.zshenv /usr/local/etc
+echo "Copying zshenv"
+sudo cp $HOME/.config/zsh/zshenv /etc/zsh/zshenv
 copycheck
 $wait
 echo -ne $newline
 
-echo "Copying .zprofile"
-sudo cp $HOME/.config/zsh/.zprofile /etc/zsh/zprofile
+echo "Copying zprofile"
+sudo cp $HOME/.config/zsh/zprofile /etc/zsh/zprofile
 copycheck
 $wait
 echo -ne $newline
