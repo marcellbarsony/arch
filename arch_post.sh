@@ -216,15 +216,6 @@ $wait
 clear
 
 echo "------------------------------"
-echo "# VIM"
-echo "------------------------------"
-
-echo "Copying .vimrc"
-cp $HOME/.config/vim/.vimrc $HOME
-copycheck
-echo -ne $newline
-
-echo "------------------------------"
 echo "# Suckless"
 echo "------------------------------"
 echo -ne $newline
