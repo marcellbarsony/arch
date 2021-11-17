@@ -1,4 +1,4 @@
-#!/binbash
+#!/bin/bash
 
 # --------------------------------------------------
 # Arch Linux chroot script
