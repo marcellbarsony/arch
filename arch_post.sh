@@ -180,12 +180,6 @@ chsh -s /usr/bin/zsh
 $wait
 echo -ne $newline
 
-echo "Copying .zshrc"
-cp $HOME/.config/zsh/.zshrc $HOME
-copycheck
-$wait
-echo -ne $newline
-
 echo "Copying zshenv"
 sudo cp $HOME/.config/zsh/zshenv /etc/zsh/zshenv
 copycheck
@@ -197,12 +191,6 @@ sudo cp $HOME/.config/zsh/zprofile /etc/zsh/zprofile
 copycheck
 $wait
 echo -ne $newline
-
-echo "Copying .zlogout"
-cp $HOME/.config/zsh/.zlogout $HOME
-copycheck
-$wait
-clear
 
 echo "------------------------------"
 echo "# Pacman"
