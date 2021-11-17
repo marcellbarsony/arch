@@ -33,6 +33,20 @@ copycheck(){
 }
 
 # --------------------------------------------------
+# Configs
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Fetching configs"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Moving dotfiles to the HOME directory"
+echo -ne $newline
+git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
+clear
+
+# --------------------------------------------------
 # Install necessary applications
 # --------------------------------------------------
 
@@ -57,7 +71,7 @@ clear
 
 echo "# Terminal - Alacritty"
 echo -ne $newline
-sudo pacman -s --noconfirm alacritty
+sudo pacman -S --noconfirm alacritty
 $wait
 clear
 
@@ -81,7 +95,7 @@ clear
 
 echo "Programming languages"
 echo -ne $newline
-sudo pacman -S --noconfirm python pip rust
+sudo pacman -S --noconfirm python python-pip rust
 $wait
 clear
 
@@ -143,16 +157,6 @@ clear
 # --------------------------------------------------
 # Configs
 # --------------------------------------------------
-
-echo "------------------------------"
-echo "# Fetching configs"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Moving dotfiles to the HOME directory"
-echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
-clear
 
 echo "------------------------------"
 echo "# Systemd"
@@ -279,9 +283,13 @@ $wait
 clear
 
 echo "--------------------------------------------------"
-echo "# Cleaning up installation"
+echo "# Cleaning up installation & HOME"
 echo "--------------------------------------------------"
 echo -ne $newline
+
+echo "Moving ~/.cargo to ~/.local/share"
+mkdir $HOME/.local/share/cargo
+mv $HOME/.cargo $HOME/.local/share/cargo
 
 echo "Removing bash files form HOME"
 rm -rf .bash*
