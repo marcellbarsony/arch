@@ -181,13 +181,13 @@ $wait
 echo -ne $newline
 
 echo "Copying zshenv"
-sudo cp $HOME/.config/zsh/zshenv /etc/zsh/zshenv
+sudo cp $HOME/.config/zsh/zshenv /etc/zsh/global/zshenv
 copycheck
 $wait
 echo -ne $newline
 
 echo "Copying zprofile"
-sudo cp $HOME/.config/zsh/zprofile /etc/zsh/zprofile
+sudo cp $HOME/.config/zsh/zprofile /etc/zsh/global/zprofile
 copycheck
 $wait
 echo -ne $newline
