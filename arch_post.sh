@@ -65,7 +65,7 @@ clear
 
 echo "# X11 - Xorg"
 echo -ne $newline
-sudo pacman -S --noconfirm xorg-server xorg-xinit arandr
+sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-xprop arandr
 $wait
 clear
 
@@ -114,7 +114,7 @@ clear
 
 echo "# Wallpaper & Colors"
 echo -ne $newline
-sudo pacman -S --noconfirm python-pywal xwallpaper
+sudo pacman -S --noconfirm xwallpaper
 $wait
 clear
 
@@ -127,15 +127,15 @@ makepkg -si --noconfirm
 cd $HOME
 clear
 
-echo "VS Codium"
-echo -ne $newline
-paru -S --noconfirm vscodium
-clear
+# echo "VS Codium"
+# echo -ne $newline
+# paru -S --noconfirm vscodium
+# clear
 
-echo "Joplin"
-echo -ne $newline
-paru -S --noconfirm joplin-desktop
-clear
+# echo "Joplin"
+# echo -ne $newline
+# paru -S --noconfirm joplin-desktop
+# clear
 
 # --------------------------------------------------
 # Bitwarden
