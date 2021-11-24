@@ -118,6 +118,8 @@ sudo pacman -S --noconfirm xwallpaper
 $wait
 clear
 
+### PARU
+
 echo "# AUR helper - PARU"
 # https://github.com/Morganamilo/paru
 echo -ne $newline
@@ -125,6 +127,15 @@ git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
 cd $HOME/.local/src/paru
 makepkg -si --noconfirm
 cd $HOME
+clear
+
+echo "Fonts"
+
+
+echo "# Spaceship prompt"
+echo -ne $newline
+paru -S --noconfirm spacehip-prompt-git
+$wait
 clear
 
 # echo "VS Codium"
