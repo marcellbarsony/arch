@@ -131,12 +131,18 @@ clear
 
 echo "Fonts"
 
-
-echo "# Spaceship prompt"
+echo "# Starship prompt"
 echo -ne $newline
-paru -S --noconfirm spacehip-prompt-git
-$wait
-clear
+cd $HOME/.local/src/
+mkdir starship
+cd starship
+sh -c "$(curl -fsSL https://starship.rs/install.sh)"
+
+#echo "# Spaceship prompt"
+#echo -ne $newline
+#paru -S --noconfirm spacehip-prompt-git
+#$wait
+#clear
 
 # echo "VS Codium"
 # echo -ne $newline
