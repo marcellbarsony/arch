@@ -47,7 +47,7 @@ git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
 clear
 
 # --------------------------------------------------
-# Install necessary applications
+# Install applications - Pacman
 # --------------------------------------------------
 
 # https://wiki.archlinux.org/title/List_of_applications
@@ -118,7 +118,9 @@ sudo pacman -S --noconfirm xwallpaper
 $wait
 clear
 
-### PARU
+# --------------------------------------------------
+# AUR helper - PARU
+# --------------------------------------------------
 
 echo "# AUR helper - PARU"
 # https://github.com/Morganamilo/paru
@@ -283,7 +285,7 @@ echo "# Cleaning up installation & HOME"
 echo "--------------------------------------------------"
 echo -ne $newline
 
-echo "Cargo: create directory"
+echo "Cargo: Create directory"
 mkdir $HOME/.local/share/cargo
 copycheck
 echo -ne $newline
