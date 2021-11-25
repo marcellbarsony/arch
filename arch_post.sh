@@ -207,7 +207,7 @@ echo "Copying zprofile"
 sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
 copycheck
 $wait
-echo -ne $newline
+clear
 
 echo "------------------------------"
 echo "# Pacman"
@@ -283,21 +283,27 @@ echo "# Cleaning up installation & HOME"
 echo "--------------------------------------------------"
 echo -ne $newline
 
-echo "Moving ~/.cargo to ~/.local/share"
+echo "Cargo: create directory"
 mkdir $HOME/.local/share/cargo
-mv $HOME/.cargo $HOME/.local/share/cargo
-
-echo "Removing bash files form HOME"
-rm -rf .bash*
 copycheck
-$wait
+echo -ne $newline
 
-echo "Removing dotfiles from /ROOT"
+echo "Cargo: Move ~/.cargo to ~/.local/share"
+mv $HOME/.cargo $HOME/.local/share/cargo
+copycheck
+echo -ne $newline
+
+echo "Bash: Removing files from HOME"
+rm -rf $HOME/.bash*
+copycheck
+echo -ne $newline
+
+echo "Dotfiles: Removing files from root (/)"
 sudo rm -rf /dotfiles
 copycheck
-$wait
+echo -ne $newline
 
-echo "Removing installation script from /ROOT"
+echo "Installation scrip: Removing  script from root (/)"
 sudo rm -rf /arch
 copycheck
 $wait
