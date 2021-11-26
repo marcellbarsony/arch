@@ -127,6 +127,22 @@ copycheck
 $wait
 clear
 
+echo "------------------------------"
+echo "# VirtualBox kernel modules"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Enable vboxservice.service"
+systemctl enable vboxservice.service
+$copycheck
+$wait
+
+echo "Modproble vboxguest vboxsf vboxvideo"
+modprobe -a vboxguest vboxsf vboxvideo
+$copycheck
+$wait
+
+
 # --------------------------------------------------
 # Locale
 # --------------------------------------------------
