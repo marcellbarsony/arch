@@ -1,7 +1,9 @@
 #!/bin/sh
 
-sudo pacman -S --noconfirm bitwarden-cli github-cli
-clear
+echo "------------------------------"
+echo "# SSH setup"
+echo "------------------------------"
+echo
 
 # Bitwarden
 
@@ -11,18 +13,18 @@ clear
     #read -p "? 2FA code: " bw2fa
     #key=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -d \" -f2`
 
-  # Sync vault
-    echo "Syncing vault with session key:"
+  # Vault sync
+    echo "BW Vault - Syncing with session key"
     bw sync --session $key
     echo
   
-  # Set master password to file
-    echo "Unlock vault"
+  # Vault unlock
+    echo "BW Vault - Unlock"
     read -s -p "? Master password: " pass
-    echo $pass >> $HOME/password.txt # !!!
+    echo $pass >> $HOME/password.txt
     echo
   
-  # Unlock vault
+  # Vault unlock - with password file
     session=`bw unlock --passwordfile $HOME/password.txt | grep "export BW_SESSION" | cut -d '"' -f 2`
     echo
 
@@ -37,21 +39,20 @@ clear
   # Install OpenSSH
     echo "Install OpenSSH"
     sudo pacman -S --noconfirm openssh
-    clear
 
   # Start SSH client
     echo "Start SSH client"
     eval "$(ssh-agent -s)"
-    echo
+    clear
 
   # Gerenate key
     read -p "GitHub e-mail: " email
     echo
     ssh-keygen -t ed25519 -C "${email}"
-    clear
+    echo
 
   # Add GitHub private key
-    echo "Add SSH private key"
+    echo "OpenSSH - Add SSH private key"
     ssh-add $HOME/.ssh/id_ed25519
 
   # Login to GitHub
