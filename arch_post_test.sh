@@ -47,20 +47,25 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo
 
-echo "Moving dotfiles to the HOME directory"
-echo
-git clone git@github.com:marcellbarsony/dotfiles.git $HOME/dotfiles
-copycheck
 mv $HOME/.config/gh $HOME
 copycheck
+
 mv $HOME/.config/Bitwarden\ CLI/ $HOME
 copycheck
-mv $HOME/dotfiles $HOME/.config
+
+rm -rf $HOME/.config
 copycheck
-mv $HOME/gh $HOME/.config/gh
+
+git clone git@github.com:marcellbarsony/dotfiles.git $HOME/.config
 copycheck
-mv $HOME/Bitwarden\ CLI/ $HOME/.config/Bitwarden\ CLI
+
+mv $HOME/gh $HOME/.config/
 copycheck
+
+mv $HOME/Bitwarden\ CLI/ $HOME/.config/
+copycheck
+
+$wait
 
 # --------------------------------------------------
 # Install applications - Pacman
