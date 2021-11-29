@@ -56,7 +56,7 @@ echo "# Installing applications"
 echo "------------------------------"
 echo
 
-grep -v "^#" $HOME/arch/packages/packages.txt | pacman -S --needed -
+grep -v "^#" $HOME/arch/packages/packages.txt | sudo pacman -S --needed -
 $wait
 clear
 
