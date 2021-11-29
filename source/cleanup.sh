@@ -28,5 +28,4 @@ echo
 echo "Installation scrip: Removing  script from root (/)"
 sudo rm -rf /arch
 copycheck
-$wait
 clear

@@ -7,7 +7,7 @@ alsa-utils
 bitwarden-cli
 
 # BROWSER
-firefox
+#firefox
 
 # GITHUB
 github-cli

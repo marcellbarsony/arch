@@ -64,13 +64,7 @@ mv $HOME/Bitwarden\ CLI/ $HOME/.config/
 # --------------------------------------------------
 # https://wiki.archlinux.org/title/List_of_applications
 
-echo "------------------------------"
-echo "# Installing applications"
-echo "------------------------------"
-echo
-
 grep -v "^#" $HOME/arch/packages/packages.txt | sudo pacman -S --needed --noconfirm -
-$wait
 clear
 
 # --------------------------------------------------
