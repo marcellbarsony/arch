@@ -32,6 +32,18 @@ copycheck(){
 }
 
 # --------------------------------------------------
+# SSH
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# SSH"
+echo "------------------------------"
+echo
+
+. $HOME/arch/ssh/ssh.sh
+clear
+
+# --------------------------------------------------
 # Configs
 # --------------------------------------------------
 
@@ -97,23 +109,6 @@ sh -c "$(curl -fsSL https://starship.rs/install.sh)"
 # echo
 # paru -S --noconfirm joplin-desktop
 # clear
-
-# --------------------------------------------------
-# Bitwarden
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Bitwarden"
-echo "------------------------------"
-echo
-
-# RBW by doy - https://github.com/doy/rbw
-# sudo pacman -S --noconfirm rbw
-
-# read -p "? 2FA code: " bw2fa
-# bwsession=`bw login --method 0 --code $bw2fa | grep "export BW_SESSION" | cut -c 3-`
-# eval $bwsession
-clear
 
 # --------------------------------------------------
 # Configs
