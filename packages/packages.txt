@@ -1,0 +1,41 @@
+# ZSH
+zsh
+zsh-syntax-highlighting
+# X11
+xorg-server
+xorg-xinit
+xorg-xprop
+xwallpaper
+arandr
+# Terminal
+alacritty
+# Browser
+firefox
+# Intel
+intel-ucode
+xf86-video-intel
+# Github
+github-cli
+# Bitwarden
+bitwarden-cli
+# Python
+python
+python-pip
+# Rust
+rust
+# ALSA
+alsa
+alsa-firmware
+alsa-utils
+# Pulseaudio & Sof
+pulseaudio
+pulseaudio-alsa
+pavucontrol
+sof-firmware
+# Additional tools
+htop
+bpytop
+neofetch
+unclutter
+man-db
+tldr
