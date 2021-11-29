@@ -5,6 +5,11 @@ echo "# SSH setup"
 echo "------------------------------"
 echo
 
+# TEST
+sudo pacman -S --noconfirm bitwarden-cli github-cli
+clear
+# TEST
+
 # Bitwarden
 
   # Login
@@ -71,10 +76,6 @@ echo
     ssh -T git@github.com
     echo
     sleep 3
-
-  # Clone GitHub repository
-    git clone git@github.com:marcellbarsony/dotfiles.git $HOME/.config
-
 
 # CLEAN-UP
 
