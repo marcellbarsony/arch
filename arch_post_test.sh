@@ -47,30 +47,21 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo
 
+# Moving BW and GH to $HOME
 mv $HOME/.config/gh $HOME
-copycheck
-
 mv $HOME/.config/Bitwarden\ CLI/ $HOME
-copycheck
-
 rm -rf $HOME/.config
-copycheck
 
+# Fetching configs
 git clone git@github.com:marcellbarsony/dotfiles.git $HOME/.config
-copycheck
 
+# Moving BW and GH to .config
 mv $HOME/gh $HOME/.config/
-copycheck
-
 mv $HOME/Bitwarden\ CLI/ $HOME/.config/
-copycheck
-
-$wait
 
 # --------------------------------------------------
-# Install applications - Pacman
+# Install applications
 # --------------------------------------------------
-
 # https://wiki.archlinux.org/title/List_of_applications
 
 echo "------------------------------"
@@ -136,6 +127,17 @@ $wait
 clear
 
 echo "------------------------------"
+echo "# Pacman"
+echo "------------------------------"
+echo
+
+echo "Copying pacman.conf"
+sudo cp $HOME/.config/pacman/pacman.conf /etc/
+copycheck
+$wait
+clear
+
+echo "------------------------------"
 echo "# ZSH"
 echo "------------------------------"
 echo
@@ -158,108 +160,16 @@ copycheck
 $wait
 clear
 
-echo "------------------------------"
-echo "# Pacman"
-echo "------------------------------"
-echo
+# --------------------------------------------------
+# Suckless
+# --------------------------------------------------
 
-echo "Copying pacman.conf"
-sudo cp $HOME/.config/pacman/pacman.conf /etc/
-copycheck
-$wait
-clear
-
-echo "------------------------------"
-echo "# Suckless"
-echo "------------------------------"
-echo
-
-echo "Cloning 'dwm' repository"
-echo
-git clone https://github.com/marcellbarsony/dwm.git $HOME/.local/src/dwm
-$wait
-echo
-
-echo "Cloning 'st' repository"
-echo
-git clone https://github.com/marcellbarsony/st.git $HOME/.local/src/st
-$wait
-echo
-
-echo "Cloning 'dmenu' repository"
-echo
-git clone https://github.com/marcellbarsony/dmenu.git $HOME/.local/src/dmenu
-$wait
-echo
-
-echo "Cloning 'slstatus' repository"
-echo
-git clone https://github.com/marcellbarsony/slstatus.git $HOME/.local/src/slstatus
-$wait
-clear
-
-echo "Changing directory to ~/.local/src/dwm & compiling"
-echo
-cd $HOME/.local/src/dwm
-sudo make clean install
-$wait
-clear
-
-echo "Changing directory to ~/.local/src/st & compiling"
-echo
-cd $HOME/.local/src/st
-sudo make clean install
-$wait
-clear
-
-echo "Changing directory to ~/.local/src/dmenu & compiling"
-echo
-cd $HOME/.local/src/dmenu
-sudo make clean install
-$wait
-clear
-
-echo "Changing directory to ~/.local/src/slstatus & compiling"
-echo
-cd $HOME/.local/src/slstatus
-sudo make clean install
-$wait
-clear
-
-echo "--------------------------------------------------"
-echo "# Cleaning up installation & HOME"
-echo "--------------------------------------------------"
-echo
-
-echo "Cargo: Create directory"
-mkdir $HOME/.local/share/cargo
-copycheck
-echo
-
-echo "Cargo: Move ~/.cargo to ~/.local/share"
-mv $HOME/.cargo $HOME/.local/share/cargo
-copycheck
-echo
-
-echo "Bash: Removing files from HOME"
-rm -rf $HOME/.bash*
-copycheck
-echo
-
-echo "Dotfiles: Removing files from root (/)"
-sudo rm -rf /dotfiles
-copycheck
-echo
-
-echo "Installation scrip: Removing  script from root (/)"
-sudo rm -rf /arch
-copycheck
-$wait
+. $HOME/arch/source/suckless.sh
 clear
 
 # --------------------------------------------------
-# REBOOT
+# Clean up
 # --------------------------------------------------
 
-# $wait
-# sudo reboot now
+. $HOME/arch/source/cleanup.sh
+clear
