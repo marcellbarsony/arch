@@ -51,12 +51,16 @@ echo "Moving dotfiles to the HOME directory"
 echo
 git clone git@github.com:marcellbarsony/dotfiles.git $HOME/dotfiles
 copycheck
-mv $HOME/.config/Bitwarden\ CLI/ $HOME/dotfiles
+mv $HOME/.config/gh $HOME
+copycheck
+mv $HOME/.config/Bitwarden\ CLI/ $HOME
 copycheck
 mv $HOME/dotfiles $HOME/.config
 copycheck
-$wait
-clear
+mv $HOME/gh $HOME/.config/gh
+copycheck
+mv $HOME/Bitwarden\ CLI/ $HOME/.config/Bitwarden\ CLI
+copycheck
 
 # --------------------------------------------------
 # Install applications - Pacman
