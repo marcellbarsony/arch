@@ -56,11 +56,9 @@ echo "# Installing applications"
 echo "------------------------------"
 echo
 
-grep -v "^#" pkg-list.txt | pacman -S --needed -
+grep -v "^#" $HOME/arch/packages/packages.txt | pacman -S --needed -
 $wait
 clear
-
-
 
 # --------------------------------------------------
 # AUR helper - PARU
