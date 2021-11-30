@@ -58,6 +58,7 @@ echo -ne $newline
 read -p "Enter your username: " username
 echo -ne $newline
 useradd -m ${username}
+HOME=/home/$username
 echo -ne $newline
 
 echo "Enter the password of ${username}"
@@ -120,7 +121,7 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Cloning dotfiles to /dotfiles directory"
+echo "Cloning dotfiles to ~/.config directory"
 echo -ne $newline
 git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
 $wait
@@ -144,12 +145,12 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying hosts"
-cp /dotfiles/hosts/hosts /etc/hosts
+cp $HOME/.config/hosts/hosts /etc/hosts
 copycheck
 echo -ne $newline
 
 echo "Copying hostname"
-cp /dotfiles/hosts/hostname /etc/hostname
+cp $HOME/.config/hosts/hostname /etc/hostname
 copycheck
 echo -ne $newline
 
@@ -230,12 +231,12 @@ echo "------------------------------"
 echo -ne $newline
 
 echo "Copying locale.gen"
-cp /dotfiles/locale/locale.gen /etc/locale.gen
+cp $HOME/.config/locale/locale.gen /etc/locale.gen
 copycheck
 echo -ne $newline
 
 echo "Copying locale.conf"
-cp /dotfiles/locale/locale.conf /etc/locale.conf
+cp $HOME/.config/locale/locale.conf /etc/locale.conf
 copycheck
 echo -ne $newline
 
