@@ -35,6 +35,83 @@ copycheck(){
 }
 
 # --------------------------------------------------
+# Root password
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Root password"
+echo "------------------------------"
+echo -ne $newline
+
+passwd
+clear
+
+# --------------------------------------------------
+# User creation
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Create user account"
+echo "------------------------------"
+echo -ne $newline
+
+read -p "Enter your username: " username
+echo -ne $newline
+useradd -m ${username}
+echo -ne $newline
+
+echo "Enter the password of ${username}"
+passwd ${username}
+$wait
+clear
+
+# --------------------------------------------------
+# User group management
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# User group management"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Adding ${username} to basic groups"
+usermod -aG wheel,audio,video,optical,storage ${username}
+echo -ne $newline
+$wait
+
+echo "Verifying group memebership"
+id ${username}
+echo -ne $newline
+$wait
+clear
+
+# --------------------------------------------------
+# Sudoers
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Sudoers"
+echo "------------------------------"
+echo -ne $newline
+
+echo "Uncomment %wheel group"
+echo -ne $newline
+sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
+export EDITOR="cp /etc/sudoers.new"
+visudo
+rm /etc/sudoers.new
+$wait
+
+echo "Add insults"
+echo -ne $newline
+sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
+export EDITOR="cp /etc/sudoers.new"
+visudo
+rm /etc/sudoers.new
+$wait
+clear
+
+# --------------------------------------------------
 # Cloning git repo
 # --------------------------------------------------
 
@@ -45,7 +122,7 @@ echo -ne $newline
 
 echo "Cloning dotfiles to /dotfiles directory"
 echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git /dotfiles
+git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
 $wait
 clear
 
@@ -202,82 +279,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 $wait
 clear
 
-# --------------------------------------------------
-# Root password
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Root password"
-echo "------------------------------"
-echo -ne $newline
-
-passwd
-clear
-
-# --------------------------------------------------
-# User creation
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Create user account"
-echo "------------------------------"
-echo -ne $newline
-
-read -p "Enter your username: " username
-echo -ne $newline
-useradd -m ${username}
-echo -ne $newline
-
-echo "Enter the password of ${username}"
-passwd ${username}
-$wait
-clear
-
-# --------------------------------------------------
-# User group management
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# User group management"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Adding ${username} to basic groups"
-usermod -aG wheel,audio,video,optical,storage ${username}
-echo -ne $newline
-$wait
-
-echo "Verifying group memebership"
-id ${username}
-echo -ne $newline
-$wait
-clear
-
-# --------------------------------------------------
-# Sudoers
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Sudoers"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Uncomment %wheel group"
-echo -ne $newline
-sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
-export EDITOR="cp /etc/sudoers.new"
-visudo
-rm /etc/sudoers.new
-$wait
-
-echo "Add insults"
-echo -ne $newline
-sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
-export EDITOR="cp /etc/sudoers.new"
-visudo
-rm /etc/sudoers.new
-$wait
-clear
+####################################################
 
 # --------------------------------------------------
 # Exit chroot environment
