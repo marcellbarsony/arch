@@ -48,16 +48,19 @@ echo "------------------------------"
 echo
 
 # Moving BW and GH to $HOME
-mv $HOME/.config/gh $HOME
-mv $HOME/.config/Bitwarden\ CLI/ $HOME
-rm -rf $HOME/.config
+#mv $HOME/.config/gh $HOME
+#mv $HOME/.config/Bitwarden\ CLI/ $HOME
+#rm -rf $HOME/.config
 
 # Fetching configs
-git clone git@github.com:marcellbarsony/dotfiles.git $HOME/.config
+#git clone git@github.com:marcellbarsony/dotfiles.git $HOME/.config
+cd $HOME/.config
+git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
+cd $HOME
 
 # Moving BW and GH to .config
-mv $HOME/gh $HOME/.config/
-mv $HOME/Bitwarden\ CLI/ $HOME/.config/
+#mv $HOME/gh $HOME/.config/
+#mv $HOME/Bitwarden\ CLI/ $HOME/.config/
 
 # --------------------------------------------------
 # Install applications
