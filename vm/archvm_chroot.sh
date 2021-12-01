@@ -121,9 +121,10 @@ echo "# Fetching configs"
 echo "------------------------------"
 echo -ne $newline
 
-echo "Cloning dotfiles to ~/.config directory"
 echo -ne $newline
 git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
+cd /home/$username
+chown -R marci:marci .config
 $wait
 clear
 
@@ -220,7 +221,6 @@ modprobe -a vboxguest vboxsf vboxvideo
 $copycheck
 $wait
 
-
 # --------------------------------------------------
 # Locale
 # --------------------------------------------------
@@ -279,8 +279,6 @@ echo -ne $newline
 grub-mkconfig -o /boot/grub/grub.cfg
 $wait
 clear
-
-####################################################
 
 # --------------------------------------------------
 # Exit chroot environment
