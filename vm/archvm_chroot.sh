@@ -31,10 +31,6 @@ copycheck(){
 	fi
 }
 
-# --------------------------------------------------
-# Root password
-# --------------------------------------------------
-
 echo "------------------------------"
 echo "# Root password"
 echo "------------------------------"
@@ -43,17 +39,12 @@ echo
 passwd
 clear
 
-# --------------------------------------------------
-# User creation
-# --------------------------------------------------
-
 echo "------------------------------"
 echo "# Create user account"
 echo "------------------------------"
 echo
 
 read -p "Enter your username: " username
-echo
 useradd -m ${username}
 HOME=/home/$username
 echo
@@ -62,10 +53,6 @@ echo "Enter the password of ${username}"
 passwd ${username}
 $wait
 clear
-
-# --------------------------------------------------
-# User group management
-# --------------------------------------------------
 
 echo "------------------------------"
 echo "# User group management"
@@ -82,10 +69,6 @@ id ${username}
 echo
 $wait
 clear
-
-# --------------------------------------------------
-# Sudoers
-# --------------------------------------------------
 
 echo "------------------------------"
 echo "# Sudoers"
@@ -108,10 +91,6 @@ rm /etc/sudoers.new
 $wait
 clear
 
-# --------------------------------------------------
-# Cloning git repo
-# --------------------------------------------------
-
 echo "------------------------------"
 echo "# Fetching configs"
 echo "------------------------------"
@@ -129,16 +108,12 @@ mkinitcpio -p linux
 $wait
 clear
 
-# --------------------------------------------------
-# Network configuration
-# --------------------------------------------------
-# https://man.archlinux.org/man/machine-info.5
-# /etc/machine-info
-
 echo "------------------------------"
 echo "# Hosts & Hostname"
 echo "------------------------------"
 echo
+# https://man.archlinux.org/man/machine-info.5
+# /etc/machine-info
 
 echo "Copying hosts"
 cp $HOME/.config/hosts/hosts /etc/hosts
@@ -215,10 +190,6 @@ modprobe -a vboxguest vboxsf vboxvideo
 $copycheck
 $wait
 
-# --------------------------------------------------
-# Locale
-# --------------------------------------------------
-
 echo "------------------------------"
 echo "# Locale"
 echo "------------------------------"
@@ -238,10 +209,6 @@ echo "Generating locale"
 locale-gen
 $wait
 clear
-
-# --------------------------------------------------
-# GRUB boot loader
-# --------------------------------------------------
 
 echo "------------------------------"
 echo "# Install GRUB and other tools"
@@ -273,10 +240,6 @@ echo
 grub-mkconfig -o /boot/grub/grub.cfg
 $wait
 clear
-
-# --------------------------------------------------
-# Exit chroot environment
-# --------------------------------------------------
 
 echo "------------------------------"
 echo "# Exit chroot & reboot"
