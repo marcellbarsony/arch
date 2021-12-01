@@ -111,13 +111,11 @@ echo
 echo "Changing shell to ZSH"
 echo
 chsh -s /usr/bin/zsh
-$wait
 echo
 
 echo "Copying zshenv"
 sudo cp $HOME/.config/zsh/global/zshenv /etc/zsh/zshenv
 copycheck
-$wait
 echo
 
 echo "Copying zprofile"
