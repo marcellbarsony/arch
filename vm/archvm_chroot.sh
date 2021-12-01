@@ -2,8 +2,6 @@
 
 # --------------------------------------------------
 # Arch Linux chroot script
-# WARNING: script is under development & hard-coded
-# https://wiki.archlinux.org/
 # by Marcell Barsony
 # --------------------------------------------------
 
@@ -13,7 +11,6 @@ clear
 # Global variables
 # --------------------------------------------------
 
-newline="\n"
 read -p "Enter the amount of wait time in seconds: " waitseconds
 wait="sleep ${waitseconds}"
 $wait
@@ -41,7 +38,7 @@ copycheck(){
 echo "------------------------------"
 echo "# Root password"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 passwd
 clear
@@ -53,13 +50,13 @@ clear
 echo "------------------------------"
 echo "# Create user account"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 read -p "Enter your username: " username
-echo -ne $newline
+echo
 useradd -m ${username}
 HOME=/home/$username
-echo -ne $newline
+echo
 
 echo "Enter the password of ${username}"
 passwd ${username}
@@ -73,16 +70,16 @@ clear
 echo "------------------------------"
 echo "# User group management"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Adding ${username} to basic groups"
 usermod -aG wheel,audio,video,optical,storage ${username}
-echo -ne $newline
+echo
 $wait
 
 echo "Verifying group memebership"
 id ${username}
-echo -ne $newline
+echo
 $wait
 clear
 
@@ -93,18 +90,17 @@ clear
 echo "------------------------------"
 echo "# Sudoers"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Uncomment %wheel group"
-echo -ne $newline
+echo
 sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
 export EDITOR="cp /etc/sudoers.new"
 visudo
 rm /etc/sudoers.new
-$wait
 
 echo "Add insults"
-echo -ne $newline
+echo
 sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
 export EDITOR="cp /etc/sudoers.new"
 visudo
@@ -119,9 +115,8 @@ clear
 echo "------------------------------"
 echo "# Fetching configs"
 echo "------------------------------"
-echo -ne $newline
+echo
 
-echo -ne $newline
 git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
 cd /home/$username
 chown -R marci:marci .config
@@ -129,7 +124,7 @@ $wait
 clear
 
 echo "Initramfs"
-echo -ne $newline
+echo
 mkinitcpio -p linux
 $wait
 clear
@@ -143,27 +138,27 @@ clear
 echo "------------------------------"
 echo "# Hosts & Hostname"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Copying hosts"
 cp $HOME/.config/hosts/hosts /etc/hosts
 copycheck
-echo -ne $newline
+echo
 
 echo "Copying hostname"
 cp $HOME/.config/hosts/hostname /etc/hostname
 copycheck
-echo -ne $newline
+echo
 
 read -p "Enter hostname: " hostname
-echo -ne $newline
+echo
 
 echo "Setting hostname ${hostname}"
 hostnamectl set-hostname ${hostname}
-echo -ne $newline
+echo
 
 echo "Checking hostname"
-echo -ne $newline
+echo
 hostnamectl
 $wait
 clear
@@ -171,10 +166,9 @@ clear
 echo "------------------------------"
 echo "# Network tools"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Network tools"
-echo -ne $newline
 pacman -S --noconfirm networkmanager
 # pacman -S wpa_supplicant
 # pacman -S wireless_tools
@@ -184,7 +178,7 @@ $wait
 clear
 
 echo "Enabling Network manager"
-echo -ne $newline
+echo
 systemctl enable NetworkManager
 copycheck
 $wait
@@ -193,14 +187,14 @@ clear
 echo "------------------------------"
 echo "# Open SSH"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 pacman -S --noconfirm openssh
 $wait
 clear
 
 echo "Enabling OpenSSH"
-echo -ne $newline
+echo
 systemctl enable sshd.service
 copycheck
 $wait
@@ -209,7 +203,7 @@ clear
 echo "------------------------------"
 echo "# VirtualBox kernel modules"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Enable vboxservice.service"
 systemctl enable vboxservice.service
@@ -228,17 +222,17 @@ $wait
 echo "------------------------------"
 echo "# Locale"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Copying locale.gen"
 cp $HOME/.config/locale/locale.gen /etc/locale.gen
 copycheck
-echo -ne $newline
+echo
 
 echo "Copying locale.conf"
 cp $HOME/.config/locale/locale.conf /etc/locale.conf
 copycheck
-echo -ne $newline
+echo
 
 echo "Generating locale"
 locale-gen
@@ -252,7 +246,7 @@ clear
 echo "------------------------------"
 echo "# Install GRUB and other tools"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 $wait
@@ -261,21 +255,21 @@ clear
 echo "------------------------------"
 echo "# Install GRUB and other tools"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Mounting /dev/sda1 >> /boot/EFI"
 mkdir /boot/EFI
 mount /dev/sda1 /boot/EFI
 copycheck
-echo -ne $newline
+echo
 
 echo "Installing grub to x86_64-efi"
 grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
 copycheck
-echo -ne $newline
+echo
 
 echo "Creating a GRUB config file"
-echo -ne $newline
+echo
 grub-mkconfig -o /boot/grub/grub.cfg
 $wait
 clear
@@ -287,7 +281,7 @@ clear
 echo "------------------------------"
 echo "# Exit chroot & reboot"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 $wait
 reboot now
@@ -296,7 +290,7 @@ reboot now
 # echo "# Umount & Reboot"
 # echo "------------------------------"
 # $wait
-# echo -ne $newline
+# echo
 
 # echo "Umount partitions"
 # umount -l /mnt

@@ -2,8 +2,6 @@
 
 # --------------------------------------------------
 # Arch Linux chroot script
-# WARNING: script is under development & hard-coded
-# https://wiki.archlinux.org/
 # by Marcell Barsony
 # --------------------------------------------------
 
@@ -13,7 +11,6 @@ clear
 # Global variables
 # --------------------------------------------------
 
-newline="\n"
 read -p "Enter the amount of wait time in seconds: " waitseconds
 wait="sleep ${waitseconds}"
 $wait
@@ -35,200 +32,13 @@ copycheck(){
 }
 
 # --------------------------------------------------
-# Cloning git repo
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Fetching configs"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Cloning dotfiles to /dotfiles directory"
-echo -ne $newline
-git clone https://github.com/marcellbarsony/dotfiles.git /dotfiles
-$wait
-clear
-
-# --------------------------------------------------
-# LVM support
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Enable LVM support"
-echo "------------------------------"
-echo -ne $newline
-
-pacman -S --noconfirm lvm2
-$wait
-clear
-
-echo "------------------------------"
-echo "# Mkinitcpio & Initramfs"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Copying mkinitcpio.conf"
-$wait
-cp /dotfiles/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
-copycheck
-$wait
-echo -ne $newline
-
-echo "Initramfs"
-echo -ne $newline
-mkinitcpio -p linux
-$wait
-clear
-
-# --------------------------------------------------
-# Network configuration
-# --------------------------------------------------
-# https://man.archlinux.org/man/machine-info.5
-# /etc/machine-info
-
-echo "------------------------------"
-echo "# Hosts & Hostname"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Copying hosts"
-cp /dotfiles/hosts/hosts /etc/hosts
-copycheck
-echo -ne $newline
-
-echo "Copying hostname"
-cp /dotfiles/hosts/hostname /etc/hostname
-copycheck
-echo -ne $newline
-
-read -p "Enter hostname: " hostname
-echo -ne $newline
-
-echo "Setting hostname ${hostname}"
-echo -ne $newline
-hostnamectl set-hostname ${hostname}
-echo -ne $newline
-
-echo "Checking hostname"
-echo -ne $newline
-hostnamectl
-$wait
-clear
-
-echo "------------------------------"
-echo "# Network tools"
-echo "------------------------------"
-echo -ne $newline
-
-pacman -S --noconfirm networkmanager
-# pacman -S wpa_supplicant
-# pacman -S wireless_tools
-# pacman -S netctl
-# pacman -S dialog
-$wait
-clear
-
-echo "Enabling Network manager"
-echo -ne $newline
-systemctl enable NetworkManager
-copycheck
-$wait
-clear
-
-echo "------------------------------"
-echo "# Open SSH"
-echo "------------------------------"
-echo -ne $newline
-
-pacman -S --noconfirm openssh
-$wait
-clear
-
-echo "Enabling OpenSSH"
-echo -ne $newline
-systemctl enable sshd.service
-copycheck
-$wait
-clear
-
-# --------------------------------------------------
-# Locale
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Locale"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Copying locale.gen"
-cp /dotfiles/locale/locale.gen /etc/locale.gen
-copycheck
-echo -ne $newline
-
-echo "Copying locale.conf"
-cp /dotfiles/locale/locale.conf /etc/locale.conf
-copycheck
-echo -ne $newline
-
-echo "Generating locale"
-locale-gen
-$wait
-clear
-
-# --------------------------------------------------
-# GRUB boot loader
-# --------------------------------------------------
-
-echo "------------------------------"
-echo "# Install GRUB and other tools"
-echo "------------------------------"
-echo -ne $newline
-
-pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
-$wait
-clear
-
-echo "------------------------------"
-echo "# Install GRUB and other tools"
-echo "------------------------------"
-echo -ne $newline
-
-echo "Creating EFI directory for boot"
-mkdir /boot/EFI
-echo -ne $newline
-
-echo "Mounting EFI partition"
-mount /dev/nvme0n1p1 /boot/EFI
-echo -ne $newline
-
-echo "Installing grub on the MBR"
-grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
-echo -ne $newline
-
-echo "Copying GRUB config snippet"
-cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
-copycheck
-echo -ne $newline
-
-echo "Copying GRUB config"
-cp /dotfiles/grub/grub /etc/default/grub
-copycheck
-echo -ne $newline
-
-echo "Creating a GRUB config file"
-echo -ne $newline
-grub-mkconfig -o /boot/grub/grub.cfg
-$wait
-clear
-
-# --------------------------------------------------
 # Root password
 # --------------------------------------------------
 
 echo "------------------------------"
 echo "# Root password"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 passwd
 clear
@@ -240,10 +50,10 @@ clear
 echo "------------------------------"
 echo "# Create user account"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 read -p "Enter your username: " username
-echo -ne $newline
+echo
 useradd -m ${username}
 
 echo "Enter the password of ${username}"
@@ -258,16 +68,16 @@ clear
 echo "------------------------------"
 echo "# User group management"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Adding ${username} to basic groups"
 usermod -aG wheel,audio,video,optical,storage ${username}
-echo -ne $newline
+echo
 $wait
 
 echo "Verifying group memebership"
 id ${username}
-echo -ne $newline
+echo
 $wait
 clear
 
@@ -278,22 +88,206 @@ clear
 echo "------------------------------"
 echo "# Sudoers"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Uncomment %wheel group"
-echo -ne $newline
+echo
 sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
 export EDITOR="cp /etc/sudoers.new"
 visudo
 rm /etc/sudoers.new
-$wait
 
 echo "Add insults"
-echo -ne $newline
+echo
 sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
 export EDITOR="cp /etc/sudoers.new"
 visudo
 rm /etc/sudoers.new
+$wait
+clear
+
+# --------------------------------------------------
+# Cloning git repo
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Fetching configs"
+echo "------------------------------"
+echo
+
+echo "Cloning dotfiles to /dotfiles directory"
+echo
+git clone https://github.com/marcellbarsony/dotfiles.git /dotfiles
+$wait
+clear
+
+# --------------------------------------------------
+# LVM support
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Enable LVM support"
+echo "------------------------------"
+echo
+
+pacman -S --noconfirm lvm2
+$wait
+clear
+
+echo "------------------------------"
+echo "# Mkinitcpio & Initramfs"
+echo "------------------------------"
+echo
+
+echo "Copying mkinitcpio.conf"
+cp /dotfiles/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
+copycheck
+$wait
+echo
+
+echo "Initramfs"
+echo
+mkinitcpio -p linux
+$wait
+clear
+
+# --------------------------------------------------
+# Network configuration
+# --------------------------------------------------
+# https://man.archlinux.org/man/machine-info.5
+# /etc/machine-info
+
+echo "------------------------------"
+echo "# Hosts & Hostname"
+echo "------------------------------"
+echo
+
+echo "Copying hosts"
+cp /dotfiles/hosts/hosts /etc/hosts
+copycheck
+echo
+
+echo "Copying hostname"
+cp /dotfiles/hosts/hostname /etc/hostname
+copycheck
+echo
+
+read -p "Enter hostname: " hostname
+echo
+
+echo "Setting hostname ${hostname}"
+hostnamectl set-hostname ${hostname}
+echo
+
+echo "Checking hostname"
+echo
+hostnamectl
+$wait
+clear
+
+echo "------------------------------"
+echo "# Network tools"
+echo "------------------------------"
+echo
+
+pacman -S --noconfirm networkmanager
+# pacman -S wpa_supplicant
+# pacman -S wireless_tools
+# pacman -S netctl
+# pacman -S dialog
+$wait
+clear
+
+echo "Enabling Network manager"
+echo
+systemctl enable NetworkManager
+copycheck
+$wait
+clear
+
+echo "------------------------------"
+echo "# Open SSH"
+echo "------------------------------"
+echo
+
+pacman -S --noconfirm openssh
+$wait
+clear
+
+echo "Enabling OpenSSH"
+echo
+systemctl enable sshd.service
+copycheck
+$wait
+clear
+
+# --------------------------------------------------
+# Locale
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Locale"
+echo "------------------------------"
+echo
+
+echo "Copying locale.gen"
+cp /dotfiles/locale/locale.gen /etc/locale.gen
+copycheck
+echo
+
+echo "Copying locale.conf"
+cp /dotfiles/locale/locale.conf /etc/locale.conf
+copycheck
+echo
+
+echo "Generating locale"
+locale-gen
+$wait
+clear
+
+# --------------------------------------------------
+# GRUB boot loader
+# --------------------------------------------------
+
+echo "------------------------------"
+echo "# Install GRUB and other tools"
+echo "------------------------------"
+echo
+
+pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
+$wait
+clear
+
+echo "------------------------------"
+echo "# Install GRUB and other tools"
+echo "------------------------------"
+echo
+
+echo "Creating EFI directory for boot"
+mkdir /boot/EFI
+echo
+
+echo "Mounting EFI partition"
+mount /dev/nvme0n1p1 /boot/EFI
+echo
+
+echo "Installing grub on the MBR"
+grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+echo
+
+echo "Copying GRUB config snippet"
+cp /usr/share/locale/en\@quot/LC_MESSAGES/grub.mo /boot/grub/locale/en.mo
+copycheck
+echo
+
+echo "Copying GRUB config"
+cp /dotfiles/grub/grub /etc/default/grub
+copycheck
+echo
+
+echo "Creating a GRUB config file"
+echo
+grub-mkconfig -o /boot/grub/grub.cfg
 $wait
 clear
 
@@ -304,19 +298,7 @@ clear
 echo "------------------------------"
 echo "# Exit chroot & reboot"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 $wait
 reboot now
-
-# echo "------------------------------"
-# echo "# Umount & Reboot"
-# echo "------------------------------"
-# $wait
-# echo -ne $newline
-
-# echo "Umount partitions"
-# umount -l /mnt
-# $wait
-
-# reboot now
