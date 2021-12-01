@@ -2,9 +2,6 @@
 
 # --------------------------------------------------
 # Arch Linux installation script
-# WARNING: script is under development & hard-coded
-# WARNING: this script is designed for VM installation
-# https://wiki.archlinux.org/
 # by Marcell Barsony
 # --------------------------------------------------
 
@@ -14,7 +11,6 @@ clear
 # Global variables
 # --------------------------------------------------
 
-newline="\n"
 read -p "Enter the amount of sleep time in seconds: " waitseconds
 wait="sleep ${waitseconds}"
 $wait
@@ -45,41 +41,40 @@ clear
 echo "------------------------------"
 echo "# Formatting disks"
 echo "------------------------------"
-echo -ne $newline
+echo
 
-echo "Formatting & mounting BOOT: /dev/sda1 (FAT32)"
-mkfs.fat -F32 /dev/sda1
-mkfs.ext4 /dev/sda2
-mount /dev/sda2 /mnt
+echo "Formatting partitions"
+mkfs.fat -F32 /dev/sda1 # EFI
+mkfs.ext4 /dev/sda2 # File system
+echo
+
+echo "Mounting partitions"
+mount /dev/sda2 /mnt # File system
 mkdir /mnt/efi
-mount /dev/sda1 /mnt/efi
-echo -ne $newline
-
-echo "Formatting & mounting ROOT: /dev/sda2 (ext4)"
-# mkfs.ext4 /dev/sda2
-# mount /dev/sda2 /mnt
-# $wait
-# echo -ne $newline
+mount /dev/sda1 /mnt/efi # EFI
+echo
 
 echo "Checking mountpoints"
 lsblk
 $wait
 clear
 
+# --------------------------------------------------
+# fstab
+# --------------------------------------------------
+
 echo "------------------------------"
 echo "# fstab"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Creating fstab directory"
 mkdir /mnt/etc/
-$wait
-echo -ne $newline
+echo
 
 echo "Generating fstab config"
 genfstab -U /mnt >> /mnt/etc/fstab
-$wait
-echo -ne $newline
+echo
 
 echo "Checking fstab"
 cat /mnt/etc/fstab
@@ -93,11 +88,10 @@ clear
 echo "------------------------------"
 echo "# Kernel"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Installing essential packages"
-$wait
-echo -ne $newline
+echo
 pacstrap /mnt base linux linux-firmware linux-headers base-devel virtualbox-guest-utils git nano vim
 $wait
 clear
@@ -109,7 +103,7 @@ clear
 echo "------------------------------"
 echo "# Chroot"
 echo "------------------------------"
-echo -ne $newline
+echo
 
 echo "Changing root to the new Arch system"
 $wait
