@@ -55,7 +55,7 @@ echo
 # Fetching configs
 #git clone git@github.com:marcellbarsony/dotfiles.git $HOME/.config
 cd $HOME/.config
-git remote set-url origin git@github.com:USERNAME/REPOSITORY.git
+git remote set-url origin git@github.com:marcellbarsony/dotfiles.git
 cd $HOME
 
 # Moving BW and GH to .config
@@ -98,7 +98,7 @@ echo "------------------------------"
 echo
 
 echo "Copying pacman.conf"
-sudo cp $HOME/.config/pacman/pacman.conf /etc/
+sudo cp $HOME/.config/_system/pacman/pacman.conf /etc/
 copycheck
 $wait
 clear

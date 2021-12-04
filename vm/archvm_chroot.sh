@@ -116,12 +116,12 @@ echo
 # /etc/machine-info
 
 echo "Copying hosts"
-cp $HOME/.config/hosts/hosts /etc/hosts
+cp $HOME/.config/_system/hosts/hosts /etc/hosts
 copycheck
 echo
 
 echo "Copying hostname"
-cp $HOME/.config/hosts/hostname /etc/hostname
+cp $HOME/.config/_system/hosts/hostname /etc/hostname
 copycheck
 echo
 
@@ -196,12 +196,12 @@ echo "------------------------------"
 echo
 
 echo "Copying locale.gen"
-cp $HOME/.config/locale/locale.gen /etc/locale.gen
+cp $HOME/.config/_system/locale/locale.gen /etc/locale.gen
 copycheck
 echo
 
 echo "Copying locale.conf"
-cp $HOME/.config/locale/locale.conf /etc/locale.conf
+cp $HOME/.config/_system/locale/locale.conf /etc/locale.conf
 copycheck
 echo
 

@@ -140,7 +140,7 @@ echo "------------------------------"
 echo
 
 echo "Copying mkinitcpio.conf"
-cp /dotfiles/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
+cp /dotfiles/_system/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
 copycheck
 $wait
 echo
@@ -163,12 +163,12 @@ echo "------------------------------"
 echo
 
 echo "Copying hosts"
-cp /dotfiles/hosts/hosts /etc/hosts
+cp /dotfiles/_system/hosts/hosts /etc/hosts
 copycheck
 echo
 
 echo "Copying hostname"
-cp /dotfiles/hosts/hostname /etc/hostname
+cp /dotfiles/_system/hosts/hostname /etc/hostname
 copycheck
 echo
 
@@ -231,12 +231,12 @@ echo "------------------------------"
 echo
 
 echo "Copying locale.gen"
-cp /dotfiles/locale/locale.gen /etc/locale.gen
+cp /dotfiles/_system/locale/locale.gen /etc/locale.gen
 copycheck
 echo
 
 echo "Copying locale.conf"
-cp /dotfiles/locale/locale.conf /etc/locale.conf
+cp /dotfiles/_system/locale/locale.conf /etc/locale.conf
 copycheck
 echo
 
@@ -281,7 +281,7 @@ copycheck
 echo
 
 echo "Copying GRUB config"
-cp /dotfiles/grub/grub /etc/default/grub
+cp /dotfiles/_system/grub/grub /etc/default/grub
 copycheck
 echo
 
