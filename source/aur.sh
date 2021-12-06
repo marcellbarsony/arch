@@ -11,17 +11,22 @@ makepkg -si --noconfirm
 cd $HOME
 clear
 
+echo "# LeftWM"
+echo
+paru -S --noconfirm leftwm-git
+clear
+
+echo "# Polybar"
+echo
+paru -S --noconfirm polybar-git
+clear
+
 echo "# Starship prompt"
 echo
 cd $HOME/.local/src/
 mkdir starship
 cd starship
 sh -c "$(curl -fsSL https://starship.rs/install.sh)"
-clear
-
-echo "# LeftWM"
-echo
-paru -S --noconfirm leftwm-git
 clear
 
 #echo "# Spaceship prompt"
