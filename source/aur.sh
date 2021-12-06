@@ -17,11 +17,16 @@ cd $HOME/.local/src/
 mkdir starship
 cd starship
 sh -c "$(curl -fsSL https://starship.rs/install.sh)"
+clear
+
+echo "# LeftWM"
+echo
+paru -S --noconfirm leftwm-git
+clear
 
 #echo "# Spaceship prompt"
 #echo
 #paru -S --noconfirm spacehip-prompt-git
-#$wait
 #clear
 
 # echo "VS Codium"
