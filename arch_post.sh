@@ -67,7 +67,7 @@ cd $HOME
 # --------------------------------------------------
 # https://wiki.archlinux.org/title/List_of_applications
 
-grep -v "^#" $HOME/arch/packages/packages.txt | sudo pacman -S --needed --noconfirm -
+grep -v "^#" $HOME/arch/source/packages.txt | sudo pacman -S --needed --noconfirm -
 clear
 
 # --------------------------------------------------
@@ -75,6 +75,13 @@ clear
 # --------------------------------------------------
 
 . $HOME/arch/source/aur.sh
+clear
+
+# --------------------------------------------------
+# Suckless
+# --------------------------------------------------
+
+. $HOME/arch/source/suckless.sh
 clear
 
 # --------------------------------------------------
@@ -122,13 +129,6 @@ echo "Copying zprofile"
 sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
 copycheck
 $wait
-clear
-
-# --------------------------------------------------
-# Suckless
-# --------------------------------------------------
-
-. $HOME/arch/source/suckless.sh
 clear
 
 # --------------------------------------------------
