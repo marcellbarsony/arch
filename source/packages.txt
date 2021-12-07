@@ -1,0 +1,56 @@
+# ALSA
+alsa
+alsa-firmware
+alsa-utils
+
+# BITWARDEN
+bitwarden-cli
+
+# GITHUB
+github-cli
+
+# INTEL
+intel-ucode
+xf86-video-intel
+
+# MAN
+man-db
+tldr
+
+# MISC
+neofetch
+unclutter
+
+# SSH
+openssh
+
+# PULSEAUDIO & SOF
+pulseaudio
+pulseaudio-alsa
+pavucontrol
+sof-firmware
+
+# PYTHON
+python
+python-pip
+
+# RUST
+rust
+
+# SYSTEM MONITOR
+htop
+bpytop
+
+# TERMINAL
+alacritty
+
+# X11
+xorg-server
+xorg-xinit
+xorg-xprop
+xwallpaper
+arandr
+
+# ZSH
+zsh
+zsh-syntax-highlighting
