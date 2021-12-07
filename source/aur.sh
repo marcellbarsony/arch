@@ -16,6 +16,11 @@ echo
 paru -S --noconfirm leftwm-git
 clear
 
+echo "# LibreWolf"
+echo
+paru -S --noconfirm librewolf-bin
+clear
+
 echo "# Polybar"
 echo
 paru -S --noconfirm polybar-git
