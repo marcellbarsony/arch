@@ -6,6 +6,12 @@ alsa-utils
 # BITWARDEN
 bitwarden-cli
 
+# COREUTILS
+bat
+exa
+lsd
+zoxide
+
 # GITHUB
 github-cli
 
