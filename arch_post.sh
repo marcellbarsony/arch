@@ -134,11 +134,31 @@ git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git $HO
 copycheck
 $wait
 clear
+
 # --------------------------------------------------
 # Time zone
 # --------------------------------------------------
 
 timedatectl set-timezone Europe/Budapest
+
+# --------------------------------------------------
+# Wallpaper
+# --------------------------------------------------
+
+echo "Create Downloads directory"
+echo
+mkdir $HOME/Downloads
+
+echo "Fetch wallpapers from Dropbox"
+echo
+curl -L -o $HOME/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
+
+echo "Unzip wallpapers"
+echo
+unzip -d $HOME/Downloads/wallpapers.zip -d $HOME/Downloads/Wallpapers -x /
+
+$wait
+clear
 
 # --------------------------------------------------
 # Clean up
