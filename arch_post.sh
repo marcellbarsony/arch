@@ -128,9 +128,12 @@ echo
 echo "Copying zprofile"
 sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
 copycheck
+
+echo "ZSH Autocomplete"
+git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src
+copycheck
 $wait
 clear
-
 # --------------------------------------------------
 # Time zone
 # --------------------------------------------------
