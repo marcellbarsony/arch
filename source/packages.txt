@@ -7,6 +7,10 @@ alsa-utils
 bitwarden-cli
 
 # COREUTILS
+zip
+unzip
+
+# COREUTILS - Rust
 bat
 #exa
 lsd
