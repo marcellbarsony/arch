@@ -23,7 +23,7 @@ clear
 
 echo "# Polybar"
 echo
-paru -S --noconfirm polybar-git
+paru -S --noconfirm polybar
 clear
 
 echo "# Starship prompt"
@@ -33,11 +33,6 @@ mkdir starship
 cd starship
 sh -c "$(curl -fsSL https://starship.rs/install.sh)"
 clear
-
-#echo "# Spaceship prompt"
-#echo
-#paru -S --noconfirm spacehip-prompt-git
-#clear
 
 # echo "VS Codium"
 # echo
