@@ -23,7 +23,7 @@ clear
 
 echo "# Polybar"
 echo
-paru -S --noconfirm polybar
+paru -S --noconfirm polybar-git
 clear
 
 echo "# Starship prompt"
