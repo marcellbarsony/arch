@@ -8,7 +8,7 @@ bitwarden-cli
 
 # COREUTILS
 bat
-exa
+#exa
 lsd
 zoxide
 
