@@ -32,6 +32,17 @@ cd $HOME/.local/src/
 mkdir starship
 cd starship
 sh -c "$(curl -fsSL https://starship.rs/install.sh)"
+cd $HOME
+clear
+
+echo "# Dmenu-rs"
+echo
+paru -S --noconfirm dmenu-rs-git
+clear
+
+echo "# Bitwarden-rs"
+echo
+paru -S --noconfirm rbw
 clear
 
 # echo "VS Codium"
