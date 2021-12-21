@@ -81,8 +81,8 @@ clear
 # Suckless
 # --------------------------------------------------
 
-. $HOME/arch/source/suckless.sh
-clear
+#. $HOME/arch/source/suckless.sh
+#clear
 
 # --------------------------------------------------
 # Configs
