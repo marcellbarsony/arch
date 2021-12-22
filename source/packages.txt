@@ -34,9 +34,9 @@ unclutter
 # SSH
 openssh
 
-# PULSEAUDIO & SOF
-pulseaudio
-pulseaudio-alsa
+# PIPEWIRE & SOF
+pipewire
+pipewire-alsa
 pavucontrol
 sof-firmware
 
