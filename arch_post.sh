@@ -35,7 +35,8 @@ copycheck(){
 # SSH setup
 # --------------------------------------------------
 
-. $HOME/arch/source/ssh.sh
+. $HOME/arch/source/rbw.sh
+#. $HOME/arch/source/ssh.sh
 clear
 
 # --------------------------------------------------
