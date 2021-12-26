@@ -10,7 +10,7 @@ mainmenu(){
 	options+=("Language")
   options+=("Cancel")
 	options+=("Shutdown")
-  whiptail --title "Arch Install Script" --menu "Select your option" 25 78 16 "${options[@]}" 3>&1 1>&2 2>&3
+  whiptail --title "Arch Install Script" --menu "Select your option" 25 78 15 "${options[@]}" 3>&1 1>&2 2>&3
 	#select=$(whiptail --title "Arch Install Script" --menu "Select your option" 25 78 16 "${options[@]}" 3>&1 1>&2 2>&3)
 	if [ "$?" = "0" ]; then
 		case ${select} in
