@@ -8,12 +8,6 @@ This script is currently **under development** and it is **not production-ready*
 
 Please note that this script is **hard-coded** for the time being.
 
-## Philosophy
-
-This automated installation sequence follows the [Arch Installation guide](https://wiki.archlinux.org/title/installation_guide) and the [Arch Principles](https://wiki.archlinux.org/title/Arch_Linux#Principles). 
-
-Designed to ship a minimal, lightweight, privacy and security-focused Arch system.
-
 ## Installation guide
 
 ### Base system
@@ -67,22 +61,3 @@ cd arch
 ```
 sh arch_post.sh
 ```
-
-## Features
-
-- UEFI
-- GRUB
-- Systemd
-- LVM on LUKS
-- X11
-- ZSH
-- Network Manager
-- Vim & Neovim
-- Suckless
-  - dwm
-  - dmenu
-  - st
-  - slstatus
-- Git
-- OpenSSH
-- **TBA**: _Hardened kernel_
