@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 echo "------------------------------"
 echo "# SSH setup"
@@ -50,10 +51,10 @@ clear
 
   # Login to GitHub
     set -u
-    echo "$ghpat" > .ghpat
+    echo "$ghpat" > .ghpatvar
     unset ghpat
-    gh auth login --with-token < .ghpat
-    rm .ghpat
+    gh auth login --with-token < .ghpatvar
+    rm .ghpatvar
     gh auth status
     sleep 5
     clear
