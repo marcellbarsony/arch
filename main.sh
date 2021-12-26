@@ -10,7 +10,7 @@ mainmenu(){
 	options+=("Language")
   options+=("Cancel")
 	options+=("Shutdown")
-	sel=$(whiptail --title "Arch Install Script" --menu "" --cancel-button "Cancel" --default-item "${nextitem}" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+	whiptail --title "Arch Install Script" --menu "" --cancel-button "Cancel" --default-item "${nextitem}" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3
 	if [ "$?" = "0" ]; then
 		case ${sel} in
 			"Language")
