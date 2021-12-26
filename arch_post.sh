@@ -131,7 +131,7 @@ sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
 copycheck
 
 echo "ZSH Autocomplete"
-git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src
+git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src/zsh-autocomplete
 copycheck
 $wait
 clear
@@ -156,7 +156,7 @@ curl -L -o $HOME/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7bu
 
 echo "Unzip wallpapers"
 echo
-unzip -d $HOME/Downloads/wallpapers.zip -d $HOME/Downloads/Wallpapers -x /
+unzip $HOME/Downloads/wallpapers.zip -d $HOME/Downloads/Wallpapers -x /
 
 $wait
 clear
