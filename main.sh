@@ -7,8 +7,9 @@ mainmenu(){
 		nextitem=${1}
 	fi
 	options=()
-	options+=("Language" "English")
-	options+=("Shutdown" "-s")
+	options+=("Language")
+  options+=("Cancel")
+	options+=("Shutdown")
 	sel=$(whiptail --backtitle "Back title" --title "Arch Install Script" --menu "" --cancel-button "Cancel" --default-item "${nextitem}" 0 0 0 \
 		"${options[@]}" \
 		3>&1 1>&2 2>&3)
@@ -16,8 +17,12 @@ mainmenu(){
 		case ${sel} in
 			"Language")
 				echo "Select language"
-				nextitem="Shutdown"
+				nextitem="Cancel"
 			;;
+      "Cancel")
+        echo "Cancel"
+        nextitem="Shutdown"
+      ;;
 			"Shutdown")
 				shutdown now
 				nextitem="Language"
@@ -29,6 +34,9 @@ mainmenu(){
 	fi
 
 }
+
+# -------------------------------
+# -------------------------------
 
 while (( "$#" ));
 do
