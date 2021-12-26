@@ -1,5 +1,10 @@
 #!/bin/bash
 
+diskselect(){
+  disk=$(lsblk -p -n -l -o NAME 7,11)
+
+}
+
 mainmenu(){
 	if [ "${1}" = "" ]; then
 		nextitem="."
@@ -10,9 +15,7 @@ mainmenu(){
 	options+=("Language")
   options+=("Cancel")
 	options+=("Shutdown")
-	sel=$(whiptail --backtitle "Back title" --title "Arch Install Script" --menu "" --cancel-button "Cancel" --default-item "${nextitem}" 0 0 0 \
-		"${options[@]}" \
-		3>&1 1>&2 2>&3)
+	sel=$(whiptail --title "Arch Install Script" --menu "" --cancel-button "Cancel" --default-item "${nextitem}" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 	if [ "$?" = "0" ]; then
 		case ${sel} in
 			"Language")
