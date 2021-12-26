@@ -6,11 +6,6 @@ diskselect(){
 }
 
 mainmenu(){
-	if [ "${1}" = "" ]; then
-		nextitem="."
-	else
-		nextitem=${1}
-	fi
 	options=()
 	options+=("Language")
   options+=("Cancel")
@@ -33,7 +28,7 @@ mainmenu(){
 		esac
 		mainmenu "${nextitem}"
 	else
-		clear
+		echo "$?"
 	fi
 
 }
