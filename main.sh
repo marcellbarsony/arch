@@ -30,6 +30,7 @@ mainmenu(){
 		mainmenu "${nextitem}"
 	else
 		echo "$?"
+    echo "${options[@]}"
 	fi
 
 }
