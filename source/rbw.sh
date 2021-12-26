@@ -51,10 +51,10 @@ clear
 
   # Login to GitHub
     set -u
-    echo "$ghpat" > .ghpatvar
+    echo "$ghpat" >> /tmp/.token
     unset ghpat
-    gh auth login --with-token < .ghpatvar
-    rm .ghpatvar
+    gh auth login --with-token < /tmp/.token
+    rm /tmp/.token
     gh auth status
     sleep 5
     clear
