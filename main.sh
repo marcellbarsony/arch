@@ -7,18 +7,18 @@ diskselect(){
 
 mainmenu(){
 	options=()
-	options+=("Language")
-  options+=("Cancel")
-	options+=("Shutdown")
-  select=$(whiptail --title "Main menu" --menu "Select your option" 25 78 16 "Option1" "Option2" 3>&1 1>&2 2>&3)
+	options+=("Language" "$selectedlang")
+  options+=("Layout" "$selectedlayout")
+  options+=("Disk" "$selecteddisk")
+  select=$(whiptail --title "Main menu" --menu "" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
 	if [ "$?" = "0" ]; then
 		case ${select} in
 			"Language")
-				echo "Select language"
-				nextitem="Cancel"
+				language
+				nextitem="Layout"
 			;;
-      "Cancel")
-        echo "Cancel"
+      "Layout")
+        echo "Keyboard Layout"
         nextitem="Shutdown"
       ;;
 			"Shutdown")
@@ -31,7 +31,25 @@ mainmenu(){
 		echo "$?"
     echo "${options[@]}"
 	fi
+}
 
+language(){
+  options=()
+	options+=("English" "(US)")
+  select=$(whiptail --title "Main menu" --menu "" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
+	if [ "$?" = "0" ]; then
+		case ${select} in
+			"English")
+				selectedlang="en_US"
+        mainmenu
+				nextitem="English"
+			;;
+		esac
+		mainmenu "${nextitem}"
+	else
+		echo "$?"
+    echo "${options[@]}"
+	fi
 }
 
 # -------------------------------
