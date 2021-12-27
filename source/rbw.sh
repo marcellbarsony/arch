@@ -8,6 +8,7 @@ echo
 # TEST
 # PARU needs to be installed
 paru -S --noconfirm rbw
+sudo pacman -S --noconfirm github-cli
 clear
 
 # Bitwarden
