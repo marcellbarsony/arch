@@ -6,6 +6,14 @@ diskselect(){
 }
 
 mainmenu(){
+  NEWT_COLORS='
+  window=,red
+  border=white,red
+  textbox=white,red
+  button=black,white
+' \
+# https://askubuntu.com/questions/776831/whiptail-change-background-color-dynamically-from-magenta/781062#781062
+
 	options=()
 	options+=("Language" "$selectedlang")
   options+=("Layout" "$selectedlayout")
@@ -36,7 +44,7 @@ mainmenu(){
 language(){
   options=()
 	options+=("English" "(US)")
-  select=$(whiptail --title "Main menu" --menu "" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
+  select=$(whiptail --title "Language" --menu "" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
 	if [ "$?" = "0" ]; then
 		case ${select} in
 			"English")
