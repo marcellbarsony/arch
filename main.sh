@@ -3,23 +3,31 @@
 dependencies(){
   if ! [ -x "$(command -v dialog)" ]
     then
-      echo "Dialog NOT installed"
+      echo "Installing Dialog"
       sudo pacman -Sy --noconfirm dialog
       dependencies
     else
-      echo "Dialog is installed"
-      mainmenu
+      echo "Dialog already installed"
+      welcome
   fi
 }
 
+welcome(){
+  dialog --title "Important note" --defaultno --yesno "This is a yes/no example" 8 50 3>&1 1>&2 2>&3
+  case $? in
+    0)
+      echo "Yes chosen."
+      ;;
+    1)
+      echo "No chosen."
+      ;;
+    255)
+      echo "Esc pressed."
+      ;;
+  esac
+}
+
 mainmenu(){
-#  NEWT_COLORS='
-#  window=,red
-#  border=white,red
-#  textbox=white,red
-#  button=black,white
-#  ' \
-#  https://askubuntu.com/questions/776831/whiptail-change-background-color-dynamically-from-magenta/781062#781062
 
   choice1="English"
   options=($choice1 "" Choice2 "" Choice3 "" Choice4 "")
@@ -92,6 +100,5 @@ do
 	shift
 done
 
-
-#mainmenu
 dependencies
+
