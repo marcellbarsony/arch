@@ -1,24 +1,33 @@
 #!/bin/bash
 
-diskselect(){
-  disk=$(lsblk -p -n -l -o NAME 7,11)
-
+dependencies(){
+  if ! [ -x "$(command -v dialog)" ]
+    then
+      echo "Dialog NOT installed"
+      sudo pacman -Sy --noconfirm dialog
+      dependencies
+    else
+      echo "Dialog is installed"
+      mainmenu
+  fi
 }
 
 mainmenu(){
-  NEWT_COLORS='
-  window=,red
-  border=white,red
-  textbox=white,red
-  button=black,white
-' \
-# https://askubuntu.com/questions/776831/whiptail-change-background-color-dynamically-from-magenta/781062#781062
+#  NEWT_COLORS='
+#  window=,red
+#  border=white,red
+#  textbox=white,red
+#  button=black,white
+#  ' \
+#  https://askubuntu.com/questions/776831/whiptail-change-background-color-dynamically-from-magenta/781062#781062
 
-	options=()
-	options+=("Language" "$selectedlang")
-  options+=("Layout" "$selectedlayout")
-  options+=("Disk" "$selecteddisk")
-  select=$(whiptail --title "Main menu" --menu "" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
+  choice1="English"
+  options=($choice1 "" Choice2 "" Choice3 "" Choice4 "")
+#	 options=()
+#  options+=(Language $sellanguage)
+#  options+=(Layout "test")
+#  options+=(Disk "test")
+  select=$(dialog --title "Main menu" --menu "menu" --cancel-button "Exit" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
 	if [ "$?" = "0" ]; then
 		case ${select} in
 			"Language")
@@ -34,7 +43,7 @@ mainmenu(){
 				nextitem="Language"
 			;;
 		esac
-		mainmenu "${nextitem}"
+      mainmenu "${nextitem}"
 	else
 		echo "$?"
     echo "${options[@]}"
@@ -48,9 +57,7 @@ language(){
 	if [ "$?" = "0" ]; then
 		case ${select} in
 			"English")
-				selectedlang="en_US"
-        mainmenu
-				nextitem="English"
+				choice1="en_US"
 			;;
 		esac
 		mainmenu "${nextitem}"
@@ -58,6 +65,11 @@ language(){
 		echo "$?"
     echo "${options[@]}"
 	fi
+}
+
+diskselect(){
+  disk=$(lsblk -p -n -l -o NAME 7,11)
+
 }
 
 # -------------------------------
@@ -80,5 +92,6 @@ do
 	shift
 done
 
-mainmenu
 
+#mainmenu
+dependencies
