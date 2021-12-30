@@ -46,63 +46,26 @@ keyboardlayout(){
       options+=("${item}" "---")
     done
   keymap=$(dialog --title "Keymap" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-    echo $keymap
-}
-
-
-#systemclock(){}
-#diskpartition(){}
-
-mainmenu(){
-  choice1="English"
-  options=($choice1 "" Choice2 "" Choice3 "" Choice4 "")
-#	 options=()
-#  options+=(Language $sellanguage)
-#  options+=(Layout "test")
-#  options+=(Disk "test")
-  select=$(dialog --title "Main menu" --menu "menu" --cancel-button "Exit" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
-	if [ "$?" = "0" ]; then
-		case ${select} in
-			"Language")
-				language
-				nextitem="Layout"
-			;;
-      "Layout")
-        echo "Keyboard Layout"
-        nextitem="Shutdown"
-      ;;
-			"Shutdown")
-				shutdown now
-				nextitem="Language"
-			;;
-		esac
-      mainmenu "${nextitem}"
-	else
-		echo "$?"
-    echo "${options[@]}"
-	fi
-}
-
-language(){
-  options=()
-	options+=("English" "(US)")
-  select=$(whiptail --title "Language" --menu "" 25 78 16 ${options[@]} 3>&1 1>&2 2>&3)
-	if [ "$?" = "0" ]; then
-		case ${select} in
-			"English")
-				choice1="en_US"
-			;;
-		esac
-		mainmenu "${nextitem}"
-	else
-		echo "$?"
-    echo "${options[@]}"
-	fi
+  if [ "$?" = "0" ]
+    then
+      echo $keymap
+      #localectl set-keymap --no-convert $keymap
+      diskselect
+  fi
 }
 
 diskselect(){
-  disk=$(lsblk -p -n -l -o NAME 7,11)
-
+  options=()
+  items=$(lsblk -p -n -l -o NAME -e 7,11)
+  for item in ${items}
+    do
+      options+=("${item}" "---")
+    done
+  disk=$(dialog --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+  if [ "$?" = "0" ]
+    then
+      echo $disk
+  fi
 }
 
 # -------------------------------
