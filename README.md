@@ -12,27 +12,29 @@ This script is currently **under development**.
 
 1.) Download the [Arch ISO](https://archlinux.org/download/) and create a bootable media
 
-2.) Verify the signature and boot the live environment
+2.) Verify the GPG signature and boot the live environment
 
-3.) Install Git
+3.) Establish internet connection
+
+4.) Install Git
 
 ```sh
 pacman -Sy git
 ```
 
-4.) Clone this repository
+5.) Clone this repository
 
 ```sh
 git clone https://github.com/marcellbarsony/arch.git --branch dev
 ```
 
-5.) Change to arch directory
+6.) Change to arch directory
 
 ```sh
 cd arch
 ```
 
-6.) Launch the installation script
+7.) Launch the installation script
 
 ```sh
 sh main.sh
