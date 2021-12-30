@@ -56,15 +56,18 @@ keyboardlayout(){
 
 diskselect(){
   options=()
-  items=$(lsblk -p -n -l -o NAME -e 7,11)
+  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+  IFS_ORIG=$IFS
+  IFS=$'\n'
   for item in ${items}
     do
-      options+=("${item}" "---")
+      options+=("${item}" "")
     done
+  IFS=$IFS_ORIG
   disk=$(dialog --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
   if [ "$?" = "0" ]
     then
-      echo $disk
+      echo ${disk%%\ *}
   fi
 }
 
