@@ -53,7 +53,6 @@ keyboardlayout(){
       diskselect
   fi
 }
-
 diskselect(){
   options=()
   items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -65,10 +64,16 @@ diskselect(){
     done
   IFS=$IFS_ORIG
   disk=$(dialog --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-  if [ "$?" = "0" ]
+  if [ "$?" != "0" ]
     then
-      echo ${disk%%\ *}
+      return 1
   fi
+    echo ${disk%%\ *}
+    return 0
+}
+
+diskpart(){
+  device=$(diskselect "(GPT, EFI)"
 }
 
 # -------------------------------
