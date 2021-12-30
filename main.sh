@@ -3,20 +3,31 @@
 dependencies(){
   if ! [ -x "$(command -v dialog)" ]
     then
-      echo "Installing Dialog"
+      echo "Installing dependencies"
       sudo pacman -Sy --noconfirm dialog
       dependencies
     else
-      echo "Dialog already installed"
-      welcome
+      echo "Dependencies installed"
+      bootmode
   fi
 }
 
-welcome(){
-  dialog --title "Important note" --defaultno --yesno "This is a yes/no example" 8 50 3>&1 1>&2 2>&3
+bootmode(){
+  if [ -d /sys/firmware/efi/efivars ]
+    then
+      note
+    else
+      echo "System is booted in BIOS mode."
+      exit 1
+  fi
+}
+
+note(){
+  dialog --title "Important note" --defaultno --yesno "Proceed with the installation?" 8 50 3>&1 1>&2 2>&3
   case $? in
     0)
       echo "Yes chosen."
+      keyboardlayout
       ;;
     1)
       echo "No chosen."
@@ -27,8 +38,22 @@ welcome(){
   esac
 }
 
-mainmenu(){
+keyboardlayout(){
+  options=("us" "Default")
+  items=$(localectl list-keymaps)
+  for item in $items
+    do
+      options+=("${item}" "---")
+    done
+  keymap=$(dialog --title "Keymap" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    echo $keymap
+}
 
+
+#systemclock(){}
+#diskpartition(){}
+
+mainmenu(){
   choice1="English"
   options=($choice1 "" Choice2 "" Choice3 "" Choice4 "")
 #	 options=()
