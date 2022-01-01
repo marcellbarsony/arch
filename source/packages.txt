@@ -54,6 +54,9 @@ bpytop
 # TERMINAL
 alacritty
 
+# TEXT EDITOR
+neovim
+
 # X11
 xorg-server
 xorg-xinit

@@ -131,7 +131,7 @@ sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
 copycheck
 
 echo "ZSH Autocomplete"
-git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src/zsh-autocomplete
+git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src/zsh-autocomplete/
 copycheck
 $wait
 clear
