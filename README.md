@@ -4,9 +4,7 @@ For the documentation please refer to the [Wiki](https://github.com/marcellbarso
 
 ## Important note
 
-This script is currently **under development** and it is **not production-ready**. It is recommended to not to use it in its current state.
-
-Please note that this script is **hard-coded** for the time being.
+This script is a **proof of concept** and currently **under development** in the **dev branch**
 
 ## Installation guide
 
@@ -16,7 +14,7 @@ Please note that this script is **hard-coded** for the time being.
 
 2.) Verify the signature and boot the live environment
 
-3.) Install Git   
+3.) Install Git
 ```
 pacman -Sy git
 ```
