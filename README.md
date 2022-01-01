@@ -4,7 +4,7 @@ For the documentation please refer to the [Wiki](https://github.com/marcellbarso
 
 ## Important note
 
-This script is a **proof of concept** and currently **under development** in the **dev branch**
+This script is a **dry run** and currently **under development** in the **dev branch**
 
 ## Installation guide
 
