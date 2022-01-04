@@ -5,12 +5,6 @@ echo "# AUR helper - PARU"
 echo "------------------------------"
 echo
 
-git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
-cd $HOME/.local/src/paru
-makepkg -si --noconfirm
-cd $HOME
-clear
-
 echo "# LeftWM"
 echo
 paru -S --noconfirm leftwm-git
@@ -45,10 +39,10 @@ echo
 paru -S --noconfirm rbw
 clear
 
-# echo "VS Codium"
-# echo
-# paru -S --noconfirm vscodium
-# clear
+echo "VS Codium"
+echo
+paru -S --noconfirm vscodium-bin
+clear
 
 # echo "Joplin"
 # echo

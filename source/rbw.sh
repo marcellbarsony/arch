@@ -7,6 +7,12 @@ echo
 
 # TEST
 # PARU needs to be installed
+git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
+cd $HOME/.local/src/paru
+makepkg -si --noconfirm
+cd $HOME
+clear
+
 paru -S --noconfirm rbw
 sudo pacman -S --noconfirm github-cli
 clear
