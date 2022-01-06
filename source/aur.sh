@@ -44,6 +44,11 @@ echo
 paru -S --noconfirm vscodium-bin
 clear
 
+echo "Spotify TUI"
+echo
+paru -S --noconfirm spotify-tui-bin
+clear
+
 # echo "Joplin"
 # echo
 # paru -S --noconfirm joplin-desktop

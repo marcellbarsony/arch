@@ -4,7 +4,7 @@ alsa-firmware
 alsa-utils
 
 # BITWARDEN
-bitwarden-cli
+#bitwarden-cli
 
 # COREUTILS
 zip
@@ -46,6 +46,9 @@ python-pip
 
 # RUST
 rust
+
+# SPOTIFY
+spotifyd
 
 # SYSTEM MONITOR
 htop
