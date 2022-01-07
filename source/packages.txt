@@ -6,6 +6,9 @@ alsa-utils
 # BITWARDEN
 #bitwarden-cli
 
+# COMPOSITOR
+picom
+
 # COREUTILS
 zip
 unzip
