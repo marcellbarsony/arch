@@ -34,6 +34,9 @@ tldr
 neofetch
 unclutter
 
+# OPENBOX
+openbox
+
 # SSH
 openssh
 
@@ -62,6 +65,9 @@ alacritty
 
 # TEXT EDITOR
 neovim
+
+# TINT2
+tint2
 
 # X11
 xorg-server
