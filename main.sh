@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Dependencies
 dependencies(){
   if ! [ -x "$(command -v dialog)" ]
     then
@@ -12,6 +13,7 @@ dependencies(){
   fi
 }
 
+# Boot mode
 bootmode(){
   if [ -d /sys/firmware/efi/efivars ]
     then
@@ -22,6 +24,7 @@ bootmode(){
   fi
 }
 
+# Note
 note(){
   dialog --title "Important note" --defaultno --yesno "Proceed with the installation?" 8 50 3>&1 1>&2 2>&3
   case $? in
@@ -41,6 +44,7 @@ note(){
   esac
 }
 
+# Keyboard Layout
 keyboardlayout(){
   options=("us" "Default")
   items=$(localectl list-keymaps)
@@ -66,6 +70,7 @@ keyboardlayout(){
   esac
 }
 
+# Select Disk
 diskselect(){
   options=()
   items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -85,6 +90,7 @@ diskselect(){
     return 0
 }
 
+# Disk Partitioning
 #diskpartmenu(){
 #  device=$(diskselect "(GPT, EFI)"
 #}
@@ -92,6 +98,7 @@ diskselect(){
 # -------------------------------
 # -------------------------------
 
+# Script Info
 while (( "$#" ));
 do
 	case ${1} in
@@ -110,4 +117,3 @@ do
 done
 
 dependencies
-
