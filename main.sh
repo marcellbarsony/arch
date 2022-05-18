@@ -112,6 +112,11 @@ do
       echo "Author: Marcell Barsony"
       echo "Important note: This script is under development"
       exit 0
+    ;;
+    *)
+      echo "Available options:"
+      echo "Help --help"
+      echo "Info --info"
   esac
   shift
 done
