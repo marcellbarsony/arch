@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Dependencies
 dependencies(){
   if ! [ -x "$(command -v dialog)" ]
     then
@@ -13,7 +12,33 @@ dependencies(){
   fi
 }
 
-# Boot mode
+
+dependencies(){
+  echo "Checking dependencies..."
+  sleep 3
+
+  declare -a dependencies=("whiptail") #Array without comma separation
+
+  for dependency in ${dependencies[@]}; do
+    command -v ${dependency} 1> /dev/null
+    if [ "$?" = "0" ];
+      then
+        echo "${dependency} [Installed]"
+      else
+        echo "Installing ${dependency}"
+        sudo pacman -Sy ${dependency}
+    fi
+  done
+
+  # Launch installer
+  if [ "$?" = "0" ];
+    then
+      language
+    else
+      echo "Dependencies are not installed."
+  fi
+}
+
 bootmode(){
   if [ -d /sys/firmware/efi/efivars ]
     then
@@ -24,7 +49,6 @@ bootmode(){
   fi
 }
 
-# Note
 note(){
   dialog --title "Important note" --defaultno --yesno "Proceed with the installation?" 8 50 3>&1 1>&2 2>&3
   case $? in
@@ -44,7 +68,6 @@ note(){
   esac
 }
 
-# Keyboard Layout
 keyboardlayout(){
   options=("us" "Default")
   items=$(localectl list-keymaps)
@@ -70,7 +93,6 @@ keyboardlayout(){
   esac
 }
 
-# Select Disk
 diskselect(){
   options=()
   items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -90,7 +112,6 @@ diskselect(){
     return 0
 }
 
-# Disk Partitioning
 #diskpartmenu(){
 #  device=$(diskselect "(GPT, EFI)"
 #}
@@ -98,11 +119,10 @@ diskselect(){
 # -------------------------------
 # -------------------------------
 
-# Script Info
 while (( "$#" ));
 do
-	case ${1} in
-		--help)
+  case ${1} in
+    --help)
       echo "------"
       echo "Arch installation script"
       echo "------"
@@ -110,6 +130,7 @@ do
     ;;
     --info)
       echo "Author: Marcell Barsony"
+      echo "Repository: https://github.com/marcellbarsony/arch"
       echo "Important note: This script is under development"
       exit 0
     ;;
