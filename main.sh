@@ -1,19 +1,7 @@
 #!/bin/bash
 
 dependencies(){
-  if ! [ -x "$(command -v dialog)" ]
-    then
-      echo "Installing dependencies"
-      sudo pacman -Sy --noconfirm dialog
-      dependencies
-    else
-      echo "Dependencies installed"
-      bootmode
-  fi
-}
 
-
-dependencies(){
   echo "Checking dependencies..."
   sleep 3
 
