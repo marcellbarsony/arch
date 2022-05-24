@@ -1,5 +1,79 @@
 #!/bin/bash
 
+network(){
+
+  echo -n "Checking network connection..."
+  ping -q -c 3 archlinux.org 2>&1 >/dev/null
+
+    case $? in
+      0)
+        echo "[Connected]"
+        # dependencies
+        test
+        ;;
+      1)
+        echo "[Disconnected]"
+        connection
+        ;;
+      *)
+        echo "[Exit status $?]"
+        ;;
+    esac
+
+}
+
+connection(){
+  echo -n "(R)etry / (W)i-Fi / (M)anual "
+  read -s -n 1 keypress
+
+    case $keypress in
+      [rR])
+        echo "[Retry]"
+        clear
+        network
+        ;;
+      [wW]  )
+        echo "[Wi-Fi]"
+        #wifi-m
+        ;;
+      [wW]  )
+        echo "[Wi-Fi Manual]"
+        #iwctl
+        ;;
+      *)
+        echo "[Exit status $?]"
+        connection
+        ;;
+    esac
+}
+
+wifi(){
+  # Read SSID
+  # Read Password
+  # Connect
+  iwctl --passphrase $passphrase station $device connect $SSID
+}
+
+wifi-manual(){
+
+  iwctl
+
+    case $? in
+      0)
+        echo "WIFI CONNECTION SUCCESFUL"
+        # dependencies
+        ;;
+      1)
+        echo "Not connected"
+        network
+        ;;
+      *)
+        echo "[Exit status $?]"
+        ;;
+    esac
+
+}
+
 dependencies(){
 
   echo "Checking dependencies..."
@@ -17,14 +91,14 @@ dependencies(){
         sudo pacman -Sy ${dependency}
     fi
   done
-
-  # Launch installer
-  if [ "$?" = "0" ];
-    then
-      language
-    else
-      echo "Dependencies are not installed."
-  fi
+  case $? in
+    0)
+      bootmode
+      ;;
+    *)
+      echo "Exit status $? [Dependencies were not installed]"
+      ;;
+  esac
 }
 
 bootmode(){
@@ -130,4 +204,4 @@ do
   shift
 done
 
-dependencies
+network
