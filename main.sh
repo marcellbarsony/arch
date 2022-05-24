@@ -2,18 +2,17 @@
 
 network(){
 
-  echo -n "Checking network connection..."
+  echo -n "Checking network..."
   ping -q -c 3 archlinux.org 2>&1 >/dev/null
 
     case $? in
       0)
         echo "[Connected]"
-        # dependencies
-        test
+        bootmode
         ;;
       1)
-        echo "[Disconnected]"
-        connection
+        echo "[DISCONNECTED]"
+        exit 1
         ;;
       *)
         echo "[Exit status $?]"
@@ -22,93 +21,67 @@ network(){
 
 }
 
-connection(){
-  echo -n "(R)etry / (W)i-Fi / (M)anual "
-  read -s -n 1 keypress
+bootmode(){
 
-    case $keypress in
-      [rR])
-        echo "[Retry]"
-        clear
-        network
-        ;;
-      [wW]  )
-        echo "[Wi-Fi]"
-        #wifi-m
-        ;;
-      [wW]  )
-        echo "[Wi-Fi Manual]"
-        #iwctl
-        ;;
-      *)
-        echo "[Exit status $?]"
-        connection
-        ;;
-    esac
-}
+  echo -n "Checking boot mode..."
+  sleep 1
 
-wifi(){
-  # Read SSID
-  # Read Password
-  # Connect
-  iwctl --passphrase $passphrase station $device connect $SSID
-}
-
-wifi-manual(){
-
-  iwctl
-
-    case $? in
-      0)
-        echo "WIFI CONNECTION SUCCESFUL"
-        # dependencies
-        ;;
-      1)
-        echo "Not connected"
-        network
-        ;;
-      *)
-        echo "[Exit status $?]"
-        ;;
-    esac
+  if [ -d /sys/firmware/efi/efivars ]
+    then
+      echo "[UEFI]"
+      dependencies
+    else
+      echo "[BIOS]"
+      echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
+      exit 1
+  fi
 
 }
 
 dependencies(){
 
-  echo "Checking dependencies..."
-  sleep 3
+  echo -n "Checking dependencies..."
+  sleep 1
 
   declare -a dependencies=("whiptail") #Array without comma separation
 
   for dependency in ${dependencies[@]}; do
     command -v ${dependency} 1> /dev/null
-    if [ "$?" = "0" ];
-      then
-        echo "${dependency} [Installed]"
-      else
-        echo "Installing ${dependency}"
-        sudo pacman -Sy ${dependency}
-    fi
+    case $? in
+      0)
+        echo "[Installed]"
+        ;;
+      1)
+        echo "[Missing]"
+        packages
+        ;;
+      *)
+        echo "[ERROR] - Exit status $?"
+        ;;
+    esac
   done
-  case $? in
-    0)
-      bootmode
-      ;;
-    *)
-      echo "Exit status $? [Dependencies were not installed]"
-      ;;
-  esac
+
 }
 
-bootmode(){
-  if [ -d /sys/firmware/efi/efivars ]
-    then
-      note
-    else
-      echo "System is booted in BIOS mode."
-      exit 1
-  fi
+packages(){
+
+  echo -n "Installing packages..."
+  sleep 1
+
+  declare -a packages=("libnewt") #Array without comma separation
+
+  for package in ${packages[@]}; do
+    sudo pacman -Sy --noconfirm ${package} 2>&1 >/dev/null
+    case $? in
+      0)
+        echo "[Done]"
+        ;;
+      *)
+        echo "[ERROR] - Exit status $?"
+        ;;
+    esac
+  done
+
 }
 
 note(){
@@ -137,7 +110,7 @@ keyboardlayout(){
     do
       options+=("${item}" "---")
     done
-  keymap=$(dialog --title "Keymap" --menu "menu" 20 78 10 ${options[@]} 3>&1 1>&2 2>&3)
+  keymap=$(whiptail --title "Keymap" --menu "menu" 20 78 10 ${options[@]} 3>&1 1>&2 2>&3)
   case $? in
     0)
       echo "Slected keymap: $keymap"
@@ -175,14 +148,13 @@ diskselect(){
 }
 
 #diskpartmenu(){
-#  device=$(diskselect "(GPT, EFI)"
+  #device=$(diskselect "(GPT, EFI)"
 #}
 
 # -------------------------------
 # -------------------------------
 
-while (( "$#" ));
-do
+while (( "$#" )); do
   case ${1} in
     --help)
       echo "------"
@@ -204,4 +176,5 @@ do
   shift
 done
 
+clear
 network
