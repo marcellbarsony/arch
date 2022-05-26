@@ -69,20 +69,17 @@ setkeymap(){
 
   items=$(localectl list-keymaps)
   options=()
+  options+=("us" "[Default]")
   for item in ${items}; do
-    options+=("us" "")
     options+=("${item}" "")
   done
 
-  keymap=$(whiptail --backtitle "${apptitle}" --title "${txtsetkeymap}" --menu "" 0 0 0 \
-    "${options[@]}" \
-    3>&1 1>&2 2>&3)
+  keymap=$(whiptail --title "Keyboard Layout"  --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
   #keymap=$(dialog --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
   if [ "$?" = "0" ]; then
     clear
     echo "loadkeys ${keymap}"
     loadkeys ${keymap}
-    pressanykey
   fi
 
 }
