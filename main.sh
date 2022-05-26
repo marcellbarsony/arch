@@ -5,19 +5,20 @@ network(){
   echo -n "Checking network..."
   ping -q -c 3 archlinux.org 2>&1 >/dev/null
 
-    case $? in
-      0)
-        echo "[Connected]"
-        bootmode
-        ;;
-      1)
-        echo "[DISCONNECTED]"
-        exit 1
-        ;;
-      *)
-        echo "[Exit status $?]"
-        ;;
-    esac
+  case $? in
+    0)
+      echo "[Connected]"
+      bootmode
+      ;;
+    1)
+      echo "[DISCONNECTED]"
+      exit 1
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
+  esac
 
 }
 
@@ -25,67 +26,102 @@ bootmode(){
 
   echo -n "Checking boot mode..."
   sleep 1
+  ls /sys/firmware/efi/efivars 2>&1 >/dev/null
 
-  if [ -d /sys/firmware/efi/efivars ]
-    then
+  case $? in
+    0)
       echo "[UEFI]"
       dependencies
-    else
+      ;;
+    1)
       echo "[BIOS]"
       echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
       exit 1
-  fi
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
+  esac
 
 }
 
 dependencies(){
 
-  echo -n "Checking dependencies..."
-  sleep 1
+  echo -n "Installing dependencies..."
+  sudo pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null
+  #pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null
 
-  declare -a dependencies=("whiptail") #Array without comma separation
-
-  for dependency in ${dependencies[@]}; do
-    command -v ${dependency} 1> /dev/null
-    case $? in
-      0)
-        echo "[Installed]"
-        ;;
-      1)
-        echo "[Missing]"
-        packages
-        ;;
-      *)
-        echo "[ERROR] - Exit status $?"
-        ;;
-    esac
-  done
+  case $? in
+    0)
+      echo "[Done]"
+      keyboardlayout
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
+  esac
 
 }
 
-packages(){
+setkeymap(){
 
-  echo -n "Installing packages..."
-  sleep 1
-
-  declare -a packages=("libnewt") #Array without comma separation
-
-  for package in ${packages[@]}; do
-    sudo pacman -Sy --noconfirm ${package} 2>&1 >/dev/null
-    case $? in
-      0)
-        echo "[Done]"
-        ;;
-      *)
-        echo "[ERROR] - Exit status $?"
-        ;;
-    esac
+  items=$(localectl list-keymaps)
+  options=()
+  for item in ${items}; do
+    options+=("us" "")
+    options+=("${item}" "")
   done
+
+  keymap=$(whiptail --backtitle "${apptitle}" --title "${txtsetkeymap}" --menu "" 0 0 0 \
+    "${options[@]}" \
+    3>&1 1>&2 2>&3)
+  #keymap=$(dialog --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
+  if [ "$?" = "0" ]; then
+    clear
+    echo "loadkeys ${keymap}"
+    loadkeys ${keymap}
+    pressanykey
+  fi
+
+}
+
+keyboardlayout(){
+
+  options=("us" "Default")
+  items=$(localectl list-keymaps)
+
+  for item in $item
+  do
+      options+=("${item}" "---")
+  done
+
+  keymap=$(whiptail --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
+  keymap=$(whiptail --title "Keymap" --menu "menu" 20 50 10 ${items[@]} 3>&1 1>&2 2>&3)
+  #keymap=$(dialog --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
+
+  case $? in
+    0)
+      echo "Slected keymap: $keymap"
+      #localectl set-keymap --no-convert $keymap
+      ;;
+    1)
+      echo "CANCEL pressed"
+      ;;
+    255)
+      echo "ESC pressed"
+      ;;
+    *)
+      echo "Exit status $?"
+      ;;
+  esac
 
 }
 
 note(){
   dialog --title "Important note" --defaultno --yesno "Proceed with the installation?" 8 50 3>&1 1>&2 2>&3
+
   case $? in
     0)
       echo "Yes chosen."
@@ -96,31 +132,6 @@ note(){
       ;;
     255)
       echo "Esc pressed."
-      ;;
-    *)
-      echo "Exit status $?"
-      ;;
-  esac
-}
-
-keyboardlayout(){
-  options=("us" "Default")
-  items=$(localectl list-keymaps)
-  for item in $items
-    do
-      options+=("${item}" "---")
-    done
-  keymap=$(whiptail --title "Keymap" --menu "menu" 20 78 10 ${options[@]} 3>&1 1>&2 2>&3)
-  case $? in
-    0)
-      echo "Slected keymap: $keymap"
-      #localectl set-keymap --no-convert $keymap
-      ;;
-    1)
-      echo "CANCEL pressed."
-      ;;
-    255)
-      echo "ESC pressed."
       ;;
     *)
       echo "Exit status $?"
@@ -177,4 +188,6 @@ while (( "$#" )); do
 done
 
 clear
-network
+#network
+#keyboardlayout
+setkeymap
