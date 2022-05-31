@@ -49,13 +49,13 @@ bootmode(){
 dependencies(){
 
   echo -n "Installing dependencies..."
-  sudo pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null
-  #pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null
+  sudo pacman -Sy --noconfirm libnewt dialog reflector 2>&1 >/dev/null
+  #pacman -Sy --noconfirm libnewt dialog reflector 2>&1 >/dev/null
 
   case $? in
     0)
       echo "[Done]"
-      keyboardlayout
+      keymap
       ;;
     *)
       echo "[ERROR]"
@@ -65,75 +65,54 @@ dependencies(){
 
 }
 
-setkeymap(){
+keymap(){
 
   items=$(localectl list-keymaps)
   options=()
   options+=("us" "[Default]")
-  for item in ${items}; do
-    options+=("${item}" "")
-  done
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
 
-  keymap=$(whiptail --title "Keyboard Layout"  --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
+  keymap=$(whiptail --title "Keyboard Layout" --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
   #keymap=$(dialog --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
+
   if [ "$?" = "0" ]; then
     clear
     echo "loadkeys ${keymap}"
     loadkeys ${keymap}
+    localectl set-keymap --no-convert ${keymap} # Systemd - /etc/vconsole.conf
+    warning
   fi
 
 }
 
-keyboardlayout(){
+warning(){
 
-  options=("us" "Default")
-  items=$(localectl list-keymaps)
+if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
+    echo "User selected Yes, exit status was $?."
+else
+    echo "User selected No, exit status was $?."
+fi
 
-  for item in $item
-  do
-      options+=("${item}" "---")
-  done
+#  dialog --title "Important note" --defaultno --yesno "Proceed with the installation?" 8 50 3>&1 1>&2 2>&3
+#
+#  case $? in
+#    0)
+#      echo "Yes chosen."
+#      keyboardlayout
+#      ;;
+#    1)
+#      echo "No chosen."
+#      ;;
+#    255)
+#      echo "Esc pressed."
+#      ;;
+#    *)
+#      echo "Exit status $?"
+#      ;;
+#  esac
 
-  keymap=$(whiptail --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
-  keymap=$(whiptail --title "Keymap" --menu "menu" 20 50 10 ${items[@]} 3>&1 1>&2 2>&3)
-  #keymap=$(dialog --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
-
-  case $? in
-    0)
-      echo "Slected keymap: $keymap"
-      #localectl set-keymap --no-convert $keymap
-      ;;
-    1)
-      echo "CANCEL pressed"
-      ;;
-    255)
-      echo "ESC pressed"
-      ;;
-    *)
-      echo "Exit status $?"
-      ;;
-  esac
-
-}
-
-note(){
-  dialog --title "Important note" --defaultno --yesno "Proceed with the installation?" 8 50 3>&1 1>&2 2>&3
-
-  case $? in
-    0)
-      echo "Yes chosen."
-      keyboardlayout
-      ;;
-    1)
-      echo "No chosen."
-      ;;
-    255)
-      echo "Esc pressed."
-      ;;
-    *)
-      echo "Exit status $?"
-      ;;
-  esac
 }
 
 diskselect(){
@@ -187,4 +166,4 @@ done
 clear
 #network
 #keyboardlayout
-setkeymap
+warning
