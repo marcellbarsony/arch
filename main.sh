@@ -172,6 +172,39 @@ diskpart(){
 
 }
 
+diskpartconfirm(){
+
+  options=()
+  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+  for item in ${items}; do
+    options+=("${item}" "")
+  done
+
+  disk=$(whiptail --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    case $? in
+    0)
+      diskpartconfirm
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
+  esac
+
+#  devices=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+#  for device in ${devices}; do
+#    devices+=("${device}" "")
+#  done
+#
+#  if (whiptail --title "Confirm" --yesno "The devices are:\n ${devices}" 8 78); then
+#      diskpartmenu
+#  else
+#      diskselect
+#  fi
+
+}
+
 diskpartmenu(){
 
   options=()
@@ -207,9 +240,6 @@ diskpartmenu(){
 
 }
 
-diskpartconfirm(){
-}
-
 # -------------------------------
 # -------------------------------
 # -------------------------------
@@ -238,5 +268,6 @@ done
 
 clear
 #network
-diskselect
+#diskselect
+diskpartconfirm
 #diskpartmenu
