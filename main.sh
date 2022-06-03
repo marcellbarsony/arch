@@ -48,9 +48,9 @@ bootmode(){
 
 systemclock(){
 
-echo -n "Set system time with timedatectl..."
-sleep 1
-timedatectl set-ntp true --no-ask-password
+  echo -n "Set system time with timedatectl..."
+  sleep 1
+  timedatectl set-ntp true --no-ask-password
 
   case $? in
     0)
@@ -107,12 +107,12 @@ keymap(){
 
 warning(){
 
-if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
-    diskselect
-else
-    echo "Installation terminated"
-    echo "Exit status $?"
-fi
+  if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
+      diskselect
+  else
+      echo "Installation terminated"
+      echo "Exit status $?"
+  fi
 
 }
 
@@ -120,14 +120,10 @@ diskselect(){
 
   options=()
   items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-  IFS_ORIG=$IFS
-  IFS=$'\n'
-  for item in ${items}
-    do
-      options+=("${item}" "")
-    done
+  for item in ${items}; do
+    options+=("${item}" "")
+  done
 
-  IFS=$IFS_ORIG
   disk=$(whiptail --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
   if [ "$?" != "0" ]
@@ -138,21 +134,41 @@ diskselect(){
     echo "Exit status $?"
     sleep 2
     diskpart
+
 }
 
-diskpart (){
+diskpart(){
 
-fdisk ${disk}
+  options=()
+  options+=("fdisk" "")
+  options+=("cfdisk" "")
 
-  case $? in
-    0)
-      diskpartmenu
+  sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+
+  if [ "$?" = "0" ]; then
+
+    case ${sel} in
+      "fdisk")
+          fdisk ${disk}
+          ;;
+      "cfdisk")
+          cfdisk ${disk}
+          ;;
+    esac
+
+  diskpartmenu
+
+  else
+    case $? in
+    1)
+      echo "Cancel pressed"
       ;;
     *)
-      echo "[ERROR]"
       echo "Exit status $?"
       ;;
   esac
+
+  fi
 
 }
 
@@ -181,7 +197,6 @@ diskpartmenu(){
     case $? in
     1)
       echo "Cancel pressed"
-      echo "Exit status $?"
       ;;
     *)
       echo "Exit status $?"
@@ -192,6 +207,10 @@ diskpartmenu(){
 
 }
 
+diskpartconfirm(){
+}
+
+# -------------------------------
 # -------------------------------
 # -------------------------------
 
@@ -219,5 +238,5 @@ done
 
 clear
 #network
-#diskselect
-diskpartmenu
+diskselect
+#diskpartmenu
