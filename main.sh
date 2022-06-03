@@ -31,7 +31,7 @@ bootmode(){
   case $? in
     0)
       echo "[UEFI]"
-      dependencies
+      systemclock
       ;;
     1)
       echo "[BIOS]"
@@ -46,11 +46,29 @@ bootmode(){
 
 }
 
+systemclock(){
+
+echo -n "Set system time with timedatectl..."
+sleep 1
+timedatectl set-ntp true --no-ask-password
+
+  case $? in
+    0)
+      echo "[Done]"
+      dependencies
+      ;;
+    *)
+      echo "Exit status $?"
+      ;;
+  esac
+
+}
+
 dependencies(){
 
   echo -n "Installing dependencies..."
-  sudo pacman -Sy --noconfirm libnewt dialog reflector 2>&1 >/dev/null
-  #pacman -Sy --noconfirm libnewt dialog reflector 2>&1 >/dev/null
+  pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null # reflector
+  #pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null # reflector
 
   case $? in
     0)
@@ -90,32 +108,16 @@ keymap(){
 warning(){
 
 if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
-    echo "User selected Yes, exit status was $?."
+    diskselect
 else
-    echo "User selected No, exit status was $?."
+    echo "Installation terminated"
+    echo "Exit status $?"
 fi
-
-#  dialog --title "Important note" --defaultno --yesno "Proceed with the installation?" 8 50 3>&1 1>&2 2>&3
-#
-#  case $? in
-#    0)
-#      echo "Yes chosen."
-#      keyboardlayout
-#      ;;
-#    1)
-#      echo "No chosen."
-#      ;;
-#    255)
-#      echo "Esc pressed."
-#      ;;
-#    *)
-#      echo "Exit status $?"
-#      ;;
-#  esac
 
 }
 
 diskselect(){
+
   options=()
   items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
   IFS_ORIG=$IFS
@@ -124,19 +126,71 @@ diskselect(){
     do
       options+=("${item}" "")
     done
+
   IFS=$IFS_ORIG
-  disk=$(dialog --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+  disk=$(whiptail --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
   if [ "$?" != "0" ]
     then
-      return 1
+      echo "Exit status $?"
   fi
     echo ${disk%%\ *}
-    return 0
+    echo "Exit status $?"
+    sleep 2
+    diskpart
 }
 
-#diskpartmenu(){
-  #device=$(diskselect "(GPT, EFI)"
-#}
+diskpart (){
+
+fdisk ${disk}
+
+  case $? in
+    0)
+      diskpartmenu
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
+  esac
+
+}
+
+diskpartmenu(){
+
+  options=()
+  options+=("PM-1" "[GPT+EFI+Luks]")
+  options+=("VM-1" "[GPT+EFI)")
+
+  sel=$(whiptail --backtitle "${apptitle}" --title "Diskpartmenu" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+
+  if [ "$?" = "0" ]; then
+
+    case ${sel} in
+      "PM-1")
+          echo "1st option"
+      ;;
+      "VM-1")
+          echo "2nd option"
+      ;;
+    esac
+
+  echo "Next item: ${sel}"
+
+  else
+    case $? in
+    1)
+      echo "Cancel pressed"
+      echo "Exit status $?"
+      ;;
+    *)
+      echo "Exit status $?"
+      ;;
+  esac
+
+  fi
+
+}
 
 # -------------------------------
 # -------------------------------
@@ -165,5 +219,5 @@ done
 
 clear
 #network
-#keyboardlayout
-warning
+#diskselect
+diskpartmenu
