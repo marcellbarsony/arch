@@ -148,26 +148,26 @@ diskpart(){
   if [ "$?" = "0" ]; then
 
     case ${sel} in
-    "fdisk")
+      "fdisk")
         fdisk ${disk}
         ;;
-    "cfdisk")
+      "cfdisk")
         cfdisk ${disk}
         ;;
     esac
 
-  diskpartmenu
+    diskpartmenu
 
-  else
+    else
 
     case $? in
-    1)
-      echo "Cancel pressed"
-      ;;
-    *)
-      echo "Exit status $?"
-      ;;
-    esac
+      1)
+        echo "Cancel pressed"
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+      esac
 
   fi
 
@@ -176,8 +176,8 @@ diskpart(){
 diskpartmenu(){
 
   options=()
-  options+=("PM-1" "[GPT+EFI+Luks]")
-  options+=("VM-1" "[GPT+EFI)")
+  options+=("PM-1" "[GPT + EFI + LVM on Luks]")
+  options+=("VM-1" "[GPT + EFI + No encryption]")
 
   sel=$(whiptail --backtitle "${apptitle}" --title "Diskpartmenu" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
@@ -185,138 +185,278 @@ diskpartmenu(){
 
     case ${sel} in
       "PM-1")
-          echo "1st option"
-      ;;
+        pm-1
+        ;;
       "VM-1")
-          echo "2nd option"
-      ;;
+        vm-1
+        ;;
     esac
 
-  echo "Next item: ${sel}"
+    else
+      case $? in
+        1)
+          echo "Cancel pressed"
+          ;;
+        *)
+          echo "Exit status $?"
+          ;;
+      esac
 
-  else
+  fi
+
+}
+
+pm-1()(
+
+  fsselect(){
+
+    options=()
+    options+=("ext4" "[Default]")
+    options+=("btrfs" "-")
+
+    fsselect=$(whiptail --title "File System" --menu "Select file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" = "0" ]; then
+
+        case ${fsselect} in
+          "ext4")
+              echo "EXT4 selected."
+          ;;
+          "btrfs")
+              echo "BTRFS selected."
+          ;;
+        esac
+
+        efiselect
+
+      else
+
+        case $? in
+          1)
+            echo "Cancel pressed"
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
+
+    fi
+
+  }
+
+  efiselect(){
+
+    options=()
+    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
+
+    efidevice=$(whiptail --title "Diskselect" --menu "Select EFI drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
     case $? in
+    0)
+      echo "Selected EFI device: ${efidevice}"
+      efiformat
+      ;;
     1)
       echo "Cancel pressed"
       ;;
     *)
       echo "Exit status $?"
       ;;
-  esac
+    esac
 
-  fi
+  }
 
-}
+  efiformat(){
 
-fsselect(){
+    echo "Formatting: ${efidevice}"
+    #mkfs.fat -F32 ${efidevice}
+    local exitcode=$?
 
-  options=()
-  options+=("ext4" "[Default]")
-  options+=("btrfs" "[Experimental]")
+    if [ ${exitcode} = "0" ]; then
+      echo "${efidevice} formatted"
+      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
+      rootselect
+    else
+      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+      diskselect
+    fi
 
-  fsselect=$(whiptail --title "File System" --menu "Select file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+  }
 
-  case $? in
-  0)
-    echo "Selected file system: ${fsselect}"
-    ;;
-  1)
-    echo "Cancel pressed"
-    ;;
-  *)
-    echo "Exit status $?"
-    ;;
-  esac
+  rootselect(){
 
-}
+    options=()
+    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
 
-efiselect(){
+    rootdevice=$(whiptail --title "Diskselect" --menu "Select ROOT drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
-  options=()
-  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-  for item in ${items}; do
-    options+=("${item}" "")
-  done
+    case $? in
+    0)
+      echo "Selected ROOT device: ${rootdevice}"
+      rootformat
+      ;;
+    1)
+      echo "Cancel pressed"
+      ;;
+    *)
+      echo "Exit status $?"
+      ;;
+    esac
 
-  efidevice=$(whiptail --title "Diskselect" --menu "Select EFI drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+  }
 
-  case $? in
-  0)
-    echo "Selected EFI device: ${efidevice}"
-    efiformat
-    ;;
-  1)
-    echo "Cancel pressed"
-    ;;
-  *)
-    echo "Exit status $?"
-    ;;
-  esac
+  rootformat(){
 
-}
+    # Mount point: /mnt
+    # Partition: /dev/root_partition
 
-efiformat(){
+    echo "Formatting: ${rootdevice}"
+    #mkfs.ext4 ${rootdevice}
+    local exitcode=$?
 
-  echo "Formatting: ${efidevice}"
-  #mkfs.fat -F32 ${efidevice}
-  local exitcode=$?
+    if [ ${exitcode} = "0" ]; then
+      echo "${rootdevice} formatted"
+      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
+      rootselect
+    else
+      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+      diskselect
+    fi
 
-  if [ ${exitcode} = "0" ]; then
-    echo "${efidevice} formatted"
-    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
-    rootselect
-  else
-    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-    diskselect
-  fi
+  }
 
-}
+  fsselect
 
-rootselect(){
+)
 
-  options=()
-  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-  for item in ${items}; do
-    options+=("${item}" "")
-  done
+vm-1()(
 
-  rootdevice=$(whiptail --title "Diskselect" --menu "Select ROOT drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+  fsselect(){
 
-  case $? in
-  0)
-    echo "Selected ROOT device: ${rootdevice}"
-    rootformat
-    ;;
-  1)
-    echo "Cancel pressed"
-    ;;
-  *)
-    echo "Exit status $?"
-    ;;
-  esac
+    options=()
+    options+=("ext4" "[Default]")
+    options+=("btrfs" "-")
 
-}
+    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
-rootformat(){
+    if [ "$?" = "0" ]; then
 
-  # Mount point: /mnt
-  # Partition: /dev/root_partition
+        case ${filesystem} in
+          "ext4")
+              echo "EXT4 selected."
+          ;;
+          "btrfs")
+              echo "BTRFS selected."
+          ;;
+        esac
 
-  echo "Formatting: ${rootdevice}"
-  #mkfs.ext4 ${rootdevice}
-  local exitcode=$?
+        efiselect
 
-  if [ ${exitcode} = "0" ]; then
-    echo "${rootdevice} formatted"
-    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
-    rootselect
-  else
-    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-    diskselect
-  fi
+      else
 
-}
+        case $? in
+          1)
+            echo "Cancel pressed"
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
 
+    fi
+
+  }
+
+  efiselect(){
+
+    options=()
+    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
+
+    efidevice=$(whiptail --title "[VM-1] EFI" --menu "EFI partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    case $? in
+      0)
+        efifilesystem
+        ;;
+      1)
+        echo "Cancel pressed"
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
+
+  }
+
+  efifilesystem(){
+
+    options=()
+    options+=("FAT32" "[Default]")
+    options+=("ext4" "-")
+    options+=("ext3" "-")
+
+    efifilesystem=$(whiptail --title "[VM-1] EFI" --menu "EFI file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" = "0" ]; then
+
+        case ${efifilesystem} in
+          "FAT32")
+            efifs="fat -F32"
+            ;;
+          "ext4")
+            echo "Not recommended"
+            exit 1
+            ;;
+        esac
+
+        efiformat
+
+      else
+
+        case $? in
+          1)
+            echo "Cancel pressed"
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
+
+    fi
+
+
+  }
+
+  efiformat(){
+
+    echo "Formatting: ${efidevice}"
+    #mkfs.${efifs} ${efidevice}
+    local exitcode=$?
+
+    if [ ${exitcode} = "0" ]; then
+      echo "${efidevice} formatted"
+      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
+      rootselect
+    else
+      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+      diskselect
+    fi
+
+  }
+
+  fsselect
+
+
+)
 
 # -------------------------------
 # -------------------------------
@@ -348,6 +488,7 @@ clear
 #network
 #diskselect
 #diskpartconfirm
-#diskpartmenu
+diskpartmenu
 #fsselect
-efiselect
+#efiselect
+#pm-1
