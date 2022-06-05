@@ -297,7 +297,6 @@ rootselect(){
 
 }
 
-
 rootformat(){
 
   # Mount point: /mnt
