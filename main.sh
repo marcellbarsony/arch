@@ -124,7 +124,7 @@ diskselect(){
     options+=("${item}" "")
   done
 
-  disk=$(whiptail --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+  disk=$(whiptail --title "Diskselect" --menu "Select disk to format" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
   if [ "$?" != "0" ]
     then
@@ -148,17 +148,18 @@ diskpart(){
   if [ "$?" = "0" ]; then
 
     case ${sel} in
-      "fdisk")
-          fdisk ${disk}
-          ;;
-      "cfdisk")
-          cfdisk ${disk}
-          ;;
+    "fdisk")
+        fdisk ${disk}
+        ;;
+    "cfdisk")
+        cfdisk ${disk}
+        ;;
     esac
 
   diskpartmenu
 
   else
+
     case $? in
     1)
       echo "Cancel pressed"
@@ -166,42 +167,9 @@ diskpart(){
     *)
       echo "Exit status $?"
       ;;
-  esac
+    esac
 
   fi
-
-}
-
-diskpartconfirm(){
-
-  options=()
-  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-  for item in ${items}; do
-    options+=("${item}" "")
-  done
-
-  disk=$(whiptail --title "Diskselect" --menu "menu" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    case $? in
-    0)
-      diskpartconfirm
-      ;;
-    *)
-      echo "[ERROR]"
-      echo "Exit status $?"
-      ;;
-  esac
-
-#  devices=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-#  for device in ${devices}; do
-#    devices+=("${device}" "")
-#  done
-#
-#  if (whiptail --title "Confirm" --yesno "The devices are:\n ${devices}" 8 78); then
-#      diskpartmenu
-#  else
-#      diskselect
-#  fi
 
 }
 
@@ -240,6 +208,117 @@ diskpartmenu(){
 
 }
 
+fsselect(){
+
+  options=()
+  options+=("ext4" "[Default]")
+  options+=("btrfs" "[Experimental]")
+
+  fsselect=$(whiptail --title "File System" --menu "Select file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+  case $? in
+  0)
+    echo "Selected file system: ${fsselect}"
+    ;;
+  1)
+    echo "Cancel pressed"
+    ;;
+  *)
+    echo "Exit status $?"
+    ;;
+  esac
+
+}
+
+efiselect(){
+
+  options=()
+  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+  for item in ${items}; do
+    options+=("${item}" "")
+  done
+
+  efidevice=$(whiptail --title "Diskselect" --menu "Select EFI drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+  case $? in
+  0)
+    echo "Selected EFI device: ${efidevice}"
+    efiformat
+    ;;
+  1)
+    echo "Cancel pressed"
+    ;;
+  *)
+    echo "Exit status $?"
+    ;;
+  esac
+
+}
+
+efiformat(){
+
+  echo "Formatting: ${efidevice}"
+  #mkfs.fat -F32 ${efidevice}
+  local exitcode=$?
+
+  if [ ${exitcode} = "0" ]; then
+    echo "${efidevice} formatted"
+    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
+    rootselect
+  else
+    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+    diskselect
+  fi
+
+}
+
+rootselect(){
+
+  options=()
+  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+  for item in ${items}; do
+    options+=("${item}" "")
+  done
+
+  rootdevice=$(whiptail --title "Diskselect" --menu "Select ROOT drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+  case $? in
+  0)
+    echo "Selected ROOT device: ${rootdevice}"
+    rootformat
+    ;;
+  1)
+    echo "Cancel pressed"
+    ;;
+  *)
+    echo "Exit status $?"
+    ;;
+  esac
+
+}
+
+
+rootformat(){
+
+  # Mount point: /mnt
+  # Partition: /dev/root_partition
+
+  echo "Formatting: ${rootdevice}"
+  #mkfs.ext4 ${rootdevice}
+  local exitcode=$?
+
+  if [ ${exitcode} = "0" ]; then
+    echo "${rootdevice} formatted"
+    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
+    rootselect
+  else
+    whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+    diskselect
+  fi
+
+}
+
+
 # -------------------------------
 # -------------------------------
 # -------------------------------
@@ -251,13 +330,13 @@ while (( "$#" )); do
       echo "Arch installation script"
       echo "------"
       exit 0
-    ;;
+      ;;
     --info)
       echo "Author: Marcell Barsony"
       echo "Repository: https://github.com/marcellbarsony/arch"
       echo "Important note: This script is under development"
       exit 0
-    ;;
+      ;;
     *)
       echo "Available options:"
       echo "Help --help"
@@ -269,5 +348,7 @@ done
 clear
 #network
 #diskselect
-diskpartconfirm
+#diskpartconfirm
 #diskpartmenu
+#fsselect
+efiselect
