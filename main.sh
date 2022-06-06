@@ -347,7 +347,7 @@ vm-1()(
 
     options=()
     options+=("ext4" "[Default]")
-    options+=("btrfs" "-")
+    options+=("btrfs" "[ - ]")
 
     filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
@@ -407,8 +407,8 @@ vm-1()(
 
     options=()
     options+=("FAT32" "[Default]")
-    options+=("ext4" "-")
-    options+=("ext3" "-")
+    options+=("ext4" "[ - ]")
+    options+=("ext3" "[ - ]")
 
     efifilesystem=$(whiptail --title "[VM-1] EFI" --menu "EFI file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
