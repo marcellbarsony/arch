@@ -484,7 +484,7 @@ vm-1()(
   rootformat(){
 
     #echo "Success [rootformat]"
-    mkfs.${efifs} ${efidevice}
+    mkfs.${filesystem} ${rootevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -524,7 +524,7 @@ vm-1()(
   mountroot(){
 
     #echo "Success [rootmount]"
-    mount /dev/sda2 /mnt
+    mount ${rootdevice} /mnt
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
