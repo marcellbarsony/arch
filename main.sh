@@ -35,12 +35,23 @@ bootmode(){
       ;;
     1)
       echo "[BIOS]"
-      echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
-      exit 1
+      read -p "Continue installation? (Y/N)" yn
+
+      case $yn in
+        [Yy])
+          systemclock
+          ;;
+        [Nn])
+          exit
+          ;;
+        * )
+          echo invalid response;
+      esac
       ;;
     *)
       echo "[ERROR]"
       echo "Exit status $?"
+      echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
       ;;
   esac
 
@@ -109,7 +120,7 @@ warning(){
 
   if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
       diskselect
-  else
+    else
       echo "Installation terminated"
       echo "Exit status $?"
   fi
