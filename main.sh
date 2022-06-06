@@ -61,7 +61,7 @@ systemclock(){
 
   echo -n "Set system time with timedatectl..."
   sleep 1
-  atimedatectl set-ntp true --no-ask-password
+  timedatectl set-ntp true --no-ask-password
 
   case $? in
     0)
@@ -141,8 +141,6 @@ diskselect(){
       echo "Exit status $?"
   fi
     echo ${disk%%\ *}
-    echo "Exit status $?"
-    sleep 2
     diskpart
 
 }
@@ -152,9 +150,8 @@ diskpart(){
   options=()
   options+=("fdisk" "")
   options+=("cfdisk" "")
-  #options+=("gdisk" "")
-  #options+=("sgdisk" "")
-  #https://man.archlinux.org/man/sgdisk.8
+  options+=("gdisk" "")
+  #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
 
   sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
@@ -162,10 +159,16 @@ diskpart(){
 
     case ${sel} in
       "fdisk")
+        clear
         fdisk ${disk}
         ;;
       "cfdisk")
+        clear
         cfdisk ${disk}
+        ;;
+      "gdisk")
+        clear
+        gdisk ${disk}
         ;;
     esac
 
@@ -589,8 +592,8 @@ while (( "$#" )); do
 done
 
 clear
-#network
+network
 #diskselect
 #diskpartconfirm
-diskpartmenu
+#diskpartmenu
 #fsselect
