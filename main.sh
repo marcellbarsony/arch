@@ -61,7 +61,7 @@ systemclock(){
 
   echo -n "Set system time with timedatectl..."
   sleep 1
-  timedatectl set-ntp true --no-ask-password
+  atimedatectl set-ntp true --no-ask-password
 
   case $? in
     0)
@@ -69,7 +69,7 @@ systemclock(){
       dependencies
       ;;
     *)
-      echo "Exit status $?"
+      echo "\nExit status $?"
       ;;
   esac
 
@@ -108,7 +108,6 @@ keymap(){
 
   if [ "$?" = "0" ]; then
     clear
-    echo "loadkeys ${keymap}"
     loadkeys ${keymap}
     localectl set-keymap --no-convert ${keymap} # Systemd - /etc/vconsole.conf
     warning
@@ -232,15 +231,6 @@ pm-1()(
 
     if [ "$?" = "0" ]; then
 
-        case ${fsselect} in
-          "ext4")
-              echo "EXT4 selected."
-          ;;
-          "btrfs")
-              echo "BTRFS selected."
-          ;;
-        esac
-
         efiselect
 
       else
@@ -266,19 +256,18 @@ pm-1()(
       options+=("${item}" "")
     done
 
-    efidevice=$(whiptail --title "Diskselect" --menu "Select EFI drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    efidevice=$(whiptail --title "[VM-1] EFI" --menu "EFI partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     case $? in
-    0)
-      echo "Selected EFI device: ${efidevice}"
-      efiformat
-      ;;
-    1)
-      echo "Cancel pressed"
-      ;;
-    *)
-      echo "Exit status $?"
-      ;;
+      0)
+        efifilesystem
+        ;;
+      1)
+        echo "Cancel pressed"
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
     esac
 
   }
@@ -361,16 +350,16 @@ vm-1()(
 
     if [ "$?" = "0" ]; then
 
-        case ${filesystem} in
-          "ext4")
-              echo "EXT4 selected."
-          ;;
-          "btrfs")
-              echo "BTRFS selected."
-          ;;
-        esac
+      #  case ${filesystem} in
+      #    "ext4")
+      #       echo "EXT4 selected."
+      #       ;;
+      #    "btrfs")
+      #       echo "BTRFS selected."
+      #       ;;
+      #  esac
 
-        efiselect
+      efiselect
 
       else
 
@@ -452,25 +441,126 @@ vm-1()(
 
   efiformat(){
 
-    echo "Formatting: ${efidevice}"
-    #mkfs.${efifs} ${efidevice}
+    #echo "Success [efiformat]"
+    mkfs.${efifs} ${efidevice}
     local exitcode=$?
 
-    if [ ${exitcode} = "0" ]; then
-      echo "${efidevice} formatted"
-      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
-      rootselect
-    else
-      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-      diskselect
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+        diskselect
     fi
+
+    rootselect
+
+  }
+
+  rootselect(){
+
+    options=()
+    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
+
+    rootdevice=$(whiptail --title "[VM-1] ROOT" --menu "ROOT partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    case $? in
+      0)
+        rootformat
+        ;;
+      1)
+        echo "Cancel pressed"
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
+
+  }
+
+  rootformat(){
+
+    #echo "Success [rootformat]"
+    mkfs.${efifs} ${efidevice}
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        diskselect
+    fi
+
+    mountefi
+
+  }
+
+  mountefi(){
+
+    #echo "Success [efidir]"
+    mkdir /mnt/efi
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "EFI directory was not created.\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
+
+    #echo "Success [efimount]"
+    mount ${efidevice} /mnt/efi
+    #mount --mkdir /dev/sdb1 /mnt/boot
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
+
+    mountroot
+
+  }
+
+  mountroot(){
+
+    #echo "Success [rootmount]"
+    mount /dev/sda2 /mnt
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
+
+    fstab
 
   }
 
   fsselect
 
-
 )
+
+fstab(){
+
+  echo "Success [fstab - dir]"
+  #mkdir /mnt/etc/
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
+    diskpartmenu
+  fi
+
+  echo "Success [fstab - gen]"
+  #genfstab -U /mnt >> /mnt/etc/fstab
+  #genfstab -L /mnt >> /mnt/etc/fstab
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
+    diskpartmenu
+  fi
+
+}
+
+
 
 # -------------------------------
 # -------------------------------
@@ -504,8 +594,3 @@ clear
 #diskpartconfirm
 diskpartmenu
 #fsselect
-#efiselect
-#pm-1
-
-# boot partition
-# mount --mkdir /dev/sdb1 /mnt/boot
