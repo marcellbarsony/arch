@@ -484,7 +484,7 @@ vm-1()(
   rootformat(){
 
     #echo "Success [rootformat]"
-    mkfs.${filesystem} ${rootevice}
+    mkfs.${filesystem} ${rootdevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
