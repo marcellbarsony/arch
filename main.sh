@@ -542,8 +542,8 @@ vm-1()(
 
 fstab(){
 
-  echo "Success [fstab - dir]"
-  #mkdir /mnt/etc/
+  #echo "Success [fstab - dir]"
+  mkdir /mnt/etc/
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -551,8 +551,8 @@ fstab(){
     diskpartmenu
   fi
 
-  echo "Success [fstab - gen]"
-  #genfstab -U /mnt >> /mnt/etc/fstab
+  #echo "Success [fstab - gen]"
+  genfstab -U /mnt >> /mnt/etc/fstab
   #genfstab -L /mnt >> /mnt/etc/fstab
   local exitcode=$?
 
