@@ -153,6 +153,9 @@ diskpart(){
   options=()
   options+=("fdisk" "")
   options+=("cfdisk" "")
+  #options+=("gdisk" "")
+  #options+=("sgdisk" "")
+  #https://man.archlinux.org/man/sgdisk.8
 
   sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
@@ -503,3 +506,6 @@ diskpartmenu
 #fsselect
 #efiselect
 #pm-1
+
+# boot partition
+# mount --mkdir /dev/sdb1 /mnt/boot
