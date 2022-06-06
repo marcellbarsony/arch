@@ -251,6 +251,11 @@ pm-1()(
 
   }
 
+  ### PARTITION SCHEME ###
+  # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
+  # Partition 2 | Boot ............... | (min. 512MB) | [Linux Filesystem] |
+  # Partition 3 | Root ............... | ............ | [Linux LVM] ...... |
+
   efiselect(){
 
     options=()
@@ -499,7 +504,7 @@ vm-1()(
   mountefi(){
 
     #echo "Success [efidir]"
-    mkdir /mnt/efi
+    mkdir /efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -508,8 +513,8 @@ vm-1()(
     fi
 
     #echo "Success [efimount]"
-    mount ${efidevice} /mnt/efi
-    #mount --mkdir /dev/sdb1 /mnt/boot
+    mount ${efidevice} /efi
+    #mount --mkdir ${efidevice} /efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -597,3 +602,9 @@ network
 #diskpartconfirm
 #diskpartmenu
 #fsselect
+
+# NOTES
+# Secure boot: https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
+# Minimal Arch install by ML: https://gist.github.com/mattiaslundberg/8620837
+# PM Encrypted UEFI Arch install: https://gist.github.com/HardenedArray/31915e3d73a4ae45adc0efa9ba458b07
+# VM Encrypted UEFI Arch install: https://gist.github.com/HardenedArray/d5b70681eca1d4e7cfb88df32cc4c7e6
