@@ -173,7 +173,7 @@ diskpart(){
         ;;
     esac
 
-    diskpartmenu
+    diskpartcheck
 
     else
 
@@ -190,17 +190,29 @@ diskpart(){
 
 }
 
+diskpartcheck(){
+
+  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+
+  if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
+      diskpartmenu
+    else
+      diskselect
+  fi
+
+}
+
 diskpartmenu(){
 
   options=()
-  options+=("Physical Machine 1" "[GPT + EFI + LVM on Luks]")
-  options+=("Virtual Machine 1" "[GPT + EFI + No encryption]")
+  options+=("Physical Machine 1" "[GPT+EFI+LVM on Luks]")
+  options+=("Virtual Machine 1" "[GPT+EFI+No encryption]")
 
-  sel=$(whiptail --title "Diskpartmenu" --menu "Partition scheme" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+  installscheme=$(whiptail --title "Diskpartmenu" --menu "Partition scheme" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
-    case ${sel} in
+    case ${installscheme} in
       "Physical Machine 1")
         pm-1
         ;;
@@ -353,20 +365,11 @@ vm-1()(
 
     options=()
     options+=("ext4" "[Default]")
-    options+=("btrfs" "[ - ]")
+    options+=("btrfs" "[-]")
 
     filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
-
-      #  case ${filesystem} in
-      #    "ext4")
-      #       echo "EXT4 selected."
-      #       ;;
-      #    "btrfs")
-      #       echo "BTRFS selected."
-      #       ;;
-      #  esac
 
       efiselect
 
@@ -413,8 +416,8 @@ vm-1()(
 
     options=()
     options+=("FAT32" "[Default]")
-    options+=("ext4" "[ - ]")
-    options+=("ext3" "[ - ]")
+    options+=("ext4" "[-]")
+    options+=("ext3" "[-]")
 
     efifilesystem=$(whiptail --title "[VM-1] EFI" --menu "EFI file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
@@ -567,9 +570,26 @@ fstab(){
     diskpartmenu
   fi
 
+  kernel
+
 }
 
+kernel(){
 
+  if [ "${installscheme}" = "Physical Machine 1" ]; then
+      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim
+    else
+      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim virtualbox-guest-utils
+  fi
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
+    diskpartmenu
+  fi
+
+}
+
+echo "You may now chroot in the system (#arch-chroot /mnt)"
 
 # -------------------------------
 # -------------------------------
@@ -598,10 +618,11 @@ while (( "$#" )); do
 done
 
 clear
-network
+#network
 #diskselect
 #diskpartconfirm
 #diskpartmenu
+diskpartcheck
 #fsselect
 
 # NOTES
