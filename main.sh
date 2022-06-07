@@ -237,17 +237,22 @@ diskpartmenu(){
 
 pm-1()(
 
+  ### PARTITION SCHEME ###
+  # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
+  # Partition 2 | Boot ............... | (min. 512MB) | [Linux Filesystem] |
+  # Partition 3 | Root ............... | ............ | [Linux LVM] ...... |
+
   fsselect(){
 
     options=()
     options+=("ext4" "[Default]")
-    options+=("btrfs" "-")
+    options+=("btrfs" "[-]")
 
-    fsselect=$(whiptail --title "File System" --menu "Select file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
 
-        efiselect
+      efiselect
 
       else
 
@@ -263,11 +268,6 @@ pm-1()(
     fi
 
   }
-
-  ### PARTITION SCHEME ###
-  # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
-  # Partition 2 | Boot ............... | (min. 512MB) | [Linux Filesystem] |
-  # Partition 3 | Root ............... | ............ | [Linux LVM] ...... |
 
   efiselect(){
 
@@ -293,24 +293,60 @@ pm-1()(
 
   }
 
-  efiformat(){
+  efifilesystem(){
 
-    echo "Formatting: ${efidevice}"
-    #mkfs.fat -F32 ${efidevice}
-    local exitcode=$?
+    options=()
+    options+=("FAT32" "[Default]")
+    options+=("ext4" "[-]")
+    options+=("ext3" "[-]")
 
-    if [ ${exitcode} = "0" ]; then
-      echo "${efidevice} formatted"
-      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
-      rootselect
-    else
-      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-      diskselect
+    efifilesystem=$(whiptail --title "[PM-1] EFI" --menu "EFI file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" = "0" ]; then
+
+        case ${efifilesystem} in
+          "FAT32")
+            efifs="fat -F32"
+            ;;
+          "ext4")
+            echo "Not recommended"
+            exit 1
+            ;;
+        esac
+
+        efiformat
+
+      else
+
+        case $? in
+          1)
+            echo "Cancel pressed"
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
+
     fi
 
   }
 
-  rootselect(){
+  efiformat(){
+
+    echo "Success [efiformat]"
+    #mkfs.${efifs} ${efidevice}
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+        diskselect
+    fi
+
+    bootselect
+
+  }
+
+  bootselect(){
 
     options=()
     items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -318,42 +354,80 @@ pm-1()(
       options+=("${item}" "")
     done
 
-    rootdevice=$(whiptail --title "Diskselect" --menu "Select ROOT drive" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    bootdevice=$(whiptail --title "[PM-1] BOOT" --menu "BOOT partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     case $? in
-    0)
-      echo "Selected ROOT device: ${rootdevice}"
-      rootformat
-      ;;
-    1)
-      echo "Cancel pressed"
-      ;;
-    *)
-      echo "Exit status $?"
-      ;;
+      0)
+        bootformat
+        ;;
+      1)
+        echo "Cancel pressed"
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
     esac
 
   }
 
-  rootformat(){
+  bootformat(){
 
-    # Mount point: /mnt
-    # Partition: /dev/root_partition
-
-    echo "Formatting: ${rootdevice}"
-    #mkfs.ext4 ${rootdevice}
+    echo "Success [bootformat]"
+    #mkfs.${filesystem} ${bootdevice}
     local exitcode=$?
 
-    if [ ${exitcode} = "0" ]; then
-      echo "${rootdevice} formatted"
-      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 successful." 8 78
-      rootselect
-    else
-      whiptail --title "EFI Formatting (FAT32)" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-      diskselect
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        diskselect
     fi
 
+    lvmselect
+
   }
+
+  lvmselect(){
+
+    options=()
+    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
+
+    lvmdevice=$(whiptail --title "[PM-1] LVM" --menu "LVM partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    case $? in
+      0)
+        cryptsetup
+        ;;
+      1)
+        echo "Cancel pressed"
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
+
+  }
+
+  cryptsetup(){
+
+  cryptsetup luksFormat ${lvmdevice}
+  # LUKS container setup
+  # Interactive menu
+  # --type luks2
+  #--key-file, -d name
+
+  }
+
+  cryptopen(){
+
+  cryptsetup open --type luks ${lvmdevice} cryptlvm
+  # Encryption password
+
+  }
+
+
+
 
   fsselect
 
@@ -582,14 +656,25 @@ kernel(){
       pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim virtualbox-guest-utils
   fi
 
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
+  if [ "${?}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Packages were not installed.\nExit status: ${?}" 8 60
+    diskpartmenu
+  fi
+
+  chroot
+
+}
+
+chroot (){
+
+  arch-chroot /mnt
+
+  if [ "${?}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Could not chroot into archiso.\nExit status: ${?}" 8 60
     diskpartmenu
   fi
 
 }
-
-echo "You may now chroot in the system (#arch-chroot /mnt)"
 
 # -------------------------------
 # -------------------------------
