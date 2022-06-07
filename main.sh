@@ -36,16 +36,17 @@ bootmode(){
     1)
       echo "[BIOS]"
       read -p "Continue installation? (Y/N)" yn
-
       case $yn in
         [Yy])
           systemclock
           ;;
         [Nn])
-          exit
+          exit 1
           ;;
         * )
-          echo invalid response;
+          echo invalid response
+          bootmode
+          ;;
       esac
       ;;
     *)
@@ -192,18 +193,18 @@ diskpart(){
 diskpartmenu(){
 
   options=()
-  options+=("PM-1" "[GPT + EFI + LVM on Luks]")
-  options+=("VM-1" "[GPT + EFI + No encryption]")
+  options+=("Physical Machine 1" "[GPT + EFI + LVM on Luks]")
+  options+=("Virtual Machine 1" "[GPT + EFI + No encryption]")
 
-  sel=$(whiptail --backtitle "${apptitle}" --title "Diskpartmenu" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+  sel=$(whiptail --title "Diskpartmenu" --menu "Partition scheme" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
     case ${sel} in
-      "PM-1")
+      "Physical Machine 1")
         pm-1
         ;;
-      "VM-1")
+      "Virtual Machine 1")
         vm-1
         ;;
     esac
