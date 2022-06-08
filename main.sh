@@ -409,22 +409,22 @@ pm-1()(
 
   }
 
-  cryptsetup(){
+  cryptpassword(){
 
-  cryptsetup -q -d "-" --type luks2 luksFormat ${lvmdevice}
-  # LUKS container setup
-  # Interactive menu
-  # --type luks2
-  #--key-file, -d name
 
   }
 
-  #cryptopen(){
+  cryptsetup(){
 
-  #cryptsetup open --type luks ${lvmdevice} cryptlvm
-  # Encryption password
+  cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file /root/luks.key
 
-  #}
+  }
+
+  cryptopen(){
+
+  cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file /root/luks.key
+
+  }
 
   fsselect
 
