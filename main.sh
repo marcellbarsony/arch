@@ -395,7 +395,7 @@ pm-1()(
 
     case $? in
       0)
-        cryptsetup
+        cryptpassword
         ;;
       1)
         echo "Cancel pressed"
@@ -409,20 +409,222 @@ pm-1()(
 
   cryptpassword(){
 
+    cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+    case $exitcode in
+      0)
+        cryptfile
+        ;;
+      1)
+        echo "Cancel pressed"
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
+
+  }
+
+  cryptfile(){
+
+    destdir=/root/luks.key
+    touch $destdir
+    local exitcode=$?
+
+    echo "$cryptpassword" > "$destdir"
+    local exitcode2=$?
+
+    if [ ${exitcode1} != "0" ] || [ ${exitcode2} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Key file [${destdir}] could not be created.\nExit status: ${exitcode}" 8 78
+        exit 1
+    fi
+
+    cryptsetup
 
   }
 
   cryptsetup(){
 
-  cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file /root/luks.key
+    cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file /root/luks.key
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Encrypting [${lvmdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
+      exit 1
+    fi
+
+    cryptsetup_open
 
   }
 
-  cryptopen(){
+  cryptsteup_open(){
 
-  cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file /root/luks.key
+    cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file /root/luks.key
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "LVM device [${lvmdevice}] could not be opened.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+    pvcreate
 
   }
+
+  pvcreate(){
+
+    pvcreate /dev/mapper/cryptlvm
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Physical volume could not be created.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+    vgcreate
+
+  }
+
+  vgcreate(){
+
+    vgcreate volgroup0 /dev/mapper/cryptlvm
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Volume group [volgroup0] could not be created.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+    vgcreate
+
+  }
+
+  rootsize(){
+
+    rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 Blue --title "ROOT filesystem" 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+    if [ ${exitcode} = 0 ]; then
+        if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
+           echo "$homesize is an integer"
+           rootcreate
+        else
+           echo "$homesize is not an integer or not defined"
+        fi
+    else
+        echo "Cancel selected"
+    fi
+
+    echo "(Exit status was $exitstatus)"
+
+  }
+
+  rootcreate(){
+
+    lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] could not be created.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+    homecreate
+
+  }
+
+  homecreate(){
+
+    lvcreate -l 100%FREE volgroup0 -n crypthome
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] could not be created.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+    modprobe
+
+  }
+
+  modprobe(){
+
+    modprobe dm_mod
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Activating volume groups [modprobe dm_mod] failed.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+    vgscan
+
+  }
+
+  vgscan(){
+
+    vgscan
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Scanning volume groups [vgscan] failed.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+    vgchange
+
+  }
+
+  vgchange(){
+
+    vgchange -ay
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Activating volume groups [vgchange -ay] failed.\nExit status: ${?}" 8 78
+      exit 1
+    fi
+
+  }
+
+  rootformat(){
+
+    mkfs.ext4 /dev/volgroup0/cryptroot
+
+
+  }
+
+  rootmount(){
+
+    mount /dev/volgroup0/cryptroot /mnt
+
+
+  }
+
+  bootmount(){
+
+    mkdir /mnt/boot
+    mount ${bootdevice} /mnt/boot
+
+  }
+
+  homeformat(){
+
+    mkfs.ext4 /dev/volgroup0/crypthome
+
+  }
+
+  homemount(){
+
+    mkdir /mnt/home
+    mount /dev/volgroup0/crypthome /mnt/home
+
+    fstab
+
+  }
+
+
 
   fsselect
 
