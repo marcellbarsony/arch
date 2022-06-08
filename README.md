@@ -1,34 +1,36 @@
-**A personal Arch Linux installation script**
+**Personal Arch Linux installation script**
 
 For the documentation please refer to the [Wiki](https://github.com/marcellbarsony/arch/wiki "Wiki - Installation script").
 
-## Important note
+## Objective
 
-This script is a **dry run** and currently **under development** in the **dev branch**
+The main objective is to create an automated Arch Linux installation script with as less interactions as possible.
 
 ## Installation guide
 
 ### Base system
 
-1.) Download the [Arch ISO](https://archlinux.org/download/) and create a bootable media
+1.) Download the [Arch ISO](https://archlinux.org/download/)
 
-2.) Verify the signature and boot the live environment
+2.) Verify the GPG signature
 
-3.) Install Git
+3.) Create a bootable media and boot the live environment
+
+4.) Install Git
 ```
 pacman -Sy git
 ```
-4.) Clone this repository
+5.) Clone this repository
 ```
 git clone https://github.com/marcellbarsony/arch.git
 ```
-5.) Change to arch directory
+6.) Change to arch directory
 ```
 cd arch
 ```
-6.) Launch the installation script
+7.) Launch the installation script
 ```
-sh arch.sh
+./main.sh
 ```
 
 ### Chroot environment
