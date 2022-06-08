@@ -419,15 +419,12 @@ pm-1()(
 
   }
 
-  cryptopen(){
+  #cryptopen(){
 
-  cryptsetup open --type luks ${lvmdevice} cryptlvm
+  #cryptsetup open --type luks ${lvmdevice} cryptlvm
   # Encryption password
 
-  }
-
-
-
+  #}
 
   fsselect
 
@@ -703,11 +700,11 @@ while (( "$#" )); do
 done
 
 clear
-#network
+network
 #diskselect
 #diskpartconfirm
 #diskpartmenu
-diskpartcheck
+#diskpartcheck
 #fsselect
 
 # NOTES
