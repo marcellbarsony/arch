@@ -411,7 +411,7 @@ pm-1()(
 
   cryptsetup(){
 
-  cryptsetup luksFormat ${lvmdevice}
+  cryptsetup -q -d "-" --type luks2 luksFormat ${lvmdevice}
   # LUKS container setup
   # Interactive menu
   # --type luks2
