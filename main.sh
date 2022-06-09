@@ -137,12 +137,18 @@ diskselect(){
 
   disk=$(whiptail --title "Diskselect" --menu "Select disk to format" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
-  if [ "$?" != "0" ]
-    then
+  case $? in
+    0)
+      echo ${disk%%\ *}
+      diskpart
+      ;;
+    1)
+      keymap
+      ;;
+    *)
       echo "Exit status $?"
-  fi
-    echo ${disk%%\ *}
-    diskpart
+      ;;
+  esac
 
 }
 
@@ -179,7 +185,7 @@ diskpart(){
 
     case $? in
       1)
-        echo "Cancel pressed"
+        diskselect
         ;;
       *)
         echo "Exit status $?"
@@ -224,7 +230,7 @@ diskpartmenu(){
     else
       case $? in
         1)
-          echo "Cancel pressed"
+          diskselect
           ;;
         *)
           echo "Exit status $?"
@@ -258,7 +264,7 @@ pm-1()(
 
         case $? in
           1)
-            echo "Cancel pressed"
+            diskpartmenu
             ;;
           *)
             echo "Exit status $?"
@@ -284,7 +290,7 @@ pm-1()(
         efifilesystem
         ;;
       1)
-        echo "Cancel pressed"
+        fsselect
         ;;
       *)
         echo "Exit status $?"
@@ -318,7 +324,7 @@ pm-1()(
 
         case $? in
           1)
-            echo "Cancel pressed"
+            efiselect
             ;;
           *)
             echo "Exit status $?"
@@ -337,7 +343,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        diskselect
+        exit ${exitcode}
     fi
 
     bootselect
@@ -359,7 +365,7 @@ pm-1()(
         bootformat
         ;;
       1)
-        echo "Cancel pressed"
+        efifilesystem
         ;;
       *)
         echo "Exit status $?"
@@ -376,7 +382,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        diskselect
+        exit ${exitcode}
     fi
 
     lvmselect
@@ -398,7 +404,7 @@ pm-1()(
         cryptpassword
         ;;
       1)
-        echo "Cancel pressed"
+        bootselect
         ;;
       *)
         echo "Exit status $?"
@@ -410,17 +416,31 @@ pm-1()(
   cryptpassword(){
 
     cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
-    local exitcode=$?
 
-    #cryptpassword=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
-    #local exitcode=$?
+    case $? in
+      0)
+        cryptpassword_confirm
+        ;;
+      1)
+        lvmselect
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
 
-    case $exitcode in
+  }
+
+  cryptpassword_confirm(){
+
+    cryptpassword_confirm=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
+
+    case $? in
       0)
         cryptfile
         ;;
       1)
-        echo "Cancel pressed"
+        cryptpassword
         ;;
       *)
         echo "Exit status $?"
@@ -431,13 +451,15 @@ pm-1()(
 
   cryptfile(){
 
+    destdir=/root/luks.key
+    destdir2=/root/luks.key2
+
     echo "Success [cryptfile]"
-    #destdir=/root/luks.key
-    #touch $destdir
+    #echo "$cryptpassword" > "$destdir"
     local exitcode1=$?
 
-    3echo "Success [cryptfile2]"
-    #echo "$cryptpassword" > "$destdir"
+    echo "Success [cryptfile2]"
+    #echo "$cryptpassword_confirm" > "$destdir2"
     local exitcode2=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
@@ -445,19 +467,25 @@ pm-1()(
         exit 1
     fi
 
-    cryptsetup
+    # Password match
+#    if cmp --silent -- "$destdir" "$destdir2"; then
+      cryptsetup
+#    else
+#      whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+#      cryptpassword
+#    fi
 
   }
 
   cryptsetup(){
 
     echo "Success [cryptsetup]"
-    #cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file /root/luks.key
+    #cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${destdir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "Encrypting [${lvmdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     cryptsetup_open
@@ -467,12 +495,12 @@ pm-1()(
   cryptsetup_open(){
 
     echo "Success [cryptsetup_open]"
-    #cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file /root/luks.key
+    #cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${destdir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "LVM device [${lvmdevice}] could not be opened.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     pvcreate
@@ -487,7 +515,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "Physical volume could not be created.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     vgcreate
@@ -502,7 +530,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "Volume group [volgroup0] could not be created.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     rootsize
@@ -518,7 +546,7 @@ pm-1()(
         if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
           rootcreate
         else
-          whiptail --title "ERROR" --msgbox "Entered value is not an integer.\nExit status: ${?}" 8 78
+          whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
           rootsize
         fi
     else
@@ -537,7 +565,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] could not be created.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     homecreate
@@ -552,7 +580,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] could not be created.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     modprobe
@@ -567,7 +595,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "Activating volume groups [modprobe dm_mod] failed.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     vgscan
@@ -582,7 +610,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "Scanning volume groups [vgscan] failed.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     vgchange
@@ -597,7 +625,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
       whiptail --title "ERROR" --msgbox "Activating volume groups [vgchange -ay] failed.\nExit status: ${?}" 8 78
-      exit 1
+      exit ${exitcode}
     fi
 
     rootformat
@@ -612,7 +640,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/cryptroot] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        diskselect
+        exit ${exitcode}
     fi
 
     rootmount
@@ -627,7 +655,7 @@ pm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "ROOT partition [/dev/volgroup0/cryptroot] was not mounted.\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     bootmount
@@ -643,7 +671,7 @@ pm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "BOOT directory was not created.\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     echo "Success [bootmount]"
@@ -652,7 +680,7 @@ pm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "BOOT partition was not mounted.\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     homeformat
@@ -667,7 +695,7 @@ pm-1()(
 
     if [ ${exitcode} != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/crypthome] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        diskselect
+        exit ${exitcode}
     fi
 
     homemount
@@ -682,7 +710,7 @@ pm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "HOME directory was not created.\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     echo "Success [homemount]"
@@ -691,7 +719,7 @@ pm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "HOME partition was not mounted.\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     fstab
@@ -892,23 +920,22 @@ vm-1()(
 
 fstab(){
 
-  #echo "Success [fstab - dir]"
-  mkdir /mnt/etc/
+  echo "Success [fstab - dir]"
+  #mkdir /mnt/etc/
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
-    exit 1
+    exit ${exitcode}
   fi
 
-  #echo "Success [fstab - gen]"
-  genfstab -U /mnt >> /mnt/etc/fstab
-  #genfstab -L /mnt >> /mnt/etc/fstab
+  echo "Success [fstab - gen]"
+  #genfstab -U /mnt >> /mnt/etc/fstab
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
-    exit 1
+    exit ${exitcode}
   fi
 
   kernel
@@ -919,13 +946,15 @@ kernel(){
 
   if [ "${installscheme}" = "Physical Machine 1" ]; then
       pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim
+      local exitcode=$?
     else
       pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim virtualbox-guest-utils
+      local exitcode=$?
   fi
 
-  if [ "${?}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Packages were not installed.\nExit status: ${?}" 8 60
-    diskpartmenu
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Packages were not installed.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
   fi
 
   chroot
@@ -971,9 +1000,10 @@ done
 
 clear
 #network
+keymap
 #diskselect
 #diskpartconfirm
-diskpartmenu
+#diskpartmenu
 #diskpartcheck
 #fsselect
 
