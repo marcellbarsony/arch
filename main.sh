@@ -201,20 +201,20 @@ diskpartcheck(){
   items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
 
   if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
-      diskpartmenu
+      installscheme
     else
       diskselect
   fi
 
 }
 
-diskpartmenu(){
+installscheme(){
 
   options=()
   options+=("Physical Machine 1" "[GPT+EFI+LVM on Luks]")
   options+=("Virtual Machine 1" "[GPT+EFI+No encryption]")
 
-  installscheme=$(whiptail --title "Diskpartmenu" --menu "Partition scheme" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+  installscheme=$(whiptail --title "Install scheme" --menu "Install scheme" 18 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
@@ -264,7 +264,7 @@ pm-1()(
 
         case $? in
           1)
-            diskpartmenu
+            installscheme
             ;;
           *)
             echo "Exit status $?"
@@ -337,8 +337,8 @@ pm-1()(
 
   efiformat(){
 
-    echo "Success [efiformat]"
-    #mkfs.${efifs} ${efidevice}
+    #echo "Success [efiformat]"
+    mkfs.${efifs} ${efidevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -376,8 +376,8 @@ pm-1()(
 
   bootformat(){
 
-    echo "Success [bootformat]"
-    #mkfs.${filesystem} ${bootdevice}
+    #echo "Success [bootformat]"
+    mkfs.${filesystem} ${bootdevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -454,12 +454,12 @@ pm-1()(
     destdir=/root/luks.key
     destdir2=/root/luks.key2
 
-    echo "Success [cryptfile]"
-    #echo "$cryptpassword" > "$destdir"
+    #echo "Success [cryptfile]"
+    echo "$cryptpassword" > "$destdir"
     local exitcode1=$?
 
-    echo "Success [cryptfile2]"
-    #echo "$cryptpassword_confirm" > "$destdir2"
+    #echo "Success [cryptfile2]"
+    echo "$cryptpassword_confirm" > "$destdir2"
     local exitcode2=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
@@ -479,8 +479,8 @@ pm-1()(
 
   cryptsetup(){
 
-    echo "Success [cryptsetup]"
-    #cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${destdir}
+    #echo "Success [cryptsetup]"
+    cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${destdir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -494,8 +494,8 @@ pm-1()(
 
   cryptsetup_open(){
 
-    echo "Success [cryptsetup_open]"
-    #cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${destdir}
+    #echo "Success [cryptsetup_open]"
+    cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${destdir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -509,8 +509,8 @@ pm-1()(
 
   pvcreate(){
 
-    echo "Success [pvcreate]"
-    #pvcreate /dev/mapper/cryptlvm
+    #echo "Success [pvcreate]"
+    pvcreate /dev/mapper/cryptlvm
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -524,8 +524,8 @@ pm-1()(
 
   vgcreate(){
 
-    echo "Success [vgcreate]"
-    #vgcreate volgroup0 /dev/mapper/cryptlvm
+    #echo "Success [vgcreate]"
+    vgcreate volgroup0 /dev/mapper/cryptlvm
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -559,8 +559,8 @@ pm-1()(
 
   rootcreate(){
 
-    echo "Success [rootcreate]"
-    #lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
+    #echo "Success [rootcreate]"
+    lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -574,8 +574,8 @@ pm-1()(
 
   homecreate(){
 
-    echo "Success [homecreate]"
-    #lvcreate -l 100%FREE volgroup0 -n crypthome
+    #echo "Success [homecreate]"
+    lvcreate -l 100%FREE volgroup0 -n crypthome
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -589,8 +589,8 @@ pm-1()(
 
   modprobe(){
 
-    echo "Success [modprobe]"
-    #modprobe dm_mod
+    #echo "Success [modprobe]"
+    modprobe dm_mod
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -604,8 +604,8 @@ pm-1()(
 
   vgscan(){
 
-    echo "Success [vgscan]"
-    #vgscan
+    #echo "Success [vgscan]"
+    vgscan
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -619,8 +619,8 @@ pm-1()(
 
   vgchange(){
 
-    echo "Success [vgchange]"
-    #vgchange -ay
+    #echo "Success [vgchange]"
+    vgchange -ay
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -634,8 +634,8 @@ pm-1()(
 
   rootformat(){
 
-    echo "Success [rootformat]"
-    #mkfs.${filesystem} /dev/volgroup0/cryptroot
+    #echo "Success [rootformat]"
+    mkfs.${filesystem} /dev/volgroup0/cryptroot
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -649,8 +649,8 @@ pm-1()(
 
   rootmount(){
 
-    echo "Success [rootmount]"
-    #mount /dev/volgroup0/cryptroot /mnt
+    #echo "Success [rootmount]"
+    mount /dev/volgroup0/cryptroot /mnt
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -665,8 +665,8 @@ pm-1()(
   bootmount(){
 
 
-    echo "Success [bootmount - dir]"
-    #mkdir /mnt/boot
+    #echo "Success [bootmount - dir]"
+    mkdir /mnt/boot
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -674,8 +674,8 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    echo "Success [bootmount]"
-    #mount ${bootdevice} /mnt/boot
+    #echo "Success [bootmount]"
+    mount ${bootdevice} /mnt/boot
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -689,8 +689,8 @@ pm-1()(
 
   homeformat(){
 
-    echo "Success [homeformat]"
-    #mkfs.${filesystem} /dev/volgroup0/crypthome
+    #echo "Success [homeformat]"
+    mkfs.${filesystem} /dev/volgroup0/crypthome
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -704,8 +704,8 @@ pm-1()(
 
   homemount(){
 
-    echo "Success [homemount - dir]"
-    #mkdir /mnt/home
+    #echo "Success [homemount - dir]"
+    mkdir /mnt/home
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -713,8 +713,8 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    echo "Success [homemount]"
-    #mount /dev/volgroup0/crypthome /mnt/home
+    #echo "Success [homemount]"
+    mount /dev/volgroup0/crypthome /mnt/home
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -748,7 +748,7 @@ vm-1()(
 
         case $? in
           1)
-            diskpartmenu
+            installscheme
             ;;
           *)
             echo "Exit status $?"
@@ -808,7 +808,7 @@ vm-1()(
 
         case $? in
           1)
-            efifilesystem
+            efiselect
             ;;
           *)
             echo "Exit status $?"
@@ -822,8 +822,8 @@ vm-1()(
 
   efiformat(){
 
-    #echo "Success [efiformat]"
-    mkfs.${efifs} ${efidevice}
+    echo "Success [efiformat]"
+    #mkfs.${efifs} ${efidevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -861,8 +861,8 @@ vm-1()(
 
   rootformat(){
 
-    #echo "Success [rootformat]"
-    mkfs.${filesystem} ${rootdevice}
+    echo "Success [rootformat]"
+    #mkfs.${filesystem} ${rootdevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -876,8 +876,8 @@ vm-1()(
 
   mountefi(){
 
-    #echo "Success [efidir]"
-    mkdir /efi
+    echo "Success [efidir]"
+    #mkdir /efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -885,8 +885,8 @@ vm-1()(
       exit ${exitcode}
     fi
 
-    #echo "Success [efimount]"
-    mount ${efidevice} /efi
+    echo "Success [efimount]"
+    #mount ${efidevice} /efi
     #mount --mkdir ${efidevice} /efi
     local exitcode=$?
 
@@ -920,8 +920,8 @@ vm-1()(
 
 fstab(){
 
-  echo "Success [fstab - dir]"
-  #mkdir /mnt/etc/
+  #echo "Success [fstab - dir]"
+  mkdir /mnt/etc/
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -929,7 +929,7 @@ fstab(){
     exit ${exitcode}
   fi
 
-  echo "Success [fstab - gen]"
+  #echo "Success [fstab - gen]"
   #genfstab -U /mnt >> /mnt/etc/fstab
   local exitcode=$?
 
@@ -945,7 +945,7 @@ fstab(){
 kernel(){
 
   if [ "${installscheme}" = "Physical Machine 1" ]; then
-      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim
+      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim lvm2
       local exitcode=$?
     else
       pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim virtualbox-guest-utils
