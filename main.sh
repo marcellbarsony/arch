@@ -412,6 +412,9 @@ pm-1()(
     cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
     local exitcode=$?
 
+    #cryptpassword=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
+    #local exitcode=$?
+
     case $exitcode in
       0)
         cryptfile
@@ -428,14 +431,18 @@ pm-1()(
 
   cryptfile(){
 
-    destdir=/root/luks.key
-    touch $destdir
+    echo "Success [cryptfile]"
+    #destdir=/root/luks.key
+    #touch $destdir
     local exitcode=$?
+    echo "${exitcode}"
 
-    echo "$cryptpassword" > "$destdir"
+    echo "Success [cryptfile2]"
+    #echo "$cryptpassword" > "$destdir"
     local exitcode2=$?
+    echo "${exitcode2}"
 
-    if [ ${exitcode1} != "0" ] || [ ${exitcode2} != "0" ]; then
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Key file [${destdir}] could not be created.\nExit status: ${exitcode}" 8 78
         exit 1
     fi
@@ -446,7 +453,8 @@ pm-1()(
 
   cryptsetup(){
 
-    cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file /root/luks.key
+    echo "Success [cryptsetup]"
+    #cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file /root/luks.key
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -458,9 +466,10 @@ pm-1()(
 
   }
 
-  cryptsteup_open(){
+  cryptsetup_open(){
 
-    cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file /root/luks.key
+    echo "Success [cryptsetup_open]"
+    #cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file /root/luks.key
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -474,7 +483,8 @@ pm-1()(
 
   pvcreate(){
 
-    pvcreate /dev/mapper/cryptlvm
+    echo "Success [pvcreate]"
+    #pvcreate /dev/mapper/cryptlvm
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -488,7 +498,8 @@ pm-1()(
 
   vgcreate(){
 
-    vgcreate volgroup0 /dev/mapper/cryptlvm
+    echo "Success [vgcreate]"
+    #vgcreate volgroup0 /dev/mapper/cryptlvm
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -496,21 +507,21 @@ pm-1()(
       exit 1
     fi
 
-    vgcreate
+    rootsize
 
   }
 
   rootsize(){
 
-    rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 Blue --title "ROOT filesystem" 3>&1 1>&2 2>&3)
+    rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ ${exitcode} = 0 ]; then
         if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
-           echo "$homesize is an integer"
-           rootcreate
+          rootcreate
         else
-           echo "$homesize is not an integer or not defined"
+          whiptail --title "ERROR" --msgbox "Entered value is not an integer.\nExit status: ${?}" 8 78
+          rootsize
         fi
     else
         echo "Cancel selected"
@@ -522,7 +533,8 @@ pm-1()(
 
   rootcreate(){
 
-    lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
+    echo "Success [rootcreate]"
+    #lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -536,7 +548,8 @@ pm-1()(
 
   homecreate(){
 
-    lvcreate -l 100%FREE volgroup0 -n crypthome
+    echo "Success [homecreate]"
+    #lvcreate -l 100%FREE volgroup0 -n crypthome
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -550,7 +563,8 @@ pm-1()(
 
   modprobe(){
 
-    modprobe dm_mod
+    echo "Success [modprobe]"
+    #modprobe dm_mod
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -564,7 +578,8 @@ pm-1()(
 
   vgscan(){
 
-    vgscan
+    echo "Success [vgscan]"
+    #vgscan
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -578,7 +593,8 @@ pm-1()(
 
   vgchange(){
 
-    vgchange -ay
+    echo "Success [vgchange]"
+    #vgchange -ay
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -586,45 +602,103 @@ pm-1()(
       exit 1
     fi
 
+    rootformat
+
   }
 
   rootformat(){
 
-    mkfs.ext4 /dev/volgroup0/cryptroot
+    echo "Success [rootformat]"
+    #mkfs.${filesystem} /dev/volgroup0/cryptroot
+    local exitcode=$?
 
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/cryptroot] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        diskselect
+    fi
+
+    rootmount
 
   }
 
   rootmount(){
 
-    mount /dev/volgroup0/cryptroot /mnt
+    echo "Success [rootmount]"
+    #mount /dev/volgroup0/cryptroot /mnt
+    local exitcode=$?
 
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "ROOT partition [/dev/volgroup0/cryptroot] was not mounted.\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
+
+    bootmount
 
   }
 
   bootmount(){
 
-    mkdir /mnt/boot
-    mount ${bootdevice} /mnt/boot
+
+    echo "Success [bootmount - dir]"
+    #mkdir /mnt/boot
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "BOOT directory was not created.\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
+
+    echo "Success [bootmount]"
+    #mount ${bootdevice} /mnt/boot
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "BOOT partition was not mounted.\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
+
+    homeformat
 
   }
 
   homeformat(){
 
-    mkfs.ext4 /dev/volgroup0/crypthome
+    echo "Success [homeformat]"
+    #mkfs.${filesystem} /dev/volgroup0/crypthome
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/crypthome] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        diskselect
+    fi
+
+    homemount
 
   }
 
   homemount(){
 
-    mkdir /mnt/home
-    mount /dev/volgroup0/crypthome /mnt/home
+    echo "Success [homemount - dir]"
+    #mkdir /mnt/home
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "HOME directory was not created.\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
+
+    echo "Success [homemount]"
+    #mount /dev/volgroup0/crypthome /mnt/home
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "HOME partition was not mounted.\nExit status: ${exitcode}" 8 60
+      diskpartmenu
+    fi
 
     fstab
 
   }
-
-
 
   fsselect
 
@@ -826,7 +900,7 @@ fstab(){
 
   if [ "${exitcode}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
-    diskpartmenu
+    exit 1
   fi
 
   #echo "Success [fstab - gen]"
@@ -836,7 +910,7 @@ fstab(){
 
   if [ "${exitcode}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
-    diskpartmenu
+    exit 1
   fi
 
   kernel
@@ -898,10 +972,10 @@ while (( "$#" )); do
 done
 
 clear
-network
+#network
 #diskselect
 #diskpartconfirm
-#diskpartmenu
+diskpartmenu
 #diskpartcheck
 #fsselect
 
