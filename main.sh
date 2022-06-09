@@ -468,12 +468,12 @@ pm-1()(
     fi
 
     # Password match
-    #if cmp --silent -- "$destdir" "$destdir2"; then
+    if cmp --silent -- "$destdir" "$destdir2"; then
       cryptsetup
-    #else
-    #  whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
-    #  cryptpassword
-    #fi
+    else
+      whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+      cryptpassword
+    fi
 
   }
 
