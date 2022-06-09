@@ -434,16 +434,14 @@ pm-1()(
     echo "Success [cryptfile]"
     #destdir=/root/luks.key
     #touch $destdir
-    local exitcode=$?
-    echo "${exitcode}"
+    local exitcode1=$?
 
-    echo "Success [cryptfile2]"
+    3echo "Success [cryptfile2]"
     #echo "$cryptpassword" > "$destdir"
     local exitcode2=$?
-    echo "${exitcode2}"
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Key file [${destdir}] could not be created.\nExit status: ${exitcode}" 8 78
+        whiptail --title "ERROR" --msgbox "Key file [${destdir}] could not be created.\nExit status 1: ${exitcode1}\nExit status 2: ${exitcode2}" 12 78
         exit 1
     fi
 
