@@ -451,24 +451,24 @@ pm-1()(
 
   cryptfile(){
 
-    destdir=/root/luks.key
-    destdir2=/root/luks.key2
+    keydir=/root/luks.key
+    keydir2=/root/luks.key2
 
     #echo "Success [cryptfile]"
-    echo "$cryptpassword" > "$destdir"
+    echo "$cryptpassword" > "$keydir"
     local exitcode1=$?
 
     #echo "Success [cryptfile2]"
-    echo "$cryptpassword_confirm" > "$destdir2"
+    echo "$cryptpassword_confirm" > "$keydir2"
     local exitcode2=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Key file [${destdir}] could not be created.\nExit status 1: ${exitcode1}\nExit status 2: ${exitcode2}" 12 78
+        whiptail --title "ERROR" --msgbox "Key file [${keydir}] could not be created.\nExit status 1: ${exitcode1}\nExit status 2: ${exitcode2}" 12 78
         exit 1
     fi
 
     # Password match
-    if cmp --silent -- "$destdir" "$destdir2"; then
+    if cmp --silent -- "$keydir" "$keydir2"; then
       cryptsetup
     else
       whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
@@ -480,7 +480,7 @@ pm-1()(
   cryptsetup(){
 
     #echo "Success [cryptsetup]"
-    cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${destdir}
+    cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${keydir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -495,7 +495,7 @@ pm-1()(
   cryptsetup_open(){
 
     #echo "Success [cryptsetup_open]"
-    cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${destdir}
+    cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${keydir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
