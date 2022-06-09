@@ -468,12 +468,12 @@ pm-1()(
     fi
 
     # Password match
-#    if cmp --silent -- "$destdir" "$destdir2"; then
+    #if cmp --silent -- "$destdir" "$destdir2"; then
       cryptsetup
-#    else
-#      whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
-#      cryptpassword
-#    fi
+    #else
+    #  whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+    #  cryptpassword
+    #fi
 
   }
 
@@ -748,7 +748,7 @@ vm-1()(
 
         case $? in
           1)
-            echo "Cancel pressed"
+            diskpartmenu
             ;;
           *)
             echo "Exit status $?"
@@ -774,7 +774,7 @@ vm-1()(
         efifilesystem
         ;;
       1)
-        echo "Cancel pressed"
+        fsselect
         ;;
       *)
         echo "Exit status $?"
@@ -808,7 +808,7 @@ vm-1()(
 
         case $? in
           1)
-            echo "Cancel pressed"
+            efifilesystem
             ;;
           *)
             echo "Exit status $?"
@@ -827,8 +827,8 @@ vm-1()(
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        diskselect
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to ${efifs} unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
     fi
 
     rootselect
@@ -850,7 +850,7 @@ vm-1()(
         rootformat
         ;;
       1)
-        echo "Cancel pressed"
+        efifilesystem
         ;;
       *)
         echo "Exit status $?"
@@ -867,7 +867,7 @@ vm-1()(
 
     if [ ${exitcode} != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        diskselect
+        exit ${exitcode}
     fi
 
     mountefi
@@ -882,7 +882,7 @@ vm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "EFI directory was not created.\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     #echo "Success [efimount]"
@@ -892,7 +892,7 @@ vm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     mountroot
@@ -907,7 +907,7 @@ vm-1()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
-      diskpartmenu
+      exit ${exitcode}
     fi
 
     fstab
@@ -964,17 +964,14 @@ kernel(){
 chroot (){
 
   arch-chroot /mnt
+  local exitcode=$?
 
   if [ "${?}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Could not chroot into archiso.\nExit status: ${?}" 8 60
-    diskpartmenu
+    whiptail --title "ERROR" --msgbox "Could not chroot into /mnt.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
   fi
 
 }
-
-# -------------------------------
-# -------------------------------
-# -------------------------------
 
 while (( "$#" )); do
   case ${1} in
