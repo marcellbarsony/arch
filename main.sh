@@ -337,7 +337,6 @@ pm-1()(
 
   efiformat(){
 
-    #echo "Success [efiformat]"
     mkfs.${efifs} ${efidevice}
     local exitcode=$?
 
@@ -376,7 +375,6 @@ pm-1()(
 
   bootformat(){
 
-    #echo "Success [bootformat]"
     mkfs.${filesystem} ${bootdevice}
     local exitcode=$?
 
@@ -451,14 +449,13 @@ pm-1()(
 
   cryptfile(){
 
+    echo "cryptfile" > /root/arch/log.txt
     keydir=/root/luks.key
     keydir2=/root/luks.key2
 
-    #echo "Success [cryptfile]"
     echo "$cryptpassword" > "$keydir"
     local exitcode1=$?
 
-    #echo "Success [cryptfile2]"
     echo "$cryptpassword_confirm" > "$keydir2"
     local exitcode2=$?
 
@@ -479,7 +476,7 @@ pm-1()(
 
   cryptsetup_create(){
 
-    #echo "Success [cryptsetup]"
+    echo "cryptsetup_create" >> /root/arch/log.txt
     cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${keydir}
     local exitcode=$?
 
@@ -494,7 +491,7 @@ pm-1()(
 
   cryptsetup_open(){
 
-    #echo "Success [cryptsetup_open]"
+    echo "cryptsetup_open" >> /root/arch/log.txt
     cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${keydir}
     local exitcode=$?
 
@@ -509,7 +506,7 @@ pm-1()(
 
   physicalvolume(){
 
-    #echo "Success [pvcreate]"
+    echo "physicalvolume" >> /root/arch/log.txt
     pvcreate /dev/mapper/cryptlvm
     local exitcode=$?
 
@@ -524,7 +521,7 @@ pm-1()(
 
   volumegroup(){
 
-    #echo "Success [vgcreate]"
+    echo "volumegroup" >> /root/arch/log.txt
     vgcreate volgroup0 /dev/mapper/cryptlvm
     local exitcode=$?
 
@@ -539,6 +536,7 @@ pm-1()(
 
   rootsize(){
 
+    echo "rootsize" >> /root/arch/log.txt
     rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
     local exitcode=$?
 
@@ -559,7 +557,7 @@ pm-1()(
 
   rootcreate(){
 
-    #echo "Success [rootcreate]"
+    echo "rootcreate" >> /root/arch/log.txt
     lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
     local exitcode=$?
 
@@ -574,7 +572,7 @@ pm-1()(
 
   homecreate(){
 
-    #echo "Success [homecreate]"
+    echo "homecreate" >> /root/arch/log.txt
     lvcreate -l 100%FREE volgroup0 -n crypthome
     local exitcode=$?
 
@@ -589,7 +587,7 @@ pm-1()(
 
   modprobe(){
 
-    #echo "Success [modprobe]"
+    echo "modprobe" >> /root/arch/log.txt
     modprobe dm_mod
     local exitcode=$?
 
@@ -604,7 +602,7 @@ pm-1()(
 
   volgroup_scan(){
 
-    #echo "Success [vgscan]"
+    echo "volgroup_scan" >> /root/arch/log.txt
     vgscan
     local exitcode=$?
 
@@ -619,7 +617,7 @@ pm-1()(
 
   volgroup_activate(){
 
-    #echo "Success [vgchange]"
+    echo "volgroup_activate" >> /root/arch/log.txt
     vgchange -ay
     local exitcode=$?
 
@@ -634,7 +632,7 @@ pm-1()(
 
   rootformat(){
 
-    #echo "Success [rootformat]"
+    echo "rootformat" >> /root/arch/log.txt
     mkfs.${filesystem} /dev/volgroup0/cryptroot
     local exitcode=$?
 
@@ -649,7 +647,7 @@ pm-1()(
 
   rootmount(){
 
-    #echo "Success [rootmount]"
+    echo "rootmount" >> /root/arch/log.txt
     mount /dev/volgroup0/cryptroot /mnt
     local exitcode=$?
 
@@ -664,8 +662,7 @@ pm-1()(
 
   bootmount(){
 
-
-    #echo "Success [bootmount - dir]"
+    echo "bootmount" >> /root/arch/log.txt
     mkdir /mnt/boot
     local exitcode=$?
 
@@ -674,7 +671,6 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    #echo "Success [bootmount]"
     mount ${bootdevice} /mnt/boot
     local exitcode=$?
 
@@ -689,7 +685,7 @@ pm-1()(
 
   homeformat(){
 
-    #echo "Success [homeformat]"
+    echo "homeformat" >> /root/arch/log.txt
     mkfs.${filesystem} /dev/volgroup0/crypthome
     local exitcode=$?
 
@@ -704,7 +700,7 @@ pm-1()(
 
   homemount(){
 
-    #echo "Success [homemount - dir]"
+    echo "homemount" >> /root/arch/log.txt
     mkdir /mnt/home
     local exitcode=$?
 
@@ -713,7 +709,6 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    #echo "Success [homemount]"
     mount /dev/volgroup0/crypthome /mnt/home
     local exitcode=$?
 
@@ -923,7 +918,6 @@ fstab(){
     exit ${exitcode}
   fi
 
-  #echo "Success [fstab - gen]"
   genfstab -U /mnt >> /mnt/etc/fstab
   local exitcode=$?
 
@@ -946,7 +940,7 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  reflector --latest 25 --sort rate --save /etc/pacman.d/mirrorlist
+  reflector --latest 25 --connection-timeout 3 --sort rate --save /etc/pacman.d/mirrorlist
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
