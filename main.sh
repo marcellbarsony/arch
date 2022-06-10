@@ -469,7 +469,7 @@ pm-1()(
 
     # Password match
     if cmp --silent -- "$keydir" "$keydir2"; then
-      cryptsetup
+      cryptsetup_create
     else
       whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
       cryptpassword
@@ -477,7 +477,7 @@ pm-1()(
 
   }
 
-  cryptsetup(){
+  cryptsetup_create(){
 
     #echo "Success [cryptsetup]"
     cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${keydir}
@@ -503,11 +503,11 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    pvcreate
+    physicalvolume
 
   }
 
-  pvcreate(){
+  physicalvolume(){
 
     #echo "Success [pvcreate]"
     pvcreate /dev/mapper/cryptlvm
@@ -518,11 +518,11 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    vgcreate
+    volumegroup
 
   }
 
-  vgcreate(){
+  volumegroup(){
 
     #echo "Success [vgcreate]"
     vgcreate volgroup0 /dev/mapper/cryptlvm
@@ -598,11 +598,11 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    vgscan
+    volgroup_scan
 
   }
 
-  vgscan(){
+  volgroup_scan(){
 
     #echo "Success [vgscan]"
     vgscan
@@ -613,11 +613,11 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    vgchange
+    volgroup_activate
 
   }
 
-  vgchange(){
+  volgroup_activate(){
 
     #echo "Success [vgchange]"
     vgchange -ay
@@ -860,7 +860,6 @@ vm-1()(
 
   rootformat(){
 
-    echo "rootformat" > /root/arch/log.txt
     mkfs.${filesystem} ${rootdevice}
     local exitcode=$?
 
@@ -875,7 +874,6 @@ vm-1()(
 
   mountefi(){
 
-    echo "mountefi" >> /root/arch/log.txt
     mkdir /efi
     local exitcode=$?
 
@@ -893,14 +891,12 @@ vm-1()(
       exit ${exitcode}
     fi
 
-    echo "mountefi $exitcode" >> /root/arch/log.txt
     mountroot
 
   }
 
   mountroot(){
 
-    echo "mounroot" >> /root/arch/log.txt
     mount ${rootdevice} /mnt
     local exitcode=$?
 
@@ -909,7 +905,6 @@ vm-1()(
       exit ${exitcode}
     fi
 
-    echo "mountroot $exitcode" >> /root/arch/log.txt
     fstab
 
   }
@@ -920,7 +915,6 @@ vm-1()(
 
 fstab(){
 
-  echo "fstab" >> /root/arch/log.txt
   mkdir /mnt/etc/
   local exitcode=$?
 
@@ -938,14 +932,12 @@ fstab(){
     exit ${exitcode}
   fi
 
-  echo "fstab $exitcode" >> /root/arch/log.txt
-  reflector
+  mirrorlist
 
 }
 
-reflector(){
+mirrorlist(){
 
-  echo "reflector" >> /root/arch/log.txt
   cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
   local exitcode=$?
 
@@ -962,14 +954,12 @@ reflector(){
     exit ${exitcode}
   fi
 
-  echo "reflector $exitcode" >> /root/arch/log.txt
   kernel
 
 }
 
 kernel(){
 
-  echo "kernel" >> /root/arch/log.txt
   if [ "${installscheme}" = "Physical Machine 1" ]; then
       pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim lvm2
       local exitcode=$?
@@ -982,7 +972,6 @@ kernel(){
     whiptail --title "ERROR" --msgbox "Packages were not installed.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
-  echo "kernel $exitcode" >> /root/arch/log.txt
 
   chroot
 
