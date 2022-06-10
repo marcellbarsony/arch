@@ -860,6 +860,7 @@ vm-1()(
 
   rootformat(){
 
+    echo "rootformat" > /root/arch/log.txt
     mkfs.${filesystem} ${rootdevice}
     local exitcode=$?
 
@@ -874,6 +875,7 @@ vm-1()(
 
   mountefi(){
 
+    echo "mountefi" >> /root/arch/log.txt
     mkdir /efi
     local exitcode=$?
 
@@ -891,12 +893,14 @@ vm-1()(
       exit ${exitcode}
     fi
 
+    echo "mountefi $exitcode" >> /root/arch/log.txt
     mountroot
 
   }
 
   mountroot(){
 
+    echo "mounroot" >> /root/arch/log.txt
     mount ${rootdevice} /mnt
     local exitcode=$?
 
@@ -905,6 +909,7 @@ vm-1()(
       exit ${exitcode}
     fi
 
+    echo "mountroot $exitcode" >> /root/arch/log.txt
     fstab
 
   }
@@ -915,7 +920,7 @@ vm-1()(
 
 fstab(){
 
-  #echo "Success [fstab - dir]"
+  echo "fstab" >> /root/arch/log.txt
   mkdir /mnt/etc/
   local exitcode=$?
 
@@ -933,12 +938,14 @@ fstab(){
     exit ${exitcode}
   fi
 
+  echo "fstab $exitcode" >> /root/arch/log.txt
   reflector
 
 }
 
 reflector(){
 
+  echo "reflector" >> /root/arch/log.txt
   cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
   local exitcode=$?
 
@@ -947,7 +954,7 @@ reflector(){
     exit ${exitcode}
   fi
 
-  reflector --connection-timeout 3 --latest 25 --sort rate --save /etc/pacman.d/mirrorlist
+  reflector --latest 25 --sort rate --save /etc/pacman.d/mirrorlist
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -955,12 +962,14 @@ reflector(){
     exit ${exitcode}
   fi
 
+  echo "reflector $exitcode" >> /root/arch/log.txt
   kernel
 
 }
 
 kernel(){
 
+  echo "kernel" >> /root/arch/log.txt
   if [ "${installscheme}" = "Physical Machine 1" ]; then
       pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim lvm2
       local exitcode=$?
@@ -973,6 +982,7 @@ kernel(){
     whiptail --title "ERROR" --msgbox "Packages were not installed.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
+  echo "kernel $exitcode" >> /root/arch/log.txt
 
   chroot
 
