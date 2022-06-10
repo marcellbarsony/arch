@@ -822,8 +822,7 @@ vm-1()(
 
   efiformat(){
 
-    echo "Success [efiformat]"
-    #mkfs.${efifs} ${efidevice}
+    mkfs.${efifs} ${efidevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -861,8 +860,7 @@ vm-1()(
 
   rootformat(){
 
-    echo "Success [rootformat]"
-    #mkfs.${filesystem} ${rootdevice}
+    mkfs.${filesystem} ${rootdevice}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -876,8 +874,7 @@ vm-1()(
 
   mountefi(){
 
-    echo "Success [efidir]"
-    #mkdir /efi
+    mkdir /efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -885,8 +882,7 @@ vm-1()(
       exit ${exitcode}
     fi
 
-    echo "Success [efimount]"
-    #mount ${efidevice} /efi
+    mount ${efidevice} /efi
     #mount --mkdir ${efidevice} /efi
     local exitcode=$?
 
@@ -901,7 +897,6 @@ vm-1()(
 
   mountroot(){
 
-    #echo "Success [rootmount]"
     mount ${rootdevice} /mnt
     local exitcode=$?
 
@@ -930,11 +925,33 @@ fstab(){
   fi
 
   #echo "Success [fstab - gen]"
-  #genfstab -U /mnt >> /mnt/etc/fstab
+  genfstab -U /mnt >> /mnt/etc/fstab
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
+  fi
+
+  mirrorlist
+
+}
+
+reflector(){
+
+  cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Mirrorlist could not be backed up.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
+  fi
+
+  reflector --connection-timeout 3 --latest 25 --sort rate --save /etc/pacman.d/mirrorlist
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Mirrorlist could not be updated.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
 
@@ -996,8 +1013,8 @@ while (( "$#" )); do
 done
 
 clear
-#network
-keymap
+network
+#keymap
 #diskselect
 #diskpartconfirm
 #diskpartmenu
