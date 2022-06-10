@@ -933,7 +933,7 @@ fstab(){
     exit ${exitcode}
   fi
 
-  mirrorlist
+  reflector
 
 }
 
