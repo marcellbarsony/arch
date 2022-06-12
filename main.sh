@@ -214,7 +214,7 @@ installscheme(){
   options+=("Physical Machine 1" "[GPT+EFI+LVM on Luks]")
   options+=("Virtual Machine 1" "[GPT+EFI+No encryption]")
 
-  installscheme=$(whiptail --title "Install scheme" --menu "Install scheme" 18 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
+  installscheme=$(whiptail --title "Install scheme" 18 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
@@ -988,7 +988,7 @@ chroot (){
     whiptail --title "ERROR" --msgbox "Could not chroot into /mnt.\n
     Exit status [Copy]: ${exitcode1}\n
     Exit status [Chmod]: ${exitcode2}\n
-    Exit status [Chroot]: ${exitcode3}" 12 78
+    Exit status [Chroot]: ${exitcode3}" 18 78
     exit 1
   fi
 
