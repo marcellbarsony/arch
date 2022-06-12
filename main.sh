@@ -214,7 +214,7 @@ installscheme(){
   options+=("Physical Machine 1" "[GPT+EFI+LVM on Luks]")
   options+=("Virtual Machine 1" "[GPT+EFI+No encryption]")
 
-  installscheme=$(whiptail --title "Install scheme" 18 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
+  installscheme=$(whiptail --title "Install scheme" --menu "" o8 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
@@ -957,10 +957,10 @@ mirrorlist(){
 kernel(){
 
   if [ "${installscheme}" = "Physical Machine 1" ]; then
-      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim lvm2
+      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim libnewt lvm2
       local exitcode=$?
     else
-      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim virtualbox-guest-utils
+      pacstrap /mnt base linux linux-firmware linux-headers base-devel git vim libnewt virtualbox-guest-utils
       local exitcode=$?
   fi
 
@@ -975,13 +975,13 @@ kernel(){
 
 chroot (){
 
-  cp /root/arch/src/chroot.sh /mnt/root
+  cp /root/arch/src/chroot.sh /mnt
   local exitcode1=$?
 
-  chmod 755 /mnt/root/chroot.sh
+  chmod 777 /mnt/root/chroot.sh
   local exitcode2=$?
 
-  arch-chroot /mnt /bin/bash /mnt/root/chroot.sh
+  arch-chroot /mnt ./chroot.sh
   local exitcode3=$?
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
