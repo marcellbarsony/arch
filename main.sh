@@ -104,7 +104,7 @@ keymap(){
       options+=("${item}" "")
     done
 
-  keymap=$(whiptail --title "Keyboard Layout" --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
+  keymap=$(whiptail --title "Keyboard Layout" --menu "" --cancel-button "Exit" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
   #keymap=$(dialog --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
@@ -460,7 +460,9 @@ pm-1()(
     local exitcode2=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Key file [${keydir}] could not be created.\nExit status 1: ${exitcode1}\nExit status 2: ${exitcode2}" 12 78
+        whiptail --title "ERROR" --msgbox "Key file [${keydir}] could not be created.\n
+        Exit status [File 1]: ${exitcode1}\n
+        Exit status [File 2]: ${exitcode2}" 12 78
         exit 1
     fi
 
@@ -548,7 +550,7 @@ pm-1()(
           rootsize
         fi
     else
-        echo "Cancel selected"
+        cryptpassword
     fi
 
     echo "(Exit status was $exitstatus)"
@@ -973,13 +975,21 @@ kernel(){
 
 chroot (){
 
-  arch-chroot /mnt
-  # arch-chroot [options] chroot-dir [command]
-  local exitcode=$?
+  cp /root/arch/src/chroot.sh /mnt/root
+  local exitcode1=$?
 
-  if [ "${?}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Could not chroot into /mnt.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
+  chmod 755 /mnt/root/chroot.sh
+  local exitcode2=$?
+
+  arch-chroot /mnt /bin/bash /mnt/root/chroot.sh
+  local exitcode3=$?
+
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Could not chroot into /mnt.\n
+    Exit status [Copy]: ${exitcode1}\n
+    Exit status [Chmod]: ${exitcode2}\n
+    Exit status [Chroot]: ${exitcode3}" 12 78
+    exit 1
   fi
 
 }
@@ -1008,12 +1018,6 @@ done
 
 clear
 network
-#keymap
-#diskselect
-#diskpartconfirm
-#diskpartmenu
-#diskpartcheck
-#fsselect
 
 # NOTES
 # Secure boot: https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
