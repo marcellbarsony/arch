@@ -16,8 +16,8 @@ rootpassword(){
     exit $?
   fi
 
-  if [ ${password} != ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "Root password did not match.\n
+  if [ ${password} != ${password_confirm} ] || [ ! ${password} ] || [ ! ${password_confirm} ]; then
+      whiptail --title "ERROR" --msgbox "Root password did not match or empty.\n
       Exit status: $?" 8 78
       rootpassword
   fi
@@ -25,7 +25,7 @@ rootpassword(){
   error=$(echo "root:${password}" | chpasswd 2>&1 )
 
   if [ $? != "0" ]; then
-    whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --no-button "Exit" 18 78
+    whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
     case $? in
       0)
         rootpassword
