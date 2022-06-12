@@ -581,11 +581,11 @@ pm-1()(
       exit ${exitcode}
     fi
 
-    modprobe
+    kernel_module
 
   }
 
-  modprobe(){
+  kernel_module(){
 
     echo "modprobe" >> /root/arch/log.txt
     modprobe dm_mod
