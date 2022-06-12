@@ -2,7 +2,7 @@
 
 rootpassword(){
 
-  password=$(whiptail --passwordbox "Root password" --nocancel 8 78 --title "ROOT" 3>&1 1>&2 2>&3)
+  password=$(whiptail --passwordbox "Root password" 8 78 --title "ROOT" 3>&1 1>&2 2>&3)
 
   if [ $? != "0" ]; then
     whiptail --title "ERROR" --msgbox "Exit status: $?" 8 78
@@ -25,8 +25,18 @@ rootpassword(){
   error=$(echo "root:${password}" | chpasswd 2>&1 )
 
   if [ $? != "0" ]; then
-    whiptail --title "ERROR" --msgbox "${error}\nExit status: $?" 8 78
-    exit $?
+    whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --no-button "Exit" 18 78
+    case $? in
+      0)
+        rootpassword
+        ;;
+      1)
+        exit 1
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
   fi
 
 }
