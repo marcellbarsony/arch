@@ -978,7 +978,7 @@ chroot (){
   cp /root/arch/src/chroot.sh /mnt
   local exitcode1=$?
 
-  chmod 777 /mnt/chroot.sh
+  chmod +x /mnt/chroot.sh
   local exitcode2=$?
 
   arch-chroot /mnt ./chroot.sh
