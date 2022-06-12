@@ -974,6 +974,7 @@ kernel(){
 chroot (){
 
   arch-chroot /mnt
+  # arch-chroot [options] chroot-dir [command]
   local exitcode=$?
 
   if [ "${?}" != "0" ]; then
