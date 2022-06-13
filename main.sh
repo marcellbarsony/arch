@@ -478,7 +478,6 @@ pm-1()(
 
   cryptsetup_create(){
 
-    echo "cryptsetup_create" >> /root/arch/log.txt
     cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${keydir}
     local exitcode=$?
 
@@ -493,7 +492,6 @@ pm-1()(
 
   cryptsetup_open(){
 
-    echo "cryptsetup_open" >> /root/arch/log.txt
     cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${keydir}
     local exitcode=$?
 
@@ -508,7 +506,6 @@ pm-1()(
 
   physicalvolume(){
 
-    echo "physicalvolume" >> /root/arch/log.txt
     pvcreate /dev/mapper/cryptlvm
     local exitcode=$?
 
@@ -523,7 +520,6 @@ pm-1()(
 
   volumegroup(){
 
-    echo "volumegroup" >> /root/arch/log.txt
     vgcreate volgroup0 /dev/mapper/cryptlvm
     local exitcode=$?
 
@@ -538,7 +534,6 @@ pm-1()(
 
   rootsize(){
 
-    echo "rootsize" >> /root/arch/log.txt
     rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
     local exitcode=$?
 
@@ -553,13 +548,10 @@ pm-1()(
         cryptpassword
     fi
 
-    echo "(Exit status was $exitstatus)"
-
   }
 
   rootcreate(){
 
-    echo "rootcreate" >> /root/arch/log.txt
     lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
     local exitcode=$?
 
@@ -574,7 +566,6 @@ pm-1()(
 
   homecreate(){
 
-    echo "homecreate" >> /root/arch/log.txt
     lvcreate -l 100%FREE volgroup0 -n crypthome
     local exitcode=$?
 
@@ -589,7 +580,6 @@ pm-1()(
 
   kernel_module(){
 
-    echo "modprobe" >> /root/arch/log.txt
     modprobe dm_mod
     local exitcode=$?
 
@@ -604,7 +594,6 @@ pm-1()(
 
   volgroup_scan(){
 
-    echo "volgroup_scan" >> /root/arch/log.txt
     vgscan
     local exitcode=$?
 
@@ -619,7 +608,6 @@ pm-1()(
 
   volgroup_activate(){
 
-    echo "volgroup_activate" >> /root/arch/log.txt
     vgchange -ay
     local exitcode=$?
 
@@ -634,7 +622,6 @@ pm-1()(
 
   rootformat(){
 
-    echo "rootformat" >> /root/arch/log.txt
     mkfs.${filesystem} /dev/volgroup0/cryptroot
     local exitcode=$?
 
@@ -649,7 +636,6 @@ pm-1()(
 
   rootmount(){
 
-    echo "rootmount" >> /root/arch/log.txt
     mount /dev/volgroup0/cryptroot /mnt
     local exitcode=$?
 
@@ -664,7 +650,6 @@ pm-1()(
 
   bootmount(){
 
-    echo "bootmount" >> /root/arch/log.txt
     mkdir /mnt/boot
     local exitcode=$?
 
@@ -687,7 +672,6 @@ pm-1()(
 
   homeformat(){
 
-    echo "homeformat" >> /root/arch/log.txt
     mkfs.${filesystem} /dev/volgroup0/crypthome
     local exitcode=$?
 
@@ -702,7 +686,6 @@ pm-1()(
 
   homemount(){
 
-    echo "homemount" >> /root/arch/log.txt
     mkdir /mnt/home
     local exitcode=$?
 

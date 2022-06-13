@@ -110,34 +110,40 @@ usergroup(){
     esac
   fi
 
-  membership=$(id ${username})
-  # groups ${username}
+  membership=$(groups ${username})
 
   whiptail --title "Example Dialog" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
-  exit 1
 
-  #sudoers
+  domainname
 
 }
 
-hostname(){
+domainname(){
 
-  hostname=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
+  nodename=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
 
-  if [ ! ${hostname} ]; then
+  if [ ! ${nodename} ]; then
     whiptail --title "ERROR" --msgbox "Hostname cannot be empty." 8 78
-    hostname
+    nodename
   fi
 
-  hostnamectl set-hostname ${hostname}
+  hostnamectl set-hostname ${nodename}
 
-  #/etc/hostname
+  sed -i "s/${HOSTNAME}/${nodename}/g" /etc/hostname
+
+  hosts
 
 }
 
 hosts(){
 
-  #/etc/hosts
+  sed -i "3 c\127.0.1.1        ${nodename}" /etc/hosts
+
+  if [ "$?" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Hosts file cannot be changed." 8 78
+  fi
+
+  sudoers
 
 }
 
@@ -155,11 +161,13 @@ sudoers(){
   visudo
   rm /etc/sudoers.new
 
+  configs
+
 }
 
 configs(){
 
-  git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
+  git clone https://github.com/marcellbarsony/dotfiles.git /home/${username}/.config
   cd /home/${username}
   chown -R ${username}:${username} .config
 
@@ -167,12 +175,19 @@ configs(){
 
 initramfs(){
 
+  echo "Mkinitcpio"
   mkinitcpio -p linux
-  cp $HOME/config/_system/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
+  cp /home/${username}/.config/_system/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
 
 }
 
 locale(){
+
+  echo "Copying locale.gen"
+  cp $HOME/.config/_system/locale/locale.gen /etc/locale.gen
+
+  echo "Copying locale.conf"
+  cp $HOME/.config/_system/locale/locale.conf /etc/locale.conf
 
   # locale configuration files
   # - locale.gen
@@ -191,10 +206,33 @@ grub(){
   # GRUB - Generate config
   grub-mkconfig -o /boot/grub/grub.cfg
 
+  #mkdir /boot/EFI
+  #mount /dev/sda1 /boot/EFI #VM
+  #mount /dev/nvme0n1p1 /boot/EFI #PM
+
+
 }
 
+vboxkernelmodules(){
 
-# LVM support
-#pacman -S --noconfirm lvm2
+  systemctl enable vboxservice.service
+
+  modprobe -a vboxguest vboxsf vboxvideo
+
+}
+
+supportpackages(){
+
+  # Install packages
+  pacman -S --noconfirm lvm2 networkmanager openssh
+
+  # Network Manager
+  systemctl enable NetowrkManager
+
+  # Open SSH
+  systemctl enable sshd.service
+
+}
+
 
 rootpassword
