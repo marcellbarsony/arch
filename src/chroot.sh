@@ -112,6 +112,7 @@ usergroup(){
   fi
 
   membership=$(id ${username})
+  # groups ${username}
 
   whiptail --title "Example Dialog" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
   exit 1
