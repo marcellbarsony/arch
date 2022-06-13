@@ -41,7 +41,6 @@ rootpassword(){
 useraccount(){
 
   username=$(whiptail --inputbox "" --title "User account" --nocancel 8 39 3>&1 1>&2 2>&3)
-  exitstatus=$?
 
   if [ ! ${username} ] || [ ${username} == "root" ]; then
     whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
@@ -120,5 +119,82 @@ usergroup(){
   #sudoers
 
 }
+
+hostname(){
+
+  hostname=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
+
+  if [ ! ${hostname} ]; then
+    whiptail --title "ERROR" --msgbox "Hostname cannot be empty." 8 78
+    hostname
+  fi
+
+  hostnamectl set-hostname ${hostname}
+
+  #/etc/hostname
+
+}
+
+hosts(){
+
+  #/etc/hosts
+
+}
+
+sudoers(){
+
+  # Uncomment %wheel group
+  sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
+  export EDITOR="cp /etc/sudoers.new"
+  visudo
+  rm /etc/sudoers.new
+
+  # Insults
+  sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
+  export EDITOR="cp /etc/sudoers.new"
+  visudo
+  rm /etc/sudoers.new
+
+}
+
+configs(){
+
+  git clone https://github.com/marcellbarsony/dotfiles.git $HOME/.config
+  cd /home/${username}
+  chown -R ${username}:${username} .config
+
+}
+
+initramfs(){
+
+  mkinitcpio -p linux
+  cp $HOME/config/_system/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
+
+}
+
+locale(){
+
+  # locale configuration files
+  # - locale.gen
+  # - locale.conf
+  locale-gen
+
+}
+
+grub(){
+
+  pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
+
+  # GRUB - Install
+  grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+
+  # GRUB - Generate config
+  grub-mkconfig -o /boot/grub/grub.cfg
+
+}
+
+
+# LVM support
+#pacman -S --noconfirm lvm2
 
 rootpassword
