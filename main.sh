@@ -214,7 +214,7 @@ installscheme(){
   options+=("Physical Machine 1" "[GPT+EFI+LVM on Luks]")
   options+=("Virtual Machine 1" "[GPT+EFI+No encryption]")
 
-  installscheme=$(whiptail --title "Install scheme" --menu "" o8 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
+  installscheme=$(whiptail --title "Install scheme" --menu "" 18 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
