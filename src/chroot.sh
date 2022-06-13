@@ -137,13 +137,15 @@ domainname(){
 
 hosts(){
 
+  sed -i "1 c\127.0.0.1        localhost" /etc/hosts
+  sed -i "2 c\::1              localhost" /etc/hosts
   sed -i "3 c\127.0.1.1        ${nodename}" /etc/hosts
 
   if [ "$?" != "0" ]; then
     whiptail --title "ERROR" --msgbox "Hosts file cannot be changed." 8 78
   fi
 
-  sudoers
+  #sudoers
 
 }
 
