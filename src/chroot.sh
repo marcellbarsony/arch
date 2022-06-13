@@ -170,6 +170,14 @@ sudoers(){
 
 }
 
+lvmsupport(){
+
+  if [ pacman -Qi lvm2 ]; then
+
+  fi
+
+}
+
 configs(){
 
   git clone https://github.com/marcellbarsony/dotfiles.git /home/${username}/.config
@@ -180,7 +188,7 @@ configs(){
 
 initramfs(){
 
-  echo "Mkinitcpio"
+  # Mkinitcpio
   mkinitcpio -p linux
   cp /home/${username}/.config/_system/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
 
@@ -188,15 +196,13 @@ initramfs(){
 
 locale(){
 
-  echo "Copying locale.gen"
-  cp $HOME/.config/_system/locale/locale.gen /etc/locale.gen
+  # Locale.gen
+  sed 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
 
-  echo "Copying locale.conf"
-  cp $HOME/.config/_system/locale/locale.conf /etc/locale.conf
+  # Locale.conf
+  echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
-  # locale configuration files
-  # - locale.gen
-  # - locale.conf
+  # Generate config
   locale-gen
 
 }
@@ -215,29 +221,36 @@ grub(){
   #mount /dev/sda1 /boot/EFI #VM
   #mount /dev/nvme0n1p1 /boot/EFI #PM
 
-
 }
 
-vboxkernelmodules(){
+virtualmodules(){
 
-  systemctl enable vboxservice.service
+  if [ pacman -Qi virtualbox-guest-utils ]; then
 
-  modprobe -a vboxguest vboxsf vboxvideo
+    # VirtualBox service
+    systemctl enable vboxservice.service
+
+    # VirtualBox kernel modules
+    modprobe -a vboxguest vboxsf vboxvideo
+
+    # VirtualBox guest services
+    VBoxClient-all
+
+  fi
 
 }
 
 supportpackages(){
 
   # Install packages
-  pacman -S --noconfirm lvm2 networkmanager openssh
+  pacman -S --noconfirm networkmanager openssh
 
   # Network Manager
-  systemctl enable NetowrkManager
+  systemctl enable NetworkManager
 
   # Open SSH
   systemctl enable sshd.service
 
 }
-
 
 rootpassword
