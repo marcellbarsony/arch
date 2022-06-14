@@ -957,7 +957,7 @@ kernel(){
   pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
   local exitcode=$?
 
-  if [ "${installscheme}" = "Physical Machine 1" ]; then
+  if [ ${dmi} != "VirtualBox" ] || ${dmi} != "VMware Virtual Platform" ]; then
       pacstrap /mnt lvm2
       local exitcode1=$?
     else
