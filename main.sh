@@ -34,6 +34,8 @@ dmidata(){
       echo "[Physical Machine]"
   fi
 
+  bootmode
+
 }
 
 bootmode(){
@@ -226,30 +228,22 @@ installscheme(){
 
   if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
 
-      whiptail --title "SMBIOS" --yesno "${dmi} environment detected.\n[GPT+EFI+No encryption]" 8 78)
+      whiptail --title "SMBIOS" --yesno "${dmi} environment detected.\n[GPT+EFI+No encryption]" 8 78
 
       if [ "$?" = "0" ]; then
-
-        vm-1
-
+          vm-1
         else
-
-        diskselect
-
+          diskselect
       fi
 
     else
 
-      whiptail --title "SMBIOS" --yesno "Physical machine [${dmi}] detected.\n[GPT+EFI+LVM on Luks]" 8 78)
+      whiptail --title "SMBIOS" --yesno "Physical machine [${dmi}] detected.\n[GPT+EFI+LVM on Luks]" 8 78
 
       if [ "$?" = "0" ]; then
-
-        pm-1
-
+          pm-1
         else
-
-        diskselect
-
+          diskselect
       fi
 
   fi
