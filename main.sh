@@ -947,7 +947,7 @@ kernel(){
       local exitcode1=$?
     else
       pacstrap /mnt virtualbox-guest-utils
-      local exitcode2=$?
+      local exitcodetv=$?
   fi
 
   if [ "${exitcode}" != "0" ]; then

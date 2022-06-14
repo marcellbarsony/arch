@@ -143,11 +143,6 @@ hosts(){
   echo "::1              localhost" >> /etc/hosts
   echo "127.0.1.1        ${nodename}" >> /etc/hosts
 
-  if [ "$?" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Hosts file cannot be changed." 8 78
-    exit 1
-  fi
-
   sudoers
 
 }
@@ -170,25 +165,12 @@ sudoers(){
 
 }
 
-#configs(){
-#
-#  git clone https://github.com/marcellbarsony/dotfiles.git /home/${username}/.config
-#  cd /home/${username}
-#  chown -R ${username}:${username} .config
-#
-#}
-
 initramfs(){
 
   # LVM support
-  if command -v lvm2 &> /dev/null; then
-
-    sed 's/HOOKS=*/HOOKS=(base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck)/g' /etc/mkinitcpio.conf
-
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "LVM support cannot be added to /etc/mkinitcpio.conf.\nExit status: $?" 8 78
-    fi
-
+  pacman -Qi lvm2 > /dev/null
+  if [ "$?" != "0" ]; then
+    sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
   fi
 
   mkinitcpio -p linux
@@ -200,10 +182,10 @@ initramfs(){
 locale(){
 
   # Locale.gen
-  sed 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
+  sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
 
   # Locale.conf
-  echo "LANG=en_US.UTF-8" > /etc/locale.conf
+  echo "LANG=en_US.UTF-8 UTF-8" > /etc/locale.conf
 
   # Generate config
   locale-gen
@@ -220,14 +202,15 @@ grub(){
   grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
 
   # LVM support
-  if command -v lvm2 &> /dev/null; then
+  pacman -Qi lvm2 > /dev/null
+  if [ "$?" != "0" ]; then
 
-    sed 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards loglevel=3 quiet video=1920x1080"/g' /etc/default/grub
-    sed 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/g'
+    #sed 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards loglevel=3 quiet video=1920x1080"/g' /etc/default/grub
 
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "LVM support cannot be added to /etc/mkinitcpio.conf.\nExit status: $?" 8 78
-    fi
+    sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards loglevel=3 quiet video=1920x1080\" /etc/default/grub
+
+
+    sed 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/g' /etc/default/grub
 
   fi
 
@@ -238,11 +221,14 @@ grub(){
   #mount /dev/sda1 /boot/EFI #VM
   #mount /dev/nvme0n1p1 /boot/EFI #PM
 
+  virtualmodules
+
 }
 
 virtualmodules(){
 
-  if [ pacman -Qi virtualbox-guest-utils ]; then
+  pacman -Qi virtualbox-guest-utils > /dev/null
+  if [ "$?" == "0" ]; then
 
     # VirtualBox service
     systemctl enable vboxservice.service
@@ -254,6 +240,8 @@ virtualmodules(){
     VBoxClient-all
 
   fi
+
+  supportpackages
 
 }
 
