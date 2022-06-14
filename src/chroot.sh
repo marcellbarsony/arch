@@ -155,42 +155,45 @@ hosts(){
 sudoers(){
 
   # Uncomment %wheel group
-  sed 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
+  sed 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  # Insults
+  # Enable insults
   sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  configs
+  initramfs
 
 }
 
-lvmsupport(){
-
-  if command -v lvm2 &> /dev/null; then
-
-  fi
-
-}
-
-configs(){
-
-  git clone https://github.com/marcellbarsony/dotfiles.git /home/${username}/.config
-  cd /home/${username}
-  chown -R ${username}:${username} .config
-
-}
+#configs(){
+#
+#  git clone https://github.com/marcellbarsony/dotfiles.git /home/${username}/.config
+#  cd /home/${username}
+#  chown -R ${username}:${username} .config
+#
+#}
 
 initramfs(){
 
-  # Mkinitcpio
+  # LVM support
+  if command -v lvm2 &> /dev/null; then
+
+    sed 's/HOOKS=*/HOOKS=(base udev autodetect modconf block encrypt lvm2 filesystems keyboard fsck)/g' /etc/mkinitcpio.conf
+
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "LVM support cannot be added to /etc/mkinitcpio.conf.\nExit status: $?" 8 78
+    fi
+
+  fi
+
   mkinitcpio -p linux
-  cp /home/${username}/.config/_system/mkinitcpio/mkinitcpio.conf /etc/mkinitcpio.conf
+
+  locale
 
 }
 
@@ -205,6 +208,8 @@ locale(){
   # Generate config
   locale-gen
 
+  grub
+
 }
 
 grub(){
@@ -213,6 +218,18 @@ grub(){
 
   # GRUB - Install
   grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+
+  # LVM support
+  if command -v lvm2 &> /dev/null; then
+
+    sed 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards loglevel=3 quiet video=1920x1080"/g' /etc/default/grub
+    sed 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/g'
+
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "LVM support cannot be added to /etc/mkinitcpio.conf.\nExit status: $?" 8 78
+    fi
+
+  fi
 
   # GRUB - Generate config
   grub-mkconfig -o /boot/grub/grub.cfg
