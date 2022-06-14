@@ -112,7 +112,7 @@ usergroup(){
 
   membership=$(groups ${username})
 
-  whiptail --title "Example Dialog" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
+  whiptail --title "INFO" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
 
   domainname
 

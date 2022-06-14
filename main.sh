@@ -8,7 +8,7 @@ network(){
   case $? in
     0)
       echo "[Connected]"
-      bootmode
+      dmidata
       ;;
     1)
       echo "[DISCONNECTED]"
@@ -19,6 +19,20 @@ network(){
       echo "Exit status $?"
       ;;
   esac
+
+}
+
+dmidata(){
+
+  echo -n "Getting SMBIOS data..."
+  sleep 1
+  dmi=$(dmidecode -s system-product-name)
+
+  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
+      echo "[Virtual Machine]"
+    else
+      echo "[Physical Machine]"
+  fi
 
 }
 
@@ -210,32 +224,33 @@ diskpartcheck(){
 
 installscheme(){
 
-  options=()
-  options+=("Physical Machine 1" "[GPT+EFI+LVM on Luks]")
-  options+=("Virtual Machine 1" "[GPT+EFI+No encryption]")
+  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
 
-  installscheme=$(whiptail --title "Install scheme" --menu "" 18 78 0 "${options[@]}" 3>&1 1>&2 2>&3)
+      whiptail --title "SMBIOS" --yesno "${dmi} environment detected.\n[GPT+EFI+No encryption]" 8 78)
 
-  if [ "$?" = "0" ]; then
+      if [ "$?" = "0" ]; then
 
-    case ${installscheme} in
-      "Physical Machine 1")
-        pm-1
-        ;;
-      "Virtual Machine 1")
         vm-1
-        ;;
-    esac
+
+        else
+
+        diskselect
+
+      fi
 
     else
-      case $? in
-        1)
-          diskselect
-          ;;
-        *)
-          echo "Exit status $?"
-          ;;
-      esac
+
+      whiptail --title "SMBIOS" --yesno "Physical machine [${dmi}] detected.\n[GPT+EFI+LVM on Luks]" 8 78)
+
+      if [ "$?" = "0" ]; then
+
+        pm-1
+
+        else
+
+        diskselect
+
+      fi
 
   fi
 
