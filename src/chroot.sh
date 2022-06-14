@@ -172,7 +172,7 @@ sudoers(){
 
 lvmsupport(){
 
-  if [ pacman -Qi lvm2 ]; then
+  if command -v lvm2 &> /dev/null; then
 
   fi
 

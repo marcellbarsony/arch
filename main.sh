@@ -939,12 +939,15 @@ mirrorlist(){
 
 kernel(){
 
+  pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
+  local exitcode=$?
+
   if [ "${installscheme}" = "Physical Machine 1" ]; then
-      pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt lvm2
-      local exitcode=$?
+      pacstrap /mnt lvm2
+      local exitcode1=$?
     else
-      pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt virtualbox-guest-utils
-      local exitcode=$?
+      pacstrap /mnt virtualbox-guest-utils
+      local exitcode2=$?
   fi
 
   if [ "${exitcode}" != "0" ]; then
