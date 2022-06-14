@@ -112,7 +112,7 @@ usergroup(){
 
   membership=$(groups ${username})
 
-  whiptail --title "INFO" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
+  whiptail --title "GROUP INFO" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
 
   domainname
 
@@ -169,7 +169,7 @@ initramfs(){
 
   # LVM support
   pacman -Qi lvm2 > /dev/null
-  if [ "$?" != "0" ]; then
+  if [ "$?" == "0" ]; then
     sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
   fi
 
@@ -185,7 +185,7 @@ locale(){
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
 
   # Locale.conf
-  echo "LANG=en_US.UTF-8 UTF-8" > /etc/locale.conf
+  echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
   # Generate config
   locale-gen
@@ -205,12 +205,9 @@ grub(){
   pacman -Qi lvm2 > /dev/null
   if [ "$?" != "0" ]; then
 
-    #sed 's/GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards loglevel=3 quiet video=1920x1080"/g' /etc/default/grub
+    sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
 
-    sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards loglevel=3 quiet video=1920x1080\" /etc/default/grub
-
-
-    sed 's/#GRUB_ENABLE_CRYPTODISK=y/GRUB_ENABLE_CRYPTODISK=y/g' /etc/default/grub
+    sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
 
   fi
 
