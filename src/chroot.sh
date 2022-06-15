@@ -200,7 +200,7 @@ grub(){
   exit 1
 
   # GRUB - Install
-  grub-install --target=x86_64-efi --efi-directory=/boot/EFI --bootloader-id=GRUB --recheck
+  grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 
   if [ "$?" == "0" ]; then
     whiptail --title "ERROR" --msgbox "Grub has been installed to /mnt/boot/EFI.\nExit status: $?" 8 78

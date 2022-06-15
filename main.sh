@@ -856,7 +856,7 @@ vm-1()(
 
   mountefi(){
 
-    mount --mkdir ${efidevice} /mnt/boot/EFI
+    mount --mkdir ${efidevice} /mnt/boot/efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -938,10 +938,10 @@ kernel(){
     whiptail --title "ERROR" --msgbox "Main packages were not installed.\nExit status: ${exitcode}" 8 60
   fi
 
-  if [ ${dmi} != "VirtualBox" ] || ${dmi} != "VMware Virtual Platform" ]; then
-      pacstrap /mnt lvm2
-    else
+  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
       pacstrap /mnt virtualbox-guest-utils
+    else
+      pacstrap /mnt lvm2
   fi
 
   if [ "$?" != "0" ]; then
