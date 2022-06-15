@@ -939,8 +939,10 @@ kernel(){
   fi
 
   if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
+      echo "\nInstalling VirtualBox Guest Utils"
       pacstrap /mnt virtualbox-guest-utils
     else
+      echo "\nInstalling LVM2 support"
       pacstrap /mnt lvm2
   fi
 
@@ -964,7 +966,7 @@ chroot(){
   local exitcode3=$?
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Could not chroot into /mnt.\n
+    whiptail --title "ERROR" --msgbox "Arch-chroot [/mnt] failed.\n
     Exit status [Copy]: ${exitcode1}\n
     Exit status [Chmod]: ${exitcode2}\n
     Exit status [Chroot]: ${exitcode3}" 18 78
