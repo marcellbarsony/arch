@@ -933,18 +933,20 @@ mirrorlist(){
 kernel(){
 
   pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
-  local exitcode=$?
+
+  if [ "${$?}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Main packages were not installed.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
+  fi
 
   if [ ${dmi} != "VirtualBox" ] || ${dmi} != "VMware Virtual Platform" ]; then
       pacstrap /mnt lvm2
-      local exitcode1=$?
     else
       pacstrap /mnt virtualbox-guest-utils
-      local exitcode2=$?
   fi
 
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Packages were not installed.\nExit status: ${exitcode}" 8 60
+  if [ "${$?}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "DMI packages were not installed.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
 

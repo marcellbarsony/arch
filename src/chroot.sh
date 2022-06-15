@@ -197,6 +197,7 @@ locale(){
 grub(){
 
   pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
+  exit 1
 
   # GRUB - Install
   grub-install --target=x86_64-efi --efi-directory=/boot/EFI --bootloader-id=GRUB --recheck
