@@ -199,7 +199,11 @@ grub(){
   pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 
   # GRUB - Install
-  grub-install --target=x86_64-efi --bootloader-id=grub_uefi --recheck
+  grub-install --target=x86_64-efi --efi-directory=/mnt/boot/EFI --bootloader-id=grub_uefi --recheck
+
+  if [ "$?" == "0" ]; then
+    whiptail --title "ERROR" --msgbox "Grub has been installed to /mnt/boot/EFI.\nExit status: $?" 8 78
+  fi
 
   # LVM support
   pacman -Qi lvm2 > /dev/null
@@ -218,9 +222,9 @@ grub(){
   # GRUB - Generate config
   grub-mkconfig -o /boot/grub/grub.cfg
 
-  #mkdir /boot/EFI
-  #mount /dev/sda1 /boot/EFI #VM
-  #mount /dev/nvme0n1p1 /boot/EFI #PM
+  if [ "$?" == "0" ]; then
+    whiptail --title "ERROR" --msgbox "Grub config has been generated.\nExit status: $?" 8 78
+  fi
 
   virtualmodules
 
@@ -242,11 +246,11 @@ virtualmodules(){
 
   fi
 
-  supportpackages
+  additionalpackages
 
 }
 
-supportpackages(){
+additionalpackages(){
 
   # Install packages
   pacman -S --noconfirm networkmanager openssh

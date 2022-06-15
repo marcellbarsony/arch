@@ -659,15 +659,8 @@ pm-1()(
 
   bootmount(){
 
-    mkdir /mnt/boot
-    local exitcode=$?
 
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "BOOT directory was not created.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    mount ${bootdevice} /mnt/boot
+    mount --mkdir ${bootdevice} /mnt/boot/EFI
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -863,16 +856,7 @@ vm-1()(
 
   mountefi(){
 
-    mkdir /efi
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "EFI directory was not created.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    mount ${efidevice} /efi
-    #mount --mkdir ${efidevice} /efi
+    mount --mkdir ${efidevice} /mnt/boot/EFI
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -894,7 +878,7 @@ vm-1()(
       exit ${exitcode}
     fi
 
-    fstab
+    mirrorlist
 
   }
 
@@ -902,27 +886,6 @@ vm-1()(
 
 )
 
-fstab(){
-
-  mkdir /mnt/etc/
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
-  fi
-
-  genfstab -U /mnt >> /mnt/etc/fstab
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
-  fi
-
-  mirrorlist
-
-}
 
 mirrorlist(){
 
@@ -956,7 +919,7 @@ kernel(){
       local exitcode1=$?
     else
       pacstrap /mnt virtualbox-guest-utils
-      local exitcodetv=$?
+      local exitcode2=$?
   fi
 
   if [ "${exitcode}" != "0" ]; then
@@ -964,7 +927,29 @@ kernel(){
     exit ${exitcode}
   fi
 
-  chroot
+  fstab
+
+}
+
+fstab(){
+
+  mkdir /mnt/etc/
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
+  fi
+
+  genfstab -U /mnt >> /mnt/etc/fstab
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
+  fi
+
+  mirrorlist
 
 }
 
