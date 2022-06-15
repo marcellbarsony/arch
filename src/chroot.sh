@@ -199,7 +199,7 @@ grub(){
   pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 
   # GRUB - Install
-  grub-install --target=x86_64-efi --efi-directory=/mnt/boot/EFI --bootloader-id=grub_uefi --recheck
+  grub-install --target=x86_64-efi --efi-directory=/boot/EFI --bootloader-id=GRUB --recheck
 
   if [ "$?" == "0" ]; then
     whiptail --title "ERROR" --msgbox "Grub has been installed to /mnt/boot/EFI.\nExit status: $?" 8 78

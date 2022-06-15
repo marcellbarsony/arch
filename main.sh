@@ -878,7 +878,7 @@ vm-1()(
       exit ${exitcode}
     fi
 
-    mirrorlist
+    fstab
 
   }
 
@@ -886,6 +886,27 @@ vm-1()(
 
 )
 
+fstab(){
+
+  mkdir /mnt/etc/
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
+  fi
+
+  genfstab -U /mnt >> /mnt/etc/fstab
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
+    exit ${exitcode}
+  fi
+
+  mirrorlist
+
+}
 
 mirrorlist(){
 
@@ -927,33 +948,11 @@ kernel(){
     exit ${exitcode}
   fi
 
-  fstab
+  chroot
 
 }
 
-fstab(){
-
-  mkdir /mnt/etc/
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
-  fi
-
-  genfstab -U /mnt >> /mnt/etc/fstab
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
-  fi
-
-  mirrorlist
-
-}
-
-chroot (){
+chroot(){
 
   cp /root/arch/src/chroot.sh /mnt
   local exitcode1=$?
