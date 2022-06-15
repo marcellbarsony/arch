@@ -22,22 +22,6 @@ network(){
 
 }
 
-dmidata(){
-
-  echo -n "Getting SMBIOS data..."
-  sleep 1
-  dmi=$(dmidecode -s system-product-name)
-
-  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-      echo "[Virtual Machine]"
-    else
-      echo "[Physical Machine]"
-  fi
-
-  bootmode
-
-}
-
 bootmode(){
 
   echo -n "Checking boot mode..."
@@ -47,14 +31,14 @@ bootmode(){
   case $? in
     0)
       echo "[UEFI]"
-      systemclock
+      dmidata
       ;;
     1)
       echo "[BIOS]"
       read -p "Continue installation? (Y/N)" yn
       case $yn in
         [Yy])
-          systemclock
+          dmidata
           ;;
         [Nn])
           exit 1
@@ -71,6 +55,22 @@ bootmode(){
       echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
       ;;
   esac
+
+}
+
+dmidata(){
+
+  echo -n "Fetching SMBIOS data..."
+  sleep 1
+  dmi=$(dmidecode -s system-product-name)
+
+  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
+      echo "[Virtual Machine]"
+    else
+      echo "[Physical Machine]"
+  fi
+
+  systemclock
 
 }
 

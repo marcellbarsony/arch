@@ -2,9 +2,9 @@
 
 rootpassword(){
 
-  password=$(whiptail --passwordbox "Root password" --title "ROOT" --nocancel 8 78 3>&1 1>&2 2>&3)
+  password=$(whiptail --passwordbox "Root password" --title "ROOT PASSWORD" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-  password_confirm=$(whiptail --passwordbox "Root password confirm" --title "ROOT" --nocancel 8 78 3>&1 1>&2 2>&3)
+  password_confirm=$(whiptail --passwordbox "Root password confirm" --title "ROOT PASSWORD" --nocancel 8 78 3>&1 1>&2 2>&3)
 
   if [ ! ${password} ] || [ ! ${password_confirm} ]; then
       whiptail --title "ERROR" --msgbox "Root password empty." 8 78
@@ -184,6 +184,23 @@ locale(){
 
   locale-gen
 
+  efimount
+
+}
+
+efimount(){
+
+  pacman -Qi virtualbox-guest-utils > /dev/null
+  if [ "$?" == "0" ]; then
+      mount --mkdir /dev/sda1 /boot/efi
+    else
+      mount --mkdir /dev/nvme0n1p3 /boot/efi
+  fi
+
+  if [ "$?" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
+  fi
+
   grub
 
 }
@@ -192,45 +209,49 @@ grub(){
 
   pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 
-  # EFI mount
-  mount --mkdir /dev/sda1 /boot/EFI
-
-  if [ "$?" == "0" ]; then
-    whiptail --title "ERROR" --msgbox "[/dev/sda1] cannt be mounted to [/boot/EFI].\nExit status: $?" 8 78
-  fi
-
   # GRUB - Install
-  grub-install --target=x86_64-efi --efi-directory=/boot/EFI --bootloader-id=GRUB --recheck
+  grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 
   if [ "$?" == "0" ]; then
     whiptail --title "ERROR" --msgbox "Grub has been installed to /mnt/boot/EFI.\nExit status: $?" 8 78
   fi
 
-  # LVM support
+  grub_lvm
+
+}
+
+grub_lvm(){
+
   pacman -Qi lvm2 > /dev/null
   if [ "$?" == "0" ]; then
-
     sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
 
     sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
-
   fi
+
+  grub_config
+
+}
+
+#grub_customization(){
 
   # GRUB Background
   # GRUB Theme
   # GRUB Menu colors
 
-  # GRUB - Generate config
+  # grub_config
+
+#}
+
+grub_config(){
+
   grub-mkconfig -o /boot/grub/grub.cfg
 
   if [ "$?" == "0" ]; then
     whiptail --title "ERROR" --msgbox "Grub config has been generated.\nExit status: $?" 8 78
   fi
 
-  sleep 5
-  exit 69
-
-  #virtualmodules
+  virtualmodules
 
 }
 
