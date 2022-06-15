@@ -660,7 +660,7 @@ pm-1()(
   bootmount(){
 
 
-    mount --mkdir ${bootdevice} /mnt/boot/EFI
+    mount --mkdir ${bootdevice} /mnt/efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -856,7 +856,7 @@ vm-1()(
 
   mountefi(){
 
-    mount --mkdir ${efidevice} /mnt/boot/efi
+    mount --mkdir ${efidevice} /mnt/efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then

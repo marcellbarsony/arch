@@ -149,13 +149,11 @@ hosts(){
 
 sudoers(){
 
-  # Uncomment %wheel group
   sed 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  # Enable insults
   sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
@@ -167,7 +165,6 @@ sudoers(){
 
 initramfs(){
 
-  # LVM support
   pacman -Qi lvm2 > /dev/null
   if [ "$?" == "0" ]; then
     sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
@@ -181,13 +178,10 @@ initramfs(){
 
 locale(){
 
-  # Locale.gen
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
 
-  # Locale.conf
   echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
-  # Generate config
   locale-gen
 
   grub
@@ -198,8 +192,15 @@ grub(){
 
   pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 
+  # EFI mount
+  mount --mkdir /dev/sda1 /boot/EFI
+
+  if [ "$?" == "0" ]; then
+    whiptail --title "ERROR" --msgbox "[/dev/sda1] cannt be mounted to [/boot/EFI].\nExit status: $?" 8 78
+  fi
+
   # GRUB - Install
-  grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
+  grub-install --target=x86_64-efi --efi-directory=/boot/EFI --bootloader-id=GRUB --recheck
 
   if [ "$?" == "0" ]; then
     whiptail --title "ERROR" --msgbox "Grub has been installed to /mnt/boot/EFI.\nExit status: $?" 8 78
@@ -226,7 +227,10 @@ grub(){
     whiptail --title "ERROR" --msgbox "Grub config has been generated.\nExit status: $?" 8 78
   fi
 
-  virtualmodules
+  sleep 5
+  exit 69
+
+  #virtualmodules
 
 }
 
