@@ -934,9 +934,8 @@ kernel(){
 
   pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
 
-  if [ "${$?}" != "0" ]; then
+  if [ "$?" != "0" ]; then
     whiptail --title "ERROR" --msgbox "Main packages were not installed.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
   fi
 
   if [ ${dmi} != "VirtualBox" ] || ${dmi} != "VMware Virtual Platform" ]; then
@@ -945,9 +944,8 @@ kernel(){
       pacstrap /mnt virtualbox-guest-utils
   fi
 
-  if [ "${$?}" != "0" ]; then
+  if [ "$?" != "0" ]; then
     whiptail --title "ERROR" --msgbox "DMI packages were not installed.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
   fi
 
   chroot
