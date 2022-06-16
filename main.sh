@@ -1,115 +1,110 @@
 #!/bin/bash
 
-network(){
+precheck()(
 
-  echo -n "Checking network..."
-  ping -q -c 3 archlinux.org 2>&1 >/dev/null
+  network(){
 
-  case $? in
-    0)
-      echo "[Connected]"
-      bootmode
-      ;;
-    1)
-      echo "[DISCONNECTED]"
-      exit 1
-      ;;
-    *)
-      echo "[ERROR]"
-      echo "Exit status $?"
-      ;;
-  esac
+    echo -n "Checking network..."
+    ping -q -c 3 archlinux.org 2>&1 >/dev/null
 
-}
+    case $? in
+      0)
+        echo "[Connected]"
+        bootmode
+        ;;
+      1)
+        echo "[DISCONNECTED]"
+        echo "Please connect to a network and try again."
+        exit 1
+        ;;
+      *)
+        echo "[ERROR]"
+        echo "Exit status $?"
+        ;;
+    esac
 
-bootmode(){
+  }
 
-  echo -n "Checking boot mode..."
-  sleep 1
-  ls /sys/firmware/efi/efivars 2>&1 >/dev/null
+  bootmode(){
 
-  case $? in
-    0)
-      echo "[UEFI]"
-      dmidata
-      ;;
-    1)
-      echo "[BIOS]"
-      read -p "Continue installation? (Y/N)" yn
-      case $yn in
-        [Yy])
-          dmidata
-          ;;
-        [Nn])
-          exit 1
-          ;;
-        * )
-          echo invalid response
-          bootmode
-          ;;
-      esac
-      ;;
-    *)
-      echo "[ERROR]"
-      echo "Exit status $?"
-      echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
-      ;;
-  esac
+    echo -n "Checking boot mode..."
+    sleep 1
+    ls /sys/firmware/efi/efivars 2>&1 >/dev/null
 
-}
+    case $? in
+      0)
+        echo "[UEFI]"
+        dmidata
+        ;;
+      1)
+        echo "[BIOS]"
+        echo "BIOS is not supported."
+        exit 1
+        ;;
+      *)
+        echo "[ERROR]"
+        echo "Exit status $?"
+        echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
+        ;;
+    esac
 
-dmidata(){
+  }
 
-  echo -n "Fetching SMBIOS data..."
-  sleep 1
-  dmi=$(dmidecode -s system-product-name)
+  dmidata(){
 
-  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-      echo "[Virtual Machine]"
-    else
-      echo "[Physical Machine]"
-  fi
+    echo -n "Fetching DMI data..."
+    sleep 1
+    dmi=$(dmidecode -s system-product-name)
 
-  systemclock
+    if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
+        echo "[Virtual Machine]"
+      else
+        echo "[Physical Machine]"
+    fi
 
-}
+    systemclock
 
-systemclock(){
+  }
 
-  echo -n "Set system time with timedatectl..."
-  sleep 1
-  timedatectl set-ntp true --no-ask-password
+  systemclock(){
 
-  case $? in
-    0)
-      echo "[Done]"
-      dependencies
-      ;;
-    *)
-      echo "\nExit status $?"
-      ;;
-  esac
+    echo -n "Updating system clock..."
+    sleep 1
+    timedatectl set-ntp true --no-ask-password
 
-}
+    case $? in
+      0)
+        echo "[Done]"
+        dependencies
+        ;;
+      *)
+        echo "\nExit status $?"
+        ;;
+    esac
 
-dependencies(){
+  }
 
-  echo -n "Installing dependencies..."
-  pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null # reflector
-  #pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null # reflector
+  dependencies(){
 
-  case $? in
-    0)
-      echo "[Done]"
-      keymap
-      ;;
-    *)
-      echo "[ERROR]"
-      echo "Exit status $?"
-      ;;
-  esac
+    echo -n "Installing dependencies..."
+    pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null
 
-}
+    case $? in
+      0)
+        echo "[Done]"
+        keymap
+        ;;
+      *)
+        echo "[ERROR]"
+        echo "Exit status $?"
+        ;;
+    esac
+
+  }
+
+  network
+
+)
 
 keymap(){
 
@@ -174,7 +169,6 @@ diskpart(){
   options+=("fdisk" "")
   options+=("cfdisk" "")
   options+=("gdisk" "")
-  options+=("parted" "")
   #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
 
   sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
@@ -217,7 +211,7 @@ diskpartcheck(){
 
   items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
 
-  if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
+  if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
       installscheme
     else
       diskselect
@@ -228,25 +222,9 @@ diskpartcheck(){
 installscheme(){
 
   if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-
-      whiptail --title "SMBIOS" --yesno "${dmi} environment detected.\n[GPT+EFI+No encryption]" 8 78
-
-      if [ "$?" = "0" ]; then
-          vm-1
-        else
-          diskselect
-      fi
-
+      vm-1
     else
-
-      whiptail --title "SMBIOS" --yesno "Physical machine [${dmi}] detected.\n[GPT+EFI+LVM on Luks]" 8 78
-
-      if [ "$?" = "0" ]; then
-          pm-1
-        else
-          diskselect
-      fi
-
+      pm-1
   fi
 
 }
@@ -919,7 +897,7 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  reflector --latest 25 --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
+  reflector --latest 25 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -940,10 +918,8 @@ kernel(){
   fi
 
   if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-      echo "Installing [VirtualBox Guest Utils]"
       pacstrap /mnt virtualbox-guest-utils
     else
-      echo "Installing [LVM2 support]"
       pacstrap /mnt lvm2
   fi
 
@@ -968,10 +944,9 @@ chroot(){
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "Arch-chroot [/mnt] failed.\n
-    Exit status [Copy]: ${exitcode1}\n
-    Exit status [Chmod]: ${exitcode2}\n
-    Exit status [Chroot]: ${exitcode3}" 18 78
-    exit 1
+    Exit status [copy]: ${exitcode1}\n
+    Exit status [chmod]: ${exitcode2}\n
+    Exit status [chroot]: ${exitcode3}" 18 78
   fi
 
   umount -l /mnt

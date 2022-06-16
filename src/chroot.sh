@@ -8,146 +8,154 @@ keymap(){
     whiptail --title "ERROR" --msgbox "Keymap [/etc/vconsole.conf] could not be set.\nExit status: $?" 8 78
   fi
 
+  system_administration
+
+}
+
+system_administration()(
+
+  # https://wiki.archlinux.org/title/General_recommendations#System_administration
+
+  rootpassword(){
+
+    password=$(whiptail --passwordbox "Root passphrase" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+    password_confirm=$(whiptail --passwordbox "Root passphrase confirm" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+    if [ ! ${password} ] || [ ! ${password_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "Root passphrase cannot be empty." 8 78
+        rootpassword
+    fi
+
+    if [ ${password} != ${password_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "Root passphrase did not match." 8 78
+        rootpassword
+    fi
+
+    error=$(echo "root:${password}" | chpasswd 2>&1 )
+
+    if [ $? != "0" ]; then
+      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          rootpassword
+          ;;
+        1)
+          exit 1
+          clear
+          ;;
+        *)
+          echo "Exit status $?"
+          ;;
+      esac
+    fi
+
+    useraccount
+
+  }
+
+  useraccount(){
+
+    username=$(whiptail --inputbox "" --title "USER" --nocancel 8 39 3>&1 1>&2 2>&3)
+
+    if [ ! ${username} ] || [ ${username} == "root" ]; then
+      whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
+      useraccount
+    fi
+
+    useradd -m ${username}
+    userpassword
+
+  }
+
+  userpassword(){
+
+    password=$(whiptail --passwordbox "User passphrase [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+    password_confirm=$(whiptail --passwordbox "User passphrase confirm [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+    if [ ! ${password} ] || [ ! ${password_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
+        userpassword
+    fi
+
+    if [ ${password} != ${password_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
+        userpassword
+    fi
+
+    error=$(echo "${username}:${password}" | chpasswd 2>&1 )
+
+    if [ $? != "0" ]; then
+      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          userpassword
+          ;;
+        1)
+          exit 1
+          clear
+          ;;
+        *)
+          echo "Exit status $?"
+          ;;
+      esac
+    fi
+
+    usergroup
+
+  }
+
+  usergroup(){
+
+    error=$(usermod -aG wheel,audio,video,optical,storage ${username} 2>&1)
+
+    if [ $? != "0" ]; then
+      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          usergroup
+          ;;
+        1)
+          exit 1
+          clear
+          ;;
+        *)
+          echo "Exit status $?"
+          ;;
+      esac
+    fi
+
+    membership=$(groups ${username})
+
+    whiptail --title "Group membership info" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
+
+    domainname
+
+  }
+
+  domainname(){
+
+    nodename=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
+
+    if [ ! ${nodename} ]; then
+      whiptail --title "ERROR" --msgbox "Hostname cannot be empty." 8 78
+      nodename
+    fi
+
+    hostnamectl set-hostname ${nodename}
+
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Hostname cannot be set.\nExit status: $?" 8 78
+    fi
+
+    hosts
+
+  }
+
   rootpassword
 
-}
-
-rootpassword(){
-
-  password=$(whiptail --passwordbox "Root passphrase" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
-
-  password_confirm=$(whiptail --passwordbox "Root passphrase confirm" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
-
-  if [ ! ${password} ] || [ ! ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "Root passphrase cannot be empty." 8 78
-      rootpassword
-  fi
-
-  if [ ${password} != ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "Root passphrase did not match." 8 78
-      rootpassword
-  fi
-
-  error=$(echo "root:${password}" | chpasswd 2>&1 )
-
-  if [ $? != "0" ]; then
-    whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-    case $? in
-      0)
-        rootpassword
-        ;;
-      1)
-        exit 1
-        clear
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-  fi
-
-  useraccount
-
-}
-
-useraccount(){
-
-  username=$(whiptail --inputbox "" --title "USER" --nocancel 8 39 3>&1 1>&2 2>&3)
-
-  if [ ! ${username} ] || [ ${username} == "root" ]; then
-    whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
-    useraccount
-  fi
-
-  useradd -m ${username}
-  userpassword
-
-}
-
-userpassword(){
-
-  password=$(whiptail --passwordbox "User passphrase [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
-
-  password_confirm=$(whiptail --passwordbox "User passphrase confirm [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
-
-  if [ ! ${password} ] || [ ! ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
-      userpassword
-  fi
-
-  if [ ${password} != ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
-      userpassword
-  fi
-
-  error=$(echo "${username}:${password}" | chpasswd 2>&1 )
-
-  if [ $? != "0" ]; then
-    whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-    case $? in
-      0)
-        userpassword
-        ;;
-      1)
-        exit 1
-        clear
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-  fi
-
-  usergroup
-
-}
-
-usergroup()
-
-  error=$(usermod -aG wheel,audio,video,optical,storage ${username} 2>&1)
-
-  if [ $? != "0" ]; then
-    whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-    case $? in
-      0)
-        usergroup
-        ;;
-      1)
-        exit 1
-        clear
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-  fi
-
-  membership=$(groups ${username})
-
-  whiptail --title "Group membership info" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
-
-  domainname
-
-}
-
-domainname(){
-
-  nodename=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
-
-  if [ ! ${nodename} ]; then
-    whiptail --title "ERROR" --msgbox "Hostname cannot be empty." 8 78
-    nodename
-  fi
-
-  hostnamectl set-hostname ${nodename}
-
-  if [ "$?" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Hostname cannot be set.\nExit status: $?" 8 78
-  fi
-
-  hosts
-
-}
+)
 
 hosts(){
 
@@ -217,55 +225,88 @@ efimount(){
 
 }
 
-grub(){
+grub()(
 
-  pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
+  grub_packages(){
 
-  # GRUB - Install
-  grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
+    pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 
-  if [ "$?" == "0" ]; then
-    whiptail --title "ERROR" --msgbox "Grub has been installed [/mnt/boot/efi].\nExit status: $?" 8 78
-  fi
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "GRUB packages were not installed.\nExit status: $?" 8 78
+    fi
 
-  grub_lvm
+    grub_password
 
-}
+  }
 
-grub_lvm(){
+  grub_password(){
 
-  pacman -Qi lvm2 > /dev/null
-  if [ "$?" == "0" ]; then
-    sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
+    #https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu
 
-    sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
-  fi
+    grub-mkpasswd-pbkdf2
+    # https://github.com/ryran/burg2-mkpasswd-pbkdf2
 
-  grub_config
+    if [ ! -f /etc/grub.d/40_custom ]; then
+      touch /etc/grub.d/40_custom
+    fi
 
-}
+    vim /etc/grub.d/40_custom
+    #echo "set superusers="${username}"" > /etc/grub.d/40_custom
+    #echo "password_pbkdf2 ${username} ${password}" >> /etc/grub.d/40_custom # password is the string generated by grub-mkpasswd-pbkdf2
 
-#grub_customization(){
+    grub_install
 
-  # GRUB Background
-  # GRUB Theme
-  # GRUB Menu colors
+  }
 
-  # grub_config
+  grub_install(){
 
-#}
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 
-grub_config(){
+    if [ "$?" == "0" ]; then
+      whiptail --title "ERROR" --msgbox "GRUB has been installed to [/mnt/boot/efi].\nExit status: $?" 8 78
+    fi
 
-  grub-mkconfig -o /boot/grub/grub.cfg
+    grub_lvm
 
-  if [ "$?" == "0" ]; then
-    whiptail --title "ERROR" --msgbox "Grub config has been generated.\nExit status: $?" 8 78
-  fi
+  }
 
-  virtualmodules
+  grub_lvm(){
 
-}
+    pacman -Qi lvm2 > /dev/null
+    if [ "$?" == "0" ]; then
+      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
+      sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
+    fi
+
+    grub_config
+
+  }
+
+  #grub_customization(){
+
+    # GRUB Theme
+      # https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse
+      # http://wiki.rosalab.ru/en/index.php/Grub2_theme_tutorial
+
+    # grub_config
+
+  #}
+
+  grub_config(){
+
+    grub-mkconfig -o /boot/grub/grub.cfg
+
+    if [ "$?" == "0" ]; then
+      whiptail --title "ERROR" --msgbox "Grub config has been generated.\nExit status: $?" 8 78
+    fi
+
+    virtualmodules
+
+  }
+
+  grub_packages
+
+)
 
 virtualmodules(){
 
