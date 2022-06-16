@@ -241,8 +241,6 @@ grub()(
 
   grub_password(){
 
-    #https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu
-
     grubpw=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
     grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase [confirm]" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
@@ -264,8 +262,8 @@ grub()(
 
     chmod -R 400 /etc/grub.d/40_custom
 
-    echo 'set superusers="username"' >> /etc/grub.d/40_custom
-    echo "password_pbkdf2 username ${grubpass}" >> /etc/grub.d/40_custom
+    echo "set superusers=\"${username}"\" >> /etc/grub.d/40_custom
+    echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/40_custom
 
     vim /etc/grub.d/40_custom
 
