@@ -84,7 +84,7 @@ system_administration()(
         userpassword
     fi
 
-    error=$(echo "${username}:${password}" | chpasswd 2>&1 )
+    error=$( echo "${username}:${password}" | chpasswd 2>&1 )
 
     if [ $? != "0" ]; then
       whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
@@ -243,12 +243,29 @@ grub()(
 
     #https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu
 
-    grub-mkpasswd-pbkdf2
-    # https://github.com/ryran/burg2-mkpasswd-pbkdf2
+    grubpw=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+    grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+    if [ ! ${grubpw} ] || [ ! ${grubpw_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "GRUB passphrase cannot be empty." 8 78
+        userpassword
+    fi
+
+    if [ ${grubpw} != ${grubpw_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "GRUB passphrase did not match." 8 78
+        userpassword
+    fi
+
+    echo -e "${grubpw}\n${grubpw}" | grub2-mkpasswd-pbkdf2 | awk '/grub.pbkdf/{print$NF}'
 
     if [ ! -f /etc/grub.d/40_custom ]; then
       touch /etc/grub.d/40_custom
     fi
+
+    chmod -R 400 /etc/grub.d/40_custom
+
+      echo 'set superusers="username"' >> /etc/grub.d/40_custom
+      echo "password_pbkdf2 username ${grubpw}" >> /etc/grub.d/40_custom
 
     vim /etc/grub.d/40_custom
     #echo "set superusers="${username}"" > /etc/grub.d/40_custom

@@ -116,7 +116,6 @@ keymap(){
     done
 
   keymap=$(whiptail --title "Keyboard Layout" --menu "" --cancel-button "Exit" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
-  #keymap=$(dialog --title "Keymap" --menu "menu" 20 50 10 ${options[@]} 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
     clear
@@ -222,14 +221,14 @@ diskpartcheck(){
 installscheme(){
 
   if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-      vm-1
+      vm_1
     else
-      pm-1
+      pm_1
   fi
 
 }
 
-pm-1()(
+pm_1()(
 
   ### PARTITION SCHEME ###
   # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
@@ -691,7 +690,7 @@ pm-1()(
 
 )
 
-vm-1()(
+vm_1()(
 
   fsselect(){
 
@@ -977,7 +976,7 @@ while (( "$#" )); do
 done
 
 clear
-network
+precheck
 
 # NOTES
 # Secure boot: https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
