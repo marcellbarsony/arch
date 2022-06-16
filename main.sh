@@ -948,7 +948,7 @@ chroot(){
     Exit status [chroot]: ${exitcode3}" 18 78
   fi
 
-  umount -l /mnt
+  #umount -l /mnt
   clear
 
 }
