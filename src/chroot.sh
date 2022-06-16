@@ -256,7 +256,7 @@ grub()(
         userpassword
     fi
 
-    grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub2-mkpasswd-pbkdf2 | awk '/grub.pbkdf/{print$NF}')
+    grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
     if [ ! -f /etc/grub.d/40_custom ]; then
       touch /etc/grub.d/40_custom
