@@ -256,16 +256,17 @@ grub()(
 
     grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
-    if [ ! -f /etc/grub.d/40_custom ]; then
-      touch /etc/grub.d/40_custom
-    fi
-
     chmod -R 400 /etc/grub.d/40_custom
 
-    echo "set superusers=\"${username}"\" >> /etc/grub.d/40_custom
+    echo "set superusers=\"${username}\"" >> /etc/grub.d/40_custom
     echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/40_custom
 
     vim /etc/grub.d/40_custom
+
+    echo "cat << EOF" >> /etc/grub.d/00_header
+    echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
+    echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
+    echo "EOF" >> /etc/grub.d/00_header
 
     grub_install
 

@@ -9,6 +9,7 @@
 ### Boot
 
 [ ] [Secure boot](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot)
+[ ] Encrypted `/boot` partition
 [ ] [GRUB Passphrase](https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu)
 [ ] GRUB Theme
 
