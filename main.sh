@@ -8,7 +8,7 @@ network(){
   case $? in
     0)
       echo "[Connected]"
-      dmidata
+      bootmode
       ;;
     1)
       echo "[DISCONNECTED]"
@@ -174,6 +174,7 @@ diskpart(){
   options+=("fdisk" "")
   options+=("cfdisk" "")
   options+=("gdisk" "")
+  options+=("parted" "")
   #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
 
   sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
@@ -918,7 +919,7 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  reflector --latest 25 --connection-timeout 3 --sort rate --save /etc/pacman.d/mirrorlist
+  reflector --latest 25 --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -939,10 +940,10 @@ kernel(){
   fi
 
   if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-      echo "\nInstalling VirtualBox Guest Utils"
+      echo "Installing [VirtualBox Guest Utils]"
       pacstrap /mnt virtualbox-guest-utils
     else
-      echo "\nInstalling LVM2 support"
+      echo "Installing [LVM2 support]"
       pacstrap /mnt lvm2
   fi
 
@@ -972,6 +973,9 @@ chroot(){
     Exit status [Chroot]: ${exitcode3}" 18 78
     exit 1
   fi
+
+  umount -l /mnt
+  clear
 
 }
 

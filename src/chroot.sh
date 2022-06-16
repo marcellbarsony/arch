@@ -1,18 +1,30 @@
 #!/bin/bash
 
+keymap(){
+
+  echo "KEYMAP=us" > /etc/vconsole.conf
+
+  if [ "$?" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Keymap [/etc/vconsole.conf] could not be set.\nExit status: $?" 8 78
+  fi
+
+  rootpassword
+
+}
+
 rootpassword(){
 
-  password=$(whiptail --passwordbox "Root password" --title "ROOT PASSWORD" --nocancel 8 78 3>&1 1>&2 2>&3)
+  password=$(whiptail --passwordbox "Root passphrase" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-  password_confirm=$(whiptail --passwordbox "Root password confirm" --title "ROOT PASSWORD" --nocancel 8 78 3>&1 1>&2 2>&3)
+  password_confirm=$(whiptail --passwordbox "Root passphrase confirm" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
   if [ ! ${password} ] || [ ! ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "Root password empty." 8 78
+      whiptail --title "ERROR" --msgbox "Root passphrase cannot be empty." 8 78
       rootpassword
   fi
 
   if [ ${password} != ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "Root password did not match." 8 78
+      whiptail --title "ERROR" --msgbox "Root passphrase did not match." 8 78
       rootpassword
   fi
 
@@ -40,7 +52,7 @@ rootpassword(){
 
 useraccount(){
 
-  username=$(whiptail --inputbox "" --title "USER ACCOUNT" --nocancel 8 39 3>&1 1>&2 2>&3)
+  username=$(whiptail --inputbox "" --title "USER" --nocancel 8 39 3>&1 1>&2 2>&3)
 
   if [ ! ${username} ] || [ ${username} == "root" ]; then
     whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
@@ -54,17 +66,17 @@ useraccount(){
 
 userpassword(){
 
-  password=$(whiptail --passwordbox "User password [${username}]" --title "USER PASSWORD" --nocancel 8 78 3>&1 1>&2 2>&3)
+  password=$(whiptail --passwordbox "User passphrase [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-  password_confirm=$(whiptail --passwordbox "User password confirm [${username}]" --title "USER PASSWORD" --nocancel 8 78 3>&1 1>&2 2>&3)
+  password_confirm=$(whiptail --passwordbox "User passphrase confirm [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
   if [ ! ${password} ] || [ ! ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "User password empty." 8 78
+      whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
       userpassword
   fi
 
   if [ ${password} != ${password_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "User password did not match." 8 78
+      whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
       userpassword
   fi
 
@@ -90,7 +102,7 @@ userpassword(){
 
 }
 
-usergroup(){
+usergroup()
 
   error=$(usermod -aG wheel,audio,video,optical,storage ${username} 2>&1)
 
@@ -112,7 +124,7 @@ usergroup(){
 
   membership=$(groups ${username})
 
-  whiptail --title "GROUP INFO" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
+  whiptail --title "Group membership info" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
 
   domainname
 
@@ -213,7 +225,7 @@ grub(){
   grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 
   if [ "$?" == "0" ]; then
-    whiptail --title "ERROR" --msgbox "Grub has been installed to /mnt/boot/EFI.\nExit status: $?" 8 78
+    whiptail --title "ERROR" --msgbox "Grub has been installed [/mnt/boot/efi].\nExit status: $?" 8 78
   fi
 
   grub_lvm
@@ -288,4 +300,4 @@ additionalpackages(){
 
 }
 
-rootpassword
+keymap
