@@ -2,11 +2,20 @@
 
 keymap(){
 
-  echo 0 | whiptail --gauge "Set keymap..." 6 50 0
-  echo "KEYMAP=us" > /etc/vconsole.conf
+  items=$(localectl list-keymaps)
+  options=()
+  options+=("us" "[Default]")
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
 
-  if [ "$?" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Keymap [/etc/vconsole.conf] could not be set.\nExit status: $?" 8 78
+  keymap=$(whiptail --title "Keyboard layout" --menu "" --nocancel 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
+
+  if [ "$?" = "0" ]; then
+
+    loadkeys ${keymap} &>/dev/null
+    localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
+
   fi
 
   system_administration

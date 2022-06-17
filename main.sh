@@ -108,24 +108,25 @@ precheck()(
 
 keymap(){
 
-  items=$(localectl list-keymaps)
+  fi
+
+    items=$(localectl list-keymaps)
   options=()
   options+=("us" "[Default]")
     for item in ${items}; do
       options+=("${item}" "")
     done
 
-  keymap=$(whiptail --title "Keyboard Layout" --menu "" --cancel-button "Exit" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
+  keymap=$(whiptail --title "Keyboard layout" --menu "" --nocancel 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
-    clear
-    loadkeys ${keymap}
-    localectl set-keymap --no-convert ${keymap} # Systemd - /etc/vconsole.conf
-
-    partition
+    loadkeys ${keymap} &>/dev/null
+    localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
 
   fi
+
+  partition
 
 }
 

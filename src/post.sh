@@ -1,5 +1,38 @@
 #!/bin/bash
 
+network()(
+
+  network_test(){
+
+    for ((i = 0 ; i <= 100 ; i+=25)); do
+        ping -q -c 1 archlinux.org &>/dev/null
+        local exitcode=$?
+        echo $i
+        sleep 1
+    done | whiptail --gauge "Checking network connection..." 6 50 0
+
+    if [ "$?" != "0" ]; then
+      whiptail --title "Network status" --msgbox "Network unreachable.\Exit status: ${?}" 8 78
+    fi
+
+    aur
+
+  }
+
+  network_connect(){
+
+    nmcli radio wifi on
+
+    nmcli device wifi list
+
+    nmcli device wifi connect <SSID> password <password>
+
+  }
+
+  network_test
+
+)
+
 aur()(
 
   aurselect(){
