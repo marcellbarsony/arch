@@ -12,7 +12,8 @@ network()(
     done | whiptail --gauge "Checking network connection..." 6 50 0
 
     if [ "$?" != "0" ]; then
-      whiptail --title "Network status" --msgbox "Network unreachable.\Exit status: ${?}" 8 78
+      whiptail --title "ERROR" --msgbox "Network unreachable.\Exit status: ${?}" 8 78
+      network connect
     fi
 
     aur
@@ -23,9 +24,30 @@ network()(
 
     nmcli radio wifi on
 
-    nmcli device wifi list
+    # List WiFi devices: nmcli device wifi list
 
-    nmcli device wifi connect <SSID> password <password>
+    ssid=$(whiptail --inputbox "Network SSID" --title "Network connection" 8 39 3>&1 1>&2 2>&3)
+
+      if [ $? != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Invalid network SSID.\Exit status: ${?}" 8 78
+        network_connect
+      fi
+
+    password=$(whiptail --passwordbox "Network passphrase" 8 78 --title "Network connection" 3>&1 1>&2 2>&3)
+
+      if [ $? != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Invalid network password.\Exit status: ${?}" 8 78
+        network_connect
+      fi
+
+    nmcli device wifi connect <ssid> password <password>
+
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Could not connect to network.\nExit status: ${?}" 8 78
+      exit $1
+    fi
+
+    aur
 
   }
 
@@ -42,7 +64,7 @@ aur()(
     options+=("PICAUR" "[Python]")
     options+=("YAY" "[Go]")
 
-    aurhelper=$(whiptail --title "AUR HELPER" --menu "Select AUR helper" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" == "0" ]; then
 
@@ -62,7 +84,7 @@ aur()(
 
         case $? in
           1)
-            exit 1
+            exit $?
             ;;
           *)
             echo "Exit status $?"
@@ -76,10 +98,27 @@ aur()(
 
   aur_paru(){
 
-    git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru
+    {
+    for ((i = 0 ; i <= 100 ; i+=100)); do
+      git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru &>/dev/null
+      echo $i
+      sleep 1
+    done
+    } | whiptail --gauge "Cloning Paru repository..." 6 50 0
+
+    git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru &>/dev/null
+
+    if [ $? == "0" ]; then
+
+      else
+
+    fi
+
     cd $HOME/.local/src/paru
     makepkg -fsri --noconfirm
     cd $HOME
+
+    #bitwarden
 
   }
 
@@ -90,6 +129,8 @@ aur()(
     makepkg -fsri --noconfirm
     cd $HOME
 
+    bitwarden
+
   }
 
   aur_picaur(){
@@ -98,6 +139,8 @@ aur()(
     cd $HOME/.local/src/picaur
     makepkg -fsri --noconfirm
     cd $HOME
+
+    bitwarden
 
   }
 
@@ -284,8 +327,6 @@ configs(){
 }
 
 install()(
-
-  # aur.sh
 
   window_manager(){
 
@@ -919,7 +960,13 @@ install()(
 
   }
 
+  install(){
 
+    # https://www.reddit.com/r/archlinux/comments/slq61o/pacman_installing_packages_in_an_array/
+
+    sudo pacman --noconfirm -S "${PKGS[@]}" 2> /dev/null |\
+
+  }
 
 )
 

@@ -108,9 +108,7 @@ precheck()(
 
 keymap(){
 
-  fi
-
-    items=$(localectl list-keymaps)
+  items=$(localectl list-keymaps)
   options=()
   options+=("us" "[Default]")
     for item in ${items}; do
@@ -171,9 +169,9 @@ partition()(
   diskpart(){
 
     options=()
-    options+=("fdisk")
-    options+=("cfdisk")
-    options+=("gdisk")
+    options+=("fdisk" "")
+    options+=("cfdisk" "")
+    options+=("gdisk" "")
     #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
 
     sel=$(whiptail --title "Diskpart" --menu "" --noitem 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
@@ -214,7 +212,7 @@ partition()(
 
   diskpartcheck(){
 
-    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    items=$(lsblk -p -n -l -o NAME -e 7,11)
 
     if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
         installscheme

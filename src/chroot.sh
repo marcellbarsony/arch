@@ -276,11 +276,6 @@ grub()(
 
     grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
-    # 40_custom
-      #chmod -R 400 /etc/grub.d/40_custom
-      #echo "set superusers=\"${username}\"" >> /etc/grub.d/40_custom
-      #echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/40_custom
-
     # 00_header
       echo "cat << EOF" >> /etc/grub.d/00_header
       echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
