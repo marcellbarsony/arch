@@ -118,115 +118,124 @@ keymap(){
   keymap=$(whiptail --title "Keyboard Layout" --menu "" --cancel-button "Exit" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
+
     clear
     loadkeys ${keymap}
     localectl set-keymap --no-convert ${keymap} # Systemd - /etc/vconsole.conf
-    warning
+
+    partition
+
   fi
 
 }
 
-warning(){
+partition()(
 
-  if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
-      diskselect
-    else
-      echo "Installation terminated"
-      echo "Exit status $?"
-  fi
+  warning(){
 
-}
+    if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
+        diskselect
+      else
+        echo "Installation terminated"
+        echo "Exit status $?"
+    fi
 
-diskselect(){
+  }
 
-  options=()
-  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-  for item in ${items}; do
-    options+=("${item}" "")
-  done
+  diskselect(){
 
-  disk=$(whiptail --title "Diskselect" --menu "Select disk to format" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    options=()
+    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    for item in ${items}; do
+      options+=("${item}" "")
+    done
 
-  case $? in
-    0)
-      echo ${disk%%\ *}
-      diskpart
-      ;;
-    1)
-      keymap
-      ;;
-    *)
-      echo "Exit status $?"
-      ;;
-  esac
-
-}
-
-diskpart(){
-
-  options=()
-  options+=("fdisk" "")
-  options+=("cfdisk" "")
-  options+=("gdisk" "")
-  #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
-
-  sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
-
-  if [ "$?" = "0" ]; then
-
-    case ${sel} in
-      "fdisk")
-        clear
-        fdisk ${disk}
-        ;;
-      "cfdisk")
-        clear
-        cfdisk ${disk}
-        ;;
-      "gdisk")
-        clear
-        gdisk ${disk}
-        ;;
-    esac
-
-    diskpartcheck
-
-    else
+    disk=$(whiptail --title "Diskselect" --menu "Select disk to format" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     case $? in
+      0)
+        echo ${disk%%\ *}
+        diskpart
+        ;;
       1)
-        diskselect
+        keymap
         ;;
       *)
         echo "Exit status $?"
         ;;
+    esac
+
+  }
+
+  diskpart(){
+
+    options=()
+    options+=("fdisk" "")
+    options+=("cfdisk" "")
+    options+=("gdisk" "")
+    #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
+
+    sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+
+    if [ "$?" = "0" ]; then
+
+      case ${sel} in
+        "fdisk")
+          clear
+          fdisk ${disk}
+          ;;
+        "cfdisk")
+          clear
+          cfdisk ${disk}
+          ;;
+        "gdisk")
+          clear
+          gdisk ${disk}
+          ;;
       esac
 
-  fi
+      diskpartcheck
 
-}
+      else
 
-diskpartcheck(){
+      case $? in
+        1)
+          diskselect
+          ;;
+        *)
+          echo "Exit status $?"
+          ;;
+        esac
 
-  items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+    fi
 
-  if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
-      installscheme
-    else
-      diskselect
-  fi
+  }
 
-}
+  diskpartcheck(){
 
-installscheme(){
+    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
 
-  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-      vm_1
-    else
-      pm_1
-  fi
+    if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
+        installscheme
+      else
+        diskselect
+    fi
 
-}
+  }
+
+  installscheme(){
+
+    if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
+        vm_1
+      else
+        pm_1
+    fi
+
+  }
+
+  warning
+
+)
 
 pm_1()(
 
