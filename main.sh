@@ -750,7 +750,7 @@ vm_1()(
 
     efifilesystem=$(whiptail --title "[VM-1] EFI" --menu "EFI file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
-    if [ "$?" = "0" ]; then
+    if [ "$?" == "0" ]; then
 
         case ${efifilesystem} in
           "FAT32")
@@ -777,12 +777,12 @@ vm_1()(
 
     fi
 
-
   }
 
   efiformat(){
 
-    mkfs.${efifs} ${efidevice} > /dev/null
+    echo 0 | whiptail --gauge "Formatting ${efidevice} to ${efifs}..." 6 50 0
+    mkfs.${efifs} ${efidevice} &> /dev/null
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -820,7 +820,8 @@ vm_1()(
 
   rootformat(){
 
-    mkfs.${filesystem} ${rootdevice}
+    echo 0 | whiptail --gauge "Format ${rootdevice} to ${filesystem}..." 6 50 0
+    mkfs.${filesystem} ${rootdevice} &>/dev/null
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -834,7 +835,8 @@ vm_1()(
 
   mountefi(){
 
-    mount --mkdir ${efidevice} /mnt/efi
+    echo 0 | whiptail --gauge "Mount ${efidevice} to /mnt/efi..." 6 50 0
+    mount --mkdir ${efidevice} /mnt/efi &>/dev/null
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -848,7 +850,8 @@ vm_1()(
 
   mountroot(){
 
-    mount ${rootdevice} /mnt
+    echo 0 | whiptail --gauge "Mount ${rootdevice} to /mnt..." 6 50 0
+    mount ${rootdevice} /mnt &>/dev/null
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -866,7 +869,8 @@ vm_1()(
 
 fstab(){
 
-  mkdir /mnt/etc/
+  echo 0 | whiptail --gauge "Create fstab directory..." 6 50 0
+  mkdir /mnt/etc/ &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -874,7 +878,8 @@ fstab(){
     exit ${exitcode}
   fi
 
-  genfstab -U /mnt >> /mnt/etc/fstab
+  echo 50 | whiptail --gauge "Create fstab config..." 6 50 0
+  genfstab -U /mnt >> /mnt/etc/fstab &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -888,7 +893,8 @@ fstab(){
 
 mirrorlist(){
 
-  cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+  echo 0 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
+  cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -896,7 +902,8 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  reflector --latest 25 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
+  echo 5 | whiptail --gauge "Updating Pacman mirrorlist with reflector..." 6 50 0
+  reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -932,12 +939,15 @@ kernel(){
 
 chroot(){
 
+  echo 0 | whiptail --gauge "Copy chroot script to /mnt..." 6 50 0
   cp /root/arch/src/chroot.sh /mnt
   local exitcode1=$?
 
+  echo 33 | whiptail --gauge "Chmod chroot script..." 6 50 0
   chmod +x /mnt/chroot.sh
   local exitcode2=$?
 
+  echo 66 | whiptail --gauge "Chroot into /mnt..." 6 50 0
   arch-chroot /mnt ./chroot.sh
   local exitcode3=$?
 

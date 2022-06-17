@@ -6,6 +6,8 @@
 
 # Features TBA
 
+## Base system
+
 ### Boot
 
 [ ] [Secure boot](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot)
@@ -13,7 +15,7 @@
 [ ] [GRUB Passphrase](https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu)
 [ ] GRUB Theme
 
-### Filesystem
+### File system
 
 [ ] [BTRFS](https://wiki.archlinux.org/title/btrfs)
 
@@ -21,7 +23,19 @@
 
 [ ] Libnewt theme
 
-### Post
+## Chroot
 
+[ ] Locale - Additional options
 
+## Post
+
+[ ] Implement proper error handling
 [ ] Suppress unnecessary command outputs
+
+### AUR
+
+[ ] AUR password dialog
+
+### Bitwarden
+
+[ ] [Bitwarden CLI](https://bitwarden.com/help/cli/) support

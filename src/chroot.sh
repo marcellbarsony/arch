@@ -2,6 +2,7 @@
 
 keymap(){
 
+  echo 0 | whiptail --gauge "Set keymap..." 6 50 0
   echo "KEYMAP=us" > /etc/vconsole.conf
 
   if [ "$?" != "0" ]; then
@@ -84,6 +85,7 @@ system_administration()(
         userpassword
     fi
 
+    echo 0 | whiptail --gauge "Set ${username}'s password..." 6 50 0
     error=$( echo "${username}:${password}" | chpasswd 2>&1 )
 
     if [ $? != "0" ]; then
@@ -108,6 +110,7 @@ system_administration()(
 
   usergroup(){
 
+    echo 0 | whiptail --gauge "Add ${username} to groups..." 6 50 0
     error=$(usermod -aG wheel,audio,video,optical,storage ${username} 2>&1)
 
     if [ $? != "0" ]; then
@@ -126,10 +129,6 @@ system_administration()(
       esac
     fi
 
-    membership=$(groups ${username})
-
-    whiptail --title "Group membership info" --msgbox "${username} has been added to the following groups:\n${membership}" 8 78
-
     domainname
 
   }
@@ -143,6 +142,7 @@ system_administration()(
       nodename
     fi
 
+    echo 0 | whiptail --gauge "Set hostname..." 6 50 0
     hostnamectl set-hostname ${nodename}
 
     if [ "$?" != "0" ]; then
@@ -159,9 +159,10 @@ system_administration()(
 
 hosts(){
 
-  echo "127.0.0.1        localhost" > /etc/hosts
-  echo "::1              localhost" >> /etc/hosts
-  echo "127.0.1.1        ${nodename}" >> /etc/hosts
+  echo 0 | whiptail --gauge "Update hosts file..." 6 50 0
+  echo "127.0.0.1        localhost" > /etc/hosts &>/dev/null
+  echo "::1              localhost" >> /etc/hosts &>/dev/null
+  echo "127.0.1.1        ${nodename}" >> /etc/hosts &>/dev/null
 
   sudoers
 
@@ -169,11 +170,13 @@ hosts(){
 
 sudoers(){
 
+  echo 0 | whiptail --gauge "Uncomment %wheel group..." 6 50 0
   sed 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
+  echo 0 | whiptail --gauge "Add insults..." 6 50 0
   sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
@@ -187,9 +190,11 @@ initramfs(){
 
   pacman -Qi lvm2 > /dev/null
   if [ "$?" == "0" ]; then
+    echo 0 | whiptail --gauge "Add LVM support to mkinitcpio..." 6 50 0
     sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
   fi
 
+  echo 0 | whiptail --gauge "Create initial ramdisk environment..." 6 50 0
   mkinitcpio -p linux
 
   locale
@@ -198,8 +203,10 @@ initramfs(){
 
 locale(){
 
+  echo 0 | whiptail --gauge "Set locale.gen... [en_US.UTF-8 UTF-8]" 6 50 0
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
 
+  echo 50 | whiptail --gauge "Set locale.conf... [LANG=en_US.UTF-8]" 6 50 0
   echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
   locale-gen
@@ -210,11 +217,14 @@ locale(){
 
 efimount(){
 
+  efimountpoint="/boot/efi"
+  echo 0 | whiptail --gauge "Mount EFI to ${efimountpoint}..." 6 50 0
+
   pacman -Qi virtualbox-guest-utils > /dev/null
   if [ "$?" == "0" ]; then
-      mount --mkdir /dev/sda1 /boot/efi
+      mount --mkdir /dev/sda1 ${efimountpoint}
     else
-      mount --mkdir /dev/nvme0n1p3 /boot/efi
+      mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
   fi
 
   if [ "$?" != "0" ]; then
@@ -229,6 +239,7 @@ grub()(
 
   grub_packages(){
 
+    clear
     pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
 
     if [ "$?" != "0" ]; then
@@ -256,17 +267,21 @@ grub()(
 
     grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
-    chmod -R 400 /etc/grub.d/40_custom
+    # /etc/grub.d/40_custom
+      chmod -R 400 /etc/grub.d/40_custom
 
-    echo "set superusers=\"${username}\"" >> /etc/grub.d/40_custom
-    echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/40_custom
+      echo "set superusers=\"${username}\"" >> /etc/grub.d/40_custom
+      echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/40_custom
 
-    vim /etc/grub.d/40_custom
+      vim /etc/grub.d/40_custom
 
-    echo "cat << EOF" >> /etc/grub.d/00_header
-    echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
-    echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
-    echo "EOF" >> /etc/grub.d/00_header
+    # 00_header
+      echo "cat << EOF" >> /etc/grub.d/00_header
+      echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
+      echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
+      echo "EOF" >> /etc/grub.d/00_header
+
+      vim /etc/grub.d/40_custom
 
     grub_install
 
@@ -274,6 +289,7 @@ grub()(
 
   grub_install(){
 
+    echo 0 | whiptail --gauge "GRUB install to /boot/efi..." 6 50 0
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 
     if [ "$?" == "0" ]; then
@@ -314,7 +330,7 @@ grub()(
       whiptail --title "ERROR" --msgbox "Grub config has been generated.\nExit status: $?" 8 78
     fi
 
-    virtualmodules
+    modules
 
   }
 
@@ -322,37 +338,82 @@ grub()(
 
 )
 
-virtualmodules(){
+modules()(
 
-  pacman -Qi virtualbox-guest-utils > /dev/null
-  if [ "$?" == "0" ]; then
+  virtualmodules(){
 
-    # VirtualBox service
-    systemctl enable vboxservice.service
+    pacman -Qi virtualbox-guest-utils > /dev/null
+    if [ "$?" == "0" ]; then
 
-    # VirtualBox kernel modules
-    modprobe -a vboxguest vboxsf vboxvideo
+      echo 0 | whiptail --gauge "Enable VirtualBox serice..." 6 50 0
+      systemctl enable vboxservice.service
 
-    # VirtualBox guest services
-    VBoxClient-all
+        if [ "$?" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "VirtualBox service could not be enabled.\nExit status: $?" 8 78
+        fi
 
-  fi
+      echo 0 | whiptail --gauge "Load VirtualBox kernel modules [modprobe]..." 6 50 0
+      modprobe -a vboxguest vboxsf vboxvideo
 
-  additionalpackages
+        if [ "$?" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "VirtualBox kernel modules could not be loaded.\nExit status: $?" 8 78
+        fi
 
-}
+      echo 0 | whiptail --gauge "Enable VirtualBox guest services..." 6 50 0
+      VBoxClient-all
 
-additionalpackages(){
+        if [ "$?" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "VirtualBox guest services could not be enabled.\nExit status: $?" 8 78
+        fi
 
-  # Install packages
-  pacman -S --noconfirm networkmanager openssh
+    fi
 
-  # Network Manager
-  systemctl enable NetworkManager
+    openssh
 
-  # Open SSH
-  systemctl enable sshd.service
+  }
 
-}
+  openssh(){
+
+    echo 0 | whiptail --gauge "Installing OpenSSH..." 6 50 0
+    pacman -S --noconfirm networkmanager openssh
+
+      if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "OpenSSH could not be installed.\nExit status: $?" 8 78
+      fi
+
+    echo 50 | whiptail --gauge "Enable OpenSSH..." 6 50 0
+    systemctl enable sshd.service
+
+      if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "OpenSSH could not be enabled.\nExit status: $?" 8 78
+      fi
+
+    netman
+
+  }
+
+  netman(){
+
+    echo 0 | whiptail --gauge "Installing Network Manager" 6 50 0
+    pacman -S --noconfirm networkmanager
+
+      if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Network Manager could not be installed.\nExit status: $?" 8 78
+      fi
+
+    echo 50 | whiptail --gauge "Enable Network Manager..." 6 50 0
+    systemctl enable NetworkManager
+
+      if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Network Manager could not be enabled.\nExit status: $?" 8 78
+      fi
+
+    exit 69
+
+  }
+
+  virtualmodules
+
+)
 
 keymap
