@@ -170,12 +170,12 @@ partition()(
   diskpart(){
 
     options=()
-    options+=("fdisk" "")
-    options+=("cfdisk" "")
-    options+=("gdisk" "")
+    options+=("fdisk")
+    options+=("cfdisk")
+    options+=("gdisk")
     #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
 
-    sel=$(whiptail --backtitle "${apptitle}" --title "Diskpart" --menu "" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+    sel=$(whiptail --title "Diskpart" --menu "" --noitem 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
 
@@ -790,7 +790,7 @@ vm_1()(
 
   efiformat(){
 
-    echo 0 | whiptail --gauge "Formatting ${efidevice} to ${efifs}..." 6 50 0
+    echo 20 | whiptail --gauge "Formatting ${efidevice} to ${efifs}..." 6 50 0
     mkfs.${efifs} ${efidevice} &> /dev/null
     local exitcode=$?
 
@@ -829,7 +829,7 @@ vm_1()(
 
   rootformat(){
 
-    echo 0 | whiptail --gauge "Format ${rootdevice} to ${filesystem}..." 6 50 0
+    echo 30 | whiptail --gauge "Format ${rootdevice} to ${filesystem}..." 6 50 0
     mkfs.${filesystem} ${rootdevice} &>/dev/null
     local exitcode=$?
 
@@ -844,7 +844,7 @@ vm_1()(
 
   mountefi(){
 
-    echo 0 | whiptail --gauge "Mount ${efidevice} to /mnt/efi..." 6 50 0
+    echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/efi..." 6 50 0
     mount --mkdir ${efidevice} /mnt/efi &>/dev/null
     local exitcode=$?
 
@@ -859,7 +859,7 @@ vm_1()(
 
   mountroot(){
 
-    echo 0 | whiptail --gauge "Mount ${rootdevice} to /mnt..." 6 50 0
+    echo 50 | whiptail --gauge "Mount ${rootdevice} to /mnt..." 6 50 0
     mount ${rootdevice} /mnt &>/dev/null
     local exitcode=$?
 
@@ -878,7 +878,7 @@ vm_1()(
 
 fstab(){
 
-  echo 0 | whiptail --gauge "Create fstab directory..." 6 50 0
+  echo 60 | whiptail --gauge "Create fstab directory..." 6 50 0
   mkdir /mnt/etc/ &>/dev/null
   local exitcode=$?
 
@@ -887,7 +887,7 @@ fstab(){
     exit ${exitcode}
   fi
 
-  echo 50 | whiptail --gauge "Create fstab config..." 6 50 0
+  echo 70 | whiptail --gauge "Create fstab config..." 6 50 0
   genfstab -U /mnt >> /mnt/etc/fstab &>/dev/null
   local exitcode=$?
 
@@ -902,7 +902,7 @@ fstab(){
 
 mirrorlist(){
 
-  echo 0 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
+  echo 80 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
   cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
   local exitcode=$?
 
@@ -911,7 +911,7 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  echo 5 | whiptail --gauge "Updating Pacman mirrorlist with reflector..." 6 50 0
+  echo 90 | whiptail --gauge "Updating Pacman mirrorlist with reflector..." 6 50 0
   reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
   local exitcode=$?
 

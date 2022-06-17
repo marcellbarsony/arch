@@ -31,6 +31,7 @@
 
 [ ] Implement proper error handling
 [ ] Suppress unnecessary command outputs
+[ ] Wayland support
 
 ### AUR
 

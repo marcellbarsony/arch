@@ -57,7 +57,7 @@ system_administration()(
 
   useraccount(){
 
-    username=$(whiptail --inputbox "" --title "USER" --nocancel 8 39 3>&1 1>&2 2>&3)
+    username=$(whiptail --inputbox "" --title "USER Account" --nocancel 8 39 3>&1 1>&2 2>&3)
 
     if [ ! ${username} ] || [ ${username} == "root" ]; then
       whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
@@ -267,21 +267,16 @@ grub()(
 
     grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
-    # /etc/grub.d/40_custom
-      chmod -R 400 /etc/grub.d/40_custom
-
-      echo "set superusers=\"${username}\"" >> /etc/grub.d/40_custom
-      echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/40_custom
-
-      vim /etc/grub.d/40_custom
+    # 40_custom
+      #chmod -R 400 /etc/grub.d/40_custom
+      #echo "set superusers=\"${username}\"" >> /etc/grub.d/40_custom
+      #echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/40_custom
 
     # 00_header
       echo "cat << EOF" >> /etc/grub.d/00_header
       echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
       echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
       echo "EOF" >> /etc/grub.d/00_header
-
-      vim /etc/grub.d/40_custom
 
     grub_install
 
