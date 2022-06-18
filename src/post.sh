@@ -113,17 +113,7 @@ aur()(
 
     cd $HOME/.local/src/paru
 
-<<<<<<< HEAD
-    {
-    for ((i = 0 ; i <= 100 ; i+=100)); do
-      makepkg -cfsri --noconfirm
-      echo $i
-      sleep 1
-    done
-    } | whiptail --gauge "Makepkg --fsri" 6 50 0
-=======
     #  makepkg -fsri --noconfirm
->>>>>>> 3e2bb1dfbaf71018d34e0115bcdb0d24ac7606a3
 
     cd $HOME
 
