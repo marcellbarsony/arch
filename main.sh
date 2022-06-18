@@ -455,7 +455,7 @@ pm_1()(
     local exitcode2=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Key file [${keydir}] could not be created.\n
+        whiptail --title "ERROR" --msgbox "Key file [${keydir}] cannot be created.\n
         Exit status [File 1]: ${exitcode1}\n
         Exit status [File 2]: ${exitcode2}" 12 78
         exit 1
@@ -491,7 +491,7 @@ pm_1()(
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "LVM device [${lvmdevice}] could not be opened.\nExit status: ${?}" 8 78
+      whiptail --title "ERROR" --msgbox "LVM device [${lvmdevice}] cannot be opened.\nExit status: ${?}" 8 78
       exit ${exitcode}
     fi
 
@@ -505,7 +505,7 @@ pm_1()(
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Physical volume could not be created.\nExit status: ${?}" 8 78
+      whiptail --title "ERROR" --msgbox "Physical volume cannot be created.\nExit status: ${?}" 8 78
       exit ${exitcode}
     fi
 
@@ -519,7 +519,7 @@ pm_1()(
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Volume group [volgroup0] could not be created.\nExit status: ${?}" 8 78
+      whiptail --title "ERROR" --msgbox "Volume group [volgroup0] cannot be created.\nExit status: ${?}" 8 78
       exit ${exitcode}
     fi
 
@@ -551,7 +551,7 @@ pm_1()(
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] could not be created.\nExit status: ${?}" 8 78
+      whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] cannot be created.\nExit status: ${?}" 8 78
       exit ${exitcode}
     fi
 
@@ -565,7 +565,7 @@ pm_1()(
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] could not be created.\nExit status: ${?}" 8 78
+      whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] cannot be created.\nExit status: ${?}" 8 78
       exit ${exitcode}
     fi
 
@@ -906,7 +906,7 @@ mirrorlist(){
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Mirrorlist could not be backed up.\nExit status: ${exitcode}" 8 60
+    whiptail --title "ERROR" --msgbox "Mirrorlist cannot be backed up.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
 
@@ -915,7 +915,7 @@ mirrorlist(){
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Mirrorlist could not be updated.\nExit status: ${exitcode}" 8 60
+    whiptail --title "ERROR" --msgbox "Mirrorlist cannot be updated.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
 

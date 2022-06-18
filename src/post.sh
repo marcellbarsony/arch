@@ -43,7 +43,7 @@ network()(
     nmcli device wifi connect ${ssid} password ${password}
 
     if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Could not connect to network.\nExit status: ${?}" 8 78
+      whiptail --title "ERROR" --msgbox "cannot connect to network.\nExit status: ${?}" 8 78
       exit $1
     fi
 
@@ -61,7 +61,7 @@ aur()(
 
     options=()
     options+=("Paru" "[Rust]")
-    options+=("PICAUR" "[Python]")
+    options+=("PIKAUR" "[Python]")
     options+=("YAY" "[Go]")
 
     aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
@@ -70,15 +70,17 @@ aur()(
 
         case ${aurhelper} in
           "Paru")
-            aur_paru
+            aurhelper="paru"
             ;;
-          "PICAUR")
-            aur_picaur
+          "PIKAUR")
+            aurhelper="pikaur"
             ;;
           "YAY")
-            aur_yay
+            aurhelper="yay"
             ;;
         esac
+
+        aurinstall
 
       else
 
@@ -96,57 +98,26 @@ aur()(
 
   }
 
-  aur_paru(){
+  aurinstall(){
 
-    {
     for ((i = 0 ; i <= 100 ; i+=100)); do
-      git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru &>/dev/null
+      git clone https://aur.archlinux.org/${aurhelper}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
+      #https://unix.stackexchange.com/questions/119648/redirecting-to-dev-null
+      exitcode=$?
       echo $i
-      sleep 1
-    done
-    } | whiptail --gauge "Cloning Paru repository..." 6 50 0
+    done | whiptail --gauge "Cloning ${aurhelper} repository..." 6 50 0
 
-    #if [ $? == "0" ]; then
-
-    #  else
-
-    #fi
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Cannot clone repository [${aurhelper}]\nExit status: ${exitcode}" 8 78
+      fi
 
     cd $HOME/.local/src/paru
 
-    {
-    for ((i = 0 ; i <= 100 ; i+=100)); do
-      makepkg -fsri --noconfirm
-      echo $i
-      sleep 1
-    done
-    } | whiptail --gauge "Makepkg --fsri" 6 50 0
+    #  makepkg -fsri --noconfirm
 
     cd $HOME
 
     #bitwarden
-
-  }
-
-  aur_yay(){
-
-    git clone https://aur.archlinux.org/yay.git $HOME/.local/src/yay
-    cd $HOME/.local/src/yay
-    makepkg -fsri --noconfirm
-    cd $HOME
-
-    bitwarden
-
-  }
-
-  aur_picaur(){
-
-    git clone https://aur.archlinux.org/pikaur.git $HOME/.local/src/picaur
-    cd $HOME/.local/src/picaur
-    makepkg -fsri --noconfirm
-    cd $HOME
-
-    bitwarden
 
   }
 
@@ -1063,5 +1034,5 @@ cleanup(){
 
 }
 
-
-network
+aur
+#network

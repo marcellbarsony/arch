@@ -348,21 +348,21 @@ modules()(
       systemctl enable vboxservice.service
 
         if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "VirtualBox service could not be enabled.\nExit status: $?" 8 78
+        whiptail --title "ERROR" --msgbox "VirtualBox service cannot be enabled.\nExit status: $?" 8 78
         fi
 
       echo 0 | whiptail --gauge "Load VirtualBox kernel modules [modprobe]..." 6 50 0
       modprobe -a vboxguest vboxsf vboxvideo
 
         if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "VirtualBox kernel modules could not be loaded.\nExit status: $?" 8 78
+        whiptail --title "ERROR" --msgbox "VirtualBox kernel modules cannot be loaded.\nExit status: $?" 8 78
         fi
 
       echo 0 | whiptail --gauge "Enable VirtualBox guest services..." 6 50 0
       VBoxClient-all
 
         if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "VirtualBox guest services could not be enabled.\nExit status: $?" 8 78
+        whiptail --title "ERROR" --msgbox "VirtualBox guest services cannot be enabled.\nExit status: $?" 8 78
         fi
 
     fi
@@ -377,34 +377,34 @@ modules()(
     pacman -S --noconfirm networkmanager openssh
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "OpenSSH could not be installed.\nExit status: $?" 8 78
+      whiptail --title "ERROR" --msgbox "OpenSSH cannot be installed.\nExit status: $?" 8 78
       fi
 
     echo 50 | whiptail --gauge "Enable OpenSSH..." 6 50 0
     systemctl enable sshd.service
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "OpenSSH could not be enabled.\nExit status: $?" 8 78
+      whiptail --title "ERROR" --msgbox "OpenSSH cannot be enabled.\nExit status: $?" 8 78
       fi
 
-    netman
+    networkmanager
 
   }
 
-  netman(){
+  networkmanager(){
 
     echo 0 | whiptail --gauge "Installing Network Manager" 6 50 0
     pacman -S --noconfirm networkmanager
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Network Manager could not be installed.\nExit status: $?" 8 78
+      whiptail --title "ERROR" --msgbox "Network Manager cannot be installed.\nExit status: $?" 8 78
       fi
 
     echo 50 | whiptail --gauge "Enable Network Manager..." 6 50 0
     systemctl enable NetworkManager
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Network Manager could not be enabled.\nExit status: $?" 8 78
+      whiptail --title "ERROR" --msgbox "Network Manager cannot be enabled.\nExit status: $?" 8 78
       fi
 
     exit 69
