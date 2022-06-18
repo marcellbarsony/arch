@@ -40,7 +40,7 @@ network()(
         network_connect
       fi
 
-    nmcli device wifi connect <ssid> password <password>
+    nmcli device wifi connect ${ssid} password ${password}
 
     if [ "$?" != "0" ]; then
       whiptail --title "ERROR" --msgbox "Could not connect to network.\nExit status: ${?}" 8 78
@@ -60,7 +60,7 @@ aur()(
   aurselect(){
 
     options=()
-    options+=("PARU" "[Rust]")
+    options+=("Paru" "[Rust]")
     options+=("PICAUR" "[Python]")
     options+=("YAY" "[Go]")
 
@@ -69,7 +69,7 @@ aur()(
     if [ "$?" == "0" ]; then
 
         case ${aurhelper} in
-          "PARU")
+          "Paru")
             aur_paru
             ;;
           "PICAUR")
@@ -106,16 +106,22 @@ aur()(
     done
     } | whiptail --gauge "Cloning Paru repository..." 6 50 0
 
-    git clone https://aur.archlinux.org/paru.git $HOME/.local/src/paru &>/dev/null
+    #if [ $? == "0" ]; then
 
-    if [ $? == "0" ]; then
+    #  else
 
-      else
-
-    fi
+    #fi
 
     cd $HOME/.local/src/paru
-    makepkg -fsri --noconfirm
+
+    {
+    for ((i = 0 ; i <= 100 ; i+=100)); do
+      makepkg -fsri --noconfirm
+      echo $i
+      sleep 1
+    done
+    } | whiptail --gauge "Makepkg --fsri" 6 50 0
+
     cd $HOME
 
     #bitwarden
@@ -245,7 +251,7 @@ github(){
 
   }
 
-  gh_email(){
+  gh_install_email(){
 
     gh_email=$(whiptail --inputbox "GitHub Login" --title "GitHub e-mail" 8 39 3>&1 1>&2 2>&3)
 
@@ -256,7 +262,7 @@ github(){
     fi
   }
 
-  gh_sshkey(){
+  gh_install_ssh_keygen(){
 
     ssh-keygen -t ed25519 -C ${gh_email}
 
@@ -266,7 +272,7 @@ github(){
 
   }
 
-  gh_login(){
+  gh_install_login(){
 
     set -u
     echo "$ghpat" > .ghpat
@@ -379,6 +385,8 @@ install()(
             ;;
         esac
 
+    fi
+
   }
 
   terminal(){
@@ -414,6 +422,8 @@ install()(
             exit $?
             ;;
         esac
+
+    fi
 
   }
 
@@ -458,6 +468,8 @@ install()(
             ;;
         esac
 
+    fi
+
   }
 
   ide(){
@@ -496,7 +508,7 @@ install()(
             exit $?
             ;;
         esac
-
+    fi
   }
 
   texteditor(){
@@ -546,6 +558,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
   }
 
@@ -592,6 +605,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
 
   }
@@ -631,6 +645,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
   }
 
@@ -665,6 +680,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
 
   }
@@ -703,6 +719,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
 
   }
@@ -742,6 +759,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
 
   }
@@ -785,6 +803,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
   }
 
@@ -827,6 +846,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
   }
 
@@ -863,6 +883,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
 
   }
@@ -896,6 +917,7 @@ install()(
             exit $?
             ;;
         esac
+    fi
 
   }
 
@@ -936,7 +958,7 @@ install()(
             exit $?
             ;;
         esac
-
+    fi
 
   }
 
@@ -945,7 +967,7 @@ install()(
     if (whiptail --title "Core utilities" --yesno "Install core utilities?\n[neofetch, unzip, zip]" 8 78); then
         sudo pacman -S --needed --noconfirm neofetch unzip zip
       else
-
+        configs
     fi
 
   }
@@ -955,7 +977,7 @@ install()(
     if (whiptail --title "Rust core utilities" --yesno "Install Rust core utilities?\n[bat, lsd, zoxide]" 8 78); then
         sudo pacman -S --needed --noconfirm bat lsd zoxide #exa
       else
-
+        configs
     fi
 
   }
@@ -964,9 +986,11 @@ install()(
 
     # https://www.reddit.com/r/archlinux/comments/slq61o/pacman_installing_packages_in_an_array/
 
-    sudo pacman --noconfirm -S "${PKGS[@]}" 2> /dev/null |\
+    sudo pacman --noconfirm -S "${PKGS[@]}" 2> /dev/null #|\
 
   }
+
+  window_manager
 
 )
 
@@ -1040,4 +1064,4 @@ cleanup(){
 }
 
 
-aurhelper
+network
