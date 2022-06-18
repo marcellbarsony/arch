@@ -116,7 +116,7 @@ aur()(
 
     {
     for ((i = 0 ; i <= 100 ; i+=100)); do
-      makepkg -fsri --noconfirm
+      makepkg -cfsri --noconfirm
       echo $i
       sleep 1
     done
@@ -187,7 +187,6 @@ bitwarden()(
             exit $?
             ;;
         esac
-
     fi
 
   }
