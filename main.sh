@@ -700,34 +700,7 @@ pm_1()(
 
 vm_1()(
 
-  fsselect(){
-
-    options=()
-    options+=("ext4" "[Default]")
-    options+=("btrfs" "[-]")
-
-    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" = "0" ]; then
-
-      efiselect
-
-      else
-
-        case $? in
-          1)
-            installscheme
-            ;;
-          *)
-            whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
-            ;;
-        esac
-
-    fi
-
-  }
-
-  efiselect(){
+  select_efi(){
 
     options=()
     items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -739,10 +712,10 @@ vm_1()(
 
     case $? in
       0)
-        efifilesystem
+        select_root
         ;;
       1)
-        fsselect
+        partition
         ;;
       *)
         whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
@@ -751,54 +724,7 @@ vm_1()(
 
   }
 
-  efifilesystem(){
-
-    options=()
-    options+=("FAT32" "[Default]")
-
-    efifilesystem=$(whiptail --title "[VM-1] EFI" --menu "EFI file system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${efifilesystem} in
-          "FAT32")
-            efifs="fat -F32" #vfat
-            ;;
-        esac
-
-        efiformat
-
-      else
-
-        case $? in
-          1)
-            efiselect
-            ;;
-          *)
-            whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
-            ;;
-        esac
-
-    fi
-
-  }
-
-  efiformat(){
-
-    echo 20 | whiptail --gauge "Formatting ${efidevice} to ${efifs}..." 6 50 0
-    mkfs.${efifs} ${efidevice} &> /dev/null
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to ${efifs} unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    rootselect
-
-  }
-
-  rootselect(){
+  select_root(){
 
     options=()
     items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -810,10 +736,10 @@ vm_1()(
 
     case $? in
       0)
-        rootformat
+        select_filesystem
         ;;
       1)
-        efifilesystem
+        select_efi
         ;;
       *)
         whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
@@ -822,7 +748,55 @@ vm_1()(
 
   }
 
-  rootformat(){
+  select_filesystem(){
+
+    options=()
+    options+=("Btrfs" "[-]")
+    options+=("ext4" "[-]")
+
+    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" = "0" ]; then
+
+      case ${fsselect} in
+        "Btrfs")
+        filesystem="btrfs"
+        ;;
+      esac
+
+      format_efi
+
+      else
+
+        case $? in
+          1)
+            select_root
+            ;;
+          *)
+            whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
+            ;;
+        esac
+
+    fi
+
+  }
+
+  format_efi(){
+
+    echo 20 | whiptail --gauge "Formatting ${efidevice} to ${efifs}..." 6 50 0
+    mkfs.fat -F32 ${efidevice} &> /dev/null
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to ${efifs} unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+    fi
+
+    format_root
+
+  }
+
+  format_root(){
 
     echo 30 | whiptail --gauge "Format ${rootdevice} to ${filesystem}..." 6 50 0
     mkfs.${filesystem} ${rootdevice} &>/dev/null
@@ -833,11 +807,11 @@ vm_1()(
         exit ${exitcode}
     fi
 
-    mountefi
+    mount_efi
 
   }
 
-  mountefi(){
+  mount_efi(){
 
     echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/efi..." 6 50 0
     mount --mkdir ${efidevice} /mnt/efi &>/dev/null
@@ -848,11 +822,11 @@ vm_1()(
       exit ${exitcode}
     fi
 
-    mountroot
+    mount_root
 
   }
 
-  mountroot(){
+  mount_root(){
 
     echo 50 | whiptail --gauge "Mount ${rootdevice} to /mnt..." 6 50 0
     mount ${rootdevice} /mnt &>/dev/null
@@ -863,16 +837,48 @@ vm_1()(
       exit ${exitcode}
     fi
 
-    #BTRFS subvolumes
     if [ ${filesystem} == "btrfs" ]; then
-      cd /mnt
+      btrfs_subvolumes
     fi
 
     fstab
 
   }
 
-  fsselect
+  btrfs_subvolumes(){
+
+    cd /mnt
+
+    # Subvolume root
+    btrfs subvolume create @
+
+    # Subvolume home
+    btrfs subvolume create @home
+
+    # Subvolume var
+    btrfs subvolume create @var
+
+    cd
+
+    umount /mnt
+
+    mkdir /mnt/{boot,home,var}
+
+    # Mount subvolume root
+    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@ ${rootdevice} /mnt
+
+    # Mount subvolume home
+    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@home ${rootdevice} /mnt/home
+
+    # Mount subvolume var
+    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@var ${rootdevice} /mnt/var
+
+    # Mount efi
+    mount ${efidevice} /mnt/boot #change GRUB install to /boot
+
+  }
+
+  efiselect
 
 )
 
@@ -940,6 +946,18 @@ kernel(){
 
   if [ "$?" != "0" ]; then
     whiptail --title "ERROR" --msgbox "DMI packages were not installed.\nExit status: ${exitcode}" 8 60
+  fi
+
+  if [ ${filesystem} == "btrfs" ]; then
+    pacstrap /mnt btrfs-progs grub-btrfs
+      case $? in
+        0)
+          whiptail --title "Info" --msgbox "Btrfs packages were successfully installed.\nExit status: ${exitcode}" 8 60
+          ;;
+        *)
+          whiptail --title "ERROR" --msgbox "Cannot install Btrfs packages.\nExit status: ${exitcode}" 8 60
+          ;;
+      esac
   fi
 
   chroot

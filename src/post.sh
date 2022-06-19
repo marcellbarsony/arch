@@ -61,8 +61,8 @@ aur()(
 
     options=()
     options+=("Paru" "[Rust]")
-    options+=("PIKAUR" "[Python]")
-    options+=("YAY" "[Go]")
+    options+=("Pikaur" "[Python]")
+    options+=("Yay" "[Go]")
 
     aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
@@ -71,12 +71,14 @@ aur()(
         case ${aurhelper} in
           "Paru")
             aurhelper="paru"
+            aurhelper_package="paru-bin"
             ;;
-          "PIKAUR")
+          "Pikaur")
             aurhelper="pikaur"
             ;;
-          "YAY")
+          "Yay")
             aurhelper="yay"
+            aurhelper_package="yay-bin"
             ;;
         esac
 
@@ -101,7 +103,7 @@ aur()(
   aurinstall(){
 
     for ((i = 0 ; i <= 100 ; i+=100)); do
-      git clone https://aur.archlinux.org/${aurhelper}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
+      git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
       #https://unix.stackexchange.com/questions/119648/redirecting-to-dev-null
       exitcode=$?
       echo $i
