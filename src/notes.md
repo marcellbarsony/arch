@@ -17,6 +17,7 @@
 
 ### File system
 
+[ ] Partition menu
 [ ] [BTRFS](https://wiki.archlinux.org/title/btrfs)
 
 ### Libnewt

@@ -706,7 +706,7 @@ vm_1()(
     options+=("ext4" "[Default]")
     options+=("btrfs" "[-]")
 
-    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
 
@@ -719,7 +719,7 @@ vm_1()(
             installscheme
             ;;
           *)
-            echo "Exit status $?"
+            whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
             ;;
         esac
 
@@ -745,7 +745,7 @@ vm_1()(
         fsselect
         ;;
       *)
-        echo "Exit status $?"
+        whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
         ;;
     esac
 
@@ -756,17 +756,13 @@ vm_1()(
     options=()
     options+=("FAT32" "[Default]")
 
-    efifilesystem=$(whiptail --title "[VM-1] EFI" --menu "EFI file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    efifilesystem=$(whiptail --title "[VM-1] EFI" --menu "EFI file system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" == "0" ]; then
 
         case ${efifilesystem} in
           "FAT32")
-            efifs="fat -F32"
-            ;;
-          "ext4")
-            echo "Not recommended"
-            exit 1
+            efifs="fat -F32" #vfat
             ;;
         esac
 
@@ -779,7 +775,7 @@ vm_1()(
             efiselect
             ;;
           *)
-            echo "Exit status $?"
+            whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
             ;;
         esac
 
@@ -820,7 +816,7 @@ vm_1()(
         efifilesystem
         ;;
       *)
-        echo "Exit status $?"
+        whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
         ;;
     esac
 
@@ -865,6 +861,11 @@ vm_1()(
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
       exit ${exitcode}
+    fi
+
+    #BTRFS subvolumes
+    if [ ${filesystem} == "btrfs" ]; then
+      cd /mnt
     fi
 
     fstab
