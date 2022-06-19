@@ -243,34 +243,8 @@ pm_1()(
   # Partition 2 | Boot ............... | (min. 512MB) | [Linux Filesystem] |
   # Partition 3 | Root ............... | ............ | [Linux LVM] ...... |
 
-  fsselect(){
 
-    options=()
-    options+=("ext4" "[Default]")
-    options+=("btrfs" "[-]")
-
-    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" = "0" ]; then
-
-      efiselect
-
-      else
-
-        case $? in
-          1)
-            installscheme
-            ;;
-          *)
-            echo "Exit status $?"
-            ;;
-        esac
-
-    fi
-
-  }
-
-  efiselect(){
+  select_efi(){
 
     options=()
     items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -282,10 +256,11 @@ pm_1()(
 
     case $? in
       0)
-        efifilesystem
+        select_boot
         ;;
       1)
         fsselect
+        partition
         ;;
       *)
         echo "Exit status $?"
@@ -294,57 +269,7 @@ pm_1()(
 
   }
 
-  efifilesystem(){
-
-    options=()
-    options+=("FAT32" "[Default]")
-
-    efifilesystem=$(whiptail --title "[PM-1] EFI" --menu "EFI file system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" = "0" ]; then
-
-        case ${efifilesystem} in
-          "FAT32")
-            efifs="fat -F32"
-            ;;
-          "ext4")
-            echo "Not recommended"
-            exit 1
-            ;;
-        esac
-
-        efiformat
-
-      else
-
-        case $? in
-          1)
-            efiselect
-            ;;
-          *)
-            echo "Exit status $?"
-            ;;
-        esac
-
-    fi
-
-  }
-
-  efiformat(){
-
-    mkfs.${efifs} ${efidevice}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    bootselect
-
-  }
-
-  bootselect(){
+  select_boot(){
 
     options=()
     items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -356,10 +281,10 @@ pm_1()(
 
     case $? in
       0)
-        bootformat
+        select_lvm
         ;;
       1)
-        efifilesystem
+        select_efi
         ;;
       *)
         echo "Exit status $?"
@@ -368,21 +293,7 @@ pm_1()(
 
   }
 
-  bootformat(){
-
-    mkfs.${filesystem} ${bootdevice}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    lvmselect
-
-  }
-
-  lvmselect(){
+  select_lvm(){
 
     options=()
     items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -394,10 +305,10 @@ pm_1()(
 
     case $? in
       0)
-        cryptpassword
+        select_filesystem
         ;;
       1)
-        bootselect
+        select_boot
         ;;
       *)
         echo "Exit status $?"
@@ -406,13 +317,58 @@ pm_1()(
 
   }
 
-  cryptpassword(){
+  select_filesystem(){
+
+    options=()
+    options+=("ext4" "[Default]")
+    options+=("btrfs" "[-]")
+
+    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    case $? in
+      1)
+        installscheme
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
+
+      select_root_size
+
+  }
+
+  select_root_size(){
+
+    rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+   case $? in
+      0)
+        if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
+            crypt_password
+          else
+            whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
+            select_root_size
+        fi
+        ;;
+      1)
+        select_filesystem
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
+    esac
+
+  }
+
+  crypt_password(){
 
     cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
 
     case $? in
       0)
-        cryptpassword_confirm
+        crypt_password_confirm
         ;;
       1)
         lvmselect
@@ -424,13 +380,13 @@ pm_1()(
 
   }
 
-  cryptpassword_confirm(){
+  crypt_password_confirm(){
 
     cryptpassword_confirm=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
 
     case $? in
       0)
-        cryptfile
+        crypt_file
         ;;
       1)
         cryptpassword
@@ -442,7 +398,7 @@ pm_1()(
 
   }
 
-  cryptfile(){
+  crypt_file(){
 
     echo "cryptfile" > /root/arch/log.txt
     keydir=/root/luks.key
@@ -463,11 +419,39 @@ pm_1()(
 
     # Password match
     if cmp --silent -- "$keydir" "$keydir2"; then
-      cryptsetup_create
+      format_efi
     else
       whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
-      cryptpassword
+      crypt_password
     fi
+
+  }
+
+  format_efi(){
+
+    mkfs.fat -F32 ${efidevice}
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+    fi
+
+    format_boot
+
+  }
+
+  format_boot(){
+
+    mkfs.${filesystem} ${bootdevice}
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+    fi
+
+    cryptsetup_create
 
   }
 
@@ -495,11 +479,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    physicalvolume
+    volume_physical
 
   }
 
-  physicalvolume(){
+  volume_physical(){
 
     pvcreate /dev/mapper/cryptlvm
     local exitcode=$?
@@ -509,11 +493,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    volumegroup
+    volume_group
 
   }
 
-  volumegroup(){
+  volume_group(){
 
     vgcreate volgroup0 /dev/mapper/cryptlvm
     local exitcode=$?
@@ -523,29 +507,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    rootsize
+    volume_create_root
 
   }
 
-  rootsize(){
-
-    rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
-    local exitcode=$?
-
-    if [ ${exitcode} = 0 ]; then
-        if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
-          rootcreate
-        else
-          whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
-          rootsize
-        fi
-    else
-        cryptpassword
-    fi
-
-  }
-
-  rootcreate(){
+  volume_create_root(){
 
     lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
     local exitcode=$?
@@ -555,11 +521,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    homecreate
+    volume_create_home
 
   }
 
-  homecreate(){
+  volume_create_home(){
 
     lvcreate -l 100%FREE volgroup0 -n crypthome
     local exitcode=$?
@@ -569,11 +535,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    kernel_module
+    volume_kernel_module
 
   }
 
-  kernel_module(){
+  volume_kernel_module(){
 
     modprobe dm_mod
     local exitcode=$?
@@ -583,11 +549,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    volgroup_scan
+    volume_group_scan
 
   }
 
-  volgroup_scan(){
+  volume_group_scan(){
 
     vgscan
     local exitcode=$?
@@ -597,11 +563,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    volgroup_activate
+    volume_group_activate
 
   }
 
-  volgroup_activate(){
+  volume_group_activate(){
 
     vgchange -ay
     local exitcode=$?
@@ -611,11 +577,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    rootformat
+    format_root
 
   }
 
-  rootformat(){
+  format_root(){
 
     mkfs.${filesystem} /dev/volgroup0/cryptroot
     local exitcode=$?
@@ -625,11 +591,11 @@ pm_1()(
         exit ${exitcode}
     fi
 
-    rootmount
+    mount_root
 
   }
 
-  rootmount(){
+  mount_root(){
 
     mount /dev/volgroup0/cryptroot /mnt
     local exitcode=$?
@@ -639,11 +605,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    bootmount
+    mount_boot
 
   }
 
-  bootmount(){
+  mount_boot(){
 
 
     mount --mkdir ${bootdevice} /mnt/efi
@@ -654,11 +620,11 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    homeformat
+    format_home
 
   }
 
-  homeformat(){
+  format_home(){
 
     mkfs.${filesystem} /dev/volgroup0/crypthome
     local exitcode=$?
@@ -668,11 +634,11 @@ pm_1()(
         exit ${exitcode}
     fi
 
-    homemount
+    mount_home
 
   }
 
-  homemount(){
+  mount_home(){
 
     mkdir /mnt/home
     local exitcode=$?
@@ -694,7 +660,7 @@ pm_1()(
 
   }
 
-  fsselect
+  select_efi
 
 )
 
@@ -862,6 +828,12 @@ vm_1()(
 
     umount /mnt
 
+    btfs_mount
+
+  }
+
+  btrfs_mount(){
+
     mkdir /mnt/{boot,home,var}
 
     # Mount subvolume root
@@ -875,6 +847,8 @@ vm_1()(
 
     # Mount efi
     mount ${efidevice} /mnt/boot #change GRUB install to /boot
+
+    fstab
 
   }
 
