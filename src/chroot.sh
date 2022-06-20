@@ -305,7 +305,7 @@ grub()(
   grub_install(){
 
     echo 0 | whiptail --gauge "GRUB install to /efi..." 6 50 0
-    grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB --recheck #--efi-directory=/boot/efi
+    grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB --recheck #/boot/efi /boot
 
     if [ "$?" == "0" ]; then
       whiptail --title "ERROR" --msgbox "GRUB has been installed to [/mnt/boot/efi].\nExit status: $?" 8 78

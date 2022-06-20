@@ -258,21 +258,17 @@ pm_1()(
 
   mount /dev/mapper/cryptroot /mnt
 
-  cd /mnt
+  btrfs subvolume create /mnt/@
 
-  btrfs subvolume create @
-
-  btrfs subvolume create @home
-
-  cd
+  btrfs subvolume create /mnt/@home
 
   umount /mnt
 
-  mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt
+  mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt #ssd
 
   mkdir /mnt/home
 
-  mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
+  mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #ssd
 
   mkdir /mnt/efi #/mnt/boot
 
