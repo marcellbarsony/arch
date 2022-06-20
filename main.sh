@@ -242,45 +242,45 @@ pm_1()(
 
   test(){
 
-  ### PARTITION SCHEME ###
-  # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
-  # Partition 2 | Root file system.... | ............ | [Linux Filesystem] |
+    ### PARTITION SCHEME ###
+    # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
+    # Partition 2 | Root file system.... | ............ | [Linux Filesystem] |
 
 
-  mkfs.fat -F32 ${efidisk}
+    mkfs.fat -F32 ${efidisk}
 
-  cryptsetup luksFormat -sha512 ${rootdisk}
+    cryptsetup luksFormat -sha512 ${rootdisk}
 
-  cryptsetup luksOpen ${rootdisk} cryptroot
+    cryptsetup luksOpen ${rootdisk} cryptroot
 
-  mkfs.btrfs /dev/mapper/cryptroot
-  # mkfs.btrfs -L mylabel /dev/partition
+    mkfs.btrfs /dev/mapper/cryptroot
+    # mkfs.btrfs -L mylabel /dev/partition
 
-  mount /dev/mapper/cryptroot /mnt
+    mount /dev/mapper/cryptroot /mnt
 
-  cd /mnt
+    cd /mnt
 
-  btrfs subvolume create @
+    btrfs subvolume create @
 
-  btrfs subvolume create @home
+    btrfs subvolume create @home
 
-  cd
+    cd
 
-  umount /mnt
+    umount /mnt
 
-  mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt
+    mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt
 
-  mkdir /mnt/home
+    mkdir /mnt/home
 
-  mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
+    mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
 
-  mkdir /mnt/efi #/mnt/boot
+    mkdir /mnt/efi #/mnt/boot
 
-  mount ${efidisk} /mnt/efi #/mnt/boot
+    mount ${efidisk} /mnt/efi #/mnt/boot
 
-  #GRUB
+    #GRUB
 
-  grub-install --target==x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+    grub-install --target==x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
 
   }
 
@@ -301,7 +301,8 @@ pm_1()(
 
     case $? in
       0)
-        select_boot
+        #select_boot
+        select_lvm
         ;;
       1)
         fsselect
@@ -388,7 +389,7 @@ pm_1()(
     rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
     local exitcode=$?
 
-   case $? in
+    case $? in
       0)
         if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
             crypt_password
@@ -482,7 +483,7 @@ pm_1()(
         exit ${exitcode}
     fi
 
-    format_boot
+    cryptsetup_create
 
   }
 
@@ -650,7 +651,7 @@ pm_1()(
       exit ${exitcode}
     fi
 
-    mount_boot
+    format_home
 
   }
 
@@ -848,7 +849,7 @@ vm_1()(
       exit ${exitcode}
     fi
 
-    if [ ${filesystem} == "btrfs" ]; then
+    if [ "${filesystem}" == "btrfs" ]; then
       btrfs_subvolumes
     fi
 
@@ -858,18 +859,18 @@ vm_1()(
 
   btrfs_subvolumes(){
 
-    cd /mnt
+    #cd /mnt
 
     # Subvolume root
-    btrfs subvolume create @
+    btrfs subvolume create /mnt/@
 
     # Subvolume home
-    btrfs subvolume create @home
+    btrfs subvolume create /mnt/@home
 
     # Subvolume var
-    btrfs subvolume create @var
+    btrfs subvolume create /mnt/@var
 
-    cd
+    #cd
 
     umount /mnt
 
@@ -898,6 +899,46 @@ vm_1()(
   }
 
   efiselect
+
+)
+
+devices()(
+
+  # select efi
+  # select boot (optional)
+  # select root (lvm)
+
+  # select filesystem (ext4/btfs)
+
+    #ext4(
+      # enter root size (GB)
+      # enter crypt password
+      # enter crypt password confirm
+      # create crypt file
+    #)
+
+  # format efi
+  # format boot (optional)
+
+    #ext4(
+      # cryptsetup luksFormat rootdevice
+      # cryptsetup open rootdevice
+      # pvcreate /dev/mapper/cryptlvm
+      # vgcreate volgroup0 /dev/mapper/cryptlvm
+      # lvcreate -L 30GB volgroup0 -n cryptroot
+      # lvcreate -L 100%FREE volgroup0 -n crypthome
+      # modprobe dm_mod
+      # vgscan
+      # vgchange -ay
+    #)
+
+  # root format
+  # root mount
+
+  # mount boot
+
+  # format home
+  # mount home
 
 )
 
