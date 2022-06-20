@@ -238,11 +238,56 @@ partition()(
 
 pm_1()(
 
+
+
+  test(){
+
+  ### PARTITION SCHEME ###
+  # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
+  # Partition 2 | Root file system.... | ............ | [Linux Filesystem] |
+
+
+  mkfs.fat -F32 ${efidisk}
+
+  cryptsetup luksFormat -sha512 ${rootdisk}
+
+  cryptsetup luksOpen ${rootdisk} cryptroot
+
+  mkfs.btrfs /dev/mapper/cryptroot
+  # mkfs.btrfs -L mylabel /dev/partition
+
+  mount /dev/mapper/cryptroot /mnt
+
+  cd /mnt
+
+  btrfs subvolume create @
+
+  btrfs subvolume create @home
+
+  cd
+
+  umount /mnt
+
+  mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt
+
+  mkdir /mnt/home
+
+  mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
+
+  mkdir /mnt/efi #/mnt/boot
+
+  mount ${efidisk} /mnt/efi #/mnt/boot
+
+  #GRUB
+
+  grub-install --target==x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+
+  }
+
   ### PARTITION SCHEME ###
   # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
   # Partition 2 | Boot ............... | (min. 512MB) | [Linux Filesystem] |
   # Partition 3 | Root ............... | ............ | [Linux LVM] ...... |
-
 
   select_efi(){
 
@@ -457,7 +502,7 @@ pm_1()(
 
   cryptsetup_create(){
 
-    cryptsetup -q --type luks2 luksFormat ${lvmdevice} --key-file ${keydir}
+    cryptsetup --type luks2 --batch-mode luksFormat ${lvmdevice} --key-file ${keydir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -471,7 +516,7 @@ pm_1()(
 
   cryptsetup_open(){
 
-    cryptsetup open --type luks ${lvmdevice} cryptlvm --key-file ${keydir}
+    cryptsetup open --type luks2 ${lvmdevice} cryptlvm --key-file ${keydir}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -780,7 +825,7 @@ vm_1()(
   mount_efi(){
 
     echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/efi..." 6 50 0
-    mount --mkdir ${efidevice} /mnt/efi &>/dev/null
+    mount --mkdir ${efidevice} /mnt/efi &>/dev/null # Arch wiki: /mnt/boot
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then

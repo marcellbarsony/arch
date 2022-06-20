@@ -203,10 +203,26 @@ initramfs(){
     sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
   fi
 
-  echo 0 | whiptail --gauge "Create initial ramdisk environment..." 6 50 0
+  #Btrfs
+    MODULES=(btrfs)
+    sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
+
   mkinitcpio -p linux
 
   locale
+
+}
+
+btrfs_uuid(){
+
+  blkid
+
+  # UUID of ${rootdisk}
+  # UUID="123456
+
+  vim /etc/default/grub
+
+
 
 }
 
@@ -288,8 +304,8 @@ grub()(
 
   grub_install(){
 
-    echo 0 | whiptail --gauge "GRUB install to /boot/efi..." 6 50 0
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
+    echo 0 | whiptail --gauge "GRUB install to /efi..." 6 50 0
+    grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB --recheck #--efi-directory=/boot/efi
 
     if [ "$?" == "0" ]; then
       whiptail --title "ERROR" --msgbox "GRUB has been installed to [/mnt/boot/efi].\nExit status: $?" 8 78
@@ -306,6 +322,11 @@ grub()(
       sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
       sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
     fi
+
+    #Btrfs
+    #sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=\"${UUID="123}:cryptroot root=/dev/mapper/cryptroot video=1920x1080\" /etc/default/grub
+
+
 
     grub_config
 
