@@ -46,25 +46,47 @@
 
   ## User dialog
 
-  1. Select EFI
-  2. Select /boot [Optional]
-  3. Select root (lvm)
+  - Select EFI
+  - [Optional] Select /boot
+  - Select /
 
-  - Select filesystem (ext4/btfs)
+  - Select filesystem (ext4/btrfs)
+  - Select encryption (true/false)
 
-  - ext4
-    * Enter root (lvm) size (GB)
+  - Select crypt setup
     * Enter crypt password
     * Enter crypt password confirm
     * Create crypt file
-
-  - Btrfs
+    * Enter root (lvm) size (GB) (btrfs?)
 
   ## Install sequence
 
-  - ext4
+  - Format EFI
+  - Mount EFI (/efi)
+
+  - Btrfs [Plain]
+    * Make: `mkfs.btrfs ${rootdevice}"`
+    * Mount: `mount ${rootdevice} /mnt`
+    * Create subvolumes: {/mnt/@, /mnt/@home, /mnt/@var or /mtn@var_log}
+    * Unmount: umount /mnt
+    * Mount: `mount -o`
+
+  - ext4 [Plain]
+    * Make: `mkfs.ext4 ${rootdevice}`
+    * Mount: `${rootdevice} /mnt`
+
+  - Btrfs & ext4 [Encrypted]
     * cryptsetup luksFormat rootdevice
     * cryptsetup open rootdevice
+
+  - Btrfs [Encrypted]
+    * Make: `mkfs.btrfs /dev/mapper/cryptroot`
+    * Mount: `mount /dev/mapper/cryptroot /mnt`
+    * Create subvolumes: {/mnt/@, /mnt/@home, /mnt/@var}
+    * Unmount: umount /mnt
+    * Mount: `mount -o`
+
+  - ext4 [Encrypted]
     * pvcreate /dev/mapper/cryptlvm
     * vgcreate volgroup0 /dev/mapper/cryptlvm
     * lvcreate -L 30GB volgroup0 -n cryptroot
@@ -73,15 +95,11 @@
     * vgscan
     * vgchange -ay
 
-  1. Format EFI
-  2. Mount EFI
+    * Format cryptroot
+    * Mount cryptroot
 
-  1. Format /boot [Optional]
-  2. Mount /boot [Optional]
-
-  1. Format root (lvm)
-  2. Mount root (lvm)
-
-  - ext4
     * Format home
     * Mount home
+
+  - [Optional] Format /boot
+  - [Optional] Mount /boot

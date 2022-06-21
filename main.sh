@@ -215,8 +215,7 @@ partition()(
     items=$(lsblk -p -n -l -o NAME -e 7,11)
 
     if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
-        #installscheme
-        install_test
+        partition
       else
         diskselect
     fi
@@ -259,35 +258,17 @@ pm_1()(
 
     mount /dev/mapper/cryptroot /mnt
 
-<<<<<<< HEAD
   btrfs subvolume create /mnt/@
 
   btrfs subvolume create /mnt/@home
-=======
-    cd /mnt
-
-    btrfs subvolume create @
-
-    btrfs subvolume create @home
-
-    cd
->>>>>>> bbb0e245bc770d29f748440da11320faad855572
 
     umount /mnt
 
-<<<<<<< HEAD
   mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt #ssd
-=======
-    mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt
->>>>>>> bbb0e245bc770d29f748440da11320faad855572
 
     mkdir /mnt/home
 
-<<<<<<< HEAD
   mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #ssd
-=======
-    mount -o noatime,compress=zstd,space_cache,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
->>>>>>> bbb0e245bc770d29f748440da11320faad855572
 
     mkdir /mnt/efi #/mnt/boot
 
@@ -874,7 +855,9 @@ vm_1()(
 
   btrfs_subvolumes(){
 
-    #cd /mnt
+    mkfs.btrfs /dev/mapper/cryptroot
+
+    mount /dev/mapper/cryptroot /mnt
 
     # Subvolume root
     btrfs subvolume create /mnt/@
@@ -882,14 +865,15 @@ vm_1()(
     # Subvolume home
     btrfs subvolume create /mnt/@home
 
-    # Subvolume var
+    # Subvolume var (var_log)
     btrfs subvolume create /mnt/@var
 
-    #cd
+    # Subvolume snapshots
+    btrfs subvolume create /mnt/@snapshots
 
     umount /mnt
 
-    btfs_mount
+    btrfs_mount
 
   }
 
@@ -903,8 +887,11 @@ vm_1()(
     # Mount subvolume home
     mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@home ${rootdevice} /mnt/home
 
-    # Mount subvolume var
+    # Mount subvolume var (var_log)
     mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@var ${rootdevice} /mnt/var
+
+    # Mount subvolume snapshots
+    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@snapshots ${rootdevice} /mnt/.snapshots
 
     # Mount efi
     mount ${efidevice} /mnt/boot #change GRUB install to /boot
@@ -917,92 +904,114 @@ vm_1()(
 
 )
 
-install_test()(
+filesystem()(
 
-  select_efi(){
+  filesystem_dialog()(
 
-    options=()
-    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-    for item in ${items}; do
-      options+=("${item}" "")
-    done
+    select_efi(){
 
-    efidevice=$(whiptail --title "[Test] EFI partition" --menu "Select EFI partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      options=()
+      items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+      for item in ${items}; do
+        options+=("${item}" "")
+      done
 
-    case $? in
-      0)
-        select_root
-        ;;
-      1)
-        partition
-        ;;
-      *)
-        whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
-        ;;
-    esac
+      efidevice=$(whiptail --title "[Test] EFI partition" --menu "Select EFI partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
-  }
+      case $? in
+        0)
+          select_root
+          ;;
+        1)
+          partition
+          ;;
+        *)
+          whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
+          ;;
+      esac
 
-  select_root(){
+    }
 
-    options=()
-    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-    for item in ${items}; do
-      options+=("${item}" "")
-    done
+    select_root(){
 
-    rootdevice=$(whiptail --title "[Test] ROOT partition" --menu "ROOT partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      options=()
+      items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+      for item in ${items}; do
+        options+=("${item}" "")
+      done
 
-    case $? in
-      0)
-        select_filesystem
-        ;;
-      1)
-        select_efi
-        ;;
-      *)
-        whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
-        ;;
-    esac
+      rootdevice=$(whiptail --title "[Test] ROOT partition" --menu "ROOT partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
-  }
+      case $? in
+        0)
+          select_filesystem
+          ;;
+        1)
+          select_efi
+          ;;
+        *)
+          whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
+          ;;
+      esac
 
-  select_filesystem(){
+    }
 
-    options=()
-    options+=("Btrfs" "[-]")
-    options+=("ext4" "[-]")
+    select_filesystem(){
 
-    filesystem=$(whiptail --title "[Test] File System" --menu "Select file system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      options=()
+      options+=("Btrfs" "[-]")
+      options+=("ext4" "[-]")
 
-    if [ "$?" = "0" ]; then
+      filesystem=$(whiptail --title "[Test] File System" --menu "Select file system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
+      if [ "$?" = "0" ]; then
+          case ${filesystem} in
+            "Btrfs")
+              filesystem="btrfs"
+              ;;
+          esac
+          select_encryption
+        else
+          case $? in
+            1)
+              select_root
+              ;;
+            *)
+              whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
+              ;;
+          esac
+      fi
+
+    }
+
+    select_encryption(){
+
+      if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
         case ${filesystem} in
-          "Btrfs")
-            filesystem="btrfs"
-            select_filesystem
+          "btrfs")
+            btrfs_encrypted
             ;;
           "ext4")
-            ext4_cryptsetup
+            ext4_encrypted
             ;;
         esac
-
       else
-
-        case $? in
-          1)
-            select_root
+        case ${filesystem} in
+          "btrfs")
+            btrfs_plain
             ;;
-          *)
-            whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
+          "ext4")
+            ext4_plain
             ;;
         esac
+      fi
 
-    fi
+    }
 
-  }
+  )
 
-  ext4_cryptsetup()(
+
+  encryption()(
 
     select_root_size(){
 
@@ -1011,7 +1020,7 @@ install_test()(
 
       case $? in
         0)
-          if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
+          if [[ ${rootsize} ]] && [ ${rootsize} -eq ${rootsize} 2>/dev/null ]; then
               crypt_password
             else
               whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
@@ -1097,7 +1106,7 @@ install_test()(
       cryptsetup --type luks2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
         exit ${exitcode}
       fi
@@ -1120,12 +1129,21 @@ install_test()(
 
     }
 
+    btrfs(){
+
+      mkfs.btrfs /dev/mapper/cryptroot
+
+
+
+
+    }
+
     volume_physical(){
 
       pvcreate /dev/mapper/cryptlvm
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Physical volume cannot be created.\nExit status: ${?}" 8 78
         exit ${exitcode}
       fi
@@ -1139,7 +1157,7 @@ install_test()(
       vgcreate volgroup0 /dev/mapper/cryptlvm
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Volume group [volgroup0] cannot be created.\nExit status: ${?}" 8 78
         exit ${exitcode}
       fi
@@ -1153,7 +1171,7 @@ install_test()(
       lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] cannot be created.\nExit status: ${?}" 8 78
         exit ${exitcode}
       fi
@@ -1167,7 +1185,7 @@ install_test()(
       lvcreate -l 100%FREE volgroup0 -n crypthome
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] cannot be created.\nExit status: ${?}" 8 78
         exit ${exitcode}
       fi
@@ -1181,7 +1199,7 @@ install_test()(
       modprobe dm_mod
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Activating volume groups [modprobe dm_mod] failed.\nExit status: ${?}" 8 78
         exit ${exitcode}
       fi
@@ -1195,7 +1213,7 @@ install_test()(
       vgscan
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Scanning volume groups [vgscan] failed.\nExit status: ${?}" 8 78
         exit ${exitcode}
       fi
@@ -1209,7 +1227,7 @@ install_test()(
       vgchange -ay
       local exitcode=$?
 
-      if [ ${exitcode} != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Activating volume groups [vgchange -ay] failed.\nExit status: ${?}" 8 78
         exit ${exitcode}
       fi
@@ -1222,12 +1240,19 @@ install_test()(
 
   )
 
+  btrfs_cryptsetup()(
+
+
+
+
+  )
+
   format_efi(){
 
     mkfs.fat -F32 ${efidevice}
     local exitcode=$?
 
-    if [ ${exitcode} != "0" ]; then
+    if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
         exit ${exitcode}
     fi
@@ -1256,7 +1281,7 @@ install_test()(
     mkfs.${filesystem} /dev/volgroup0/cryptroot
     local exitcode=$?
 
-    if [ ${exitcode} != "0" ]; then
+    if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/cryptroot] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
         exit ${exitcode}
     fi
@@ -1284,7 +1309,7 @@ install_test()(
     mkfs.${filesystem} /dev/volgroup0/crypthome
     local exitcode=$?
 
-    if [ ${exitcode} != "0" ]; then
+    if [ "${exitcode}" != "0" ]; then
         whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/crypthome] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
         exit ${exitcode}
     fi
@@ -1375,7 +1400,7 @@ kernel(){
     whiptail --title "ERROR" --msgbox "Main packages were not installed.\nExit status: ${exitcode}" 8 60
   fi
 
-  if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
+  if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
       pacstrap /mnt virtualbox-guest-utils
     else
       pacstrap /mnt lvm2
@@ -1450,6 +1475,4 @@ while (( "$#" )); do
 done
 
 clear
-#precheck
-
-install_test
+precheck
