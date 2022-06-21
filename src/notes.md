@@ -73,7 +73,7 @@
 
   - ext4 [Plain]
     * Make: `mkfs.ext4 ${rootdevice}`
-    * Mount: `${rootdevice} /mnt`
+    * Mount: `mount ${rootdevice} /mnt`
 
   - Btrfs & ext4 [Encrypted]
     * cryptsetup luksFormat rootdevice
