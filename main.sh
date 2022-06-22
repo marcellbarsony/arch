@@ -215,9 +215,9 @@ partition()(
     items=$(lsblk -p -n -l -o NAME -e 7,11)
 
     if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
-        partition
+        filesystem
       else
-        diskselect
+        partition
     fi
 
   }
@@ -233,558 +233,6 @@ partition()(
   }
 
   warning
-
-)
-
-pm_1()(
-
-
-
-  test(){
-
-    ### PARTITION SCHEME ###
-    # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
-    # Partition 2 | Root file system.... | ............ | [Linux Filesystem] |
-
-
-    mkfs.fat -F32 ${efidisk}
-
-    cryptsetup luksFormat -sha512 ${rootdisk}
-
-    cryptsetup luksOpen ${rootdisk} cryptroot
-
-    mkfs.btrfs /dev/mapper/cryptroot
-    # mkfs.btrfs -L mylabel /dev/partition
-
-    mount /dev/mapper/cryptroot /mnt
-
-  btrfs subvolume create /mnt/@
-
-  btrfs subvolume create /mnt/@home
-
-    umount /mnt
-
-  mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt #ssd
-
-    mkdir /mnt/home
-
-  mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #ssd
-
-    mkdir /mnt/efi #/mnt/boot
-
-    mount ${efidisk} /mnt/efi #/mnt/boot
-
-    #GRUB
-
-    grub-install --target==x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
-
-  }
-
-  select_efi(){
-
-    options=()
-    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-    for item in ${items}; do
-      options+=("${item}" "")
-    done
-
-    efidevice=$(whiptail --title "[VM-1] EFI" --menu "EFI partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    case $? in
-      0)
-        #select_boot
-        select_lvm
-        ;;
-      1)
-        fsselect
-        partition
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-
-  }
-
-  select_boot(){
-
-    options=()
-    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-    for item in ${items}; do
-      options+=("${item}" "")
-    done
-
-    bootdevice=$(whiptail --title "[PM-1] BOOT" --menu "BOOT partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    case $? in
-      0)
-        select_lvm
-        ;;
-      1)
-        select_efi
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-
-  }
-
-  select_lvm(){
-
-    options=()
-    items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
-    for item in ${items}; do
-      options+=("${item}" "")
-    done
-
-    lvmdevice=$(whiptail --title "[PM-1] LVM" --menu "LVM partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    case $? in
-      0)
-        select_filesystem
-        ;;
-      1)
-        select_boot
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-
-  }
-
-  select_filesystem(){
-
-    options=()
-    options+=("ext4" "[Default]")
-    options+=("btrfs" "[-]")
-
-    filesystem=$(whiptail --title "[VM-1] File System" --menu "File system" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    case $? in
-      1)
-        installscheme
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-
-      select_root_size
-
-  }
-
-  select_root_size(){
-
-    rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
-    local exitcode=$?
-
-    case $? in
-      0)
-        if [[ $rootsize ]] && [ $rootsize -eq $rootsize 2>/dev/null ]; then
-            crypt_password
-          else
-            whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
-            select_root_size
-        fi
-        ;;
-      1)
-        select_filesystem
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-
-  }
-
-  crypt_password(){
-
-    cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
-
-    case $? in
-      0)
-        crypt_password_confirm
-        ;;
-      1)
-        lvmselect
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-
-  }
-
-  crypt_password_confirm(){
-
-    cryptpassword_confirm=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
-
-    case $? in
-      0)
-        crypt_file
-        ;;
-      1)
-        cryptpassword
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-    esac
-
-  }
-
-  crypt_file(){
-
-    echo "cryptfile" > /root/arch/log.txt
-    keydir=/root/luks.key
-    keydir2=/root/luks.key2
-
-    echo "$cryptpassword" > "$keydir"
-    local exitcode1=$?
-
-    echo "$cryptpassword_confirm" > "$keydir2"
-    local exitcode2=$?
-
-    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Key file [${keydir}] cannot be created.\n
-        Exit status [File 1]: ${exitcode1}\n
-        Exit status [File 2]: ${exitcode2}" 12 78
-        exit 1
-    fi
-
-    # Password match
-    if cmp --silent -- "$keydir" "$keydir2"; then
-      format_efi
-    else
-      whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
-      crypt_password
-    fi
-
-  }
-
-  format_efi(){
-
-    mkfs.fat -F32 ${efidevice}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    cryptsetup_create
-
-  }
-
-  format_boot(){
-
-    mkfs.${filesystem} ${bootdevice}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    cryptsetup_create
-
-  }
-
-  cryptsetup_create(){
-
-    cryptsetup --type luks2 --batch-mode luksFormat ${lvmdevice} --key-file ${keydir}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Encrypting [${lvmdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
-      exit ${exitcode}
-    fi
-
-    cryptsetup_open
-
-  }
-
-  cryptsetup_open(){
-
-    cryptsetup open --type luks2 ${lvmdevice} cryptlvm --key-file ${keydir}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "LVM device [${lvmdevice}] cannot be opened.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    volume_physical
-
-  }
-
-  volume_physical(){
-
-    pvcreate /dev/mapper/cryptlvm
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Physical volume cannot be created.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    volume_group
-
-  }
-
-  volume_group(){
-
-    vgcreate volgroup0 /dev/mapper/cryptlvm
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Volume group [volgroup0] cannot be created.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    volume_create_root
-
-  }
-
-  volume_create_root(){
-
-    lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] cannot be created.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    volume_create_home
-
-  }
-
-  volume_create_home(){
-
-    lvcreate -l 100%FREE volgroup0 -n crypthome
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] cannot be created.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    volume_kernel_module
-
-  }
-
-  volume_kernel_module(){
-
-    modprobe dm_mod
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Activating volume groups [modprobe dm_mod] failed.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    volume_group_scan
-
-  }
-
-  volume_group_scan(){
-
-    vgscan
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Scanning volume groups [vgscan] failed.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    volume_group_activate
-
-  }
-
-  volume_group_activate(){
-
-    vgchange -ay
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Activating volume groups [vgchange -ay] failed.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
-
-    format_root
-
-  }
-
-  format_root(){
-
-    mkfs.${filesystem} /dev/volgroup0/cryptroot
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/cryptroot] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    mount_root
-
-  }
-
-  mount_root(){
-
-    mount /dev/volgroup0/cryptroot /mnt
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "ROOT partition [/dev/volgroup0/cryptroot] was not mounted.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    format_home
-
-  }
-
-  mount_boot(){
-
-
-    mount --mkdir ${bootdevice} /mnt/efi
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "BOOT partition was not mounted.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    format_home
-
-  }
-
-  format_home(){
-
-    mkfs.${filesystem} /dev/volgroup0/crypthome
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/crypthome] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    mount_home
-
-  }
-
-  mount_home(){
-
-    mkdir /mnt/home
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "HOME directory was not created.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    mount /dev/volgroup0/crypthome /mnt/home
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "HOME partition was not mounted.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    fstab
-
-  }
-
-  select_efi
-
-)
-
-vm_1()(
-
-  format_root(){
-
-    echo 30 | whiptail --gauge "Format ${rootdevice} to ${filesystem}..." 6 50 0
-    mkfs.${filesystem} ${rootdevice} &>/dev/null
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-    fi
-
-    mount_efi
-
-  }
-
-  mount_root(){
-
-    echo 50 | whiptail --gauge "Mount ${rootdevice} to /mnt..." 6 50 0
-    mount ${rootdevice} /mnt &>/dev/null
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    if [ "${filesystem}" == "btrfs" ]; then
-      btrfs_subvolumes
-    fi
-
-    fstab
-
-  }
-
-  btrfs_subvolumes(){
-
-    mkfs.btrfs /dev/mapper/cryptroot
-
-    mount /dev/mapper/cryptroot /mnt
-
-    # Subvolume root
-    btrfs subvolume create /mnt/@
-
-    # Subvolume home
-    btrfs subvolume create /mnt/@home
-
-    # Subvolume var (var_log)
-    btrfs subvolume create /mnt/@var
-
-    # Subvolume snapshots
-    btrfs subvolume create /mnt/@snapshots
-
-    umount /mnt
-
-    btrfs_mount
-
-  }
-
-  btrfs_mount(){
-
-    mkdir /mnt/{boot,home,var}
-
-    # Mount subvolume root
-    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@ ${rootdevice} /mnt
-
-    # Mount subvolume home
-    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@home ${rootdevice} /mnt/home
-
-    # Mount subvolume var (var_log)
-    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@var ${rootdevice} /mnt/var
-
-    # Mount subvolume snapshots
-    mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@snapshots ${rootdevice} /mnt/.snapshots
-
-    # Mount efi
-    mount ${efidevice} /mnt/boot #change GRUB install to /boot
-
-    fstab
-
-  }
-
-  efiselect
 
 )
 
@@ -1087,6 +535,56 @@ filesystem()(
 
     encrypted_btrfs()(
 
+      format_root(){
+
+        mkfs.${filesystem} /dev/mapper/cryptroot &>/dev/null
+        # mkfs.btrfs -L mylabel /dev/partition
+        local exitcode=$?
+
+        if [ "${exitcode}" != "0" ]; then
+            whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+            exit ${exitcode}
+        fi
+
+        mount_root
+
+      }
+
+      mount_root(){
+
+        mount /dev/mapper/cryptroot /mnt &>/dev/null
+        local exitcode=$?
+
+        if [ "${exitcode}" != "0" ]; then
+          whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+          exit ${exitcode}
+        fi
+
+        btrfs_subvolumes
+
+      }
+
+      btrfs_subvolumes(){
+
+        btrfs subvolume create /mnt/@
+
+        btrfs subvolume create /mnt/@home
+
+        umount /mnt
+
+      }
+
+      btrfs_mount(){
+
+        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt #ssd
+
+        mkdir /mnt/home
+
+        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #ssd
+
+
+      }
+
 
     )
 
@@ -1271,7 +769,7 @@ filesystem()(
         mkfs.${filesystem} ${rootdevice} &>/dev/null
         local exitcode=$?
 
-        if [ ${exitcode} != "0" ]; then
+        if [ "${exitcode}" != "0" ]; then
             whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
             exit ${exitcode}
         fi
@@ -1290,8 +788,51 @@ filesystem()(
           exit ${exitcode}
         fi
 
+        btrfs_subvolumes
+
       }
 
+      btrfs_subvolumes(){
+
+        # Subvolume root
+        btrfs subvolume create /mnt/@
+
+        # Subvolume home
+        btrfs subvolume create /mnt/@home
+
+        # Subvolume var (var_log)
+        btrfs subvolume create /mnt/@var
+
+        # Subvolume snapshots
+        btrfs subvolume create /mnt/@snapshots
+
+        umount /mnt
+
+        btrfs_mount
+
+      }
+
+      btrfs_mount(){
+
+        mkdir /mnt/{home,var,snapshots}
+
+        # Mount subvolume root
+        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@ ${rootdevice} /mnt
+
+        # Mount subvolume home
+        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@home ${rootdevice} /mnt/home
+
+        # Mount subvolume var (var_log)
+        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@var ${rootdevice} /mnt/var
+
+        # Mount subvolume snapshots
+        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@snapshots ${rootdevice} /mnt/.snapshots
+
+        fstab
+
+      }
+
+      format_root
 
     )
 
