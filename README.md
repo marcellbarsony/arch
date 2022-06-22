@@ -30,3 +30,41 @@ cd arch
 ```
 ./main.sh
 ```
+
+## File system
+
+### Encrypted Btrfs
+
+| Partition      | Partition Name | Partition Size | Filesystem type    |
+| -------------- | -------------- | -------------- | ------------------ |
+| Partition 1    | EFI System     | (min. 512MB)   | [EFI System]       |
+| Partition 2    | Root           |                | [Linux Filesystem] |
+| Root subvolume | @              |                |                    |
+| Root subvolume | @/home         |                |                    |
+| Root subvolume | @/var          |                |                    |
+
+### Encrypted ext4
+
+| Partition No.  | Partition Name | Partition Size | Filesystem type  |
+| -------------- | -------------- | -------------- | ---------------- |
+| Partition 1    | EFI System     | (min. 512MB)   | [EFI System]     |
+| Partition 2    | Root           |                | [Linux LVM]      |
+| Root subvolume | cryptroot      |                |                  |
+| Root subvolume | crypthome      |                |                  |
+
+### Plain Btrfs
+
+| Partition No.  | Partition Name | Partition Size | Filesystem type    |
+| -------------- | -------------- | -------------- | ------------------ |
+| Partition 1    | EFI System     | (min. 512MB)   | [EFI System]       |
+| Partition 2    | Root           |                | [Linux Filesystem] |
+| Root subvolume | @              |                |                    |
+| Root subvolume | @/home         |                |                    |
+| Root subvolume | @/var          |                |                    |
+
+### Plain ext4
+
+| Partition No. | Partition Name | Partition Size | Filesystem type  |
+| ------------- | -------------- | -------------- | ---------------- |
+| Partition 1   | EFI System     | (min. 512MB)   | [EFI System]     |
+| Partition 2   | Root           |                | [Linux LVM]      |

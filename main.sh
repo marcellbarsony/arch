@@ -280,11 +280,6 @@ pm_1()(
 
   }
 
-  ### PARTITION SCHEME ###
-  # Partition 1 | EFI System Partition | (min. 256MB) | [EFI System] ..... |
-  # Partition 2 | Boot ............... | (min. 512MB) | [Linux Filesystem] |
-  # Partition 3 | Root ............... | ............ | [Linux LVM] ...... |
-
   select_efi(){
 
     options=()
@@ -879,9 +874,11 @@ filesystem()(
         case $? in
           0)
             encryption="True"
+            encryption_dialog
             ;;
           1)
             encryption="False"
+            efi
             ;;
           *)
             echo "Exit status: $?"
@@ -907,7 +904,7 @@ filesystem()(
           crypt_password_confirm
           ;;
         1)
-          select_root_size
+          filesystem
           ;;
         *)
           echo "Exit status $?"
@@ -925,7 +922,7 @@ filesystem()(
           crypt_file
           ;;
         1)
-          cryptpassword
+          crypt_password
           ;;
         *)
           echo "Exit status $?"
@@ -954,11 +951,24 @@ filesystem()(
 
       # Password match
       if cmp --silent -- "$keydir" "$keydir2"; then
-        cryptsetup_create
+
       else
         whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
         crypt_password
       fi
+
+    }
+
+    crypt_flesystem(){
+
+        case ${filesystem} in
+          "btrfs")
+            efi
+            ;;
+          "ext4")
+            select_root_size
+            ;;
+        esac
 
     }
 
@@ -970,14 +980,14 @@ filesystem()(
       case $? in
         0)
           if [[ ${rootsize} ]] && [ ${rootsize} -eq ${rootsize} 2>/dev/null ]; then
-              crypt_password
+              efi
             else
               whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
               select_root_size
           fi
           ;;
         1)
-          install_test
+          crypt_password
           ;;
         *)
           echo "Exit status $?"
@@ -985,6 +995,8 @@ filesystem()(
       esac
 
     }
+
+    crypt_password
 
   )
 
@@ -1000,7 +1012,7 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      cryptsetup_create
+      mount_efi
 
     }
 
@@ -1015,24 +1027,26 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      format_root
+      encryption_select
 
     }
 
+    encryption_select(){
+
+      case ${encryption} in
+        "True")
+          encrypted
+          ;;
+        "False")
+          plain
+          ;;
+      esac
+
+    }
+
+    format_efi
+
   )
-
-  encryption_select(){
-
-    case ${encryption} in
-      "True")
-        encrypted
-        ;;
-      "False")
-        plain
-        ;;
-    esac
-
-  }
 
   encrypted()(
 
@@ -1060,18 +1074,16 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      volume_physical
+      case ${filesystem} in
+        "btrfs")
+          encrypted_btrfs
+          ;;
+        "ext4")
+          encrypted_ext4
+          ;;
+      esac
 
     }
-
-    case ${filesystem} in
-      "btrfs")
-        encrypted_btrfs
-        ;;
-      "ext4")
-        encrypted_ext4
-        ;;
-    esac
 
     encrypted_btrfs()(
 
@@ -1174,7 +1186,7 @@ filesystem()(
           exit ${exitcode}
         fi
 
-        format_efi
+        format_root
 
       }
 
@@ -1242,6 +1254,8 @@ filesystem()(
 
       }
 
+      volume_physical
+
     )
 
     cryptsetup_create
@@ -1307,7 +1321,11 @@ filesystem()(
           exit ${exitcode}
         fi
 
+        fstab
+
       }
+
+      format_root
 
     )
 
