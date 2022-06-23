@@ -769,6 +769,16 @@ filesystem()(
 
   plain()(
 
+    filesystem_select(){
+
+      if [ "${filesystem}" == "btrfs" ]; then
+          plain_btrfs
+        else
+          plain_ext4
+      fi
+
+    }
+
     plain_btrfs()(
 
       format_root(){
@@ -877,10 +887,11 @@ filesystem()(
 
     )
 
-    filesystem_dialog
+    filesystem_select
 
   )
 
+  filesystem_dialog
 
 )
 
