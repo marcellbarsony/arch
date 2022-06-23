@@ -877,9 +877,10 @@ filesystem()(
 
     )
 
+    filesystem_dialog
+
   )
 
-  filesystem_dialog
 
 )
 
