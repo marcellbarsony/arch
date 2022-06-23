@@ -491,14 +491,11 @@ filesystem()(
 
     encryption_select(){
 
-      case ${encryption} in
-        "True")
+      if [ "${encryption}" == "True" ]; then
           encrypted
-          ;;
-        "False")
+        else
           plain
-          ;;
-      esac
+      fi
 
     }
 
