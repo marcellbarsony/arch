@@ -318,21 +318,31 @@ filesystem()(
 
     select_encryption(){
 
-      if (whiptail --title "Encryption" --yesno "File system encryption" --yes-button "Encrypt" --no-button "Plain" 8 60); then
-        case $? in
-          0)
-            encryption="True"
-            encryption_dialog
-            ;;
-          1)
-            encryption="False"
-            efi
-            ;;
-          *)
-            echo "Exit status: $?"
-            exit $?
-            ;;
-        esac
+      options=()
+      options+=("Encrypted" "[-]")
+      options+=("Plain" "[-]")
+
+      encryption=$(whiptail --title "Encryption" --menu "File system encryption" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      if [ "$?" = "0" ]; then
+          case ${encryption} in
+            "Encrypted")
+              encryption="True"
+              encryption_dialog
+              ;;
+            "Plain")
+              encryption="False"
+              efi_partition
+              ;;
+          esac
+        else
+          case $? in
+            1)
+              select_filesystem
+              ;;
+            *)
+              whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
+              ;;
+          esac
       fi
 
     }
@@ -411,7 +421,7 @@ filesystem()(
 
         case ${filesystem} in
           "btrfs")
-            efi
+            efi_partition
             ;;
           "ext4")
             select_root_size
@@ -448,7 +458,7 @@ filesystem()(
 
   )
 
-  efi_part()(
+  efi_partition()(
 
     format_efi(){
 
