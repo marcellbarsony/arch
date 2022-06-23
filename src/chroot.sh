@@ -304,8 +304,8 @@ grub()(
 
   grub_install(){
 
-    echo 0 | whiptail --gauge "GRUB install to /efi..." 6 50 0
-    grub-install --target=x86_64-efi --efi-directory=/efi --bootloader-id=GRUB --recheck #/boot/efi /boot
+    echo 0 | whiptail --gauge "GRUB install to /boot..." 6 50 0
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck #/boot/efi /boot
 
     if [ "$?" == "0" ]; then
       whiptail --title "ERROR" --msgbox "GRUB has been installed to [/mnt/boot/efi].\nExit status: $?" 8 78
@@ -325,8 +325,6 @@ grub()(
 
     #Btrfs
     #sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=\"${UUID="123}:cryptroot root=/dev/mapper/cryptroot video=1920x1080\" /etc/default/grub
-
-
 
     grub_config
 

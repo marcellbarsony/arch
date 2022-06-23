@@ -132,7 +132,7 @@ partition()(
 
   warning(){
 
-    if (whiptail --title "WARNING" --yesno "All data will be erased - Proceed with the installation?" --defaultno 8 60); then
+    if (whiptail --title "WARNING" --yesno "Everything not backed up will be lost." --yes-button "Proceed" --no-button "Exit" --defaultno 8 60); then
         diskselect
       else
         echo "Installation terminated"
@@ -248,7 +248,7 @@ filesystem()(
         options+=("${item}" "")
       done
 
-      efidevice=$(whiptail --title "[Test] EFI partition" --menu "Select EFI partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      efidevice=$(whiptail --title "EFI partition" --menu "Select partition [EFI]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -272,7 +272,7 @@ filesystem()(
         options+=("${item}" "")
       done
 
-      rootdevice=$(whiptail --title "[Test] ROOT partition" --menu "ROOT partition" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      rootdevice=$(whiptail --title "Root partition" --menu "Select partition [Root]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -466,8 +466,8 @@ filesystem()(
 
     mount_efi(){
 
-      echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/efi..." 6 50 0
-      mount --mkdir ${efidevice} /mnt/efi # Arch wiki: /mnt/boot
+      echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/boot..." 6 50 0
+      mount --mkdir ${efidevice} /mnt/boot
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
@@ -927,31 +927,29 @@ mirrorlist(){
 kernel(){
 
   pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
-
-  if [ "$?" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Main packages were not installed.\nExit status: ${exitcode}" 8 60
-  fi
+  local exitcode1=$?
 
   if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
-      pacstrap /mnt virtualbox-guest-utils
-    else
-      pacstrap /mnt lvm2
+    pacstrap /mnt virtualbox-guest-utils
+    local exitcode2=$?
   fi
 
-  if [ "$?" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "DMI packages were not installed.\nExit status: ${exitcode}" 8 60
+  if [ "${encryption}" == "True" ]; then
+    pacstrap /mnt lvm2
+    local exitcode3=$?
   fi
 
   if [ ${filesystem} == "btrfs" ]; then
     pacstrap /mnt btrfs-progs grub-btrfs
-      case $? in
-        0)
-          whiptail --title "Info" --msgbox "Btrfs packages were successfully installed.\nExit status: ${exitcode}" 8 60
-          ;;
-        *)
-          whiptail --title "ERROR" --msgbox "Cannot install Btrfs packages.\nExit status: ${exitcode}" 8 60
-          ;;
-      esac
+    local exitcode4=$?
+  fi
+
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "An error occurred whilst installing packages.\n
+    Exit status [Main packages]: ${exitcode1}\n
+    Exit status [DMI packages]: ${exitcode2}\n
+    Exit status [Crypt packages]: ${exitcode3}\n
+    Exit status [Btrfs packages]: ${exitcode4}" 18 78
   fi
 
   chroot
