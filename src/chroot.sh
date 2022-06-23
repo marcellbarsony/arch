@@ -24,145 +24,182 @@ keymap(){
 
 system_administration()(
 
-  # https://wiki.archlinux.org/title/General_recommendations#System_administration
+  sysadmin_dialog()(
 
-  rootpassword(){
+    # https://wiki.archlinux.org/title/General_recommendations#System_administration
 
-    password=$(whiptail --passwordbox "Root passphrase" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+    root_password(){
 
-    password_confirm=$(whiptail --passwordbox "Root passphrase confirm" --title "ROOT Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      root_password=$(whiptail --passwordbox "Root passphrase" --title "Root passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-    if [ ! ${password} ] || [ ! ${password_confirm} ]; then
+      root_password_confirm=$(whiptail --passwordbox "Root passphrase confirm" --title "Root passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+      if [ ! ${root_password} ] || [ ! ${root_password_confirm} ]; then
         whiptail --title "ERROR" --msgbox "Root passphrase cannot be empty." 8 78
-        rootpassword
-    fi
+        root_password
+      fi
 
-    if [ ${password} != ${password_confirm} ]; then
+      if [ ${root_password} != ${root_password_confirm} ]; then
         whiptail --title "ERROR" --msgbox "Root passphrase did not match." 8 78
-        rootpassword
-    fi
+        root_password
+      fi
 
-    error=$(echo "root:${password}" | chpasswd 2>&1 )
+      user_account
 
-    if [ $? != "0" ]; then
-      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-        0)
-          rootpassword
-          ;;
-        1)
-          exit 1
-          clear
-          ;;
-        *)
-          echo "Exit status $?"
-          ;;
-      esac
-    fi
+    }
 
-    useraccount
+    user_account(){
 
-  }
+      username=$(whiptail --inputbox "" --title "USER Account" --nocancel 8 39 3>&1 1>&2 2>&3)
 
-  useraccount(){
+      if [ ! ${username} ] || [ ${username} == "root" ]; then
+        whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
+        user_account
+      fi
 
-    username=$(whiptail --inputbox "" --title "USER Account" --nocancel 8 39 3>&1 1>&2 2>&3)
+      user_password
 
-    if [ ! ${username} ] || [ ${username} == "root" ]; then
-      whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
-      useraccount
-    fi
+    }
 
-    useradd -m ${username}
-    userpassword
+    user_password(){
 
-  }
+      user_password=$(whiptail --passwordbox "User passphrase [${username}]" --title "User passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-  userpassword(){
+      user_password_confirm=$(whiptail --passwordbox "User passphrase confirm [${username}]" --title "User passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-    password=$(whiptail --passwordbox "User passphrase [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      if [ ! ${user_password} ] || [ ! ${user_password_confirm} ]; then
+          whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
+          user_password
+      fi
 
-    password_confirm=$(whiptail --passwordbox "User passphrase confirm [${username}]" --title "USER Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      if [ ${user_password} != ${user_password_confirm} ]; then
+          whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
+          user_password
+      fi
 
-    if [ ! ${password} ] || [ ! ${password_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
-        userpassword
-    fi
+      domain_name
 
-    if [ ${password} != ${password_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
-        userpassword
-    fi
+    }
 
-    echo 0 | whiptail --gauge "Set ${username}'s password..." 6 50 0
-    error=$( echo "${username}:${password}" | chpasswd 2>&1 )
+    domain_name(){
 
-    if [ $? != "0" ]; then
-      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-        0)
-          userpassword
-          ;;
-        1)
-          exit 1
-          clear
-          ;;
-        *)
-          echo "Exit status $?"
-          ;;
-      esac
-    fi
+      nodename=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
 
-    usergroup
+      if [ ! ${nodename} ]; then
+        whiptail --title "ERROR" --msgbox "Hostname cannot be empty." 8 78
+        domain_name
+      fi
 
-  }
+      sysadmin
 
-  usergroup(){
+    }
 
-    echo 0 | whiptail --gauge "Add ${username} to groups..." 6 50 0
-    error=$(usermod -aG wheel,audio,video,optical,storage ${username} 2>&1)
+    root_password
 
-    if [ $? != "0" ]; then
-      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-        0)
-          usergroup
-          ;;
-        1)
-          exit 1
-          clear
-          ;;
-        *)
-          echo "Exit status $?"
-          ;;
-      esac
-    fi
+  )
 
-    domainname
+  sysadmin()(
 
-  }
+    root_password(){
 
-  domainname(){
+      error=$( echo "root:${password}" | chpasswd 2>&1 )
 
-    nodename=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
+      if [ $? != "0" ]; then
+        whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+        case $? in
+          0)
+            root_password
+            ;;
+          1)
+            exit 1
+            clear
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
+      fi
 
-    if [ ! ${nodename} ]; then
-      whiptail --title "ERROR" --msgbox "Hostname cannot be empty." 8 78
-      nodename
-    fi
+      user_create
 
-    echo 0 | whiptail --gauge "Set hostname..." 6 50 0
-    hostnamectl set-hostname ${nodename}
+    }
 
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Hostname cannot be set.\nExit status: $?" 8 78
-    fi
+    user_create(){
 
-    hosts
+      useradd -m ${username}
 
-  }
+      if [ $? != "0" ]; then
+        whiptail --title "ERROR" --yesno "Cannot create user account [${username}].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+        case $? in
+          0)
+            user_create
+            ;;
+          1)
+            exit 1
+            clear
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
+      fi
 
-  rootpassword
+      user_password
+
+    }
+
+    user_password(){
+
+      error=$( echo "${username}:${user_password}" | chpasswd 2>&1 )
+
+      if [ $? != "0" ]; then
+        whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+        case $? in
+          0)
+            user_password
+            ;;
+          1)
+            exit 1
+            clear
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
+      fi
+
+      user_group
+
+
+    }
+
+    user_group(){
+
+      usermod -aG wheel,audio,video,optical,storage ${username} 2>&1
+
+      if [ "$?" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Cannot add ${username} to groups.\nExit status: $?" 8 78
+      fi
+
+      domain_name
+
+    }
+
+    domain_name(){
+
+      hostnamectl set-hostname ${nodename}
+
+      if [ "$?" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Hostname [${nodename}] cannot be set.\nExit status: $?" 8 78
+      fi
+
+      hosts
+
+    }
+
+  )
+
+  sysadmin_dialog
 
 )
 
@@ -185,7 +222,7 @@ sudoers(){
   visudo
   rm /etc/sudoers.new
 
-  echo 0 | whiptail --gauge "Add insults..." 6 50 0
+  echo 50 | whiptail --gauge "Add insults..." 6 50 0
   sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
@@ -204,8 +241,8 @@ initramfs(){
   fi
 
   #Btrfs
-    MODULES=(btrfs)
-    sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
+    #MODULES=(btrfs)
+    #sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
 
   mkinitcpio -p linux
 
@@ -236,29 +273,30 @@ locale(){
 
   locale-gen
 
-  efimount
-
-}
-
-efimount(){
-
-  efimountpoint="/boot/efi"
-  echo 0 | whiptail --gauge "Mount EFI to ${efimountpoint}..." 6 50 0
-
-  pacman -Qi virtualbox-guest-utils > /dev/null
-  if [ "$?" == "0" ]; then
-      mount --mkdir /dev/sda1 ${efimountpoint}
-    else
-      mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
-  fi
-
-  if [ "$?" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
-  fi
-
+  #efimount
   grub
 
 }
+
+#efimount(){
+#
+#  efimountpoint="/boot/efi"
+#  echo 0 | whiptail --gauge "Mount EFI to ${efimountpoint}..." 6 50 0
+#
+#  pacman -Qi virtualbox-guest-utils > /dev/null
+#  if [ "$?" == "0" ]; then
+#      mount --mkdir /dev/sda1 ${efimountpoint}
+#    else
+#      mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
+#  fi
+#
+#  if [ "$?" != "0" ]; then
+#    whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
+#  fi
+#
+#  grub
+#
+#}
 
 grub()(
 
@@ -305,7 +343,7 @@ grub()(
   grub_install(){
 
     echo 0 | whiptail --gauge "GRUB install to /boot..." 6 50 0
-    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck #/boot/efi /boot
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 
     if [ "$?" == "0" ]; then
       whiptail --title "ERROR" --msgbox "GRUB has been installed to [/mnt/boot/efi].\nExit status: $?" 8 78

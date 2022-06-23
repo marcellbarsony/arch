@@ -318,31 +318,12 @@ filesystem()(
 
     select_encryption(){
 
-      options=()
-      options+=("Encrypted" "[-]")
-      options+=("Plain" "[-]")
-
-      encryption=$(whiptail --title "Encryption" --menu "File system encryption" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-      if [ "$?" = "0" ]; then
-          case ${encryption} in
-            "Encrypted")
-              encryption="True"
-              encryption_dialog
-              ;;
-            "Plain")
-              encryption="False"
-              efi_partition
-              ;;
-          esac
+      if (whiptail --title "Encryption" --yesno "File system encryption" --yes-button "Encrypt" --no-button "Plain" 8 78); then
+          encryption="True"
+          encryption_dialog
         else
-          case $? in
-            1)
-              select_filesystem
-              ;;
-            *)
-              whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
-              ;;
-          esac
+          encryption="False"
+          efi_partition
       fi
 
     }
@@ -476,8 +457,8 @@ filesystem()(
 
     mount_efi(){
 
-      echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/boot..." 6 50 0
-      mount --mkdir ${efidevice} /mnt/boot
+      echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/boot/efi..." 6 50 0
+      mount --mkdir ${efidevice} /mnt/boot/efi
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
