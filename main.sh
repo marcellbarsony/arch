@@ -193,7 +193,7 @@ partition()(
           ;;
       esac
 
-      diskpartcheck
+      diskpart_check
 
       else
 
@@ -210,7 +210,7 @@ partition()(
 
   }
 
-  diskpartcheck(){
+  diskpart_check(){
 
     items=$(lsblk -p -n -l -o NAME -e 7,11)
 
