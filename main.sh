@@ -294,7 +294,7 @@ filesystem()(
       options+=("Btrfs" "[-]")
       options+=("ext4" "[-]")
 
-      filesystem=$(whiptail --title "[Test] File System" --menu "Select file system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      filesystem=$(whiptail --title "File System" --menu "Select file system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       if [ "$?" = "0" ]; then
           case ${filesystem} in
@@ -318,7 +318,7 @@ filesystem()(
 
     select_encryption(){
 
-      if (whiptail --title "[Test] Encryption" --yesno "File system encryption" --yes-button "Encrypt" --no-button "Plain" 8 60); then
+      if (whiptail --title "Encryption" --yesno "File system encryption" --yes-button "Encrypt" --no-button "Plain" 8 60); then
         case $? in
           0)
             encryption="True"
@@ -399,15 +399,15 @@ filesystem()(
 
       # Password match
       if cmp --silent -- "$keydir" "$keydir2"; then
-
-      else
-        whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
-        crypt_password
+          crypt_filesystem
+        else
+          whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+          crypt_password
       fi
 
     }
 
-    crypt_flesystem(){
+    crypt_filesystem(){
 
         case ${filesystem} in
           "btrfs")
@@ -428,7 +428,7 @@ filesystem()(
       case $? in
         0)
           if [[ ${rootsize} ]] && [ ${rootsize} -eq ${rootsize} 2>/dev/null ]; then
-              efi
+              efi_part
             else
               whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
               select_root_size
@@ -448,11 +448,11 @@ filesystem()(
 
   )
 
-  efi()(
+  efi_part()(
 
     format_efi(){
 
-      mkfs.fat -F32 ${efidevice} &>/dev/null
+      mkfs.fat -F32 ${efidevice}
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
@@ -467,7 +467,7 @@ filesystem()(
     mount_efi(){
 
       echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/efi..." 6 50 0
-      mount --mkdir ${efidevice} /mnt/efi &>/dev/null # Arch wiki: /mnt/boot
+      mount --mkdir ${efidevice} /mnt/efi # Arch wiki: /mnt/boot
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
