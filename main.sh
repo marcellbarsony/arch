@@ -222,16 +222,6 @@ partition()(
 
   }
 
-  installscheme(){
-
-    if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-        vm_1
-      else
-        pm_1
-    fi
-
-  }
-
   warning
 
 )
@@ -451,7 +441,8 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      mount_efi
+      #mount_efi
+      encryption_select
 
     }
 

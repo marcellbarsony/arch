@@ -297,26 +297,6 @@ locale(){
 
 }
 
-#efimount(){
-#
-#  efimountpoint="/boot/efi"
-#  echo 0 | whiptail --gauge "Mount EFI to ${efimountpoint}..." 6 50 0
-#
-#  pacman -Qi virtualbox-guest-utils > /dev/null
-#  if [ "$?" == "0" ]; then
-#      mount --mkdir /dev/sda1 ${efimountpoint}
-#    else
-#      mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
-#  fi
-#
-#  if [ "$?" != "0" ]; then
-#    whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
-#  fi
-#
-#  grub
-#
-#}
-
 grub()(
 
   grub_packages(){
@@ -348,9 +328,25 @@ grub()(
 
   grub_install(){
 
-    grub-install --target=x86_64-efi --bootloader-id=GRUB
-    # --efi-directory=/boot/efi
-    # --recheck
+    # EFI mount
+
+    efimountpoint="/boot/efi"
+
+    pacman -Qi virtualbox-guest-utils > /dev/null
+
+    if [ "$?" == "0" ]; then
+        mount --mkdir /dev/sda1 ${efimountpoint}
+      else
+        mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
+    fi
+
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
+    fi
+
+    # GRUB install
+
+    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
