@@ -336,7 +336,7 @@ filesystem()(
 
     crypt_password(){
 
-      cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
+      cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "Encryption" 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -354,7 +354,7 @@ filesystem()(
 
     crypt_password_confirm(){
 
-      cryptpassword_confirm=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "LUKS" 3>&1 1>&2 2>&3)
+      cryptpassword_confirm=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "Encryption" 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -413,7 +413,7 @@ filesystem()(
 
     select_root_size(){
 
-      rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "ROOT filesystem" 3>&1 1>&2 2>&3)
+      rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "Root filesystem" 3>&1 1>&2 2>&3)
       local exitcode=$?
 
       case $? in

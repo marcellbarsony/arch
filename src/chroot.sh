@@ -344,11 +344,11 @@ grub()(
 
   grub_install(){
 
-    echo 0 | whiptail --gauge "GRUB install to /boot..." 6 50 0
+    echo 0 | whiptail --gauge "GRUB install to /boot/efi..." 6 50 0
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
 
-    if [ "$?" == "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB has been installed to [/mnt/boot/efi].\nExit status: $?" 8 78
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot/efi].\nExit status: $?" 8 78
     fi
 
     grub_lvm
@@ -384,8 +384,8 @@ grub()(
 
     grub-mkconfig -o /boot/grub/grub.cfg
 
-    if [ "$?" == "0" ]; then
-      whiptail --title "ERROR" --msgbox "Grub config has been generated.\nExit status: $?" 8 78
+    if [ "$?" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Grub config cannot be generated.\nExit status: $?" 8 78
     fi
 
     modules
@@ -432,14 +432,12 @@ modules()(
 
   openssh(){
 
-    echo 0 | whiptail --gauge "Installing OpenSSH..." 6 50 0
     pacman -S --noconfirm networkmanager openssh
 
       if [ "$?" != "0" ]; then
       whiptail --title "ERROR" --msgbox "OpenSSH cannot be installed.\nExit status: $?" 8 78
       fi
 
-    echo 50 | whiptail --gauge "Enable OpenSSH..." 6 50 0
     systemctl enable sshd.service
 
       if [ "$?" != "0" ]; then
@@ -452,14 +450,12 @@ modules()(
 
   networkmanager(){
 
-    echo 0 | whiptail --gauge "Installing Network Manager" 6 50 0
     pacman -S --noconfirm networkmanager
 
       if [ "$?" != "0" ]; then
       whiptail --title "ERROR" --msgbox "Network Manager cannot be installed.\nExit status: $?" 8 78
       fi
 
-    echo 50 | whiptail --gauge "Enable Network Manager..." 6 50 0
     systemctl enable NetworkManager
 
       if [ "$?" != "0" ]; then
