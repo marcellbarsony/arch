@@ -90,6 +90,25 @@ system_administration()(
         domain_name
       fi
 
+      grub_password
+
+    }
+
+    grub_password(){
+
+      grubpw=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase [confirm]" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+      if [ ! ${grubpw} ] || [ ! ${grubpw_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "GRUB passphrase cannot be empty." 8 78
+        grub_password
+      fi
+
+      if [ ${grubpw} != ${grubpw_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "GRUB passphrase did not match." 8 78
+        grub_password
+      fi
+
       sysadmin
 
     }
@@ -316,26 +335,12 @@ grub()(
 
   grub_password(){
 
-    grubpw=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
-    grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase [confirm]" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
-
-    if [ ! ${grubpw} ] || [ ! ${grubpw_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "GRUB passphrase cannot be empty." 8 78
-      userpassword
-    fi
-
-    if [ ${grubpw} != ${grubpw_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "GRUB passphrase did not match." 8 78
-      userpassword
-    fi
-
     grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
-    # 00_header
-      echo "cat << EOF" >> /etc/grub.d/00_header
-      echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
-      echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
-      echo "EOF" >> /etc/grub.d/00_header
+    echo "cat << EOF" >> /etc/grub.d/00_header
+    echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
+    echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
+    echo "EOF" >> /etc/grub.d/00_header
 
     grub_install
 
@@ -343,11 +348,13 @@ grub()(
 
   grub_install(){
 
-    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck
+    grub-install --target=x86_64-efi --bootloader-id=GRUB
+    # --efi-directory=/boot/efi
+    # --recheck
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot].\nExit status: ${exitcode}" 8 78
+      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot/efi].\nExit status: ${exitcode}" 8 78
     fi
 
     grub_lvm

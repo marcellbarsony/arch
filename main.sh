@@ -457,8 +457,8 @@ filesystem()(
 
     mount_efi(){
 
-      echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/boot..." 6 50 0
-      mount --mkdir ${efidevice} /mnt/boot
+      echo 100 | whiptail --gauge "Mount ${efidevice} to /mnt/boot..." 6 50 0
+      mount --mkdir ${efidevice} /mnt/boot/efi
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
