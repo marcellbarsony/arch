@@ -102,7 +102,7 @@ system_administration()(
 
     root_password(){
 
-      error=$( echo "root:${password}" | chpasswd 2>&1 )
+      error=$( echo "root:${root_password}" | chpasswd 2>&1 )
 
       if [ $? != "0" ]; then
         whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
