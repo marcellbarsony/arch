@@ -261,16 +261,14 @@ btrfs_uuid(){
 
   vim /etc/default/grub
 
-
-
 }
 
 locale(){
 
-  echo 0 | whiptail --gauge "Set locale.gen... [en_US.UTF-8 UTF-8]" 6 50 0
+  echo 50 | whiptail --gauge "Set locale.gen... [en_US.UTF-8 UTF-8]" 6 50 0
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
 
-  echo 50 | whiptail --gauge "Set locale.conf... [LANG=en_US.UTF-8]" 6 50 0
+  echo 100 | whiptail --gauge "Set locale.conf... [LANG=en_US.UTF-8]" 6 50 0
   echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
   locale-gen
@@ -306,9 +304,10 @@ grub()(
 
     clear
     pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB packages were not installed.\nExit status: $?" 8 78
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "GRUB packages were not installed.\nExit status: ${exitcode}" 8 78
     fi
 
     grub_password
@@ -321,13 +320,13 @@ grub()(
     grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase [confirm]" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
     if [ ! ${grubpw} ] || [ ! ${grubpw_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "GRUB passphrase cannot be empty." 8 78
-        userpassword
+      whiptail --title "ERROR" --msgbox "GRUB passphrase cannot be empty." 8 78
+      userpassword
     fi
 
     if [ ${grubpw} != ${grubpw_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "GRUB passphrase did not match." 8 78
-        userpassword
+      whiptail --title "ERROR" --msgbox "GRUB passphrase did not match." 8 78
+      userpassword
     fi
 
     grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
@@ -344,11 +343,11 @@ grub()(
 
   grub_install(){
 
-    echo 0 | whiptail --gauge "GRUB install to /boot/efi..." 6 50 0
     grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot/efi].\nExit status: $?" 8 78
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot/efi].\nExit status: ${exitcode}" 8 78
     fi
 
     grub_lvm
@@ -358,6 +357,7 @@ grub()(
   grub_lvm(){
 
     pacman -Qi lvm2 > /dev/null
+
     if [ "$?" == "0" ]; then
       sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
       sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
@@ -383,9 +383,10 @@ grub()(
   grub_config(){
 
     grub-mkconfig -o /boot/grub/grub.cfg
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Grub config cannot be generated.\nExit status: $?" 8 78
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Grub config cannot be generated.\nExit status: ${exitcode}" 8 78
     fi
 
     modules
@@ -403,25 +404,25 @@ modules()(
     pacman -Qi virtualbox-guest-utils > /dev/null
     if [ "$?" == "0" ]; then
 
-      echo 0 | whiptail --gauge "Enable VirtualBox serice..." 6 50 0
       systemctl enable vboxservice.service
+      local exitcode=$?
 
-        if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "VirtualBox service cannot be enabled.\nExit status: $?" 8 78
+        if [ "${exitcode}" != "0" ]; then
+          whiptail --title "ERROR" --msgbox "VirtualBox service cannot be enabled.\nExit status: ${exitcode}" 8 78
         fi
 
-      echo 0 | whiptail --gauge "Load VirtualBox kernel modules [modprobe]..." 6 50 0
       modprobe -a vboxguest vboxsf vboxvideo
+      local exitcode2=$?
 
-        if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "VirtualBox kernel modules cannot be loaded.\nExit status: $?" 8 78
+        if [ "${exitcode2}" != "0" ]; then
+          whiptail --title "ERROR" --msgbox "VirtualBox kernel modules cannot be loaded.\nExit status: ${exitcode2}" 8 78
         fi
 
-      echo 0 | whiptail --gauge "Enable VirtualBox guest services..." 6 50 0
       VBoxClient-all
+      local exitcode3=$?
 
-        if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "VirtualBox guest services cannot be enabled.\nExit status: $?" 8 78
+        if [ "${exitcode3}" != "0" ]; then
+          whiptail --title "ERROR" --msgbox "VirtualBox guest services cannot be enabled.\nExit status: ${exitcode3}" 8 78
         fi
 
     fi

@@ -457,8 +457,8 @@ filesystem()(
 
     mount_efi(){
 
-      echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/boot/efi..." 6 50 0
-      mount --mkdir ${efidevice} /mnt/boot/efi
+      echo 40 | whiptail --gauge "Mount ${efidevice} to /mnt/boot..." 6 50 0
+      mount --mkdir ${efidevice} /mnt/boot
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
@@ -919,6 +919,8 @@ mirrorlist(){
     whiptail --title "ERROR" --msgbox "Mirrorlist cannot be updated.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
+
+  clear
 
   kernel
 
