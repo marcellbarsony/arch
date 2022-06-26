@@ -343,11 +343,11 @@ grub()(
 
   grub_install(){
 
-    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB --recheck
+    grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB --recheck
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot/efi].\nExit status: ${exitcode}" 8 78
+      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot].\nExit status: ${exitcode}" 8 78
     fi
 
     grub_lvm

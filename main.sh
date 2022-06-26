@@ -911,7 +911,7 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  echo 90 | whiptail --gauge "Updating Pacman mirrorlist with reflector..." 6 50 0
+  echo 90 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
   reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
   local exitcode=$?
 
