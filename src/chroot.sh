@@ -50,7 +50,7 @@ system_administration()(
 
     user_account(){
 
-      username=$(whiptail --inputbox "" --title "USER Account" --nocancel 8 39 3>&1 1>&2 2>&3)
+      username=$(whiptail --inputbox "" --title "User account" --nocancel 8 39 3>&1 1>&2 2>&3)
 
       if [ ! ${username} ] || [ ${username} == "root" ]; then
         whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
@@ -196,6 +196,8 @@ system_administration()(
       hosts
 
     }
+
+    root_password
 
   )
 
