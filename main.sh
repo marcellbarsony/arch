@@ -857,7 +857,6 @@ filesystem()(
 
 fstab(){
 
-  echo 0 | whiptail --gauge "Create fstab directory..." 6 50 0
   mkdir /mnt/etc/ &>/dev/null
   local exitcode=$?
 
@@ -866,7 +865,6 @@ fstab(){
     exit ${exitcode}
   fi
 
-  echo 0 | whiptail --gauge "Create fstab config..." 6 50 0
   genfstab -U /mnt >> /mnt/etc/fstab &>/dev/null
   local exitcode=$?
 
@@ -907,15 +905,24 @@ mirrorlist(){
 
 kernel(){
 
+  echo 0 | whiptail --gauge "Pacstrap: Installing base packages..." 6 50 0
+  sleep 1
+  clear
   pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
   local exitcode1=$?
 
   if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
+    echo 0 | whiptail --gauge "Pacstrap: Installing ${dmi} packages..." 6 50 0
+    sleep 1
+    clear
     pacstrap /mnt virtualbox-guest-utils
     local exitcode2=$?
   fi
 
   if [ "${encryption}" == "True" ]; then
+    echo 0 | whiptail --gauge "Pacstrap: Installing lvm2..." 6 50 0
+    sleep 1
+    clear
     pacstrap /mnt lvm2
     local exitcode3=$?
   fi

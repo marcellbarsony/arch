@@ -226,7 +226,6 @@ system_administration()(
 
 hosts(){
 
-  echo 0 | whiptail --gauge "Update hosts file..." 6 50 0
   echo "127.0.0.1        localhost" > /etc/hosts &>/dev/null
   echo "::1              localhost" >> /etc/hosts &>/dev/null
   echo "127.0.1.1        ${nodename}" >> /etc/hosts &>/dev/null
@@ -259,6 +258,7 @@ initramfs(){
   if [ "$?" == "0" ]; then
     echo 0 | whiptail --gauge "Add LVM support to mkinitcpio..." 6 50 0
     sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
+    sleep 1
   fi
 
   #Btrfs
@@ -271,16 +271,20 @@ initramfs(){
 
 }
 
-btrfs_uuid(){
+btrfs()(
 
-  blkid
+  btrfs_uuid(){
 
-  # UUID of ${rootdisk}
-  # UUID="123456
+    blkid
 
-  vim /etc/default/grub
+    # UUID of ${rootdisk}
+    # UUID="123456
 
-}
+    vim /etc/default/grub
+
+  }
+
+)
 
 locale(){
 
@@ -344,7 +348,8 @@ grub()(
     pacman -Qi lvm2 > /dev/null
 
     if [ "$?" == "0" ]; then
-      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
+      #sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
+      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/sda2:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
       sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
     fi
 
