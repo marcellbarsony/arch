@@ -409,7 +409,7 @@ filesystem()(
       case $? in
         0)
           if [[ ${rootsize} ]] && [ ${rootsize} -eq ${rootsize} 2>/dev/null ]; then
-              efi_partition
+              encrypted
             else
               whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
               select_root_size
@@ -681,7 +681,7 @@ filesystem()(
           exit ${exitcode}
         fi
 
-        fstab
+        efi_partition
 
       }
 
