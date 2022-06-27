@@ -328,24 +328,6 @@ grub()(
 
   grub_install(){
 
-    # EFI mount
-
-#    efimountpoint="/boot/efi"
-#
-#    pacman -Qi virtualbox-guest-utils > /dev/null
-#
-#    if [ "$?" == "0" ]; then
-#        mount --mkdir /dev/sda1 ${efimountpoint}
-#      else
-#        mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
-#    fi
-#
-#    if [ "$?" != "0" ]; then
-#      whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
-#    fi
-
-    # GRUB install
-
     grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
     local exitcode=$?
 
