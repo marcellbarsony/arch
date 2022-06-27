@@ -313,7 +313,7 @@ filesystem()(
           encryption_dialog
         else
           encryption="False"
-          efi_partition
+          plain
       fi
 
     }
@@ -426,52 +426,6 @@ filesystem()(
     }
 
     crypt_password
-
-  )
-
-  efi_partition()(
-
-    format_efi(){
-
-      mkfs.fat -F32 ${efidevice}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-      fi
-
-      #mount_efi
-      encryption_select
-
-    }
-
-    mount_efi(){
-
-      echo 100 | whiptail --gauge "Mount ${efidevice} to /mnt/boot..." 6 50 0
-      mount --mkdir ${efidevice} /mnt/boot/efi
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
-
-      encryption_select
-
-    }
-
-    encryption_select(){
-
-      if [ "${encryption}" == "True" ]; then
-          encrypted
-        else
-          plain
-      fi
-
-    }
-
-    format_efi
 
   )
 
@@ -817,7 +771,7 @@ filesystem()(
         # Mount subvolume snapshots
         mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@snapshots ${rootdevice} /mnt/.snapshots
 
-        fstab
+        efi_partition
 
       }
 
@@ -851,7 +805,7 @@ filesystem()(
           exit ${exitcode}
         fi
 
-        fstab
+        efi_partition
 
       }
 
@@ -860,6 +814,40 @@ filesystem()(
     )
 
     filesystem_select
+
+  )
+
+  efi_partition()(
+
+    format_efi(){
+
+      mkfs.fat -F32 ${efidevice}
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+      fi
+
+      mount_efi
+
+    }
+
+    mount_efi(){
+
+      mount --mkdir ${efidevice} /mnt/boot/efi
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
+        exit ${exitcode}
+      fi
+
+      fstab
+
+    }
+
+    format_efi
 
   )
 

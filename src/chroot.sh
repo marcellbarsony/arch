@@ -330,19 +330,19 @@ grub()(
 
     # EFI mount
 
-    efimountpoint="/boot/efi"
-
-    pacman -Qi virtualbox-guest-utils > /dev/null
-
-    if [ "$?" == "0" ]; then
-        mount --mkdir /dev/sda1 ${efimountpoint}
-      else
-        mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
-    fi
-
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
-    fi
+#    efimountpoint="/boot/efi"
+#
+#    pacman -Qi virtualbox-guest-utils > /dev/null
+#
+#    if [ "$?" == "0" ]; then
+#        mount --mkdir /dev/sda1 ${efimountpoint}
+#      else
+#        mount --mkdir /dev/nvme0n1p3 ${efimountpoint}
+#    fi
+#
+#    if [ "$?" != "0" ]; then
+#      whiptail --title "ERROR" --msgbox "ESP cannot be mounted to [/boot/efi].\nExit status: $?" 8 78
+#    fi
 
     # GRUB install
 
