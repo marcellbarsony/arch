@@ -857,7 +857,7 @@ filesystem()(
 
 fstab(){
 
-  echo 60 | whiptail --gauge "Create fstab directory..." 6 50 0
+  echo 0 | whiptail --gauge "Create fstab directory..." 6 50 0
   mkdir /mnt/etc/ &>/dev/null
   local exitcode=$?
 
@@ -866,9 +866,7 @@ fstab(){
     exit ${exitcode}
   fi
 
-  sleep 1
-
-  echo 70 | whiptail --gauge "Create fstab config..." 6 50 0
+  echo 0 | whiptail --gauge "Create fstab config..." 6 50 0
   genfstab -U /mnt >> /mnt/etc/fstab &>/dev/null
   local exitcode=$?
 
@@ -876,8 +874,6 @@ fstab(){
     whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
-
-  sleep 1
 
   mirrorlist
 
