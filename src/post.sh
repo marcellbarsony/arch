@@ -55,37 +55,33 @@ network()(
 
 )
 
-aur()(
+dialog()(
 
-  aurselect(){
+  aur(){
 
     options=()
     options+=("Paru" "[Rust]")
     options+=("Pikaur" "[Python]")
     options+=("Yay" "[Go]")
 
-    aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --default-item "Paru" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" == "0" ]; then
-
         case ${aurhelper} in
           "Paru")
             aurhelper="paru"
-            aurhelper_package="paru-bin"
             ;;
           "Pikaur")
             aurhelper="pikaur"
+            aurhelper_package="pikaur"
             ;;
           "Yay")
             aurhelper="yay"
             aurhelper_package="yay-bin"
             ;;
         esac
-
-        aurinstall
-
+        bwclient
       else
-
         case $? in
           1)
             exit $?
@@ -95,41 +91,11 @@ aur()(
             exit $?
             ;;
         esac
-
     fi
 
   }
 
-  aurinstall(){
-
-    for ((i = 0 ; i <= 100 ; i+=100)); do
-      git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
-      #https://unix.stackexchange.com/questions/119648/redirecting-to-dev-null
-      exitcode=$?
-      echo $i
-    done | whiptail --gauge "Cloning ${aurhelper} repository..." 6 50 0
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Cannot clone repository [${aurhelper}]\nExit status: ${exitcode}" 8 78
-      fi
-
-    cd $HOME/.local/src/paru
-
-    #  makepkg -fsri --noconfirm
-
-    cd $HOME
-
-    #bitwarden
-
-  }
-
-  aurselect
-
-)
-
-bitwarden()(
-
-  bwclient_select(){
+  bwclient(){
 
     options=()
     options+=("Bitwarden CLI" "[Bitwarden]")
@@ -138,7 +104,6 @@ bitwarden()(
     bwcli=$(whiptail --title "Bitwarden CLI" --menu "Select Bitwarden CLI" --default-item "rbw" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" == "0" ]; then
-
         case ${bwcli} in
           "Bitwarden CLI")
             whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
@@ -148,9 +113,7 @@ bitwarden()(
             bwclient_install
             ;;
         esac
-
       else
-
         case $? in
           1)
             exit 1
@@ -164,9 +127,278 @@ bitwarden()(
 
   }
 
-  bwclient_install(){
+  github_email(){
 
-    ${aurhelper} -S --noconfirm --quiet ${bwcli}
+    gh_email=$(whiptail --inputbox "GitHub login" --title "GitHub e-mail" 8 39 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+        case $? in
+          1)
+            bwclient
+            ;;
+          *)
+            echo "Exit status $?"
+            exit $?
+            ;;
+        esac
+    fi
+
+    window_manager
+
+  }
+
+  window_manager(){
+
+    options=()
+    options+=("dwm" "[C]")
+    options+=("i3" "[C]")
+    options+=("LeftWM" "[Rust]") # bar dependency
+    options+=("OpenBox" "[C]") # bar dependency
+    options+=("Qtile" "[Python]")
+
+    windowmanager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+        case $? in
+          1)
+            github_email
+            ;;
+          *)
+            echo "Exit status $?"
+            exit $?
+            ;;
+        esac
+    fi
+
+    terminal
+
+
+  }
+
+  terminal(){
+
+    options=()
+    options+=("Alacritty" "[Rust]")
+    options+=("kitty" "[Python]")
+    options+=("None" "[-]")
+
+    terminal_select=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          window_manager
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    browser
+
+  }
+
+  browser(){
+
+    options=()
+    options+=("Chromium" "[Chromium]")
+    options+=("LibreWolf" "[Firefox]")
+    options+=("qutebrowser" "[qt5]")
+    options+=("None" "[-]")
+
+    browser_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "LibreWolf" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          terminal
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    ide
+
+  }
+
+  ide(){
+
+    options=()
+    options+=("Visual Studio Code [OSS]" "Visual Studio Code")
+    options+=("VSCodium" "[Visual Studio Code]")
+    options+=("None" "[-]")
+
+    ide_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "VSCodium" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          browser
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    texteditor
+
+  }
+
+  texteditor(){
+
+    options=()
+    options+=("Emacs" "[Emacs]")
+    options+=("Nano" "[Console]")
+    options+=("Neovim" "[Vi]")
+    options+=("Vi" "[Vi]")
+    options+=("Vim" "[Vi]")
+    options+=("None" "[-]")
+
+    texteditor_select=$(whiptail --tite "Text editor" --menu "Select a text editor" --default-item "Neovim" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          ide
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+  }
+
+  application_launcher(){
+
+    options=()
+    options+=("dmenu" "[Suckless]")
+    options+=("dmenu2" "[Suckless]")
+    options+=("dmenu-rs" "[Shizcow]")
+    options+=("rofi" "[davatorium]")
+    options+=("None" "[-]")
+
+    applauncher_select=$(whiptail --title "Application launcher" --menu "Select application launcher" --default-item "dmenu-rs" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          texteditor
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    tesk_manager
+
+  }
+
+  task_manager()(
+
+    options=()
+    options+=("bpytop" "[aristocratos]")
+    options+=("htop" "[htop-dev]")
+    options+=("None" "[-]")
+
+    sysmonitor_select=$(whiptail --tite "Task manager" --menu "Select a task manager" --default-item "htop" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          application_launcher
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    system_monitor
+
+  )
+
+  system_monitor()(
+
+    options=()
+    options+=("Conky" "[Emacs]")
+    options+=("None" "[-]")
+
+    texteditor_select=$(whiptail --tite "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          task_manager
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    audio
+
+
+  )
+
+  audio(){
+
+    options=()
+    options+=("ALSA" "[Advance Linux Sound Architecture]")
+    options+=("PipeWire" "[PipeWire]")
+
+    audio_select=$(whiptail --title "Audio" --menu "Select audio backend" --default-item "PipWire" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          system_monitor
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    music
+
+  }
+
+)
+
+install()(
+
+  aur()(
+
+    if [ ${aurhelper} == "paru" ]; then
+        sudo pacman -S paru
+      else
+        git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
+        cd $HOME/.local/src/${aurhelper}
+        makepkg -fsri --noconfirm
+        cd $HOME
+    fi
+
+    bwclient
+
+  )
+
+  bwclient(){
+
+   ${aurhelper} -S --noconfirm --quiet ${bwcli}
 
     if [ ${bwcli} == "rbw" ]; then
         rbw_config
@@ -175,6 +407,206 @@ bitwarden()(
     fi
 
   }
+
+  github(){
+
+    sudo pacman -S --noconfirm github-cli
+
+    window_manager
+
+  }
+
+  window_manager(){
+
+    case ${windowmanager} in
+      "dwm")
+        whiptail --title "ERROR" --msgbox "DWM is not supported yet." 8 60
+        window_manager
+        ;;
+      "i3")
+        sudo pacman -S --needed --noconfirm i3-wm
+        # Overwrite .xinitrc
+        ;;
+      "LeftWM")
+        ${aurhelper} -S --noconfirm leftwm
+        # Overwrite .xinitrc
+        # Bar dependency
+        ;;
+      "OpenBox")
+        sudo pacman -S --needed --noconfirm openbox tint2
+        # Overwrite .xinitrc
+        # Bar dependency
+        ;;
+      "Qtile")
+        sudo pacman -S --needed --noconfirm qtile
+        # Overwrite .xinitrc
+        ;;
+    esac
+
+  }
+
+  terminal(){
+
+    case ${terminal_select} in
+      "Alacritty")
+        sudo pacman -S alacritty
+        ;;
+      "kitty")
+        sudo pacman -S kitty
+        ;;
+      "None")
+        browser
+    esac
+
+  }
+
+  browser(){
+
+    case ${browser_select} in
+      "Chromium")
+        pacman -S --noconfirm chromium
+        ;;
+      "LibreWolf")
+        paru -S --noconfirm librewolf-bin
+        ;;
+      "qutebrowser")
+        pacman -S --noconfirm qutebrowser
+        ;;
+      "None")
+        ide
+        ;;
+    esac
+
+    ide
+
+  }
+
+  ide(){
+
+    case ${ide_select} in
+      "Visual Studio Code [OSS]")
+        sudo pacman -S --noconfirm code
+        ;;
+      "VSCodium")
+        ${aurhelper} -S --noconfirm vscodium-bin
+        ;;
+      "None")
+        texteditor
+        ;;
+    esac
+
+    texteditor
+
+  }
+
+  texteditor(){
+
+    case ${texteditor_select} in
+      "Emacs")
+        sudo pacman -S --noconfirm emacs
+        ;;
+      "Nano")
+        sudo pacman -S --noconfirm nano
+        ;;
+      "Neovim")
+        sudo pacman -S --noconfirm neovim
+        ;;
+      "Vi")
+        sudo pacman -S --noconfirm vi
+        ;;
+      "Vim")
+        sudo pacman -S --noconfirm vim
+        ;;
+      "None")
+        application_launcher
+        ;;
+    esac
+
+    application_launcher
+
+  }
+
+  application_launcher(){
+
+    case ${applauncher_select} in
+      "dmenu")
+        ${aurhelper} -S --noconfirm dmenu-git
+        ;;
+      "dmenu2")
+        ${aurhelper} -S --noconfirm dmenu2
+        ;;
+      "dmenu-rs")
+        ${aurhelper} -S --noconfirm dmenu-rs-git
+        ;;
+      "rofi")
+        sudo pacman -S --noconfirm rofi
+        ;;
+      "None")
+        task_manager
+        ;;
+    esac
+
+    task_manager
+
+  }
+
+  task_manager(){
+
+    case ${taskmanager_select} in
+      "bpytop")
+        sudo pacman -S --noconfirm bpytop
+        ;;
+      "htop")
+        sudo pacman -S --noconfirm htop
+        ;;
+      "None")
+        system_monitor
+        ;;
+    esac
+
+    system_monitor
+
+  }
+
+  system_monitor(){
+
+    case ${texteditor_select} in
+      "Conky")
+        sudo pacman -S --noconfirm conky
+        ;;
+      "None")
+        audio
+        ;;
+    esac
+
+    audio
+
+  }
+
+  audio(){
+
+    case ${audio_select} in
+      "ALSA")
+        sudo pacman -S --noconfirm alsa alsa-firmware alsa-utils sof-firmware
+        ;;
+      "PipWire")
+        sudo pacman -S --noconfirm pipewire pipewire-alsa pavucontrol sof-firmware
+        ;;
+      "None")
+        texteditor
+        ;;
+    esac
+
+    texteditor
+
+  }
+
+)
+
+
+#################################
+
+bitwarden()(
 
   rbw_config(){
 
@@ -221,17 +653,6 @@ github(){
 
     sudo pacman -S --noconfirm github-cli
 
-  }
-
-  gh_install_email(){
-
-    gh_email=$(whiptail --inputbox "GitHub Login" --title "GitHub e-mail" 8 39 3>&1 1>&2 2>&3)
-
-    if [ $? = 0 ]; then
-        gh_sshkey
-      else
-        exit 1
-    fi
   }
 
   gh_install_ssh_keygen(){
@@ -305,396 +726,6 @@ configs(){
 }
 
 install()(
-
-  window_manager(){
-
-    options=()
-    options+=("dwm" "[C]")
-    options+=("i3" "[C]")
-    options+=("LeftWM" "[Rust]") # bar dependency
-    options+=("OpenBox" "[C]") # bar dependency
-    options+=("Qtile" "[Python]")
-    options+=("None" "[-]")
-
-    windowmanager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${windowmanager} in
-          "dwm")
-            whiptail --title "ERROR" --msgbox "DWM is not supported yet." 8 60
-            window_manager
-            ;;
-          "i3")
-            sudo pacman -S --needed --noconfirm i3-wm
-            # Overwrite .xinitrc
-            ;;
-          "LeftWM")
-            ${aurhelper} -S --noconfirm leftwm
-            # Overwrite .xinitrc
-            ;;
-          "OpenBox")
-            sudo pacman -S --needed --noconfirm openbox tint2
-            # Overwrite .xinitrc
-            ;;
-          "Qtile")
-            sudo pacman -S --needed --noconfirm qtile
-            # Overwrite .xinitrc
-            ;;
-          "None")
-            browser
-        esac
-
-      else
-
-        case $? in
-          1)
-            exit 1
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-
-    fi
-
-  }
-
-  terminal(){
-
-    options=()
-    options+=("Alacritty" "[Rust]")
-    options+=("kitty" "[Python]")
-    options+=("None" "[-]")
-
-    terminal_select=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${terminal_select} in
-          "Alacritty")
-            sudo pacman -S alacritty
-            ;;
-          "kitty")
-            sudo pacman -S kitty
-            ;;
-          "None")
-            browser
-        esac
-
-      else
-
-        case $? in
-          1)
-            exit 1
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-
-    fi
-
-  }
-
-  browser(){
-
-    options=()
-    options+=("Chromium" "[Chromium]")
-    options+=("LibreWolf" "[Firefox]")
-    options+=("qutebrowser" "[qt5]")
-    options+=("None" "[-]")
-
-    browser_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "LibreWolf" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${browser_select} in
-          "Chromium")
-            pacman -S --noconfirm chromium
-            ;;
-          "LibreWolf")
-            paru -S --noconfirm librewolf-bin
-            ;;
-          "qutebrowser")
-            pacman -S --noconfirm qutebrowser
-            ;;
-          "None")
-            ide
-            ;;
-        esac
-
-        ide
-
-      else
-
-        case $? in
-          1)
-            window_manager
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-
-    fi
-
-  }
-
-  ide(){
-
-    options=()
-    options+=("Visual Studio Code [OSS]" "Visual Studio Code")
-    options+=("VSCodium" "[Visual Studio Code]")
-    options+=("None" "[-]")
-
-    ide_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "VSCodium" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${ide_select} in
-          "Visual Studio Code [OSS]")
-            sudo pacman -S --noconfirm code
-            ;;
-          "VSCodium")
-            ${aurhelper} -S --noconfirm vscodium-bin
-            ;;
-          "None")
-            texteditor
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-  }
-
-  texteditor(){
-
-    options=()
-    options+=("Emacs" "[Emacs]")
-    options+=("Nano" "[Console]")
-    options+=("Neovim" "[Vi]")
-    options+=("Vi" "[Vi]")
-    options+=("Vim" "[Vi]")
-    options+=("None" "[-]")
-
-    texteditor_select=$(whiptail --tite "Text editor" --menu "Select a text editor" --default-item "Neovim" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${texteditor_select} in
-          "Emacs")
-            sudo pacman -S --noconfirm emacs
-            ;;
-          "Nano")
-            sudo pacman -S --noconfirm nano
-            ;;
-          "Neovim")
-            sudo pacman -S --noconfirm neovim
-            ;;
-          "Vi")
-            sudo pacman -S --noconfirm vi
-            ;;
-          "Vim")
-            sudo pacman -S --noconfirm vim
-            ;;
-          "None")
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-  }
-
-  application_launcher(){
-
-    options=()
-    options+=("dmenu" "[Suckless]")
-    options+=("dmenu2" "[Suckless]")
-    options+=("dmenu-rs" "[Shizcow]")
-    options+=("rofi" "[davatorium]")
-    options+=("None" "[-]")
-
-    applauncher_select=$(whiptail --title "Application launcher" --menu "Select application launcher" --default-item "dmenu-rs" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-    if [ "$?" == "0" ]; then
-
-        case ${applauncher_select} in
-          "dmenu")
-            ${aurhelper} -S --noconfirm dmenu-git
-            ;;
-          "dmenu2")
-            ${aurhelper} -S --noconfirm dmenu2
-            ;;
-          "dmenu-rs")
-            ${aurhelper} -S --noconfirm dmenu-rs-git
-            ;;
-          "rofi")
-            sudo pacman -S --noconfirm rofi
-            ;;
-          "None")
-            texteditor
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-
-  }
-
-  task_manager(){
-
-    options=()
-    options+=("bpytop" "[aristocratos]")
-    options+=("htop" "[htop-dev]")
-    options+=("None" "[-]")
-
-    sysmonitor_select=$(whiptail --tite "Task manager" --menu "Select a task manager" --default-item "htop" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${taskmanager_select} in
-          "bpytop")
-            sudo pacman -S --noconfirm bpytop
-            ;;
-          "htop")
-            sudo pacman -S --noconfirm htop
-            ;;
-          "None")
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-  }
-
-  system_monitor(){
-
-    options=()
-    options+=("Conky" "[Emacs]")
-    options+=("None" "[-]")
-
-    texteditor_select=$(whiptail --tite "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${texteditor_select} in
-          "Conky")
-            sudo pacman -S --noconfirm conky
-            ;;
-          "None")
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-
-  }
-
-  audio(){
-
-    options=()
-    options+=("ALSA" "[Advance Linux Sound Architecture]")
-    options+=("PipeWire" "[PipeWire]")
-
-    music_select=$(whiptail --title "Audio" --menu "Select audio backend" --default-item "PipWire" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-    if [ "$?" == "0" ]; then
-
-        case ${music_select} in
-          "ALSA")
-            sudo pacman -S --noconfirm alsa alsa-firmware alsa-utils sof-firmware
-            ;;
-          "PipWire")
-            sudo pacman -S --noconfirm pipewire pipewire-alsa pavucontrol sof-firmware
-            ;;
-          "None")
-            texteditor
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-
-  }
 
   music(){
 
