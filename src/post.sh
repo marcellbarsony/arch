@@ -286,7 +286,7 @@ dialog()(
     options=()
     options+=("Alacritty" "[Rust]")
     options+=("kitty" "[Python]")
-    options+=("None" "[-]")
+    options+=("st" "[C]")
 
     terminal_select=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
@@ -368,7 +368,6 @@ dialog()(
     options+=("Neovim" "[Vi]")
     options+=("Vi" "[Vi]")
     options+=("Vim" "[Vi]")
-    options+=("None" "[-]")
 
     texteditor_select=$(whiptail --title "Text editor" --menu "Select a text editor" --default-item "Neovim" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
@@ -424,7 +423,7 @@ dialog()(
     options+=("htop" "[htop-dev]")
     options+=("None" "[-]")
 
-    sysmonitor_select=$(whiptail --title "Task manager" --menu "Select a task manager" --default-item "htop" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    taskmanager_select=$(whiptail --title "Task manager" --menu "Select a task manager" --default-item "htop" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -449,7 +448,7 @@ dialog()(
     options+=("Conky" "[Emacs]")
     options+=("None" "[-]")
 
-    texteditor_select=$(whiptail --title "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    systemmonitor_select=$(whiptail --title "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -688,14 +687,13 @@ install()(
       esac
     fi
 
-
-
-    cd $HOME/.local/src/${aurhelper}
+    cd ${aurdir}
 
     makepkg -si --noconfirm
+    local exitcode2=$?
 
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot make package [${aurhelper}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+    if [ "${exitcode2}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot make package [${aurhelper}]\nExit status: ${exitcode2}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
         0)
           aur
@@ -704,7 +702,7 @@ install()(
           exit 1
           ;;
         *)
-          echo "Exit status ${exitcode}"
+          echo "Exit status ${exitcode2}"
           ;;
       esac
     fi
@@ -718,6 +716,22 @@ install()(
   bwclient(){
 
     sudo pacman -S --noconfirm --quiet ${bwcli}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install package [${bwcli}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          bwclient
+          ;;
+        1)
+          exit 1
+          ;;
+        *)
+          echo "Exit status ${exitcode}"
+          ;;
+      esac
+    fi
 
     github_cli
 
@@ -726,6 +740,22 @@ install()(
   github_cli(){
 
     sudo pacman -S --noconfirm github-cli
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install package [github-cli]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          github_cli
+          ;;
+        1)
+          exit 1
+          ;;
+        *)
+          echo "Exit status ${exitcode}"
+          ;;
+      esac
+    fi
 
     window_manager
 
@@ -735,27 +765,48 @@ install()(
 
     case ${windowmanager} in
       "dwm")
-        # dwm install
+        git clone git://git.suckless.org/dwm $HOME/.local/src/dwm
+        cd $HOME/.local/src/dwm
+        make
+        make install
+        local exitcode=$?
+        cd $HOME
         ;;
       "i3")
         sudo pacman -S --needed --noconfirm i3-wm
+        local exitcode=$?
         # Overwrite .xinitrc
         ;;
       "LeftWM")
         ${aurhelper} -S --noconfirm leftwm
+        local exitcode=$?
         # Overwrite .xinitrc
         # Bar dependency
         ;;
       "OpenBox")
         sudo pacman -S --needed --noconfirm openbox tint2
+        local exitcode=$?
         # Overwrite .xinitrc
         # Bar dependency
         ;;
       "Qtile")
         sudo pacman -S --needed --noconfirm qtile
+        local exitcode=$?
         # Overwrite .xinitrc
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${windowmanager}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          window_manager
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     terminal
 
@@ -766,13 +817,28 @@ install()(
     case ${terminal_select} in
       "Alacritty")
         sudo pacman -S alacritty
+        local exitcode=$?
         ;;
       "kitty")
         sudo pacman -S kitty
+        local exitcode=$?
         ;;
-      "None")
-        browser
+      "st")
+        ${aurhelper} -S --noconfirm st
+        local exitcode=$?
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${terminal_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          terminal
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     browser
 
@@ -783,17 +849,32 @@ install()(
     case ${browser_select} in
       "Chromium")
         pacman -S --noconfirm chromium
+        local exitcode=$?
         ;;
       "LibreWolf")
         paru -S --noconfirm librewolf-bin
+        local exitcode=$?
         ;;
       "qutebrowser")
         pacman -S --noconfirm qutebrowser
+        local exitcode=$?
         ;;
       "None")
         ide
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${browser_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     ide
 
@@ -804,14 +885,28 @@ install()(
     case ${ide_select} in
       "Visual_Studio_Code")
         sudo pacman -S --noconfirm code
+        local exitcode=$?
         ;;
       "VSCodium")
         ${aurhelper} -S --noconfirm vscodium-bin
+        local exitcode=$?
         ;;
       "None")
         texteditor
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${ide_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     texteditor
 
@@ -822,23 +917,40 @@ install()(
     case ${texteditor_select} in
       "Emacs")
         sudo pacman -S --noconfirm emacs
+        local exitcode=$?
         ;;
       "Nano")
         sudo pacman -S --noconfirm nano
+        local exitcode=$?
         ;;
       "Neovim")
         sudo pacman -S --noconfirm neovim
+        local exitcode=$?
         ;;
       "Vi")
         sudo pacman -S --noconfirm vi
+        local exitcode=$?
         ;;
       "Vim")
         sudo pacman -S --noconfirm vim
+        local exitcode=$?
         ;;
       "None")
         application_launcher
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${texteditor_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     application_launcher
 
@@ -849,20 +961,36 @@ install()(
     case ${applauncher_select} in
       "dmenu")
         ${aurhelper} -S --noconfirm dmenu-git
+        local exitcode=$?
         ;;
       "dmenu2")
         ${aurhelper} -S --noconfirm dmenu2
+        local exitcode=$?
         ;;
       "dmenu-rs")
         ${aurhelper} -S --noconfirm dmenu-rs-git
+        local exitcode=$?
         ;;
       "rofi")
         sudo pacman -S --noconfirm rofi
+        local exitcode=$?
         ;;
       "None")
         task_manager
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${applauncher_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     task_manager
 
@@ -873,14 +1001,28 @@ install()(
     case ${taskmanager_select} in
       "bpytop")
         sudo pacman -S --noconfirm bpytop
+        local exitcode=$?
         ;;
       "htop")
         sudo pacman -S --noconfirm htop
+        local exitcode=$?
         ;;
       "None")
         system_monitor
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${taskmanager_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     system_monitor
 
@@ -888,14 +1030,27 @@ install()(
 
   system_monitor(){
 
-    case ${texteditor_select} in
+    case ${systemmonitor_select} in
       "Conky")
         sudo pacman -S --noconfirm conky
+        local exitcode=$?
         ;;
       "None")
         audio
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${systemmonitor_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     audio
 
@@ -906,14 +1061,28 @@ install()(
     case ${audio_select} in
       "ALSA")
         sudo pacman -S --noconfirm alsa alsa-firmware alsa-utils sof-firmware
+        local exitcode=$?
         ;;
       "PipWire")
         sudo pacman -S --noconfirm pipewire pipewire-alsa pavucontrol sof-firmware
+        local exitcode=$?
         ;;
       "None")
         texteditor
         ;;
     esac
+
+        if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${audio_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     texteditor
 
@@ -924,14 +1093,28 @@ install()(
     case ${music_select} in
       "Spotify")
         ${aurhelper} -S --noconfirm spotify
+        local exitcode=$?
         ;;
       "Spotify_TUI")
         ${aurhelper} -S --noconfirm spotify-tui-bin spotifyd
+        local exitcode=$?
         ;;
       "None")
         x11
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${music_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     zsh_prompt
 
@@ -945,11 +1128,25 @@ install()(
       "Spaceship")
         sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
         ${aurhelper} -S --noconfirm spaceship-prompt
+        local exitcode=$?
         ;;
       "Starship")
         sudo pacman -S --noconfirm zsh zsh-syntax-highlighting starship
+        local exitcode=$?
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${prompt_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     man
 
@@ -960,17 +1157,32 @@ install()(
     case ${manpages_select} in
       "man-db")
         sudo pacman -S --noconfirm man-db
+        local exitcode=$?
         ;;
       "tldr")
         sudo pacman -S --noconfirm tldr
+        local exitcode=$?
         ;;
       "Both")
         sudo pacman -S --noconfirm man-db tldr
+        local exitcode=$?
         ;;
       "None")
         microcode
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${manpages_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     microcode
 
@@ -981,14 +1193,28 @@ install()(
     case ${microcode} in
       "AMD")
         sudo pacman -S --needed --noconfirm amd-ucode
+        local exitcode=$?
         ;;
       "Intel")
         sudo pacman -S --needed --noconfirm intel-ucode xf-86-video-intel
+        local exitcode=$?
         ;;
       "None")
         compositor
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${microcode}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     compositor
 
@@ -1000,11 +1226,25 @@ install()(
     case ${compositor_select} in
       "Picom")
         sudo pacman -S --needed --noconfirm picom
+        local exitcode=$?
         ;;
       "None")
         languages
+        local exitcode=$?
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${compositor_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     languages
 
@@ -1015,17 +1255,32 @@ install()(
     case ${language_select} in
       "All")
         sudo pacman -S --needed --noconfirm python python-pip rust
+        local exitcode=$?
         ;;
       "Python")
         sudo pacman -S --needed --noconfirm python python-pip
+        local exitcode=$?
         ;;
       "Rust")
         sudo pacman -S --needed --noconfirm rust
+        local exitcode=$?
         ;;
       "None")
         coreutils
         ;;
     esac
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot install [${language_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          browser
+          ;;
+        1)
+          exit 1
+          ;;
+      esac
+    fi
 
     coreutils
 
