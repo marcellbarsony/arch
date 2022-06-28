@@ -131,7 +131,7 @@ dialog()(
 
   bw_email(){
 
-    bw_email=$(whiptail --inputbox "Bitwarden CLI" --title "Bitwarden e-mail" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    bw_email=$(whiptail --inputbox "Bitwarden e-mail" --title "Bitwarden CLI" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -209,7 +209,7 @@ dialog()(
 
   github_pubkey(){
 
-    gh_pubkeyname=$(whiptail --inputbox "GitHub" --title "GitHub SSH key" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    gh_pubkeyname=$(whiptail --inputbox "GitHub SSH Key" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -664,8 +664,44 @@ install()(
   aur()(
 
     git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot clone ${aurhelper_package} repository to ~/.local/srch/${aurhelper}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+     case ${exitcode} in
+        0)
+          aur
+          ;;
+        1)
+          exit ${exitcode}
+          ;;
+        *)
+          echo "Exit status ${exitcode}"
+          ;;
+      esac
+    fi
+
+
+
     cd $HOME/.local/src/${aurhelper}
+
     makepkg -si --noconfirm
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot clone ${aurhelper_package} repository to ~/.local/srch/${aurhelper}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case ${exitcode} in
+        0)
+          aur
+          ;;
+        1)
+          exit ${exitcode}
+          ;;
+        *)
+          echo "Exit status ${exitcode}"
+          ;;
+      esac
+    fi
+
     cd $HOME
 
     bwclient
@@ -676,11 +712,11 @@ install()(
 
     sudo pacman -S --noconfirm --quiet ${bwcli}
 
-    github
+    github_cli
 
   }
 
-  github(){
+  github_cli(){
 
     sudo pacman -S --noconfirm github-cli
 
