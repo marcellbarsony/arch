@@ -663,20 +663,27 @@ install()(
 
   aur()(
 
-    git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper}
+    aurdir="$HOME/.local/src/${aurhelper}"
+
+    if [ -d "${aurdir}" ]; then
+      rm -rf ${aurdir}
+    fi
+
+    git clone https://aur.archlinux.org/${aurhelper_package}.git ${aurdir}
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot clone ${aurhelper_package} repository to ~/.local/srch/${aurhelper}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-     case ${exitcode} in
+      whiptail --title "ERROR" --yesno "Cannot clone ${aurhelper_package} repository to ${aurdir}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+     case $? in
         0)
           aur
           ;;
         1)
-          exit ${exitcode}
+          exit 1
           ;;
         *)
           echo "Exit status ${exitcode}"
+          exit ${exitcode}
           ;;
       esac
     fi
@@ -688,13 +695,13 @@ install()(
     makepkg -si --noconfirm
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot clone ${aurhelper_package} repository to ~/.local/srch/${aurhelper}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-      case ${exitcode} in
+      whiptail --title "ERROR" --yesno "Cannot make package [${aurhelper}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
         0)
           aur
           ;;
         1)
-          exit ${exitcode}
+          exit 1
           ;;
         *)
           echo "Exit status ${exitcode}"
