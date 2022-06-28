@@ -16,7 +16,7 @@ network()(
       network connect
     fi
 
-    aur
+    dialog
 
   }
 
@@ -47,7 +47,7 @@ network()(
       exit $1
     fi
 
-    aur
+    dialog
 
   }
 
@@ -107,16 +107,14 @@ dialog()(
         case ${bwcli} in
           "Bitwarden CLI")
             whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
-            bwclient_select
-            ;;
-          "rbw")
-            bwclient_install
+            bwclient
             ;;
         esac
+      github_email
       else
         case $? in
           1)
-            exit 1
+            aur
             ;;
           *)
             echo "Exit status $?"
@@ -377,6 +375,158 @@ dialog()(
 
   }
 
+  music(){
+
+    options=()
+    options+=("Spotify" "[Spotify GmbH]")
+    options+=("Spotify TUI" "[Spotifyd]")
+    options+=("None" "[-]")
+
+    music_select=$(whiptail --title "Music" --menu "Select music streaming client" --default-item "Spotify TUI" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          audio
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    x11
+
+  }
+
+  x11(){
+
+    # If Wayland is not implemented
+    sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-prop xwallpaper arandr unclutter
+
+  }
+
+  zsh_prompt(){
+
+    options=()
+    options+=("Spaceship" "[spaceship-prompt]")
+    options+=("Starship" "[Starship]")
+
+    prompt_select=$(whiptail --title "ZSH prompt" --menu "Select ZSH prompt" --default-item "Starship" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          music
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    microcode
+
+  }
+
+  microcode(){
+
+    options=()
+    options+=("AMD" "[Advanced Micro Devices]")
+    options+=("Intel" "[Intel Corporation]")
+    options+=("None" "[-]")
+
+    microcode_select=$(whiptail --title "CPU microcode" --menu "Select CPU microcode" --default-item "Intel" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          zsh_prompt
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    compositor
+
+  }
+
+  compostior(){
+
+    options=()
+    options+=("Picom" "[Picom]")
+    options+=("None" "[-]")
+
+    compositor_select=$(whiptail --title "Compositor" --menu "Select compositor" --default-item "Picom" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+        case $? in
+          1)
+            microcode
+            ;;
+          *)
+            echo "Exit status $?"
+            exit $?
+            ;;
+        esac
+    fi
+
+    languages
+
+  }
+
+  languages(){
+
+    options=()
+    options+=("All" "[-]")
+    options+=("Python" "[Python]")
+    options+=("Rust" "[Rust]")
+    options+=("None" "[-]")
+
+    language_select=$(whiptail --title "Programming language" --menu "Select programming language" --default-item "All" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+    if [ "$?" != "0" ]; then
+        case $? in
+          1)
+            compositor
+            ;;
+          *)
+            echo "Exit status $?"
+            exit $?
+            ;;
+        esac
+    fi
+
+    coreutils
+
+  }
+
+  coreutils(){
+
+    if (whiptail --title "Core utilities" --yesno "Install core utilities\n[neofetch, unzip, zip]" 8 78); then
+        coreutils_install="yes"
+      else
+        coreutils_rust
+    fi
+
+  }
+
+  coreutils_rust(){
+    if (whiptail --title "Core utilities [Rust]" --yesno "Install core utilities [Rust]\n[bat, lsd, zoxide]" 8 78); then
+        coreutils_install_rust="yes"
+      else
+        configs
+    fi
+
+  }
+
+  aur
+
 )
 
 install()(
@@ -601,10 +751,133 @@ install()(
 
   }
 
+  music(){
+
+    case ${music_select} in
+      "Spotify")
+        ${aurhelper} -S --noconfirm spotify
+        ;;
+      "Spotify TUI")
+        ${aurhelper} -S --noconfirm spotify-tui-bin spotifyd
+        ;;
+      "None")
+        x11
+        ;;
+    esac
+
+    x11
+
+  }
+
+  zsh_prompt(){
+
+    case ${prompt_select} in
+      "Spaceship")
+        sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
+        ${aurhelper} -S --noconfirm spaceship-prompt
+        ;;
+      "Starship")
+        sudo pacman -S --noconfirm zsh zsh-syntax-highlighting starship
+        ;;
+    esac
+
+    man
+
+  }
+
+  man(){
+
+    case ${manpages_select} in
+      "man-db")
+        sudo pacman -S --noconfirm man-db
+        ;;
+      "tldr")
+        sudo pacman -S --noconfirm tldr
+        ;;
+      "Both")
+        sudo pacman -S --noconfirm man-db tldr
+        ;;
+      "None")
+        microcode
+        ;;
+    esac
+
+    microcode
+
+  }
+
+  microcode(){
+
+    case ${microcode} in
+      "AMD")
+        sudo pacman -S --needed --noconfirm amd-ucode
+        ;;
+      "Intel")
+        sudo pacman -S --needed --noconfirm intel-ucode xf-86-video-intel
+        ;;
+      "None")
+        compositor
+        ;;
+    esac
+
+    compositor
+
+
+  }
+
+  compositor(){
+
+    case ${compositor_select} in
+      "Picom")
+        sudo pacman -S --needed --noconfirm picom
+        ;;
+      "None")
+        languages
+        ;;
+    esac
+
+    languages
+
+  }
+
+  languages(){
+
+    case ${language_select} in
+      "All")
+        sudo pacman -S --needed --noconfirm python python-pip rust
+        ;;
+      "Python")
+        sudo pacman -S --needed --noconfirm python python-pip
+        ;;
+      "Rust")
+        sudo pacman -S --needed --noconfirm rust
+        ;;
+      "None")
+        coreutils
+        ;;
+    esac
+
+    coreutils
+
+  }
+
+  coreutils(){
+
+    if [ ${coreutils_install} == "yes" ]; then
+      sudo pacman -S --needed --noconfirm neofetch unzip zip
+    fi
+
+    if [ ${coreutils_install_rust} == "yes" ]; then
+      sudo pacman -S --needed --noconfirm bat lsd zoxide #exa
+    fi
+
+  }
+
+  #cmatrix
+
+  aur
+
 )
-
-
-#################################
 
 bitwarden()(
 
@@ -612,7 +885,7 @@ bitwarden()(
 
     bw_email=$(whiptail --inputbox "BW CLI Config" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
 
-    if [ $? = 0 ]; then
+    if [ $? == "0" ]; then
         rbw config set e-mail ${bw_email}
       else
         exit 1
@@ -724,280 +997,6 @@ configs(){
   cd $HOME
 
 }
-
-install()(
-
-  music(){
-
-    options=()
-    options+=("Spotify" "[Spotify GmbH]")
-    options+=("Spotify TUI" "[Spotifyd]")
-    options+=("None" "[-]")
-
-    music_select=$(whiptail --title "Music" --menu "Select music streaming client" --default-item "Spotify TUI" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-    if [ "$?" == "0" ]; then
-
-        case ${music_select} in
-          "Spotify")
-            ${aurhelper} -S --noconfirm spotify
-            ;;
-          "Spotify TUI")
-            ${aurhelper} -S --noconfirm spotify-tui-bin spotifyd
-            ;;
-          "None")
-            texteditor
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-
-  }
-
-  x11(){
-
-    # If Wayland is not implemented
-    sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-prop xwallpaper arandr unclutter
-
-  }
-
-  zsh_prompt(){
-
-    options=()
-    options+=("Spaceship" "[spaceship-prompt]")
-    options+=("Starship" "[Starship]")
-
-    prompt_select=$(whiptail --title "ZSH prompt" --menu "Select ZSH prompt" --default-item "Starship" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-    if [ "$?" == "0" ]; then
-
-        case ${prompt_select} in
-          "Spaceship")
-            sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
-            ${aurhelper} -S --noconfirm spaceship-prompt
-            ;;
-          "Starship")
-            sudo pacman -S --noconfirm zsh zsh-syntax-highlighting starship
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-  }
-
-  man(){
-
-    options=()
-    options+=("man-db" "[cjwatson]")
-    options+=("tldr" "[tldr-pages]")
-    options+=("Both" "[cjwatson + tldr-pages]")
-    options+=("None" "[-]")
-
-    manpages_select=$(whiptail --tite "Text editor" --menu "Select additional man pages" --default-item "Both" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${manpages_select} in
-          "man-db")
-            sudo pacman -S --noconfirm man-db
-            ;;
-          "tldr")
-            sudo pacman -S --noconfirm tldr
-            ;;
-          "Both")
-            sudo pacman -S --noconfirm man-db tldr
-            ;;
-          "None")
-            ;;
-        esac
-
-        texteditor
-
-      else
-
-        case $? in
-          1)
-            browser
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-  }
-
-  microcode(){
-
-    options=()
-    options+=("AMD" "[Advanced Micro Devices]")
-    options+=("Intel" "[Intel Corporation]")
-    options+=("None" "[-]")
-
-    microcode_select=$(whiptail --title "CPU microcode" --menu "Select CPU microcode" --default-item "Intel" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${microcode} in
-          "AMD")
-            sudo pacman -S --needed --noconfirm amd-ucode
-            ;;
-          "Intel")
-            sudo pacman -S --needed --noconfirm intel-ucode xf-86-video-intel
-            ;;
-          "None")
-            ;;
-        esac
-
-      else
-
-        case $? in
-          1)
-            exit 1
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-
-  }
-
-  compositor(){
-
-    options=()
-    options+=("Picom" "[Picom]")
-    options+=("None" "[-]")
-
-    compositor_select=$(whiptail --title "Compositor" --menu "Select compositor" --default-item "Picom" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${compositor_select} in
-          "Picom")
-            sudo pacman -S --needed --noconfirm picom
-            ;;
-          "None")
-            ;;
-        esac
-
-      else
-
-        case $? in
-          1)
-            exit 1
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-  }
-
-  languages(){
-
-    options=()
-    options+=("Python" "[Python]")
-    options+=("Python + Rust" "[Python + Rust]")
-    options+=("Rust" "[Rust]")
-    options+=("None" "[-]")
-
-    language_select=$(whiptail --title "Programming language" --menu "Select programming language" --default-item "Python + Rust" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-    if [ "$?" == "0" ]; then
-
-        case ${language_select} in
-          "Python")
-            sudo pacman -S --needed --noconfirm python python-pip
-            ;;
-          "Python + Rust")
-            sudo pacman -S --needed --noconfirm python python-pip rust
-            ;;
-          "Rust")
-            sudo pacman -S --needed --noconfirm rust
-            ;;
-          "None")
-            ;;
-        esac
-
-      else
-
-        case $? in
-          1)
-            exit 1
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
-    fi
-
-  }
-
-  coreutils(){
-
-    if (whiptail --title "Core utilities" --yesno "Install core utilities?\n[neofetch, unzip, zip]" 8 78); then
-        sudo pacman -S --needed --noconfirm neofetch unzip zip
-      else
-        configs
-    fi
-
-  }
-
-  coreutils_rust(){
-
-    if (whiptail --title "Rust core utilities" --yesno "Install Rust core utilities?\n[bat, lsd, zoxide]" 8 78); then
-        sudo pacman -S --needed --noconfirm bat lsd zoxide #exa
-      else
-        configs
-    fi
-
-  }
-
-  install(){
-
-    # https://www.reddit.com/r/archlinux/comments/slq61o/pacman_installing_packages_in_an_array/
-
-    sudo pacman --noconfirm -S "${PKGS[@]}" 2> /dev/null #|\
-
-  }
-
-  #cmatrix
-
-  window_manager
-
-)
 
 configs()(
 
