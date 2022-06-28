@@ -660,6 +660,30 @@ dialog()(
 
 install()(
 
+  mirrorlist(){
+
+    echo 50 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
+    sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Mirrorlist cannot be backed up.\nExit status: ${exitcode}" 8 60
+      exit ${exitcode}
+    fi
+
+    echo 100 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
+    sudo reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Mirrorlist cannot be updated.\nExit status: ${exitcode}" 8 60
+      exit ${exitcode}
+    fi
+
+    aur
+
+  }
+
   aur()(
 
     aurdir="$HOME/.local/src/${aurhelper}"
@@ -1300,7 +1324,7 @@ install()(
 
   }
 
-  aur
+  mirrorlist
 
 )
 
