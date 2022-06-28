@@ -128,11 +128,11 @@ dialog()(
 
   bw_email(){
 
-    bw_email=$(whiptail --inputbox "Bitwarden CLI" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
+    bw_email=$(whiptail --inputbox "Bitwarden CLI" --title "Bitwarden e-mail" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      case $${exitcode} in
+      case ${exitcode} in
         1)
           bw_client
           ;;
@@ -154,13 +154,8 @@ dialog()(
 
   github_email(){
 
-    gh_email=$(whiptail --inputbox "GitHub" --title "GitHub e-mail" 8 39 3>&1 1>&2 2>&3)
+    gh_email=$(whiptail --inputbox "GitHub" --title "GitHub e-mail" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
-
-    if [ ! ${gh_email} ]; then
-      whiptail --title "ERROR" --msgbox "GitHub e-mail cannot be empty." 8 78
-      github_email
-    fi
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
@@ -174,19 +169,19 @@ dialog()(
       esac
     fi
 
+    if [ ! ${gh_email} ]; then
+      whiptail --title "ERROR" --msgbox "GitHub e-mail cannot be empty." 8 78
+      github_email
+    fi
+
     github_pubkey
 
   }
 
   github_username(){
 
-    gh_username=$(whiptail --inputbox "GitHub" --title "GitHub username" 8 39 3>&1 1>&2 2>&3)
+    gh_username=$(whiptail --inputbox "GitHub" --title "GitHub username" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
-
-    if [ ! ${gh_username} ] ; then
-      whiptail --title "ERROR" --msgbox "GitHub username cannot be empty." 8 78
-      github_username
-    fi
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
@@ -200,11 +195,31 @@ dialog()(
       esac
     fi
 
+    if [ ! ${gh_username} ] ; then
+      whiptail --title "ERROR" --msgbox "GitHub username cannot be empty." 8 78
+      github_username
+    fi
+
+    github_pubkey
+
   }
 
   github_pubkey(){
 
-    gh_pubkeyname=$(whiptail --inputbox "GitHub" --title "GitHub SSH key" 8 39 3>&1 1>&2 2>&3)
+    gh_pubkeyname=$(whiptail --inputbox "GitHub" --title "GitHub SSH key" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      case ${exitcode} in
+        1)
+          github_email
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
 
     if [ ! ${gh_pubkeyname} ] ; then
       whiptail --title "ERROR" --msgbox "GitHub SSH key name cannot be empty." 8 78
@@ -244,7 +259,7 @@ dialog()(
     options+=("OpenBox" "[C]") # bar dependency
     options+=("Qtile" "[Python]")
 
-    windowmanager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    windowmanager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
         case $? in
@@ -269,7 +284,7 @@ dialog()(
     options+=("kitty" "[Python]")
     options+=("None" "[-]")
 
-    terminal_select=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    terminal_select=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -295,7 +310,7 @@ dialog()(
     options+=("qutebrowser" "[qt5]")
     options+=("None" "[-]")
 
-    browser_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "LibreWolf" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    browser_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "LibreWolf" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -320,7 +335,7 @@ dialog()(
     options+=("VSCodium" "[Visual_Studio_Code]")
     options+=("None" "[-]")
 
-    ide_select=$(whiptail --title "IDE" --menu "Select an IDE" --default-item "VSCodium" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    ide_select=$(whiptail --title "IDE" --menu "Select an IDE" --default-item "VSCodium" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -349,7 +364,7 @@ dialog()(
     options+=("Vim" "[Vi]")
     options+=("None" "[-]")
 
-    texteditor_select=$(whiptail --tite "Text editor" --menu "Select a text editor" --default-item "Neovim" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    texteditor_select=$(whiptail --title "Text editor" --menu "Select a text editor" --default-item "Neovim" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -374,7 +389,7 @@ dialog()(
     options+=("rofi" "[davatorium]")
     options+=("None" "[-]")
 
-    applauncher_select=$(whiptail --title "Application launcher" --menu "Select application launcher" --default-item "dmenu-rs" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    applauncher_select=$(whiptail --title "Application launcher" --menu "Select application launcher" --default-item "dmenu-rs" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     if [ "$?" != "0" ]; then
       case $? in
         1)
@@ -398,7 +413,7 @@ dialog()(
     options+=("htop" "[htop-dev]")
     options+=("None" "[-]")
 
-    sysmonitor_select=$(whiptail --tite "Task manager" --menu "Select a task manager" --default-item "htop" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    sysmonitor_select=$(whiptail --tite "Task manager" --menu "Select a task manager" --default-item "htop" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -422,7 +437,7 @@ dialog()(
     options+=("Conky" "[Emacs]")
     options+=("None" "[-]")
 
-    texteditor_select=$(whiptail --tite "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    texteditor_select=$(whiptail --tite "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -447,7 +462,7 @@ dialog()(
     options+=("ALSA" "[Advanced_Linux_Sound_Architecture]")
     options+=("PipeWire" "[PipeWire]")
 
-    audio_select=$(whiptail --title "Audio" --menu "Select audio backend" --default-item "PipWire" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    audio_select=$(whiptail --title "Audio" --menu "Select audio backend" --default-item "PipWire" --noitem 25 78 17 --cancel-button "Back" ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -472,7 +487,7 @@ dialog()(
     options+=("Spotify_TUI" "[Spotifyd]")
     options+=("None" "[-]")
 
-    music_select=$(whiptail --title "Music" --menu "Select music streaming client" --default-item "Spotify TUI" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    music_select=$(whiptail --title "Music" --menu "Select music streaming client" --default-item "Spotify TUI" --noitem 25 78 17 --cancel-button "Back" ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -486,7 +501,8 @@ dialog()(
       esac
     fi
 
-    x11
+    #x11
+    zsh_prompt
 
   }
 
@@ -503,7 +519,7 @@ dialog()(
     options+=("Spaceship" "[spaceship-prompt]")
     options+=("Starship" "[Starship]")
 
-    prompt_select=$(whiptail --title "ZSH prompt" --menu "Select ZSH prompt" --default-item "Starship" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    prompt_select=$(whiptail --title "ZSH prompt" --menu "Select ZSH prompt" --default-item "Starship" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -528,7 +544,7 @@ dialog()(
     options+=("Intel" "[Intel Corporation]")
     options+=("None" "[-]")
 
-    microcode_select=$(whiptail --title "CPU microcode" --menu "Select CPU microcode" --default-item "Intel" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    microcode_select=$(whiptail --title "CPU microcode" --menu "Select CPU microcode" --default-item "Intel" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
       case $? in
@@ -552,7 +568,7 @@ dialog()(
     options+=("Picom" "[Picom]")
     options+=("None" "[-]")
 
-    compositor_select=$(whiptail --title "Compositor" --menu "Select compositor" --default-item "Picom" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    compositor_select=$(whiptail --title "Compositor" --menu "Select compositor" --default-item "Picom" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
         case $? in
@@ -578,7 +594,7 @@ dialog()(
     options+=("Rust" "[Rust]")
     options+=("None" "[-]")
 
-    language_select=$(whiptail --title "Programming language" --menu "Select programming language" --default-item "All" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    language_select=$(whiptail --title "Programming language" --menu "Select programming language" --default-item "All" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" != "0" ]; then
         case $? in
@@ -598,19 +614,21 @@ dialog()(
 
   coreutils(){
 
-    if (whiptail --title "Core utilities" --yesno "Install core utilities\n[neofetch, unzip, zip]" 8 78); then
+    if (whiptail --title "Core utilities" --yesno "Install core utilities\n[neofetch, unzip, zip]" --no-button "Back" 8 78); then
         coreutils_install="yes"
       else
-        coreutils_rust
+        languages
     fi
+
+    coreutils_rust
 
   }
 
   coreutils_rust(){
-    if (whiptail --title "Core utilities [Rust]" --yesno "Install core utilities [Rust]\n[bat, lsd, zoxide]" 8 78); then
+    if (whiptail --title "Core utilities [Rust]" --yesno "Install core utilities [Rust]\n[bat, lsd, zoxide]" --no-button "Back" 8 78); then
         coreutils_install_rust="yes"
       else
-        configs
+        coreutils
     fi
 
     configs
