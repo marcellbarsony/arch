@@ -81,7 +81,7 @@ dialog()(
             aurhelper_package="yay-bin"
             ;;
         esac
-        bwclient
+        bw_client
       else
         case $? in
           1)
@@ -99,14 +99,14 @@ dialog()(
   bw_client(){
 
     options=()
-    options+=("Bitwarden CLI" "[Bitwarden]")
+    options+=("Bitwarden_CLI" "[Bitwarden]")
     options+=("rbw" "[Bitwarden]")
 
     bwcli=$(whiptail --title "Bitwarden CLI" --menu "Select Bitwarden CLI" --default-item "rbw" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     if [ "$?" == "0" ]; then
         case ${bwcli} in
-          "Bitwarden CLI")
+          "Bitwarden_CLI")
             whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
             bw_client
             ;;
@@ -128,7 +128,7 @@ dialog()(
 
   bw_email(){
 
-    bw_email=$(whiptail --inputbox "BW CLI Config" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
+    bw_email=$(whiptail --inputbox "Bitwarden CLI" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ ! ${bw_email} ]; then
@@ -148,11 +148,13 @@ dialog()(
       esac
     fi
 
+    github_email
+
   }
 
   github_email(){
 
-    gh_email=$(whiptail --inputbox "GitHub login" --title "GitHub e-mail" 8 39 3>&1 1>&2 2>&3)
+    gh_email=$(whiptail --inputbox "GitHub" --title "GitHub e-mail" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ ! ${gh_email} ]; then
@@ -178,7 +180,7 @@ dialog()(
 
   github_username(){
 
-    gh_username=$(whiptail --inputbox "GitHub login" --title "GitHub username" 8 39 3>&1 1>&2 2>&3)
+    gh_username=$(whiptail --inputbox "GitHub" --title "GitHub username" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ ! ${gh_username} ] ; then
@@ -202,7 +204,7 @@ dialog()(
 
   github_pubkey(){
 
-    gh_pubkeyname=$(whiptail --inputbox "GitHub SSH key" --title "GitHub SSH key" 8 39 3>&1 1>&2 2>&3)
+    gh_pubkeyname=$(whiptail --inputbox "GitHub" --title "GitHub SSH key" 8 39 3>&1 1>&2 2>&3)
 
     if [ ! ${gh_pubkeyname} ] ; then
       whiptail --title "ERROR" --msgbox "GitHub SSH key name cannot be empty." 8 78
@@ -215,7 +217,7 @@ dialog()(
 
   ssh_passphrase(){
 
-    ssh_passphrase=$(whiptail --passwordbox "SSH passphrase" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+    ssh_passphrase=$(whiptail --passwordbox "SSH" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
     ssh_passphrase_confirm=$(whiptail --passwordbox "SSH passphrase [confirm]" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
@@ -257,7 +259,6 @@ dialog()(
     fi
 
     terminal
-
 
   }
 
@@ -315,8 +316,8 @@ dialog()(
   ide(){
 
     options=()
-    options+=("Visual Studio Code [OSS]" "Visual Studio Code")
-    options+=("VSCodium" "[Visual Studio Code]")
+    options+=("Visual_Studio_Code" "[Visual_Studio_Code]")
+    options+=("VSCodium" "[Visual_Studio_Code]")
     options+=("None" "[-]")
 
     ide_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "VSCodium" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
@@ -442,7 +443,7 @@ dialog()(
   audio(){
 
     options=()
-    options+=("ALSA" "[Advance Linux Sound Architecture]")
+    options+=("ALSA" "[Advanced_Linux_Sound_Architecture]")
     options+=("PipeWire" "[PipeWire]")
 
     audio_select=$(whiptail --title "Audio" --menu "Select audio backend" --default-item "PipWire" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
@@ -466,8 +467,8 @@ dialog()(
   music(){
 
     options=()
-    options+=("Spotify" "[Spotify GmbH]")
-    options+=("Spotify TUI" "[Spotifyd]")
+    options+=("Spotify" "[Spotify_GmbH]")
+    options+=("Spotify_TUI" "[Spotifyd]")
     options+=("None" "[-]")
 
     music_select=$(whiptail --title "Music" --menu "Select music streaming client" --default-item "Spotify TUI" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
@@ -522,7 +523,7 @@ dialog()(
   microcode(){
 
     options=()
-    options+=("AMD" "[Advanced Micro Devices]")
+    options+=("AMD" "[Advanced_Micro_Devices]")
     options+=("Intel" "[Intel Corporation]")
     options+=("None" "[-]")
 
@@ -610,6 +611,8 @@ dialog()(
       else
         configs
     fi
+
+    configs
 
   }
 
@@ -718,7 +721,7 @@ install()(
   ide(){
 
     case ${ide_select} in
-      "Visual Studio Code [OSS]")
+      "Visual_Studio_Code")
         sudo pacman -S --noconfirm code
         ;;
       "VSCodium")
@@ -841,7 +844,7 @@ install()(
       "Spotify")
         ${aurhelper} -S --noconfirm spotify
         ;;
-      "Spotify TUI")
+      "Spotify_TUI")
         ${aurhelper} -S --noconfirm spotify-tui-bin spotifyd
         ;;
       "None")
