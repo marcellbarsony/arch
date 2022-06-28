@@ -131,11 +131,6 @@ dialog()(
     bw_email=$(whiptail --inputbox "Bitwarden CLI" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
-    if [ ! ${bw_email} ]; then
-      whiptail --title "ERROR" --msgbox "Bitwarden e-mail cannot be empty." 8 78
-      bw_email
-    fi
-
     if [ "$?" != "0" ]; then
       case $? in
         1)
@@ -146,6 +141,11 @@ dialog()(
           exit $?
           ;;
       esac
+    fi
+
+    if [ ! ${bw_email} ]; then
+      whiptail --title "ERROR" --msgbox "Bitwarden e-mail cannot be empty." 8 78
+      bw_email
     fi
 
     github_email
@@ -217,7 +217,7 @@ dialog()(
 
   ssh_passphrase(){
 
-    ssh_passphrase=$(whiptail --passwordbox "SSH" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+    ssh_passphrase=$(whiptail --passwordbox "SSH passphrase" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
     ssh_passphrase_confirm=$(whiptail --passwordbox "SSH passphrase [confirm]" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
@@ -320,16 +320,17 @@ dialog()(
     options+=("VSCodium" "[Visual_Studio_Code]")
     options+=("None" "[-]")
 
-    ide_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "VSCodium" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    ide_select=$(whiptail --title "IDE" --menu "Select an IDE" --default-item "VSCodium" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
+    if [ "${exitcode}" != "0" ]; then
       case $? in
         1)
           browser
           ;;
         *)
-          echo "Exit status $?"
-          exit $?
+          echo "Exit status ${exitcode}"
+          exit ${exitcode}
           ;;
       esac
     fi
