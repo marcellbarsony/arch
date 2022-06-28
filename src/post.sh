@@ -86,6 +86,7 @@ dialog()(
       else
         case ${exitcode} in
           1)
+            clear
             exit ${exitcode}
             ;;
           *)
@@ -103,7 +104,7 @@ dialog()(
     options+=("Bitwarden_CLI" "[Bitwarden]")
     options+=("rbw" "[Bitwarden]")
 
-    bwcli=$(whiptail --title "Bitwarden CLI" --menu "Select Bitwarden CLI" --default-item "rbw" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    bwcli=$(whiptail --title "Bitwarden CLI" --menu "Select Bitwarden CLI" --default-item "rbw" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" == "0" ]; then
@@ -156,7 +157,7 @@ dialog()(
 
   github_email(){
 
-    gh_email=$(whiptail --inputbox "GitHub" --title "GitHub e-mail" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    gh_email=$(whiptail --inputbox "GitHub e-mail" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -182,7 +183,7 @@ dialog()(
 
   github_username(){
 
-    gh_username=$(whiptail --inputbox "GitHub" --title "GitHub username" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    gh_username=$(whiptail --inputbox "GitHub username" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -423,7 +424,7 @@ dialog()(
     options+=("htop" "[htop-dev]")
     options+=("None" "[-]")
 
-    sysmonitor_select=$(whiptail --tite "Task manager" --menu "Select a task manager" --default-item "htop" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    sysmonitor_select=$(whiptail --title "Task manager" --menu "Select a task manager" --default-item "htop" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -448,7 +449,7 @@ dialog()(
     options+=("Conky" "[Emacs]")
     options+=("None" "[-]")
 
-    texteditor_select=$(whiptail --tite "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    texteditor_select=$(whiptail --title "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -556,7 +557,7 @@ dialog()(
 
     options=()
     options+=("AMD" "[Advanced_Micro_Devices]")
-    options+=("Intel" "[Intel Corporation]")
+    options+=("Intel" "[Intel_Corporation]")
     options+=("None" "[-]")
 
     microcode_select=$(whiptail --title "CPU microcode" --menu "Select CPU microcode" --default-item "Intel" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
@@ -578,7 +579,7 @@ dialog()(
 
   }
 
-  compostior(){
+  compositor(){
 
     options=()
     options+=("Picom" "[Picom]")
@@ -635,7 +636,7 @@ dialog()(
     if (whiptail --title "Core utilities" --yesno "Install core utilities\n[neofetch, unzip, zip]" --no-button "Back" 8 78); then
         coreutils_install="yes"
       else
-        languages
+        coreutils_rust
     fi
 
     coreutils_rust
@@ -643,13 +644,14 @@ dialog()(
   }
 
   coreutils_rust(){
+
     if (whiptail --title "Core utilities [Rust]" --yesno "Install core utilities [Rust]\n[bat, lsd, zoxide]" --no-button "Back" 8 78); then
         coreutils_install_rust="yes"
       else
-        coreutils
+        configs
     fi
 
-    configs
+    install
 
   }
 
