@@ -70,6 +70,7 @@ dialog()(
         case ${aurhelper} in
           "Paru")
             aurhelper="paru"
+            aurhelper_package="paru-bin"
             ;;
           "Pikaur")
             aurhelper="pikaur"
@@ -95,7 +96,7 @@ dialog()(
 
   }
 
-  bwclient(){
+  bw_client(){
 
     options=()
     options+=("Bitwarden CLI" "[Bitwarden]")
@@ -107,10 +108,10 @@ dialog()(
         case ${bwcli} in
           "Bitwarden CLI")
             whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
-            bwclient
+            bw_client
             ;;
         esac
-      github_email
+      bw_email
       else
         case $? in
           1)
@@ -125,23 +126,110 @@ dialog()(
 
   }
 
+  bw_email(){
+
+    bw_email=$(whiptail --inputbox "BW CLI Config" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+    if [ ! ${bw_email} ]; then
+      whiptail --title "ERROR" --msgbox "Bitwarden e-mail cannot be empty." 8 78
+      bw_email
+    fi
+
+    if [ "$?" != "0" ]; then
+      case $? in
+        1)
+          bw_client
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+  }
+
   github_email(){
 
     gh_email=$(whiptail --inputbox "GitHub login" --title "GitHub e-mail" 8 39 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-        case $? in
-          1)
-            bwclient
-            ;;
-          *)
-            echo "Exit status $?"
-            exit $?
-            ;;
-        esac
+    if [ ! ${gh_email} ]; then
+      whiptail --title "ERROR" --msgbox "GitHub e-mail cannot be empty." 8 78
+      github_email
     fi
 
-    window_manager
+    if [ "${exitcode}" != "0" ]; then
+      case $? in
+        1)
+          bw_email
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+    github_pubkey
+
+  }
+
+  github_username(){
+
+    gh_username=$(whiptail --inputbox "GitHub login" --title "GitHub username" 8 39 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+    if [ ! ${gh_username} ] ; then
+      whiptail --title "ERROR" --msgbox "GitHub username cannot be empty." 8 78
+      github_username
+    fi
+
+    if [ "${exitcode}" != "0" ]; then
+      case $? in
+        1)
+          github_email
+          ;;
+        *)
+          echo "Exit status $?"
+          exit $?
+          ;;
+      esac
+    fi
+
+  }
+
+  github_pubkey(){
+
+    gh_pubkeyname=$(whiptail --inputbox "GitHub SSH key" --title "GitHub SSH key" 8 39 3>&1 1>&2 2>&3)
+
+    if [ ! ${gh_pubkeyname} ] ; then
+      whiptail --title "ERROR" --msgbox "GitHub SSH key name cannot be empty." 8 78
+      github_pubkey
+    fi
+
+    ssh_passphrase
+
+  }
+
+  ssh_passphrase(){
+
+    ssh_passphrase=$(whiptail --passwordbox "SSH passphrase" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+    ssh_passphrase_confirm=$(whiptail --passwordbox "SSH passphrase [confirm]" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+
+      if [ ! ${ssh_passphrase} ] || [ ! ${ssh_passphrase_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "SSH passphrase cannot be empty." 8 78
+        ssh_passphrase
+      fi
+
+      if [ ${ssh_passphrase} != ${ssh_passphrase_confirm} ]; then
+        whiptail --title "ERROR" --msgbox "SSH passphrase did not match." 8 78
+        ssh_passphrase
+      fi
+
+      window_manager
 
   }
 
@@ -533,14 +621,10 @@ install()(
 
   aur()(
 
-    if [ ${aurhelper} == "paru" ]; then
-        sudo pacman -S paru
-      else
-        git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
-        cd $HOME/.local/src/${aurhelper}
-        makepkg -fsri --noconfirm
-        cd $HOME
-    fi
+    git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
+    cd $HOME/.local/src/${aurhelper}
+    makepkg -si --noconfirm
+    cd $HOME
 
     bwclient
 
@@ -548,7 +632,7 @@ install()(
 
   bwclient(){
 
-   ${aurhelper} -S --noconfirm --quiet ${bwcli}
+    sudo pacman -S --noconfirm --quiet ${bwcli}
 
     if [ ${bwcli} == "rbw" ]; then
         rbw_config
@@ -881,21 +965,57 @@ install()(
 
 bitwarden()(
 
-  rbw_config(){
+  rbw_register(){
 
-    bw_email=$(whiptail --inputbox "BW CLI Config" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
-
-    if [ $? == "0" ]; then
-        rbw config set e-mail ${bw_email}
-      else
-        exit 1
-    fi
+    # E-mail
+    rbw config set email ${bw_email}
 
     # Register
-    rbw register
+    error=$( rbw register 2>&1 )
+    local exitcode=$?
 
-    # Sync & Login
-    rbw sync
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          rbw_register
+          ;;
+        1)
+          clear
+          echo "${error}"
+          exit ${exitcode}
+          ;;
+        *)
+          clear
+          echo "${error}"
+          echo "Exit status $?"
+          ;;
+      esac
+    fi
+
+    rbw_login
+
+  }
+
+  rbw_login(){
+
+    error=$( rbw sync 2>&1 )
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          rbw_login
+          ;;
+        1)
+          exit ${exitcode}
+          ;;
+        *)
+          echo "Exit status $?"
+          ;;
+      esac
+    fi
 
     # GitHub PAT
     ghpat=$(rbw get GitHub_PAT)
@@ -912,6 +1032,7 @@ openssh(){
 
   openssh_client(){
 
+    # Start SSH agent
     eval "$(ssh-agent -s)"
 
   }
@@ -922,15 +1043,11 @@ openssh(){
 
 github(){
 
-  gh_install(){
+  gh_ssh_keygen(){
 
-    sudo pacman -S --noconfirm github-cli
+    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f $HOME/.ssh/id_ed25519.pub
 
-  }
-
-  gh_install_ssh_keygen(){
-
-    ssh-keygen -t ed25519 -C ${gh_email}
+    clear
 
     ssh-add $HOME/.ssh/id_ed25519
 
@@ -938,12 +1055,31 @@ github(){
 
   }
 
-  gh_install_login(){
+  gh_login(){
 
     set -u
+    cd $HOME
     echo "$ghpat" > .ghpat
     unset ghpat
     gh auth login --with-token < .ghpat
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Could not authenticate github with token [.ghpat].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+      case $? in
+        0)
+          gh_install_login
+          ;;
+        1)
+          clear
+          exit ${exitcode}
+          ;;
+        *)
+          echo "Exit status $?"
+          ;;
+      esac
+    fi
+
     rm .ghpat
     gh auth status
 
@@ -953,62 +1089,54 @@ github(){
 
   gh_pubkey(){
 
-    gh_pubkeyname=$(whiptail --inputbox "GitHub SSH key" --title "GitHub SSH key name" 8 39 3>&1 1>&2 2>&3)
-
     gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
-
-    gh_sshtest
-
-
-  }
-
-  gh_sshtest(){
+    local exitcode=$?
 
     ssh -T git@github.com
 
-    if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GitHub SSH authentication unsuccessfull.\nExit status: $?" 8 78
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "GitHub SSH authentication unsuccessfull.\nExit status: ${exitcode}" 8 78
+      exit $
     fi
-
-    clean
-
-  }
-
-  clean(){
-
-    rm $HOME/password.txt
-
-    rm $HOME/token.txt
 
     configs
 
   }
 
-  gh_install
-
-}
-
-configs(){
-
-  git clone git@github.com:marcellbarsony/dotfiles.git $HOME/.config
-  cd $HOME/.config
-
-  git remote set-url origin git@github.com:marcellbarsony/dotfiles.git
-  cd $HOME
+  gh_ssh_keygen
 
 }
 
 configs()(
 
+  clone(){
+
+    git clone git@github.com:${gh_username}/dotfiles.git $HOME/.config
+
+    cd $HOME/.config
+
+    git remote set-url origin git@github.com:${gh_username}/dotfiles.git
+
+    cd $HOME
+
+    systemd
+
+
+  }
+
   systemd(){
 
     sudo cp $HOME/.config/systemd/logind.conf /etc/systemd/
+
+    pacman
 
   }
 
   pacman(){
 
     sudo cp $HOME/.config/_system/pacman/pacman.conf /etc/
+
+    zsh
 
   }
 
@@ -1027,6 +1155,7 @@ configs()(
     # ZSH Autocomplete
     git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src/zsh-autocomplete/
 
+    customization
 
   }
 
@@ -1044,7 +1173,11 @@ customization()(
     # Unzip
     unzip $HOME/Downloads/wallpapers.zip -d $HOME/Downloads/Wallpapers/ -x /
 
+    cleanup
+
   }
+
+  wallpaper
 
 )
 
@@ -1067,5 +1200,4 @@ cleanup(){
 
 }
 
-aur
-#network
+network

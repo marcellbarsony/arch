@@ -68,13 +68,13 @@ system_administration()(
       user_password_confirm=$(whiptail --passwordbox "User passphrase confirm [${username}]" --title "User passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
       if [ ! ${user_password} ] || [ ! ${user_password_confirm} ]; then
-          whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
-          user_password
+        whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
+        user_password
       fi
 
       if [ ${user_password} != ${user_password_confirm} ]; then
-          whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
-          user_password
+        whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
+        user_password
       fi
 
       domain_name

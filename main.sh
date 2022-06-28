@@ -801,7 +801,7 @@ filesystem()(
         local exitcode=$?
 
         if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+          whiptail --title "ERROR" --msgbox "Root partition was not mounted\nExit status: ${exitcode}" 8 60
           exit ${exitcode}
         fi
 
