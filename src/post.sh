@@ -64,9 +64,10 @@ dialog()(
     options+=("Pikaur" "[Python]")
     options+=("Yay" "[Go]")
 
-    aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --default-item "Paru" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --default-item "Paru" --noitem --cancel-button "Exit" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" == "0" ]; then
+    if [ "${exitcode}" == "0" ]; then
         case ${aurhelper} in
           "Paru")
             aurhelper="paru"
@@ -83,13 +84,13 @@ dialog()(
         esac
         bw_client
       else
-        case $? in
+        case ${exitcode} in
           1)
-            exit $?
+            exit ${exitcode}
             ;;
           *)
-            echo "Exit status $?"
-            exit $?
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
             ;;
         esac
     fi
@@ -103,8 +104,9 @@ dialog()(
     options+=("rbw" "[Bitwarden]")
 
     bwcli=$(whiptail --title "Bitwarden CLI" --menu "Select Bitwarden CLI" --default-item "rbw" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" == "0" ]; then
+    if [ "${exitcode}" == "0" ]; then
         case ${bwcli} in
           "Bitwarden_CLI")
             whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
@@ -113,13 +115,13 @@ dialog()(
         esac
       bw_email
       else
-        case $? in
+        case ${exitcode} in
           1)
             aur
             ;;
           *)
-            echo "Exit status $?"
-            exit $?
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
             ;;
         esac
     fi
@@ -232,9 +234,9 @@ dialog()(
 
   ssh_passphrase(){
 
-    ssh_passphrase=$(whiptail --passwordbox "SSH passphrase" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+    ssh_passphrase=$(whiptail --passwordbox "SSH passphrase" --title "SSH" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-    ssh_passphrase_confirm=$(whiptail --passwordbox "SSH passphrase [confirm]" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+    ssh_passphrase_confirm=$(whiptail --passwordbox "SSH passphrase [confirm]" --title "SSH" --nocancel 8 78 3>&1 1>&2 2>&3)
 
     if [ ! ${ssh_passphrase} ] || [ ! ${ssh_passphrase_confirm} ]; then
       whiptail --title "ERROR" --msgbox "SSH passphrase cannot be empty." 8 78
@@ -260,14 +262,15 @@ dialog()(
     options+=("Qtile" "[Python]")
 
     windowmanager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-        case $? in
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
           1)
             github_email
             ;;
           *)
-            echo "Exit status $?"
+            echo "Exit status ${exitcode}"
             exit $?
             ;;
         esac
@@ -285,15 +288,16 @@ dialog()(
     options+=("None" "[-]")
 
     terminal_select=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
+    if [ "${exitcode}" != "0" ]; then
+      case ${exitcode} in
         1)
           window_manager
           ;;
         *)
-          echo "Exit status $?"
-          exit $?
+          echo "Exit status ${exitcode}"
+          exit ${exitcode}
           ;;
       esac
     fi
@@ -311,15 +315,16 @@ dialog()(
     options+=("None" "[-]")
 
     browser_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "LibreWolf" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
+    if [ "${exitcode}" != "0" ]; then
+      case ${exitcode} in
         1)
           terminal
           ;;
         *)
-          echo "Exit status $?"
-          exit $?
+          echo "Exit status ${exitcode}"
+          exit ${exitcode}
           ;;
       esac
     fi
@@ -365,18 +370,21 @@ dialog()(
     options+=("None" "[-]")
 
     texteditor_select=$(whiptail --title "Text editor" --menu "Select a text editor" --default-item "Neovim" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          ide
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            ide
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
+
+    application_launcher
 
   }
 
@@ -390,19 +398,21 @@ dialog()(
     options+=("None" "[-]")
 
     applauncher_select=$(whiptail --title "Application launcher" --menu "Select application launcher" --default-item "dmenu-rs" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          texteditor
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            texteditor
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
 
-    tesk_manager
+    task_manager
 
   }
 
@@ -414,17 +424,18 @@ dialog()(
     options+=("None" "[-]")
 
     sysmonitor_select=$(whiptail --tite "Task manager" --menu "Select a task manager" --default-item "htop" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          application_launcher
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            application_launcher
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
 
     system_monitor
@@ -438,21 +449,21 @@ dialog()(
     options+=("None" "[-]")
 
     texteditor_select=$(whiptail --tite "System monitor" --menu "Select a systemmonitor" --default-item "Conky" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          task_manager
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            task_manager
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
 
     audio
-
 
   )
 
@@ -463,17 +474,18 @@ dialog()(
     options+=("PipeWire" "[PipeWire]")
 
     audio_select=$(whiptail --title "Audio" --menu "Select audio backend" --default-item "PipWire" --noitem 25 78 17 --cancel-button "Back" ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          system_monitor
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            system_monitor
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
 
     music
@@ -488,17 +500,18 @@ dialog()(
     options+=("None" "[-]")
 
     music_select=$(whiptail --title "Music" --menu "Select music streaming client" --default-item "Spotify TUI" --noitem 25 78 17 --cancel-button "Back" ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          audio
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            audio
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
 
     #x11
@@ -510,6 +523,7 @@ dialog()(
 
     # If Wayland is not implemented
     sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-prop xwallpaper arandr unclutter
+    local exitcode=$?
 
   }
 
@@ -520,17 +534,18 @@ dialog()(
     options+=("Starship" "[Starship]")
 
     prompt_select=$(whiptail --title "ZSH prompt" --menu "Select ZSH prompt" --default-item "Starship" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          music
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            music
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
 
     microcode
@@ -545,17 +560,18 @@ dialog()(
     options+=("None" "[-]")
 
     microcode_select=$(whiptail --title "CPU microcode" --menu "Select CPU microcode" --default-item "Intel" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
-        1)
-          zsh_prompt
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
-      esac
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            zsh_prompt
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
+            ;;
+        esac
     fi
 
     compositor
@@ -569,15 +585,16 @@ dialog()(
     options+=("None" "[-]")
 
     compositor_select=$(whiptail --title "Compositor" --menu "Select compositor" --default-item "Picom" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-        case $? in
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
           1)
             microcode
             ;;
           *)
-            echo "Exit status $?"
-            exit $?
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
             ;;
         esac
     fi
@@ -595,15 +612,16 @@ dialog()(
     options+=("None" "[-]")
 
     language_select=$(whiptail --title "Programming language" --menu "Select programming language" --default-item "All" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-        case $? in
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
           1)
             compositor
             ;;
           *)
-            echo "Exit status $?"
-            exit $?
+            echo "Exit status ${exitcode}"
+            exit ${exitcode}
             ;;
         esac
     fi
