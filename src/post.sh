@@ -131,13 +131,13 @@ dialog()(
     bw_email=$(whiptail --inputbox "Bitwarden CLI" --title "Bitwarden e-mail" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
-    if [ "$?" != "0" ]; then
-      case $? in
+    if [ "${exitcode}" != "0" ]; then
+      case $${exitcode} in
         1)
           bw_client
           ;;
         *)
-          echo "Exit status $?"
+          echo "Exit status ${exitcode}"
           exit $?
           ;;
       esac
@@ -163,7 +163,7 @@ dialog()(
     fi
 
     if [ "${exitcode}" != "0" ]; then
-      case $? in
+      case ${exitcode} in
         1)
           bw_email
           ;;
@@ -189,7 +189,7 @@ dialog()(
     fi
 
     if [ "${exitcode}" != "0" ]; then
-      case $? in
+      case ${exitcode} in
         1)
           github_email
           ;;
@@ -221,17 +221,17 @@ dialog()(
 
     ssh_passphrase_confirm=$(whiptail --passwordbox "SSH passphrase [confirm]" --title "SSH passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-      if [ ! ${ssh_passphrase} ] || [ ! ${ssh_passphrase_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "SSH passphrase cannot be empty." 8 78
-        ssh_passphrase
-      fi
+    if [ ! ${ssh_passphrase} ] || [ ! ${ssh_passphrase_confirm} ]; then
+      whiptail --title "ERROR" --msgbox "SSH passphrase cannot be empty." 8 78
+      ssh_passphrase
+    fi
 
-      if [ ${ssh_passphrase} != ${ssh_passphrase_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "SSH passphrase did not match." 8 78
-        ssh_passphrase
-      fi
+    if [ ${ssh_passphrase} != ${ssh_passphrase_confirm} ]; then
+      whiptail --title "ERROR" --msgbox "SSH passphrase did not match." 8 78
+      ssh_passphrase
+    fi
 
-      window_manager
+    window_manager
 
   }
 
@@ -324,7 +324,7 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      case $? in
+      case ${exitcode} in
         1)
           browser
           ;;
