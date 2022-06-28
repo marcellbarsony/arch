@@ -13,7 +13,7 @@ network()(
 
     if [ "$?" != "0" ]; then
       whiptail --title "ERROR" --msgbox "Network unreachable.\Exit status: ${?}" 8 78
-      network connect
+      network_connect
     fi
 
     dialog
@@ -633,7 +633,7 @@ dialog()(
 
   coreutils(){
 
-    if (whiptail --title "Core utilities" --yesno "Install core utilities\n[neofetch, unzip, zip]" --no-button "Back" 8 78); then
+    if (whiptail --title "Core utilities" --yesno "Install core utilities\n[cmatrix, neofetch, unzip, zip]" 8 78); then
         coreutils_install="yes"
       else
         coreutils_rust
@@ -645,7 +645,7 @@ dialog()(
 
   coreutils_rust(){
 
-    if (whiptail --title "Core utilities [Rust]" --yesno "Install core utilities [Rust]\n[bat, lsd, zoxide]" --no-button "Back" 8 78); then
+    if (whiptail --title "Core utilities [Rust]" --yesno "Install core utilities [Rust]\n[bat, lsd, zoxide]" 8 78); then
         coreutils_install_rust="yes"
       else
         configs
@@ -676,11 +676,7 @@ install()(
 
     sudo pacman -S --noconfirm --quiet ${bwcli}
 
-    if [ ${bwcli} == "rbw" ]; then
-        rbw_config
-      else
-        bwcli_config
-    fi
+    github
 
   }
 
@@ -696,8 +692,7 @@ install()(
 
     case ${windowmanager} in
       "dwm")
-        whiptail --title "ERROR" --msgbox "DWM is not supported yet." 8 60
-        window_manager
+        # dwm install
         ;;
       "i3")
         sudo pacman -S --needed --noconfirm i3-wm
@@ -719,6 +714,8 @@ install()(
         ;;
     esac
 
+    terminal
+
   }
 
   terminal(){
@@ -733,6 +730,8 @@ install()(
       "None")
         browser
     esac
+
+    browser
 
   }
 
@@ -891,9 +890,11 @@ install()(
         ;;
     esac
 
-    x11
+    zsh_prompt
 
   }
+
+  #x11
 
   zsh_prompt(){
 
@@ -990,16 +991,16 @@ install()(
   coreutils(){
 
     if [ ${coreutils_install} == "yes" ]; then
-      sudo pacman -S --needed --noconfirm neofetch unzip zip
+      sudo pacman -S --needed --noconfirm cmatrix neofetch unzip zip
     fi
 
     if [ ${coreutils_install_rust} == "yes" ]; then
       sudo pacman -S --needed --noconfirm bat lsd zoxide #exa
     fi
 
-  }
+    bitwarden
 
-  #cmatrix
+  }
 
   aur
 
@@ -1011,21 +1012,25 @@ bitwarden()(
 
     # E-mail
     rbw config set email ${bw_email}
+    local exitcode=$?
 
     # Register
     error=$( rbw register 2>&1 )
-    local exitcode=$?
+    local exitcode2=$?
 
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
+    if [ "${exitcode}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "${error}\n
+      Exit status [rbw e-mail]: ${exitcode}\n
+      Exit status [rbw register]: ${exitcode2}"
+      --yes-button "Retry" --no-button "Exit" 18 78
+      case ${exitcode} in
         0)
           rbw_register
           ;;
         1)
           clear
           echo "${error}"
-          exit ${exitcode}
+          exit 1
           ;;
         *)
           clear
@@ -1045,8 +1050,8 @@ bitwarden()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
+      whiptail --title "ERROR" --yesno "${error}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case ${exitcode} in
         0)
           rbw_login
           ;;
@@ -1054,7 +1059,7 @@ bitwarden()(
           exit ${exitcode}
           ;;
         *)
-          echo "Exit status $?"
+          echo "Exit status ${exitcode}"
           ;;
       esac
     fi
@@ -1076,6 +1081,24 @@ openssh(){
 
     # Start SSH agent
     eval "$(ssh-agent -s)"
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      case ${exitcode} in
+        0)
+          openssh_client
+          ;;
+        1)
+          exit ${exitcode}
+          ;;
+        *)
+          echo "Exit status ${exitcode}"
+          ;;
+      esac
+    fi
+
+    github
 
   }
 
@@ -1088,10 +1111,22 @@ github(){
   gh_ssh_keygen(){
 
     ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f $HOME/.ssh/id_ed25519.pub
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Cannot generate SSH key.\Exit status: ${exitcode}" 8 78
+      exit ${exitcode}
+    fi
 
     clear
 
     ssh-add $HOME/.ssh/id_ed25519
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Cannot add SSH key to SSH agent.\Exit status: ${exitcode}" 8 78
+      exit ${exitcode}
+    fi
 
     gh_login
 
@@ -1107,8 +1142,8 @@ github(){
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Could not authenticate github with token [.ghpat].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
+      whiptail --title "ERROR" --yesno "Cannot authenticate github with token [.ghpat].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+      case ${exitcode} in
         0)
           gh_install_login
           ;;
@@ -1124,6 +1159,7 @@ github(){
 
     rm .ghpat
     gh auth status
+    sleep 5
 
     gh_pubkey
 
@@ -1138,7 +1174,7 @@ github(){
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "GitHub SSH authentication unsuccessfull.\nExit status: ${exitcode}" 8 78
-      exit $
+      exit ${exitcode}
     fi
 
     configs
@@ -1187,7 +1223,7 @@ configs()(
     # Change shell to ZSH
     chsh -s /usr/bin/zsh
 
-    # Copying zshenv
+    # Copy zshenv
     sudo cp $HOME/.config/zsh/global/zshenv /etc/zsh/zshenv
 
     # Copy zprofile
@@ -1219,27 +1255,29 @@ customization()(
 
   }
 
+  cleanup(){
+
+    #Cargo
+    mkdir $HOME/.local/share/cargo
+    mv $HOME/.cargo $HOME/.local/share/cargo
+
+    #Bash: Removing files from $HOME
+    mkdir $HOME/.local/share/bash
+    mv $HOME/.bash* $HOME/.local/share/bash
+
+    success
+
+  }
+
+  success(){
+
+    whiptail --title "SUCCESS" --msgbox "Arch installation has finished." 8 78
+    exit 69
+
+  }
+
   wallpaper
 
 )
-
-cleanup(){
-
-  #Cargo: Create directory
-  mkdir $HOME/.local/share/cargo
-
-  #Cargo: Move ~/.cargo to ~/.local/share
-  mv $HOME/.cargo $HOME/.local/share/cargo
-
-  #Bash: Removing files from $HOME
-  rm -rf $HOME/.bash*
-
-  #Dotfiles: Removing unnecessary files from root (/)
-  sudo rm -rf /dotfiles
-
-  #echo Installation scrip: Removing  script from root (/)
-  sudo rm -rf /arch
-
-}
 
 network
