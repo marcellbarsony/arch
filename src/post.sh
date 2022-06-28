@@ -660,6 +660,12 @@ dialog()(
 
 install()(
 
+  reflector(){
+
+
+
+  }
+
   mirrorlist(){
 
     echo 50 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
@@ -840,11 +846,11 @@ install()(
 
     case ${terminal_select} in
       "Alacritty")
-        sudo pacman -S alacritty
+        sudo pacman -S --noconfirm alacritty
         local exitcode=$?
         ;;
       "kitty")
-        sudo pacman -S kitty
+        sudo pacman -S --noconfirm kitty
         local exitcode=$?
         ;;
       "st")
@@ -984,7 +990,7 @@ install()(
 
     case ${applauncher_select} in
       "dmenu")
-        ${aurhelper} -S --noconfirm dmenu-git
+        sudo pacman -S dmenu
         local exitcode=$?
         ;;
       "dmenu2")
@@ -992,7 +998,7 @@ install()(
         local exitcode=$?
         ;;
       "dmenu-rs")
-        ${aurhelper} -S --noconfirm dmenu-rs-git
+        ${aurhelper} -S --noconfirm dmenu-rs
         local exitcode=$?
         ;;
       "rofi")
