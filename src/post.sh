@@ -663,7 +663,7 @@ install()(
 
   aur()(
 
-    git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper} 1&>/dev/null
+    git clone https://aur.archlinux.org/${aurhelper_package}.git $HOME/.local/src/${aurhelper}
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
