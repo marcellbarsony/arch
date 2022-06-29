@@ -548,6 +548,33 @@ dialog()(
         esac
     fi
 
+    manpages
+
+  }
+
+  manpages(){
+
+    options=()
+    options+=("All" "[-]")
+    options+=("man-db" "[man-db]")
+    options+=("tldr" "[tldr]")
+    options+=("None" "[-]")
+
+    manpages_select=$(whiptail --title "Man pages" --menu "Select additional manpages" --default-item "All" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+        case ${exitcode} in
+          1)
+            zsh_prompt
+            ;;
+          *)
+            echo "Exit status ${exitcode}"
+            exit ${exitcodemanpages}
+            ;;
+        esac
+    fi
+
     microcode
 
   }
@@ -1160,14 +1187,15 @@ install()(
 
   zsh_prompt(){
 
+    sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
+
     case ${prompt_select} in
       "Spaceship")
-        sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
         ${aurhelper} -S --noconfirm spaceship-prompt
         local exitcode=$?
         ;;
       "Starship")
-        sudo pacman -S --noconfirm zsh zsh-syntax-highlighting starship
+        sudo pacman -S --noconfirm starship
         local exitcode=$?
         ;;
     esac
@@ -1191,16 +1219,16 @@ install()(
   man(){
 
     case ${manpages_select} in
+      "All")
+        sudo pacman -S --noconfirm man-db tldr
+        local exitcode=$?
+        ;;
       "man-db")
         sudo pacman -S --noconfirm man-db
         local exitcode=$?
         ;;
       "tldr")
         sudo pacman -S --noconfirm tldr
-        local exitcode=$?
-        ;;
-      "Both")
-        sudo pacman -S --noconfirm man-db tldr
         local exitcode=$?
         ;;
       "None")

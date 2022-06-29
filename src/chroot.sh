@@ -242,14 +242,17 @@ sudoers(){
   visudo
   rm /etc/sudoers.new
 
-  echo 50 | whiptail --gauge "Add insults..." 6 50 0
+  echo 33 | whiptail --gauge "Add insults..." 6 50 0
   sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  # Disable password prompt timeout
-  # https://wiki.archlinux.org/title/Sudo#Disable_password_prompt_timeout
+  echo 66 | whiptail --gauge "Disable password prompt timeout..." 6 50 0
+  sed '72 i Defaults passwd_timeout=0' /etc/sudoers > /etc/sudoers.new
+  export EDITOR="cp /etc/sudoers.new"
+  visudo
+  rm /etc/sudoers.new
 
   initramfs
 
