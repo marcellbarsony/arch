@@ -662,7 +662,13 @@ install()(
 
   reflector(){
 
+    pacman -Qi reflector > /dev/null
 
+    if [ "$?" == "0" ]; then
+      sudo pacman -S reflector
+    fi
+
+    mirrorlist
 
   }
 
