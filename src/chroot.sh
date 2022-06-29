@@ -251,9 +251,6 @@ sudoers(){
   # Disable password prompt timeout
   # https://wiki.archlinux.org/title/Sudo#Disable_password_prompt_timeout
 
-  # Polkit
-  # sudo pacman -S polkit
-
   initramfs
 
 }
