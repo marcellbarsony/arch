@@ -222,6 +222,27 @@ partition()(
 
   }
 
+  sgdisk_partition()(
+
+  # https://fedoramagazine.org/managing-partitions-with-sgdisk/
+
+    sgdisk_efi(){
+
+      # List partitions
+      gdisk -l /dev/sda
+
+      # Create partitions
+      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi /dev/sda
+      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot /dev/sda
+      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm /dev/sda
+
+      # Delete partitions
+      sgdisk --zap-all /dev/sda
+
+    }
+
+  )
+
   warning
 
 )

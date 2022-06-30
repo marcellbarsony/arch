@@ -44,6 +44,14 @@
 
 # Install sequence sketch
 
+  ## Sgdisk dialog
+  - EFI size (512MiB)
+  - Boot size (512MiB)
+
+  - Create EFI
+  - Create boot
+  - Create /
+
   ## User dialog
 
   - Select EFI
@@ -62,7 +70,10 @@
   ## Install sequence
 
   - Format EFI
-  - Mount EFI (/efi)
+  - Mount EFI mnt/boot/efi
+
+  - Format Boot
+  - Mount Boot /mnt/boot
 
   - Btrfs [Plain]
     * Make: `mkfs.btrfs ${rootdevice}"`
