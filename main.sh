@@ -238,14 +238,38 @@ filesystem()(
         options+=("${item}" "")
       done
 
-      efidevice=$(whiptail --title "EFI partition" --menu "Select partition [EFI]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      efidevice=$(whiptail --title "Partition" --menu "Select partition [EFI]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+
+      case $? in
+        0)
+          select_boot
+          ;;
+        1)
+          partition
+          ;;
+        *)
+          whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
+          ;;
+      esac
+
+    }
+
+    select_boot(){
+
+      options=()
+      items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
+      for item in ${items}; do
+        options+=("${item}" "")
+      done
+
+      bootdevice=$(whiptail --title "Partition" --menu "Select partition [Boot]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
           select_root
           ;;
         1)
-          partition
+          select_efi
           ;;
         *)
           whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
@@ -262,14 +286,14 @@ filesystem()(
         options+=("${item}" "")
       done
 
-      rootdevice=$(whiptail --title "Root partition" --menu "Select partition [Root]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      rootdevice=$(whiptail --title "Partition" --menu "Select partition [Root]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
           select_filesystem
           ;;
         1)
-          select_efi
+          select_boot
           ;;
         *)
           whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
@@ -843,11 +867,45 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      fstab
+      boot_partition
 
     }
 
     format_efi
+
+  )
+
+  boot_partition()(
+
+    format_boot(){
+
+      mkfs.${filesystem} ${bootdevice}
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+      fi
+
+      mount_boot
+
+    }
+
+    mount_boot(){
+
+      mount --mkdir ${efidevice} /mnt/boot
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
+        exit ${exitcode}
+      fi
+
+      fstab
+
+    }
+
+    format_boot
 
   )
 
