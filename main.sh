@@ -231,6 +231,9 @@ partition()(
       # List partitions
       gdisk -l /dev/sda
 
+      # Create GPT table
+      sgdisk -o /dev/sda
+
       # Create partitions
       sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi /dev/sda
       sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot /dev/sda
@@ -238,6 +241,10 @@ partition()(
 
       # Delete partitions
       sgdisk --zap-all /dev/sda
+
+      # Partition info
+      sgdisk -i <partition_no> /dev/sda
+      sgdisk -i 2 /dev/sda
 
     }
 
