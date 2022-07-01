@@ -765,7 +765,7 @@ filesystem()(
           exit ${exitcode}
         fi
 
-        efi_partition
+        boot_partition
 
       }
 
@@ -855,7 +855,7 @@ filesystem()(
         # Mount subvolume snapshots
         mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@snapshots ${rootdevice} /mnt/.snapshots
 
-        efi_partition
+        boot_partition
 
       }
 
@@ -889,7 +889,7 @@ filesystem()(
           exit ${exitcode}
         fi
 
-        efi_partition
+        boot_partition
 
       }
 
@@ -898,40 +898,6 @@ filesystem()(
     )
 
     filesystem_select
-
-  )
-
-  efi_partition()(
-
-    format_efi(){
-
-      mkfs.fat -F32 ${efidevice}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-      fi
-
-      mount_efi
-
-    }
-
-    mount_efi(){
-
-      mount --mkdir ${efidevice} /mnt/boot/efi
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
-
-      boot_partition
-
-    }
-
-    format_efi
 
   )
 
@@ -961,13 +927,49 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      fstab
+      efi_partition
 
     }
 
     format_boot
 
   )
+
+  efi_partition()(
+
+    format_efi(){
+
+      mkfs.fat -F32 ${efidevice}
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+      fi
+
+      mount_efi
+
+    }
+
+    mount_efi(){
+
+      mount --mkdir ${efidevice} /mnt/boot/efi
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
+        exit ${exitcode}
+      fi
+
+      fstab
+
+    }
+
+    format_efi
+
+  )
+
+
 
   filesystem_dialog
 
