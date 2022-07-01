@@ -215,61 +215,15 @@ partition()(
 
   sgdisk_partition()(
 
-    sgdisk_dialog()(
-
-      sgdisk_efi(){
-
-        efisize=$(whiptail --inputbox "EFI size (MiB)" --title "EFI" --nocancel 8 39 3>&1 1>&2 2>&3)
-        local exitstatus=$?
-
-        regex='^[0-9]+$'
-        if ! [[ ${efisize} =~ ${regex} ]] ; then
-          whiptail --title "ERROR" --msgbox "EFI size must be an integer.\nExit status: ${exitcode}" 8 78
-          sgdisk_efi
-        fi
-
-        if [ ${exitstatus} != 0 ]; then
-          whiptail --title "ERROR" --msgbox "An error occurred.\nExit status: ${exitcode}" 8 78
-          exit ${exitcode}
-        fi
-
-        sgdisk_boot
-
-      }
-
-      sgdisk_boot(){
-
-        bootsize=$(whiptail --inputbox "Boot size (GiB)" --title "Boot" --nocancel 8 39 3>&1 1>&2 2>&3)
-        local exitstatus=$?
-
-        regex='^[0-9]+$'
-        if ! [[ ${bootsize} =~ ${regex} ]] ; then
-          whiptail --title "ERROR" --msgbox "Boot size must be an integer.\nExit status: ${exitcode}" 8 78
-          sgdisk_boot
-        fi
-
-        if [ ${exitstatus} != 0 ]; then
-          whiptail --title "ERROR" --msgbox "An error occurred.\nExit status: ${exitcode}" 8 78
-          exit ${exitcode}
-        fi
-
-        sgdisk_create
-
-      }
-
-      sgdisk_efi
-
-    )
-
     sgdisk_create(){
 
       sgdisk -o ${disk}
       local exitcode=$?
 
-      sgdisk -n 0:0:+${efisize}MiB -t 0:ef00 -c 0:efi ${disk}
+      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi ${disk}
       local exitcode1=$?
 
-      sgdisk -n 0:0:+${bootsize}GiB -t 0:8300 -c 0:boot ${disk}
+      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
       local exitcode2=$?
 
       sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
@@ -296,7 +250,7 @@ partition()(
           filesystem
         else
           sgdisk --zap-all ${disk}
-          sgdisk_partition
+          partition
       fi
 
     }
