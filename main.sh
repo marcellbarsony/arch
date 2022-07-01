@@ -192,7 +192,7 @@ partition()(
           gdisk ${disk}
           ;;
         "sgdisk")
-          filesystem
+          sgdisk_partition
           ;;
       esac
 
@@ -253,7 +253,11 @@ partition()(
           exit ${exitcode}
         fi
 
+        sgdisk_create
+
       }
+
+      sgdisk_efi
 
     )
 
@@ -306,6 +310,8 @@ partition()(
       #sgdisk -i <partition_no> ${disk}
 
     }
+
+    sgdisk_dialog
 
   )
 
