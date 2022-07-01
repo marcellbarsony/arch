@@ -263,7 +263,7 @@ partition()(
 
     sgdisk_create(){
 
-      sgdisk -o {disk}
+      sgdisk -o ${disk}
       local exitcode=$?
 
       sgdisk -n 0:0:+${efisize}MiB -t 0:ef00 -c 0:efi ${disk}
@@ -290,7 +290,7 @@ partition()(
 
     sgdisk_check(){
 
-      items=$(gdisk -l ${disk} | tail -4 )
+      items=$( gdisk -l ${disk} | tail -4 )
 
       if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
           filesystem
@@ -419,6 +419,7 @@ filesystem()(
           case ${filesystem} in
             "Btrfs")
               filesystem="btrfs"
+              sgdisk -t 3:8300 ${disk}
               ;;
           esac
           select_encryption
