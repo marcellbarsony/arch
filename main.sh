@@ -182,22 +182,22 @@ partition()(
         "cfdisk")
           clear
           cfdisk ${disk}
+          diskpart_check
           ;;
         "fdisk")
           clear
           fdisk ${disk}
+          diskpart_check
           ;;
         "gdisk")
           clear
           gdisk ${disk}
+          diskpart_check
           ;;
         "sgdisk")
           sgdisk_partition
           ;;
       esac
-
-      diskpart_check
-
       else
 
       case $? in
@@ -265,7 +265,7 @@ partition()(
 
     }
 
-    sgdisk_dialog
+    sgdisk_create
 
   )
 
@@ -1085,6 +1085,7 @@ chroot(){
 
   #umount -l /mnt
   clear
+  exit 1
 
 }
 
