@@ -45,6 +45,7 @@
 # Install sequence sketch
 
   ## Sgdisk dialog
+
   - EFI size (512MiB)
   - Boot size (512MiB)
 
@@ -111,6 +112,3 @@
 
     * Format home
     * Mount home
-
-  - [Optional] Format /boot
-  - [Optional] Mount /boot

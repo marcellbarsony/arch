@@ -169,27 +169,30 @@ partition()(
   diskpart(){
 
     options=()
-    options+=("fdisk" "")
     options+=("cfdisk" "")
+    options+=("fdisk" "")
     options+=("gdisk" "")
-    #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
+    options+=("sgdisk" "")
 
-    sel=$(whiptail --title "Diskpart" --menu "" --noitem 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+    diskpart_tool=$(whiptail --title "Diskpart" --menu "" --noitem --default-item "sgdisk" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
 
-      case ${sel} in
-        "fdisk")
-          clear
-          fdisk ${disk}
-          ;;
+      case ${diskpart_tool} in
         "cfdisk")
           clear
           cfdisk ${disk}
           ;;
+        "fdisk")
+          clear
+          fdisk ${disk}
+          ;;
         "gdisk")
           clear
           gdisk ${disk}
+          ;;
+        "sgdisk")
+          filesystem
           ;;
       esac
 
@@ -210,6 +213,102 @@ partition()(
 
   }
 
+  sgdisk_partition()(
+
+    sgdisk_dialog()(
+
+      sgdisk_efi(){
+
+        efisize=$(whiptail --inputbox "EFI size (MiB)" --title "EFI" --nocancel 8 39 3>&1 1>&2 2>&3)
+        local exitstatus=$?
+
+        regex='^[0-9]+$'
+        if ! [[ ${efisize} =~ ${regex} ]] ; then
+          whiptail --title "ERROR" --msgbox "EFI size must be an integer.\nExit status: ${exitcode}" 8 78
+          sgdisk_efi
+        fi
+
+        if [ ${exitstatus} != 0 ]; then
+          whiptail --title "ERROR" --msgbox "An error occurred.\nExit status: ${exitcode}" 8 78
+          exit ${exitcode}
+        fi
+
+        sgdisk_boot
+
+      }
+
+      sgdisk_boot(){
+
+        bootsize=$(whiptail --inputbox "Boot size (GiB)" --title "Boot" --nocancel 8 39 3>&1 1>&2 2>&3)
+        local exitstatus=$?
+
+        regex='^[0-9]+$'
+        if ! [[ ${bootsize} =~ ${regex} ]] ; then
+          whiptail --title "ERROR" --msgbox "Boot size must be an integer.\nExit status: ${exitcode}" 8 78
+          sgdisk_boot
+        fi
+
+        if [ ${exitstatus} != 0 ]; then
+          whiptail --title "ERROR" --msgbox "An error occurred.\nExit status: ${exitcode}" 8 78
+          exit ${exitcode}
+        fi
+
+      }
+
+    )
+
+    sgdisk_create(){
+
+      sgdisk -o {disk}
+      local exitcode=$?
+
+      sgdisk -n 0:0:+${efisize}MiB -t 0:ef00 -c 0:efi ${disk}
+      local exitcode1=$?
+
+      sgdisk -n 0:0:+${bootsize}GiB -t 0:8300 -c 0:boot ${disk}
+      local exitcode2=$?
+
+      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
+      local exitcode3=$?
+
+      if [ "${exitcode}" != "0" ] || [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Create.\n
+        Exit status [GPT]: ${exitcode}\n
+        Exit status [/efi]: ${exitcode1}\n
+        Exit status [/boot]: ${exitcode2}\n
+        Exit status [/root]: ${exitcode3}" 18 78
+        exit 1
+      fi
+
+      sgdisk_check
+
+    }
+
+    sgdisk_check(){
+
+      items=$(gdisk -l ${disk} | tail -4 )
+
+      if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
+          filesystem
+        else
+          sgdisk --zap-all ${disk}
+          sgdisk_partition
+      fi
+
+    }
+
+    sgdisk_sketch(){
+
+      # List partitions
+      gdisk -l ${disk}
+
+      # Partition info
+      #sgdisk -i <partition_no> ${disk}
+
+    }
+
+  )
+
   diskpart_check(){
 
     items=$(lsblk -p -n -l -o NAME -e 7,11)
@@ -221,34 +320,6 @@ partition()(
     fi
 
   }
-
-  sgdisk_partition()(
-
-  # https://fedoramagazine.org/managing-partitions-with-sgdisk/
-
-    sgdisk_efi(){
-
-      # List partitions
-      gdisk -l /dev/sda
-
-      # Create GPT table
-      sgdisk -o /dev/sda
-
-      # Create partitions
-      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi /dev/sda
-      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot /dev/sda
-      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm /dev/sda
-
-      # Delete partitions
-      sgdisk --zap-all /dev/sda
-
-      # Partition info
-      sgdisk -i <partition_no> /dev/sda
-      sgdisk -i 2 /dev/sda
-
-    }
-
-  )
 
   warning
 
