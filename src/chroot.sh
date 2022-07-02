@@ -267,9 +267,14 @@ initramfs(){
     sleep 1
   fi
 
-  #Btrfs
+  pacman -Qi btrfs-progs > /dev/null
+  if [ "$?" == "0" ]; then
+    echo 0 | whiptail --gauge "Add LVM support to mkinitcpio..." 6 50 0
     #MODULES=(btrfs)
-    #sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
+    sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
+    sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
+    sleep 1
+  fi
 
   mkinitcpio -p linux
 
@@ -338,18 +343,18 @@ grub()(
 
   grub_install(){
 
-    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot/efi
+    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [/boot/efi].\nExit status: ${exitcode}" 8 78
     fi
 
-    grub_lvm
+    grub_crypt
 
   }
 
-  grub_lvm(){
+  grub_crypt(){
 
     pacman -Qi lvm2 > /dev/null
 
@@ -358,8 +363,13 @@ grub()(
       sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
     fi
 
-    #Btrfs
-    #sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=\"${UUID="123}:cryptroot root=/dev/mapper/cryptroot video=1920x1080\" /etc/default/grub
+    pacman -Qi btrfs-progs > /dev/null
+
+    if [ "$?" == "0" ]; then
+      uuid=( blkid | grep ${rootdevice} | cut -d\" -f 2 ) #Root disk UUID, not cryptroot
+      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot root=/dev/mapper/cryptroot:allow-discards\ video=1920x1080\" /etc/default/grub
+      sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
+    fi
 
     grub_config
 
@@ -459,6 +469,19 @@ modules()(
       fi
 
     exit 69
+
+  }
+
+  fstrim(){
+
+    systemctl enable fstrim.timer
+
+  }
+
+  watchdog(){
+
+    # Fix Watchdog error reports at shutdown
+    sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
 
   }
 

@@ -444,7 +444,7 @@ filesystem()(
 
         case ${filesystem} in
           "btrfs")
-            efi_partition
+            encrypted
             ;;
           "ext4")
             select_root_size
@@ -493,19 +493,11 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      cryptsetup_open
+      filesystem_select
 
     }
 
-    cryptsetup_open(){
-
-      cryptsetup open --type luks2 ${rootdevice} cryptlvm --key-file ${keydir}
-      local exitcode=$?
-
-      if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
+    filesystem_select(){
 
       case ${filesystem} in
         "btrfs")
@@ -520,9 +512,23 @@ filesystem()(
 
     encrypted_btrfs()(
 
+      cryptsetup_open(){
+
+        cryptsetup open --type luks2 ${rootdevice} cryptroot
+        local exitcode=$?
+
+        if [ ${exitcode} != "0" ]; then
+          whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+          exit ${exitcode}
+        fi
+
+        format_root
+
+      }
+
       format_root(){
 
-        mkfs.${filesystem} /dev/mapper/cryptroot &>/dev/null
+        mkfs.${filesystem} /dev/mapper/cryptroot
         # mkfs.btrfs -L mylabel /dev/partition
         local exitcode=$?
 
@@ -537,7 +543,7 @@ filesystem()(
 
       mount_root(){
 
-        mount /dev/mapper/cryptroot /mnt &>/dev/null
+        mount /dev/mapper/cryptroot /mnt
         local exitcode=$?
 
         if [ "${exitcode}" != "0" ]; then
@@ -552,28 +558,71 @@ filesystem()(
       btrfs_subvolumes(){
 
         btrfs subvolume create /mnt/@
+        local exitcode1=$?
 
         btrfs subvolume create /mnt/@home
+        local exitcode2=$?
+
+        btrfs subvolume create /mnt/@var
+        local exitcode3=$?
 
         umount /mnt
+        local exitcode4=$?
+
+        if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
+          whiptail --title "ERROR" --msgbox "An error occurred whilst creating subvolumes.\n
+          Exit status [Create @]: ${exitcode1}\n
+          Exit status [Create @home]: ${exitcode2}\n
+          Exit status [Create @var]: ${exitcode3}\n
+          Exit status [umount /mnt]: ${exitcode4}" 18 78
+        fi
+
+        btrfs_mount
 
       }
 
       btrfs_mount(){
 
-        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt #ssd
+        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt #Optional:ssd
+        local exitcode1=$?
 
-        mkdir /mnt/home
+        mkdir -p /mnt/{boot,home,var}
 
-        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #ssd
+        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #Optional:ssd
+        local exitcode2=$?
 
+        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@var /dev/mapper/cryptroot /mnt/var #Optional:ssd
+        local exitcode3=$?
+
+          if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
+            whiptail --title "ERROR" --msgbox "An error occurred whilst mounting subvolumes.\n
+            Exit status [Create @]: ${exitcode1}\n
+            Exit status [Create @home]: ${exitcode2}\n
+            Exit status [Create @var]: ${exitcode3}\n
+            Exit status [umount /mnt]: ${exitcode4}" 18 78
+          fi
+
+        fstab
 
       }
 
+      cryptsetup_open
 
     )
 
     encrypted_ext4()(
+
+      cryptsetup_open(){
+
+      cryptsetup open --type luks2 ${rootdevice} cryptlvm --key-file ${keydir}
+      local exitcode=$?
+
+      if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+        exit ${exitcode}
+      fi
+
+      }
 
       volume_physical(){
 
@@ -737,7 +786,7 @@ filesystem()(
 
       }
 
-      volume_physical
+      cryptsetup_open
 
     )
 
