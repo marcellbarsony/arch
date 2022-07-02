@@ -598,31 +598,21 @@ filesystem()(
 
       btrfs_mount(){
 
-        error=$( mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt 2>&1) #Optional:ssd
+        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
+        #Optional:ssd
+        # dmesg | grep "BTRFS"
         local exitcode1=$?
-
-        if [ ${exitcode1} != "0" ]; then
-        whiptail --title "ERROR" --yesno "${error}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-        case $? in
-          0)
-            btrfs_mount
-            ;;
-          1)
-            exit 1
-            clear
-            ;;
-          *)
-            echo "Exit status $?"
-            ;;
-        esac
-        fi
 
         mkdir -p /mnt/{boot,home,var}
 
-        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #Optional:ssd
+        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
+        #Optional:ssd
+        # dmesg | grep "BTRFS"
         local exitcode2=$?
 
-        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var #Optional:ssd
+        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
+        #Optional:ssd
+        # dmesg | grep "BTRFS"
         local exitcode3=$?
 
         mount ${efidevice} /mnt/boot
