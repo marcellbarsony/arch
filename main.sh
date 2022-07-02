@@ -245,7 +245,7 @@ partition()(
 
       items=$( gdisk -l ${disk} | tail -4 )
 
-      if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
+      if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
           filesystem
         else
           sgdisk --zap-all ${disk}
@@ -529,10 +529,9 @@ filesystem()(
         cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
         local exitcode=$?
 
-        if [ ${exitcode} == "0" ]; then
-          #whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
-          #exit ${exitcode}
-            whiptail --title "SUCESS" --msgbox "Cryptsetup opne ${rootdevice} successful.\nExit status: ${exitcode}" 8 78
+        if [ ${exitcode} != "0" ]; then
+          whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+          exit ${exitcode}
         fi
 
         format_root
@@ -541,7 +540,6 @@ filesystem()(
 
       format_root(){
 
-        #mkfs.btrfs -f /dev/mapper/cryptroot
         mkfs.btrfs -L mylabel /dev/mapper/cryptroot
         local exitcode=$?
 
@@ -579,15 +577,19 @@ filesystem()(
         btrfs subvolume create /mnt/@var
         local exitcode3=$?
 
-        umount /mnt
+        btrfs subvolume create /mnt/@snapshots
         local exitcode4=$?
 
-        if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
+        umount /mnt
+        local exitcode5=$?
+
+        if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
           whiptail --title "ERROR" --msgbox "An error occurred whilst creating subvolumes.\n
           Exit status [Create @]: ${exitcode1}\n
           Exit status [Create @home]: ${exitcode2}\n
           Exit status [Create @var]: ${exitcode3}\n
-          Exit status [umount /mnt]: ${exitcode4}" 18 78
+          Exit status [Create @snapshots]: ${exitcode4}\n
+          Exit status [umount /mnt]: ${exitcode5}" 18 78
         fi
 
         btrfs_mount
@@ -912,7 +914,7 @@ fstab(){
 
 mirrorlist(){
 
-  echo 0 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
+  echo 33 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
   cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
   local exitcode=$?
 
@@ -921,7 +923,7 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  echo 33 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
+  echo 66 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
   reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
   local exitcode=$?
 
@@ -941,7 +943,7 @@ pacman_conf(){
 
 
   echo 0 | whiptail --gauge "Copying pacman.conf >> /etc/pacman.conf..." 6 50 0
-  cp ~/arch/src/pacman.conf /etc/pacman.conf &>/dev/null
+  cp ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
@@ -949,7 +951,7 @@ pacman_conf(){
   fi
 
   echo 50 | whiptail --gauge "Copying pacman.conf >> /mnt/etc/pacman.conf..." 6 50 0
-  cp ~/arch/src/pacman.conf /mnt/etc/pacman.conf &>/dev/null
+  cp ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then

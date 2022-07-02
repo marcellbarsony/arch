@@ -35,36 +35,20 @@ cd arch
 
 ### Encrypted Btrfs
 
-| Partition      | Partition Name | Partition Size | Filesystem type    |
-| -------------- | -------------- | -------------- | ------------------ |
-| Partition 1    | EFI System     | (min. 512MB)   | [EFI System]       |
-| Partition 2    | Root           |                | [Linux Filesystem] |
-| Root subvolume | @              |                |                    |
-| Root subvolume | @/home         |                |                    |
-| Root subvolume | @/var          |                |                    |
+| Partition      | Partition Name | Partition Size | Filesystem type    | Mount point     |
+| -------------- | -------------- | -------------- | ------------------ | --------------- |
+| Partition 1    | EFI System     | 512MiB         | ef00               | /mnt/boot/      |
+| Partition 2    | Root           |                | 8300               |                 |
+| Root subvolume | @              |                |                    | /mnt            |
+| Root subvolume | @/home         |                |                    | /mnt/home       |
+| Root subvolume | @/var          |                |                    | /mnt/var        |
+| Root subvolume | @/.snapshots   |                |                    | /mnt/.snapshots |
 
 ### Encrypted ext4
 
-| Partition No.  | Partition Name | Partition Size | Filesystem type  |
-| -------------- | -------------- | -------------- | ---------------- |
-| Partition 1    | EFI System     | (min. 512MB)   | [EFI System]     |
-| Partition 2    | Root           |                | [Linux LVM]      |
-| Root subvolume | cryptroot      |                |                  |
-| Root subvolume | crypthome      |                |                  |
-
-### Plain Btrfs
-
-| Partition No.  | Partition Name | Partition Size | Filesystem type    |
-| -------------- | -------------- | -------------- | ------------------ |
-| Partition 1    | EFI System     | (min. 512MB)   | [EFI System]       |
-| Partition 2    | Root           |                | [Linux Filesystem] |
-| Root subvolume | @              |                |                    |
-| Root subvolume | @/home         |                |                    |
-| Root subvolume | @/var          |                |                    |
-
-### Plain ext4
-
-| Partition No. | Partition Name | Partition Size | Filesystem type  |
-| ------------- | -------------- | -------------- | ---------------- |
-| Partition 1   | EFI System     | (min. 512MB)   | [EFI System]     |
-| Partition 2   | Root           |                | [Linux LVM]      |
+| Partition No.  | Partition Name | Partition Size | Filesystem type  | Mount point    |
+| -------------- | -------------- | -------------- | ---------------- | -------------- |
+| Partition 1    | EFI System     | 512MiB         | ef00             | /mnt/boot      |
+| Partition 2    | Root           |                | 8e00             |                |
+| Root subvolume | cryptroot      |                |                  | /mnt           |
+| Root subvolume | crypthome      |                |                  | /mnt/home      |
