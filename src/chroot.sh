@@ -30,9 +30,9 @@ system_administration()(
 
     root_password(){
 
-      root_password=$(whiptail --passwordbox "Root passphrase" --title "Root passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      root_password=$(whiptail --passwordbox "Root passphrase" --title "Root" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-      root_password_confirm=$(whiptail --passwordbox "Root passphrase confirm" --title "Root passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      root_password_confirm=$(whiptail --passwordbox "Root passphrase [confirm]" --title "Root" --nocancel 8 78 3>&1 1>&2 2>&3)
 
       if [ ! ${root_password} ] || [ ! ${root_password_confirm} ]; then
         whiptail --title "ERROR" --msgbox "Root passphrase cannot be empty." 8 78
@@ -63,9 +63,9 @@ system_administration()(
 
     user_password(){
 
-      user_password=$(whiptail --passwordbox "User passphrase [${username}]" --title "User passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      user_password=$(whiptail --passwordbox "${username}'s passphrase" --title "User" --nocancel 8 78 3>&1 1>&2 2>&3)
 
-      user_password_confirm=$(whiptail --passwordbox "User passphrase confirm [${username}]" --title "User passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      user_password_confirm=$(whiptail --passwordbox "${username}'s passphrase [confirm]" --title "User" --nocancel 8 78 3>&1 1>&2 2>&3)
 
       if [ ! ${user_password} ] || [ ! ${user_password_confirm} ]; then
         whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
@@ -367,8 +367,8 @@ grub()(
 
     if [ "$?" == "0" ]; then
       uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot
-      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
-      sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
+      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
+      #sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
     fi
 
     grub_config

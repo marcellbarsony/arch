@@ -245,7 +245,7 @@ partition()(
 
       items=$( gdisk -l ${disk} | tail -4 )
 
-      if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
+      if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
           filesystem
         else
           sgdisk --zap-all ${disk}
