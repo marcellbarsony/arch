@@ -562,8 +562,8 @@ filesystem()(
 
         if [ "${exitcode}" == "0" ]; then
           #whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+          #exit ${exitcode}
           whiptail --title "SUCESS" --msgbox "Mounting /dev/mapper/cryptroot to /mnt successful.\nExit status: ${exitcode}" 8 78
-          exit ${exitcode}
         fi
 
         btrfs_subvolumes
@@ -574,7 +574,6 @@ filesystem()(
 
         btrfs subvolume create /mnt/@
         local exitcode1=$?
-          whiptail --title "SUCESS" --msgbox "Create subvolume @.\nExit status: ${exitcode}" 8 78
 
         btrfs subvolume create /mnt/@home
         local exitcode2=$?
@@ -599,8 +598,24 @@ filesystem()(
 
       btrfs_mount(){
 
-        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt #Optional:ssd
+        error=$( mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt 2>&1) #Optional:ssd
         local exitcode1=$?
+
+        if [ ${exitcode1} != "0" ]; then
+        whiptail --title "ERROR" --yesno "${error}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+        case $? in
+          0)
+            btrfs_mount
+            ;;
+          1)
+            exit 1
+            clear
+            ;;
+          *)
+            echo "Exit status $?"
+            ;;
+        esac
+        fi
 
         mkdir -p /mnt/{boot,home,var}
 
