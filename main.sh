@@ -300,7 +300,7 @@ filesystem()(
 
       case $? in
         0)
-          select_boot
+          select_root
           ;;
         1)
           partition
@@ -351,7 +351,7 @@ filesystem()(
           select_filesystem
           ;;
         1)
-          select_boot
+          select_efi
           ;;
         *)
           whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
@@ -451,7 +451,7 @@ filesystem()(
 
       # Password match
       if cmp --silent -- "$keydir" "$keydir2"; then
-          crypt_filesystem
+          encryption
         else
           whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
           crypt_password
@@ -462,7 +462,6 @@ filesystem()(
     select_root_size(){
 
       if [ ${filesystem} == "ext4" ]; then
-
           rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "Root filesystem" 3>&1 1>&2 2>&3)
           local exitcode=$?
 
@@ -482,7 +481,6 @@ filesystem()(
               echo "Exit status $?"
               ;;
           esac
-
       fi
 
       encryption
@@ -528,7 +526,7 @@ filesystem()(
 
       cryptsetup_open(){
 
-        cryptsetup open --type luks2 ${rootdevice} cryptroot
+        cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
         local exitcode=$?
 
         if [ ${exitcode} != "0" ]; then
@@ -542,7 +540,7 @@ filesystem()(
 
       format_root(){
 
-        mkfs.${filesystem} /dev/mapper/cryptroot
+        mkfs.${filesystem} -f /dev/mapper/cryptroot
         # mkfs.btrfs -L mylabel /dev/partition
         local exitcode=$?
 
@@ -878,8 +876,6 @@ filesystem()(
     format_efi
 
   )
-
-
 
   filesystem_dialog
 
