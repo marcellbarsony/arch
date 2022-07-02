@@ -382,7 +382,13 @@ grub()(
       # https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse
       # http://wiki.rosalab.ru/en/index.php/Grub2_theme_tutorial
 
-    # grub_config
+    # GRUB Config
+
+    # GRUB Resolution
+      # Get resolution: hwinfo --framebuffer
+      # Change config: GRUB_GFXMODE=1024x768x32
+      # Change config: GRUB_GFXPAYLOAD_LINUX=keep
+      # Apply changes: grub-mkconfig -o /boot/grub/grub.cfg
 
   #}
 
