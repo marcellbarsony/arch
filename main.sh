@@ -372,7 +372,7 @@ filesystem()(
           case ${filesystem} in
             "Btrfs")
               filesystem="btrfs"
-              sgdisk -t 3:8300 ${disk}
+              sgdisk -t 2:8300 ${disk}
               ;;
           esac
           encryption_dialog
