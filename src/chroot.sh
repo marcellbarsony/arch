@@ -367,8 +367,8 @@ grub()(
     pacman -Qi btrfs-progs > /dev/null
 
     if [ "$?" == "0" ]; then
-      uuid=( blkid | grep ${rootdevice} | cut -d\" -f 2 ) #Root disk UUID, not cryptroot
-      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot root=/dev/mapper/cryptroot:allow-discards\ video=1920x1080\" /etc/default/grub
+      uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot
+      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot\ root=/dev/mapper/cryptroot:allow-discards\ video=1920x1080\" /etc/default/grub
       sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
     fi
 

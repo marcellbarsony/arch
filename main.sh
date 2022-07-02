@@ -397,7 +397,7 @@ filesystem()(
 
     crypt_password(){
 
-      cryptpassword=$(whiptail --passwordbox "Encryption password" 8 78 --title "Encryption" 3>&1 1>&2 2>&3)
+      cryptpassword=$(whiptail --passwordbox "Encryption passphrase" 8 78 --title "Crypt" 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -415,7 +415,7 @@ filesystem()(
 
     crypt_password_confirm(){
 
-      cryptpassword_confirm=$(whiptail --passwordbox "Confirm encryption password" 8 78 --title "Encryption" 3>&1 1>&2 2>&3)
+      cryptpassword_confirm=$(whiptail --passwordbox "Encryption passphrase [confirm]" 8 78 --title "Crypt" 3>&1 1>&2 2>&3)
 
       case $? in
         0)
