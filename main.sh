@@ -218,23 +218,22 @@ partition()(
     sgdisk_create(){
 
       sgdisk -o ${disk}
-      local exitcode=$?
-
-      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi ${disk}
       local exitcode1=$?
 
-      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
+      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi ${disk}
       local exitcode2=$?
 
-      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
-      local exitcode3=$?
+      #sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
+      #local exitcode3=$?
 
-      if [ "${exitcode}" != "0" ] || [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
+      local exitcode4=$?
+
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
         whiptail --title "ERROR" --msgbox "Create.\n
-        Exit status [GPT]: ${exitcode}\n
-        Exit status [/efi]: ${exitcode1}\n
-        Exit status [/boot]: ${exitcode2}\n
-        Exit status [/root]: ${exitcode3}" 18 78
+        Exit status [GPT]: ${exitcode1}\n
+        Exit status [/efi]: ${exitcode2}\n
+        Exit status [/root]: ${exitcode4}" 18 78
         exit 1
       fi
 
