@@ -639,8 +639,6 @@ filesystem()(
             Exit status [Mount EFI]: ${exitcode4}" 18 78
           fi
 
-
-
         fstab
 
       }
