@@ -540,7 +540,8 @@ filesystem()(
 
       format_root(){
 
-        mkfs.btrfs -f /dev/mapper/cryptroot
+        #mkfs.btrfs -f /dev/mapper/cryptroot
+        mkfs.btrfs -L mylabel /dev/mapper/cryptroot
         local exitcode=$?
 
         if [ "${exitcode}" != "0" ]; then
