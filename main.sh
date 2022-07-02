@@ -914,7 +914,7 @@ fstab(){
 
 mirrorlist(){
 
-  echo 33 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
+  echo 0 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
   cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
   local exitcode=$?
 
@@ -923,15 +923,15 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  echo 66 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
+  echo 33 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
   reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Cannot update mirrorlist.\nExit status: ${exitcode}" 8 60
+    whiptail --title "ERROR" --msgbox "Cannot update mirrorlist.\n
+    Exit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
-
 
   clear
 
@@ -966,7 +966,8 @@ kernel(){
 
   echo 0 | whiptail --gauge "Pacstrap: Installing base packages..." 6 50 0
   clear
-  pacstrap -C ~/arch/src/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
+  pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
+  # linux-hardened linux-hardened-headers
   local exitcode1=$?
 
   if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
@@ -976,6 +977,10 @@ kernel(){
     pacstrap /mnt virtualbox-guest-utils
     local exitcode2=$?
   fi
+
+  # Hardened Kernel
+  #Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
+  #ls -lsha /boot
 
   if [ "${filesystem}" == "ext4" ]; then
     echo 0 | whiptail --gauge "Pacstrap: Installing lvm2..." 6 50 0

@@ -276,6 +276,7 @@ initramfs(){
   fi
 
   mkinitcpio -p linux
+  #mkinitcpio -p linux-hardened
 
   locale
 

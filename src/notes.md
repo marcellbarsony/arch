@@ -12,13 +12,13 @@
 
 [ ] [Secure boot](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot)
 [ ] Encrypted `/boot` partition
-[ ] [GRUB Passphrase](https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu)
+[x] [GRUB Passphrase](https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu)
 [ ] GRUB Theme
 
 ### File system
 
-[ ] Partition menu
-[ ] [BTRFS](https://wiki.archlinux.org/title/btrfs)
+[x] Partition menu
+[x] [BTRFS](https://wiki.archlinux.org/title/btrfs)
 
 ### Libnewt
 
@@ -28,7 +28,11 @@
 
 [ ] Locale - Additional options
 
-## Post
+## Kernel
+
+[ ] Hardened Linux kernel
+
+## Script
 
 [ ] Implement proper error handling
 [ ] Suppress unnecessary command outputs
