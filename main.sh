@@ -529,9 +529,10 @@ filesystem()(
         cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
         local exitcode=$?
 
-        if [ ${exitcode} != "0" ]; then
-          whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
-          exit ${exitcode}
+        if [ ${exitcode} == "0" ]; then
+          #whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+          #exit ${exitcode}
+            whiptail --title "SUCESS" --msgbox "Cryptsetup opne ${rootdevice} successful.\nExit status: ${exitcode}" 8 78
         fi
 
         format_root
@@ -544,9 +545,10 @@ filesystem()(
         mkfs.btrfs -L mylabel /dev/mapper/cryptroot
         local exitcode=$?
 
-        if [ "${exitcode}" != "0" ]; then
-            whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-            exit ${exitcode}
+        if [ "${exitcode}" == "0" ]; then
+            #whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+            #exit ${exitcode}
+            whiptail --title "SUCESS" --msgbox "Formatting ${rootdevice} to ${filesystem} successful.\nExit status: ${exitcode}" 8 78
         fi
 
         mount_root
@@ -558,8 +560,9 @@ filesystem()(
         mount /dev/mapper/cryptroot /mnt
         local exitcode=$?
 
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+        if [ "${exitcode}" == "0" ]; then
+          #whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+          whiptail --title "SUCESS" --msgbox "Mounting /dev/mapper/cryptroot to /mnt successful.\nExit status: ${exitcode}" 8 78
           exit ${exitcode}
         fi
 
@@ -571,6 +574,7 @@ filesystem()(
 
         btrfs subvolume create /mnt/@
         local exitcode1=$?
+          whiptail --title "SUCESS" --msgbox "Create subvolume @.\nExit status: ${exitcode}" 8 78
 
         btrfs subvolume create /mnt/@home
         local exitcode2=$?
