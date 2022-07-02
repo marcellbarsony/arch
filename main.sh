@@ -376,7 +376,7 @@ filesystem()(
               sgdisk -t 3:8300 ${disk}
               ;;
           esac
-          select_encryption
+          encryption_dialog
         else
           case $? in
             1)
@@ -386,18 +386,6 @@ filesystem()(
               whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
               ;;
           esac
-      fi
-
-    }
-
-    select_encryption(){
-
-      if (whiptail --title "Encryption" --yesno "File system encryption" --yes-button "Encrypt" --no-button "Plain" 8 78); then
-          encryption="True"
-          encryption_dialog
-        else
-          encryption="False"
-          plain
       fi
 
     }
@@ -472,40 +460,33 @@ filesystem()(
 
     }
 
-    crypt_filesystem(){
-
-        case ${filesystem} in
-          "btrfs")
-            encrypted
-            ;;
-          "ext4")
-            select_root_size
-            ;;
-        esac
-
-    }
-
     select_root_size(){
 
-      rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "Root filesystem" 3>&1 1>&2 2>&3)
-      local exitcode=$?
+      if [ ${filesystem} == "ext4" ]; then
 
-      case $? in
-        0)
-          if [[ ${rootsize} ]] && [ ${rootsize} -eq ${rootsize} 2>/dev/null ]; then
-              encrypted
-            else
-              whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
-              select_root_size
-          fi
-          ;;
-        1)
-          crypt_password
-          ;;
-        *)
-          echo "Exit status $?"
-          ;;
-      esac
+          rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "Root filesystem" 3>&1 1>&2 2>&3)
+          local exitcode=$?
+
+          case $? in
+            0)
+              if [[ ${rootsize} ]] && [ ${rootsize} -eq ${rootsize} 2>/dev/null ]; then
+                  encrypted
+                else
+                  whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
+                  select_root_size
+              fi
+              ;;
+            1)
+              crypt_password
+              ;;
+            *)
+              echo "Exit status $?"
+              ;;
+          esac
+
+      fi
+
+      encryption
 
     }
 
@@ -513,7 +494,7 @@ filesystem()(
 
   )
 
-  encrypted()(
+  encryption()(
 
     mkfs.fat -F32 ${efidevice}
 
@@ -828,130 +809,6 @@ filesystem()(
     )
 
     cryptsetup_create
-
-  )
-
-  plain()(
-
-    filesystem_select(){
-
-      if [ "${filesystem}" == "btrfs" ]; then
-          plain_btrfs
-        else
-          plain_ext4
-      fi
-
-    }
-
-    plain_btrfs()(
-
-      format_root(){
-
-        mkfs.${filesystem} ${rootdevice} &>/dev/null
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-            whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-            exit ${exitcode}
-        fi
-
-        mount_root
-
-      }
-
-      mount_root(){
-
-        mount ${rootdevice} /mnt &>/dev/null
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
-          exit ${exitcode}
-        fi
-
-        btrfs_subvolumes
-
-      }
-
-      btrfs_subvolumes(){
-
-        # Subvolume root
-        btrfs subvolume create /mnt/@
-
-        # Subvolume home
-        btrfs subvolume create /mnt/@home
-
-        # Subvolume var (var_log)
-        btrfs subvolume create /mnt/@var
-
-        # Subvolume snapshots
-        btrfs subvolume create /mnt/@snapshots
-
-        umount /mnt
-
-        btrfs_mount
-
-      }
-
-      btrfs_mount(){
-
-        mkdir /mnt/{home,var,snapshots}
-
-        # Mount subvolume root
-        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@ ${rootdevice} /mnt
-
-        # Mount subvolume home
-        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@home ${rootdevice} /mnt/home
-
-        # Mount subvolume var (var_log)
-        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@var ${rootdevice} /mnt/var
-
-        # Mount subvolume snapshots
-        mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@snapshots ${rootdevice} /mnt/.snapshots
-
-        boot_partition
-
-      }
-
-      format_root
-
-    )
-
-    plain_ext4()(
-
-      format_root(){
-
-        mkfs.${filesystem} ${rootdevice} &>/dev/null
-        local exitcode=$?
-
-        if [ ${exitcode} != "0" ]; then
-            whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-            exit ${exitcode}
-        fi
-
-        mount_root
-
-      }
-
-      mount_root(){
-
-        mount ${rootdevice} /mnt &>/dev/null
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Root partition was not mounted\nExit status: ${exitcode}" 8 60
-          exit ${exitcode}
-        fi
-
-        boot_partition
-
-      }
-
-      format_root
-
-    )
-
-    filesystem_select
 
   )
 
