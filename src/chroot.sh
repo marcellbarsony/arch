@@ -269,7 +269,7 @@ initramfs(){
 
   pacman -Qi btrfs-progs > /dev/null
   if [ "$?" == "0" ]; then
-    echo 0 | whiptail --gauge "Add LVM support to mkinitcpio..." 6 50 0
+    echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
     #MODULES=(btrfs)
     sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
     sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
