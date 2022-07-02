@@ -598,7 +598,7 @@ filesystem()(
 
       btrfs_mount(){
 
-        error=$( mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@ /dev/mapper/cryptroot /mnt 2>&1) #Optional:ssd
+        error=$( mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt 2>&1) #Optional:ssd
         local exitcode1=$?
 
         if [ ${exitcode1} != "0" ]; then
@@ -619,10 +619,10 @@ filesystem()(
 
         mkdir -p /mnt/{boot,home,var}
 
-        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #Optional:ssd
+        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home #Optional:ssd
         local exitcode2=$?
 
-        mount -o noatime,compress=zstd,space_cache=v2,dicard=async,subvol=@var /dev/mapper/cryptroot /mnt/var #Optional:ssd
+        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var #Optional:ssd
         local exitcode3=$?
 
         mount ${efidevice} /mnt/boot
