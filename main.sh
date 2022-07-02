@@ -132,7 +132,7 @@ partition()(
 
   warning(){
 
-    if (whiptail --title "WARNING" --yesno "Everything not backed up will be lost." --yes-button "Proceed" --no-button "Exit" --defaultno 8 60); then
+    if (whiptail --title "WARNING" --yesno "Everything not backed up will be lost." --yes-button "Proceed" --no-button "Exit" 8 60); then
         diskselect
       else
         echo "Installation terminated"
@@ -272,7 +272,7 @@ partition()(
 
     items=$(lsblk -p -n -l -o NAME -e 7,11)
 
-    if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
+    if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
         filesystem
       else
         partition
@@ -540,8 +540,7 @@ filesystem()(
 
       format_root(){
 
-        mkfs.${filesystem} -f /dev/mapper/cryptroot
-        # mkfs.btrfs -L mylabel /dev/partition
+        mkfs.btrfs -f /dev/mapper/cryptroot
         local exitcode=$?
 
         if [ "${exitcode}" != "0" ]; then
