@@ -169,32 +169,35 @@ partition()(
   diskpart(){
 
     options=()
-    options+=("fdisk" "")
     options+=("cfdisk" "")
+    options+=("fdisk" "")
     options+=("gdisk" "")
-    #options+=("sgdisk" "") #https://man.archlinux.org/man/sgdisk.8
+    options+=("sgdisk" "")
 
-    sel=$(whiptail --title "Diskpart" --menu "" --noitem 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+    diskpart_tool=$(whiptail --title "Diskpart" --menu "" --noitem --default-item "sgdisk" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
 
-      case ${sel} in
-        "fdisk")
-          clear
-          fdisk ${disk}
-          ;;
+      case ${diskpart_tool} in
         "cfdisk")
           clear
           cfdisk ${disk}
+          diskpart_check
+          ;;
+        "fdisk")
+          clear
+          fdisk ${disk}
+          diskpart_check
           ;;
         "gdisk")
           clear
           gdisk ${disk}
+          diskpart_check
+          ;;
+        "sgdisk")
+          sgdisk_partition
           ;;
       esac
-
-      diskpart_check
-
       else
 
       case $? in
@@ -210,6 +213,62 @@ partition()(
 
   }
 
+  sgdisk_partition()(
+
+    sgdisk_create(){
+
+      sgdisk -o ${disk}
+      local exitcode=$?
+
+      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi ${disk}
+      local exitcode1=$?
+
+      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
+      local exitcode2=$?
+
+      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
+      local exitcode3=$?
+
+      if [ "${exitcode}" != "0" ] || [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Create.\n
+        Exit status [GPT]: ${exitcode}\n
+        Exit status [/efi]: ${exitcode1}\n
+        Exit status [/boot]: ${exitcode2}\n
+        Exit status [/root]: ${exitcode3}" 18 78
+        exit 1
+      fi
+
+      sgdisk_check
+
+    }
+
+    sgdisk_check(){
+
+      items=$( gdisk -l ${disk} | tail -4 )
+
+      if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
+          filesystem
+        else
+          sgdisk --zap-all ${disk}
+          partition
+      fi
+
+    }
+
+    sgdisk_sketch(){
+
+      # List partitions
+      gdisk -l ${disk}
+
+      # Partition info
+      #sgdisk -i <partition_no> ${disk}
+
+    }
+
+    sgdisk_create
+
+  )
+
   diskpart_check(){
 
     items=$(lsblk -p -n -l -o NAME -e 7,11)
@@ -221,34 +280,6 @@ partition()(
     fi
 
   }
-
-  sgdisk_partition()(
-
-  # https://fedoramagazine.org/managing-partitions-with-sgdisk/
-
-    sgdisk_efi(){
-
-      # List partitions
-      gdisk -l /dev/sda
-
-      # Create GPT table
-      sgdisk -o /dev/sda
-
-      # Create partitions
-      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi /dev/sda
-      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot /dev/sda
-      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm /dev/sda
-
-      # Delete partitions
-      sgdisk --zap-all /dev/sda
-
-      # Partition info
-      sgdisk -i <partition_no> /dev/sda
-      sgdisk -i 2 /dev/sda
-
-    }
-
-  )
 
   warning
 
@@ -342,6 +373,7 @@ filesystem()(
           case ${filesystem} in
             "Btrfs")
               filesystem="btrfs"
+              sgdisk -t 3:8300 ${disk}
               ;;
           esac
           select_encryption
@@ -782,7 +814,7 @@ filesystem()(
           exit ${exitcode}
         fi
 
-        efi_partition
+        boot_partition
 
       }
 
@@ -872,7 +904,7 @@ filesystem()(
         # Mount subvolume snapshots
         mount -o noatime,compress=zstd,space_cache,discard=async,subvol=@snapshots ${rootdevice} /mnt/.snapshots
 
-        efi_partition
+        boot_partition
 
       }
 
@@ -906,7 +938,7 @@ filesystem()(
           exit ${exitcode}
         fi
 
-        efi_partition
+        boot_partition
 
       }
 
@@ -915,40 +947,6 @@ filesystem()(
     )
 
     filesystem_select
-
-  )
-
-  efi_partition()(
-
-    format_efi(){
-
-      mkfs.fat -F32 ${efidevice}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-      fi
-
-      mount_efi
-
-    }
-
-    mount_efi(){
-
-      mount --mkdir ${efidevice} /mnt/boot/efi
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
-
-      boot_partition
-
-    }
-
-    format_efi
 
   )
 
@@ -978,13 +976,49 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      fstab
+      efi_partition
 
     }
 
     format_boot
 
   )
+
+  efi_partition()(
+
+    format_efi(){
+
+      mkfs.fat -F32 ${efidevice}
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+      fi
+
+      mount_efi
+
+    }
+
+    mount_efi(){
+
+      mount --mkdir ${efidevice} /mnt/boot/efi
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
+        exit ${exitcode}
+      fi
+
+      fstab
+
+    }
+
+    format_efi
+
+  )
+
+
 
   filesystem_dialog
 
@@ -1102,6 +1136,7 @@ chroot(){
 
   #umount -l /mnt
   clear
+  exit 1
 
 }
 
