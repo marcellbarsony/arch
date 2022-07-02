@@ -245,7 +245,7 @@ partition()(
 
       items=$( gdisk -l ${disk} | tail -4 )
 
-      if (whiptail --title "Confirm partitions" --yesno "${items}" --defaultno 18 78); then
+      if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
           filesystem
         else
           sgdisk --zap-all ${disk}
@@ -545,10 +545,9 @@ filesystem()(
         mkfs.btrfs -L mylabel /dev/mapper/cryptroot
         local exitcode=$?
 
-        if [ "${exitcode}" == "0" ]; then
-            #whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-            #exit ${exitcode}
-            whiptail --title "SUCESS" --msgbox "Formatting ${rootdevice} to ${filesystem} successful.\nExit status: ${exitcode}" 8 78
+        if [ "${exitcode}" != "0" ]; then
+            whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+            exit ${exitcode}
         fi
 
         mount_root
@@ -560,10 +559,9 @@ filesystem()(
         mount /dev/mapper/cryptroot /mnt
         local exitcode=$?
 
-        if [ "${exitcode}" == "0" ]; then
-          #whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
-          #exit ${exitcode}
-          whiptail --title "SUCESS" --msgbox "Mounting /dev/mapper/cryptroot to /mnt successful.\nExit status: ${exitcode}" 8 78
+        if [ "${exitcode}" != "0" ]; then
+          whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+          exit ${exitcode}
         fi
 
         btrfs_subvolumes
@@ -914,7 +912,7 @@ fstab(){
 
 mirrorlist(){
 
-  echo 80 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
+  echo 0 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
   cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
   local exitcode=$?
 
@@ -923,16 +921,40 @@ mirrorlist(){
     exit ${exitcode}
   fi
 
-  echo 90 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
+  echo 33 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
   reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Mirrorlist cannot be updated.\nExit status: ${exitcode}" 8 60
+    whiptail --title "ERROR" --msgbox "Cannot update mirrorlist.\nExit status: ${exitcode}" 8 60
     exit ${exitcode}
   fi
 
+
   clear
+
+  pacman_conf
+
+}
+
+pacman_conf(){
+
+
+  echo 0 | whiptail --gauge "Copying pacman.conf >> /etc/pacman.conf..." 6 50 0
+  cp ~/arch/src/pacman.conf /etc/pacman.conf &>/dev/null
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Cannot copy pacman.conf to /etc/pacman.conf\nExit status: ${exitcode}" 8 60
+  fi
+
+  echo 50 | whiptail --gauge "Copying pacman.conf >> /mnt/etc/pacman.conf..." 6 50 0
+  cp ~/arch/src/pacman.conf /mnt/etc/pacman.conf &>/dev/null
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Cannot copy pacman.conf to /mnt/etc/pacman.conf\nExit status: ${exitcode}" 8 60
+  fi
 
   kernel
 
@@ -941,9 +963,8 @@ mirrorlist(){
 kernel(){
 
   echo 0 | whiptail --gauge "Pacstrap: Installing base packages..." 6 50 0
-  sleep 1
   clear
-  pacstrap /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
+  pacstrap -C ~/arch/src/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
   local exitcode1=$?
 
   if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
@@ -954,7 +975,7 @@ kernel(){
     local exitcode2=$?
   fi
 
-  if [ "${encryption}" == "True" ]; then
+  if [ "${filesystem}" == "ext4" ]; then
     echo 0 | whiptail --gauge "Pacstrap: Installing lvm2..." 6 50 0
     sleep 1
     clear
@@ -963,6 +984,7 @@ kernel(){
   fi
 
   if [ ${filesystem} == "btrfs" ]; then
+    echo 0 | whiptail --gauge "Pacstrap: Installing Btrfs progs..." 6 50 0
     pacstrap /mnt btrfs-progs grub-btrfs
     local exitcode4=$?
   fi

@@ -273,7 +273,6 @@ initramfs(){
     #MODULES=(btrfs)
     sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
     sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
-    sleep 1
   fi
 
   mkinitcpio -p linux
@@ -316,7 +315,6 @@ grub()(
 
   grub_packages(){
 
-    clear
     pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
     local exitcode=$?
 
