@@ -751,7 +751,7 @@ filesystem()(
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ext4 unsuccessful.\nExit status: ${exitcode}" 8 78
         exit ${exitcode}
       fi
 
