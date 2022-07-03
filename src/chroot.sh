@@ -260,43 +260,19 @@ sudoers(){
 
 initramfs(){
 
-  pacman -Qi lvm2 > /dev/null
-  if [ "$?" == "0" ]; then
-    echo 0 | whiptail --gauge "Add LVM support to mkinitcpio..." 6 50 0
-    sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
-    sleep 1
-  fi
-
   pacman -Qi btrfs-progs > /dev/null
   if [ "$?" == "0" ]; then
     echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
-    #MODULES=(btrfs)
     sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
     sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
     sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
   fi
 
-  mkinitcpio -p linux
-  #mkinitcpio -p linux-hardened
+  mkinitcpio -p linux #linux-hardened
 
   locale
 
 }
-
-btrfs()(
-
-  btrfs_uuid(){
-
-    blkid
-
-    # UUID of ${rootdisk}
-    # UUID="123456
-
-    vim /etc/default/grub
-
-  }
-
-)
 
 locale(){
 
@@ -307,8 +283,13 @@ locale(){
   echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
   locale-gen
+  local exitcode=$?
 
-  #efimount
+  if [ "${exitcode}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Cannot generate locale [locale-gen].\nExit status: ${exitcode}" 18 78
+    exit ${exitcode}
+  fi
+
   grub
 
 }
@@ -343,10 +324,10 @@ grub()(
 
   grub_header(){
 
-    luks2uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
+    luksuuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
 
     echo "#!/bin/sh" > /etc/grub.d/01_header &>/dev/null
-    echo "echo "cryptomount -u ${luks2uuid}"" >> /etc/grub.d/01_header &>/dev/null # Remove dashes from UUID
+    echo "echo "cryptomount -u ${luksuuid}"" >> /etc/grub.d/01_header &>/dev/null # Remove dashes from UUID
 
     grub_btrfs
 
@@ -366,22 +347,20 @@ grub()(
 
   grub_crypt(){
 
-    pacman -Qi lvm2 > /dev/null
+    #Btrfs
+    pacman -Qi btrfs-progs > /dev/null
+    if [ "$?" == "0" ]; then
+      uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot UUID
+      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
+      sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub
+      #sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
+    fi
 
+    #ext4
+    pacman -Qi lvm2 > /dev/null
     if [ "$?" == "0" ]; then
       sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"cryptdevice=/dev/nvme0n1p3:volgroup0:allow-discards\ loglevel=3\ quiet\ video=1920x1080\" /etc/default/grub
       sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
-    fi
-
-    pacman -Qi btrfs-progs > /dev/null
-
-    if [ "$?" == "0" ]; then
-      uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot
-      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
-      #sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
-
-      sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub
-
     fi
 
     grub_install
@@ -392,6 +371,7 @@ grub()(
 
     efidir="/efi"
     bootdir="/efi"
+
     grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=${efidir} --boot-direcoty=${bootdir}
     local exitcode=$?
 
@@ -399,7 +379,7 @@ grub()(
       whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [${grubdir}].\nExit status: ${exitcode}" 8 78
     fi
 
-    grub_crypt
+    grub_config
 
   }
 

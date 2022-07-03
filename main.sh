@@ -644,7 +644,7 @@ boot_partition()(
 
 )
 
-ext4_encrypted()(
+ext4()(
 
   cryptsetup_open(){
 
