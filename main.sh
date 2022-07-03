@@ -499,7 +499,7 @@ root_partition()(
       exit ${exitcode}
     fi
 
-    btrfs
+    btrfs_system
 
   }
 
@@ -507,7 +507,7 @@ root_partition()(
 
 )
 
-btrfs()(
+btrfs_system()(
 
   btrfs_subvolumes(){
 
@@ -558,11 +558,17 @@ btrfs()(
     # dmesg | grep "BTRFS"
     local exitcode3=$?
 
-    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
+    mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/.snapshots
+    #Optional:ssd
+    # dmesg | grep "BTRFS"
+    local exitcoder=$?
+
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "An error occurred whilst mounting subvolumes.\n
-      Exit status [Create @]: ${exitcode1}\n
-      Exit status [Create @home]: ${exitcode2}\n
-      Exit status [Create @var]: ${exitcode3}" 18 78
+      Create @          - ${exitcode1}\n
+      Create @home      - ${exitcode2}\n
+      Create @var       - ${exitcode3}\n
+      Create @snapshots - ${exitcode4}" 18 78
     fi
 
     efi_partition
