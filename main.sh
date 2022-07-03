@@ -169,9 +169,9 @@ partition()(
   diskpart(){
 
     options=()
-    options+=("cfdisk" "")
+    #options+=("cfdisk" "")
     options+=("fdisk" "")
-    options+=("gdisk" "")
+    #options+=("gdisk" "")
     options+=("sgdisk" "")
 
     diskpart_tool=$(whiptail --title "Diskpart" --menu "" --noitem --default-item "sgdisk" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
@@ -247,7 +247,7 @@ partition()(
       items=$( gdisk -l ${disk} | tail -4 )
 
       if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
-          filesystem
+          setup_dialog
         else
           sgdisk --zap-all ${disk}
           partition
@@ -285,7 +285,7 @@ partition()(
 
 )
 
-filesystem()(
+setup_dialog()(
 
   filesystem_dialog()(
 
@@ -423,7 +423,7 @@ filesystem()(
 
       # Password match
       if cmp --silent -- "$keydir" "$keydir2"; then
-          encryption
+          crypt_setup
         else
           whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
           crypt_password
@@ -435,385 +435,392 @@ filesystem()(
 
   )
 
-  encryption()(
-
-    mkfs.fat -F32 ${efidevice}
-
-    cryptsetup_create(){
-
-      cryptsetup --type luks2 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-      fi
-
-      cryptsetup_open
-
-    }
-
-    cryptsetup_open(){
-
-      cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
-      local exitcode=$?
-
-      if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
-
-      format_root
-
-    }
-
-    format_root(){
-
-      mkfs.btrfs -L system /dev/mapper/cryptroot
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-          exit ${exitcode}
-      fi
-
-      mount_root
-
-    }
-
-    mount_root(){
-
-      mount /dev/mapper/cryptroot /mnt
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
-
-      btrfs_subvolumes
-
-    }
-
-    btrfs_subvolumes(){
-
-      btrfs subvolume create /mnt/@
-      local exitcode1=$?
-
-      btrfs subvolume create /mnt/@home
-      local exitcode2=$?
-
-      btrfs subvolume create /mnt/@var
-      local exitcode3=$?
-
-      btrfs subvolume create /mnt/@snapshots
-      local exitcode4=$?
-
-      umount -R /mnt
-      local exitcode5=$?
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "An error occurred whilst creating subvolumes.\n
-        Exit status [Create @]: ${exitcode1}\n
-        Exit status [Create @home]: ${exitcode2}\n
-        Exit status [Create @var]: ${exitcode3}\n
-        Exit status [Create @snapshots]: ${exitcode4}\n
-        Exit status [umount /mnt]: ${exitcode5}" 18 78
-      fi
-
-      btrfs_mount
-
-    }
-
-    btrfs_mount(){
-
-      mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
-      #Optional:ssd
-      # dmesg | grep "BTRFS"
-      local exitcode1=$?
-
-      mkdir -p /mnt/{efi,boot,home,var}
-
-      mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
-      #Optional:ssd
-      # dmesg | grep "BTRFS"
-      local exitcode2=$?
-
-      mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
-      #Optional:ssd
-      # dmesg | grep "BTRFS"
-      local exitcode3=$?
-
-      #mount ${efidevice} /mnt/boot
-      mount ${efidevice} /mnt/efi
-      local exitcode4=$?
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "An error occurred whilst mounting subvolumes.\n
-        Exit status [Create @]: ${exitcode1}\n
-        Exit status [Create @home]: ${exitcode2}\n
-        Exit status [Create @var]: ${exitcode3}\n
-        Exit status [Mount EFI]: ${exitcode4}" 18 78
-      fi
-
-      boot_partition
-
-    }
-
-    cryptsetup_create
-
-    encrypted_ext4()(
-
-      cryptsetup_open(){
-
-      cryptsetup open --type luks2 ${rootdevice} cryptlvm --key-file ${keydir}
-      local exitcode=$?
-
-      if [ ${exitcode} != "0" ]; then
-        whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
-
-      }
-
-      volume_physical(){
-
-        pvcreate /dev/mapper/cryptlvm
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Physical volume cannot be created.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        volume_group
-
-      }
-
-      volume_group(){
-
-        vgcreate volgroup0 /dev/mapper/cryptlvm
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Volume group [volgroup0] cannot be created.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        volume_create_root
-
-      }
-
-      volume_create_root(){
-
-        lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] cannot be created.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        volume_create_home
-
-      }
-
-      volume_create_home(){
-
-        lvcreate -l 100%FREE volgroup0 -n crypthome
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] cannot be created.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        volume_kernel_module
-
-      }
-
-      volume_kernel_module(){
-
-        modprobe dm_mod
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Activating volume groups [modprobe dm_mod] failed.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        volume_group_scan
-
-      }
-
-      volume_group_scan(){
-
-        vgscan
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Scanning volume groups [vgscan] failed.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        volume_group_activate
-
-      }
-
-      volume_group_activate(){
-
-        vgchange -ay
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Activating volume groups [vgchange -ay] failed.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        format_root
-
-      }
-
-      format_root(){
-
-        mkfs.${filesystem} /dev/volgroup0/cryptroot
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-            whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/cryptroot] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-            exit ${exitcode}
-        fi
-
-        mount_root
-
-      }
-
-      mount_root(){
-
-        mount /dev/volgroup0/cryptroot /mnt
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "ROOT partition [/dev/volgroup0/cryptroot] was not mounted.\nExit status: ${exitcode}" 8 60
-          exit ${exitcode}
-        fi
-
-        format_home
-
-      }
-
-      format_home(){
-
-        mkfs.${filesystem} /dev/volgroup0/crypthome
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-            whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/crypthome] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-            exit ${exitcode}
-        fi
-
-        mount_home
-
-      }
-
-      mount_home(){
-
-        mkdir /mnt/home
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "HOME directory was not created.\nExit status: ${exitcode}" 8 60
-          exit ${exitcode}
-        fi
-
-        mount /dev/volgroup0/crypthome /mnt/home
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "HOME partition was not mounted.\nExit status: ${exitcode}" 8 60
-          exit ${exitcode}
-        fi
-
-        boot_partition
-
-      }
-
-      cryptsetup_open
-    )
-
-  )
-
-  boot_partition()(
-
-    format_boot(){
-
-      mkfs.ext4 ${bootdevice}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ext4 unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-      fi
-
-      mount_boot
-
-    }
-
-    mount_boot(){
-
-      mount --mkdir ${bootdevice} /mnt/efi
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Boot partition was not mounted\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
-
-      fstab
-
-    }
-
-    format_boot
-
-  )
-
-  efi_partition()(
-
-    format_efi(){
-
-      mkfs.fat -F32 ${efidevice}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Formatting ${efidevice} to FAT32 unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
-      fi
-
-      mount_efi
-
-    }
-
-    mount_efi(){
-
-      #mount --mkdir ${efidevice} /mnt/boot
-      mount --mkdir ${efidevice} /mnt/efi
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
-
-      fstab
-
-    }
-
-    format_efi
-
-  )
-
   filesystem_dialog
 
+)
+
+crypt_setup()(
+
+  cryptsetup_create(){
+
+    cryptsetup --type luks2 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
+      exit ${exitcode}
+    fi
+
+    cryptsetup_open
+
+  }
+
+  cryptsetup_open(){
+
+    cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    root_partition
+
+  }
+
+  cryptsetup_create
+
+)
+
+root_partition()(
+
+  root_format(){
+
+    mkfs.btrfs -L system /dev/mapper/cryptroot
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+    fi
+
+    root_mount
+
+  }
+
+  root_mount(){
+
+    mount /dev/mapper/cryptroot /mnt
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+      exit ${exitcode}
+    fi
+
+    btrfs
+
+  }
+
+  root_format
+
+)
+
+btrfs()(
+
+  btrfs_subvolumes(){
+
+    btrfs subvolume create /mnt/@
+    local exitcode1=$?
+
+    btrfs subvolume create /mnt/@home
+    local exitcode2=$?
+
+    btrfs subvolume create /mnt/@var
+    local exitcode3=$?
+
+    btrfs subvolume create /mnt/@snapshots
+    local exitcode4=$?
+
+    umount -R /mnt
+    local exitcode5=$?
+
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "An error occurred whilst creating subvolumes.\n
+      Exit status [Create @]: ${exitcode1}\n
+      Exit status [Create @home]: ${exitcode2}\n
+      Exit status [Create @var]: ${exitcode3}\n
+      Exit status [Create @snapshots]: ${exitcode4}\n
+      Exit status [umount /mnt]: ${exitcode5}" 18 78
+    fi
+
+    btrfs_mount
+
+  }
+
+  btrfs_mount(){
+
+    mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
+    #Optional:ssd
+    # dmesg | grep "BTRFS"
+    local exitcode1=$?
+
+    mkdir -p /mnt/{efi,boot,home,var}
+
+    mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
+    #Optional:ssd
+    # dmesg | grep "BTRFS"
+    local exitcode2=$?
+
+    mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
+    #Optional:ssd
+    # dmesg | grep "BTRFS"
+    local exitcode3=$?
+
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
+      whiptail --title "ERROR" --msgbox "An error occurred whilst mounting subvolumes.\n
+      Exit status [Create @]: ${exitcode1}\n
+      Exit status [Create @home]: ${exitcode2}\n
+      Exit status [Create @var]: ${exitcode3}" 18 78
+    fi
+
+    efi_partition
+
+  }
+
+  btrfs_subvolumes
+
+)
+
+efi_partition()(
+
+  efi_format(){
+
+    mkfs.fat -F32 ${efidevice}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Cannot format EFI [${efidevice}] to FAT32.\nExit status: ${exitcode}" 18 78
+      exit ${exitcode}
+    fi
+
+    efi_mount
+
+  }
+
+  efi_mount(){
+
+    efimountdir="/mnt/efi"
+    #efimountdir="/mnt/boot"
+
+    mount ${efidevice} ${efimountdir}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Cannot mount EFI [${efidevice}] to ${efimountdir}.\nExit status: ${exitcode}" 18 78
+      exit ${exitcode}
+    fi
+
+    boot_partition
+
+  }
+
+  efi_format
+
+)
+
+boot_partition()(
+
+  boot_format(){
+
+    mkfs.ext4 ${bootdevice}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Formatting ${bootdevice} to ext4 unsuccessful.\nExit status: ${exitcode}" 8 78
+      exit ${exitcode}
+    fi
+
+    boot_mount
+
+  }
+
+  mount_boot(){
+
+    mount --mkdir ${bootdevice} /mnt/efi
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Boot partition was not mounted\nExit status: ${exitcode}" 8 60
+      exit ${exitcode}
+    fi
+
+    fstab
+
+  }
+
+  boot_format
+
+)
+
+ext4_encrypted()(
+
+  cryptsetup_open(){
+
+  cryptsetup open --type luks2 ${rootdevice} cryptlvm --key-file ${keydir}
+  local exitcode=$?
+
+  if [ ${exitcode} != "0" ]; then
+    whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+    exit ${exitcode}
+  fi
+
+  }
+
+  volume_physical(){
+
+    pvcreate /dev/mapper/cryptlvm
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Physical volume cannot be created.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    volume_group
+
+  }
+
+  volume_group(){
+
+    vgcreate volgroup0 /dev/mapper/cryptlvm
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Volume group [volgroup0] cannot be created.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    volume_create_root
+
+  }
+
+  volume_create_root(){
+
+    lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] cannot be created.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    volume_create_home
+
+  }
+
+  volume_create_home(){
+
+    lvcreate -l 100%FREE volgroup0 -n crypthome
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] cannot be created.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    volume_kernel_module
+
+  }
+
+  volume_kernel_module(){
+
+    modprobe dm_mod
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Activating volume groups [modprobe dm_mod] failed.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    volume_group_scan
+
+  }
+
+  volume_group_scan(){
+
+    vgscan
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Scanning volume groups [vgscan] failed.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    volume_group_activate
+
+  }
+
+  volume_group_activate(){
+
+    vgchange -ay
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Activating volume groups [vgchange -ay] failed.\nExit status: ${?}" 8 78
+      exit ${exitcode}
+    fi
+
+    format_root
+
+  }
+
+  format_root(){
+
+    mkfs.${filesystem} /dev/volgroup0/cryptroot
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/cryptroot] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+    fi
+
+    mount_root
+
+  }
+
+  mount_root(){
+
+    mount /dev/volgroup0/cryptroot /mnt
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "ROOT partition [/dev/volgroup0/cryptroot] was not mounted.\nExit status: ${exitcode}" 8 60
+      exit ${exitcode}
+    fi
+
+    format_home
+
+  }
+
+  format_home(){
+
+    mkfs.${filesystem} /dev/volgroup0/crypthome
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/crypthome] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+        exit ${exitcode}
+    fi
+
+    mount_home
+
+  }
+
+  mount_home(){
+
+    mkdir /mnt/home
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "HOME directory was not created.\nExit status: ${exitcode}" 8 60
+      exit ${exitcode}
+    fi
+
+    mount /dev/volgroup0/crypthome /mnt/home
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "HOME partition was not mounted.\nExit status: ${exitcode}" 8 60
+      exit ${exitcode}
+    fi
+
+    boot_partition
+
+  }
+
+  cryptsetup_open
 )
 
 fstab(){
