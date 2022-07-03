@@ -541,34 +541,35 @@ btrfs_system()(
 
   btrfs_mount(){
 
+    mkdir -p /mnt/{efi,boot,home,var}
+    mkdir -p /mnt/.snapshots
+
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
+    local exitcode1=$?
     #Optional:ssd
     # dmesg | grep "BTRFS"
-    local exitcode1=$?
-
-    mkdir -p /mnt/{efi,boot,home,var}
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
+    local exitcode2=$?
     #Optional:ssd
     # dmesg | grep "BTRFS"
-    local exitcode2=$?
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
+    local exitcode3=$?
     #Optional:ssd
     # dmesg | grep "BTRFS"
-    local exitcode3=$?
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/.snapshots
+    local exitcoder=$?
     #Optional:ssd
     # dmesg | grep "BTRFS"
-    local exitcoder=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "An error occurred whilst mounting subvolumes.\n
-      Create @          - ${exitcode1}\n
-      Create @home      - ${exitcode2}\n
-      Create @var       - ${exitcode3}\n
-      Create @snapshots - ${exitcode4}" 18 78
+      ${exitcode1} - Create @\n
+      ${exitcode2} - Create @home\n
+      ${exitcode3} - Create @var\n
+      ${exitcode4} - Create @snapshots" 18 78
     fi
 
     efi_partition
@@ -587,7 +588,7 @@ efi_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Cannot format EFI [${efidevice}] to FAT32.\nExit status: ${exitcode}" 18 78
+      whiptail --title "ERROR" --msgbox "Cannot format ESP [${efidevice}] to FAT32.\nExit status: ${exitcode}" 18 78
       exit ${exitcode}
     fi
 
@@ -604,7 +605,7 @@ efi_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Cannot mount EFI [${efidevice}] to ${efimountdir}.\nExit status: ${exitcode}" 18 78
+      whiptail --title "ERROR" --msgbox "Cannot mount ESP [${efidevice}] to ${efimountdir}.\nExit status: ${exitcode}" 18 78
       exit ${exitcode}
     fi
 
@@ -630,9 +631,10 @@ boot_partition()(
 
     boot_mount
 
+
   }
 
-  mount_boot(){
+  boot_mount(){
 
     mount --mkdir ${bootdevice} /mnt/efi
     local exitcode=$?
