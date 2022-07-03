@@ -220,28 +220,22 @@ partition()(
       sgdisk -o ${disk}
       local exitcode1=$?
 
-      #sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi ${disk}
-      local exitcode=$?
+      sgdisk -n 0:0:+750MiB -t 0:ef00 -c 0:efi ${disk}
+      local exitcode2=$?
 
-      #sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
-      #local exitcode=$?
-
-      #sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
-      local exitcode=$?
-
-      sgdisk --clear \
-         --new=0:0:+750MiB --typecode=1:ef00 --change-name=0:efi \
-         --new=0:0:+1GiB   --typecode=2:8300 --change-name=0:boot \
-         --new=0:0:0       --typecode=3:8300 --change-name=0:cryptsystem \
-         ${disk}
+      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
       local exitcode3=$?
 
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
+      sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem ${disk}
+      local exitcode4=$?
+
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
         whiptail --title "ERROR" --msgbox "Create.\n
-        Exit status [GPT]: ${exitcode1}\n
-        Exit status [/efi]: ${exitcode2}\n
+        Exit status [Clear]: ${exitcode1}\n
+        Exit status [GPT]: ${exitcode2}\n
+        Exit status [/efi]: ${exitcode3}\n
         Exit status [/root]: ${exitcode4}" 18 78
-        #exit 1
+        exit 1
       fi
 
       sgdisk_check
