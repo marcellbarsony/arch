@@ -19,6 +19,8 @@
 
 [x] Partition menu
 [x] [BTRFS](https://wiki.archlinux.org/title/btrfs)
+[ ] [Snapper](https://wiki.archlinux.org/title/snapper)
+[ ] [Timeshift]()
 
 ### Libnewt
 

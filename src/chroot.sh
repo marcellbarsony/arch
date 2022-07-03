@@ -272,7 +272,8 @@ initramfs(){
     echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
     #MODULES=(btrfs)
     sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
-    sed -i "s/block filesystems/block encrypt filesystems/g" /etc/mkinitcpio.conf
+    sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
+    sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
   fi
 
   mkinitcpio -p linux
@@ -336,19 +337,28 @@ grub()(
     echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
     echo "EOF" >> /etc/grub.d/00_header
 
-    grub_install
+    grub_header
 
   }
 
-  grub_install(){
+  grub_header(){
 
-    grubdir="/boot"
-    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=${grubdir}
-    local exitcode=$?
+    luks2uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
 
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [${grubdir}].\nExit status: ${exitcode}" 8 78
-    fi
+    echo "#!/bin/sh" > /etc/grub.d/01_header &>/dev/null
+    echo "echo "cryptomount -u ${luks2uuid}"" >> /etc/grub.d/01_header &>/dev/null # Remove dashes from UUID
+
+    grub_btrfs
+
+  }
+
+  grub_btrfs(){
+
+    sed -i '/#GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"/s/^#//g' /etc/default/grub-btrfs/config
+    #sed -i "s/GRUB_BTRFS_GRUB_DIRNAME=\"/boot/grub2\"/GRUB_BTRFS_GRUB_DIRNAME=\"/efi/grub\"/g" /etc/mkinitcpio.conf
+    sed -i 's/GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"/GRUB_BTRFS_GRUB_DIRNAME="/efi/grub"/g' /etc/mkinitcpio.conf
+
+    systemctl enable --now grub-btrfs.path
 
     grub_crypt
 
@@ -370,11 +380,26 @@ grub()(
       sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
       #sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
 
-      #https://keyb0ardninja.github.io/BTRFS.html#grub-setup
-      #GRUB_PRELOAD_MODULES="part_gpt part_msdos luks2"
+      sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub
+
     fi
 
-    grub_config
+    grub_install
+
+  }
+
+  grub_install(){
+
+    efidir="/efi"
+    bootdir="/efi"
+    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=${efidir} --boot-direcoty=${bootdir}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [${grubdir}].\nExit status: ${exitcode}" 8 78
+    fi
+
+    grub_crypt
 
   }
 

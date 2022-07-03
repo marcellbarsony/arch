@@ -767,7 +767,7 @@ filesystem()(
 
     mount_boot(){
 
-      mount --mkdir ${efidevice} /mnt/boot
+      mount --mkdir ${efidevice} /mnt/efi
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
@@ -801,7 +801,8 @@ filesystem()(
 
     mount_efi(){
 
-      mount --mkdir ${efidevice} /mnt/boot/efi
+      #mount --mkdir ${efidevice} /mnt/boot
+      mount --mkdir ${efidevice} /mnt/efi
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
@@ -897,7 +898,7 @@ kernel(){
 
   echo 0 | whiptail --gauge "Pacstrap: Installing base packages..." 6 50 0
   clear
-  pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt
+  pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt intel-ucode
   # linux-hardened linux-hardened-headers
   local exitcode1=$?
 
