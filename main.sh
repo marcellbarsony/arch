@@ -761,11 +761,11 @@ filesystem()(
 
     mount_boot(){
 
-      mount --mkdir ${efidevice} /mnt/efi
+      mount --mkdir ${bootdevice} /mnt/efi
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "EFI partition was not mounted\nExit status: ${exitcode}" 8 60
+        whiptail --title "ERROR" --msgbox "Boot partition was not mounted\nExit status: ${exitcode}" 8 60
         exit ${exitcode}
       fi
 
