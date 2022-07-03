@@ -769,7 +769,7 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      efi_partition
+      fstab
 
     }
 
