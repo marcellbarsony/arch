@@ -96,8 +96,8 @@ system_administration()(
 
     grub_password(){
 
-      grubpw=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
-      grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase [confirm]" --title "GRUB Passphrase" --nocancel 8 78 3>&1 1>&2 2>&3)
+      grubpw=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB" --nocancel 8 78 3>&1 1>&2 2>&3)
+      grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase [confirm]" --title "GRUB" --nocancel 8 78 3>&1 1>&2 2>&3)
 
       if [ ! ${grubpw} ] || [ ! ${grubpw_confirm} ]; then
         whiptail --title "ERROR" --msgbox "GRUB passphrase cannot be empty." 8 78
@@ -367,8 +367,11 @@ grub()(
 
     if [ "$?" == "0" ]; then
       uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot
-      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
+      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
       #sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
+
+      #https://keyb0ardninja.github.io/BTRFS.html#grub-setup
+      #GRUB_PRELOAD_MODULES="part_gpt part_msdos luks2"
     fi
 
     grub_config

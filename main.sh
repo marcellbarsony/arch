@@ -220,21 +220,28 @@ partition()(
       sgdisk -o ${disk}
       local exitcode1=$?
 
-      sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi ${disk}
-      local exitcode2=$?
+      #sgdisk -n 0:0:+512MiB -t 0:ef00 -c 0:efi ${disk}
+      local exitcode=$?
 
       #sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
-      #local exitcode3=$?
+      #local exitcode=$?
 
-      sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
-      local exitcode4=$?
+      #sgdisk -n 0:0:0 -t 0:8e00 -c 0:lvm ${disk}
+      local exitcode=$?
 
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
+      sgdisk --clear \
+         --new=0:0:+750MiB --typecode=1:ef00 --change-name=0:efi \
+         --new=0:0:+1GiB   --typecode=2:8300 --change-name=0:boot \
+         --new=0:0:0       --typecode=3:8300 --change-name=0:cryptsystem \
+         ${disk}
+      local exitcode3=$?
+
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
         whiptail --title "ERROR" --msgbox "Create.\n
         Exit status [GPT]: ${exitcode1}\n
         Exit status [/efi]: ${exitcode2}\n
         Exit status [/root]: ${exitcode4}" 18 78
-        exit 1
+        #exit 1
       fi
 
       sgdisk_check
@@ -300,7 +307,7 @@ filesystem()(
 
       case $? in
         0)
-          select_root
+          select_boot
           ;;
         1)
           partition
@@ -348,44 +355,15 @@ filesystem()(
 
       case $? in
         0)
-          select_filesystem
+          encryption_dialog
           ;;
         1)
-          select_efi
+          select_boot
           ;;
         *)
           whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
           ;;
       esac
-
-    }
-
-    select_filesystem(){
-
-      options=()
-      options+=("Btrfs" "[-]")
-      options+=("ext4" "[-]")
-
-      filesystem=$(whiptail --title "File System" --menu "Select file system" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
-
-      if [ "$?" = "0" ]; then
-          case ${filesystem} in
-            "Btrfs")
-              filesystem="btrfs"
-              sgdisk -t 2:8300 ${disk}
-              ;;
-          esac
-          encryption_dialog
-        else
-          case $? in
-            1)
-              select_root
-              ;;
-            *)
-              whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
-              ;;
-          esac
-      fi
 
     }
 
@@ -459,34 +437,6 @@ filesystem()(
 
     }
 
-    select_root_size(){
-
-      if [ ${filesystem} == "ext4" ]; then
-          rootsize=$(whiptail --inputbox "Root size [GB]" 8 39 --title "Root filesystem" 3>&1 1>&2 2>&3)
-          local exitcode=$?
-
-          case $? in
-            0)
-              if [[ ${rootsize} ]] && [ ${rootsize} -eq ${rootsize} 2>/dev/null ]; then
-                  encrypted
-                else
-                  whiptail --title "ERROR" --msgbox "Value is not an integer.\nExit status: ${?}" 8 78
-                  select_root_size
-              fi
-              ;;
-            1)
-              crypt_password
-              ;;
-            *)
-              echo "Exit status $?"
-              ;;
-          esac
-      fi
-
-      encryption
-
-    }
-
     crypt_password
 
   )
@@ -497,7 +447,7 @@ filesystem()(
 
     cryptsetup_create(){
 
-      cryptsetup --type luks2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
+      cryptsetup --type luks2 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
@@ -505,134 +455,118 @@ filesystem()(
         exit ${exitcode}
       fi
 
-      filesystem_select
-
-    }
-
-    filesystem_select(){
-
-      case ${filesystem} in
-        "btrfs")
-          encrypted_btrfs
-          ;;
-        "ext4")
-          encrypted_ext4
-          ;;
-      esac
-
-    }
-
-    encrypted_btrfs()(
-
-      cryptsetup_open(){
-
-        cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
-        local exitcode=$?
-
-        if [ ${exitcode} != "0" ]; then
-          whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
-          exit ${exitcode}
-        fi
-
-        format_root
-
-      }
-
-      format_root(){
-
-        mkfs.btrfs -L mylabel /dev/mapper/cryptroot
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-            whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-            exit ${exitcode}
-        fi
-
-        mount_root
-
-      }
-
-      mount_root(){
-
-        mount /dev/mapper/cryptroot /mnt
-        local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
-          exit ${exitcode}
-        fi
-
-        btrfs_subvolumes
-
-      }
-
-      btrfs_subvolumes(){
-
-        btrfs subvolume create /mnt/@
-        local exitcode1=$?
-
-        btrfs subvolume create /mnt/@home
-        local exitcode2=$?
-
-        btrfs subvolume create /mnt/@var
-        local exitcode3=$?
-
-        btrfs subvolume create /mnt/@snapshots
-        local exitcode4=$?
-
-        umount /mnt
-        local exitcode5=$?
-
-        if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "An error occurred whilst creating subvolumes.\n
-          Exit status [Create @]: ${exitcode1}\n
-          Exit status [Create @home]: ${exitcode2}\n
-          Exit status [Create @var]: ${exitcode3}\n
-          Exit status [Create @snapshots]: ${exitcode4}\n
-          Exit status [umount /mnt]: ${exitcode5}" 18 78
-        fi
-
-        btrfs_mount
-
-      }
-
-      btrfs_mount(){
-
-        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
-        #Optional:ssd
-        # dmesg | grep "BTRFS"
-        local exitcode1=$?
-
-        mkdir -p /mnt/{boot,home,var}
-
-        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
-        #Optional:ssd
-        # dmesg | grep "BTRFS"
-        local exitcode2=$?
-
-        mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
-        #Optional:ssd
-        # dmesg | grep "BTRFS"
-        local exitcode3=$?
-
-        mount ${efidevice} /mnt/boot
-        local exitcode4=$?
-
-          if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-            whiptail --title "ERROR" --msgbox "An error occurred whilst mounting subvolumes.\n
-            Exit status [Create @]: ${exitcode1}\n
-            Exit status [Create @home]: ${exitcode2}\n
-            Exit status [Create @var]: ${exitcode3}\n
-            Exit status [Mount EFI]: ${exitcode4}" 18 78
-          fi
-
-        fstab
-
-      }
-
       cryptsetup_open
 
-    )
+    }
+
+    cryptsetup_open(){
+
+      cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
+      local exitcode=$?
+
+      if [ ${exitcode} != "0" ]; then
+        whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+        exit ${exitcode}
+      fi
+
+      format_root
+
+    }
+
+    format_root(){
+
+      mkfs.btrfs -L system /dev/mapper/cryptroot
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+          whiptail --title "ERROR" --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
+          exit ${exitcode}
+      fi
+
+      mount_root
+
+    }
+
+    mount_root(){
+
+      mount /dev/mapper/cryptroot /mnt
+      local exitcode=$?
+
+      if [ "${exitcode}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+        exit ${exitcode}
+      fi
+
+      btrfs_subvolumes
+
+    }
+
+    btrfs_subvolumes(){
+
+      btrfs subvolume create /mnt/@
+      local exitcode1=$?
+
+      btrfs subvolume create /mnt/@home
+      local exitcode2=$?
+
+      btrfs subvolume create /mnt/@var
+      local exitcode3=$?
+
+      btrfs subvolume create /mnt/@snapshots
+      local exitcode4=$?
+
+      umount -R /mnt
+      local exitcode5=$?
+
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "An error occurred whilst creating subvolumes.\n
+        Exit status [Create @]: ${exitcode1}\n
+        Exit status [Create @home]: ${exitcode2}\n
+        Exit status [Create @var]: ${exitcode3}\n
+        Exit status [Create @snapshots]: ${exitcode4}\n
+        Exit status [umount /mnt]: ${exitcode5}" 18 78
+      fi
+
+      btrfs_mount
+
+    }
+
+    btrfs_mount(){
+
+      mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
+      #Optional:ssd
+      # dmesg | grep "BTRFS"
+      local exitcode1=$?
+
+      mkdir -p /mnt/{efi,boot,home,var}
+
+      mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
+      #Optional:ssd
+      # dmesg | grep "BTRFS"
+      local exitcode2=$?
+
+      mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
+      #Optional:ssd
+      # dmesg | grep "BTRFS"
+      local exitcode3=$?
+
+      #mount ${efidevice} /mnt/boot
+      mount ${efidevice} /mnt/efi
+      local exitcode4=$?
+
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
+        whiptail --title "ERROR" --msgbox "An error occurred whilst mounting subvolumes.\n
+        Exit status [Create @]: ${exitcode1}\n
+        Exit status [Create @home]: ${exitcode2}\n
+        Exit status [Create @var]: ${exitcode3}\n
+        Exit status [Mount EFI]: ${exitcode4}" 18 78
+      fi
+
+      boot_partition
+
+    }
+
+    cryptsetup_create
 
     encrypted_ext4()(
 
@@ -811,10 +745,7 @@ filesystem()(
       }
 
       cryptsetup_open
-
     )
-
-    cryptsetup_create
 
   )
 
@@ -822,7 +753,7 @@ filesystem()(
 
     format_boot(){
 
-      mkfs.${filesystem} ${bootdevice}
+      mkfs.ext4 ${bootdevice}
       local exitcode=$?
 
       if [ "${exitcode}" != "0" ]; then
