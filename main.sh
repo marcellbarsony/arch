@@ -528,11 +528,11 @@ btrfs_system()(
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "An error occurred whilst creating subvolumes.\n
-      Exit status [Create @]: ${exitcode1}\n
-      Exit status [Create @home]: ${exitcode2}\n
-      Exit status [Create @var]: ${exitcode3}\n
-      Exit status [Create @snapshots]: ${exitcode4}\n
-      Exit status [umount /mnt]: ${exitcode5}" 18 78
+      Exit status [Create @          ]: ${exitcode1}\n
+      Exit status [Create @home      ]: ${exitcode2}\n
+      Exit status [Create @var       ]: ${exitcode3}\n
+      Exit status [Create @snapshots ]: ${exitcode4}\n
+      Exit status [Unmount /mnt      ]: ${exitcode5}" 18 78
     fi
 
     btrfs_mount
@@ -834,19 +834,16 @@ ext4()(
 fstab(){
 
   mkdir /mnt/etc/ &>/dev/null
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "fstab directory was not created.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
-  fi
+  local exitcode1=$?
 
   genfstab -U /mnt >> /mnt/etc/fstab &>/dev/null
-  local exitcode=$?
+  local exitcode2=$?
 
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "fstab config was not generated.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Cannot copy pacman.conf.\n
+    Fstab directory: ${exitcode1}\n
+    Fstab config: ${exitcode2}" 18 78
+    exit 1
   fi
 
   mirrorlist
@@ -857,21 +854,16 @@ mirrorlist(){
 
   echo 0 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
   cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Mirrorlist cannot be backed up.\nExit status: ${exitcode}" 8 60
-    exit ${exitcode}
-  fi
+  local exitcode1=$?
 
   echo 33 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
   reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
-  local exitcode=$?
+  local exitcode2=$?
 
-  if [ "${exitcode}" != "0" ]; then
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "Cannot update mirrorlist.\n
-    Exit status: ${exitcode}" 8 60
-    exit ${exitcode}
+    Mirrorlist backup: ${exitcode1}\n
+    Mirrorlist update: ${exitcode2}" 18 78
   fi
 
   clear
@@ -882,21 +874,19 @@ mirrorlist(){
 
 pacman_conf(){
 
-
   echo 0 | whiptail --gauge "Copying pacman.conf >> /etc/pacman.conf..." 6 50 0
   cp ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Cannot copy pacman.conf to /etc/pacman.conf\nExit status: ${exitcode}" 8 60
-  fi
+  local exitcode1=$?
 
   echo 50 | whiptail --gauge "Copying pacman.conf >> /mnt/etc/pacman.conf..." 6 50 0
   cp ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
-  local exitcode=$?
+  local exitcode2=$?
 
-  if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Cannot copy pacman.conf to /mnt/etc/pacman.conf\nExit status: ${exitcode}" 8 60
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+    whiptail --title "ERROR" --msgbox "Cannot copy pacman.conf.\n
+    pacman.conf >> /etc/pacman.conf - ${exitcode1}\n
+    pacman.conf >> /mnt/etc/pacman.conf - ${exitcode2}" 18 78
+    exit 1
   fi
 
   kernel
@@ -906,43 +896,32 @@ pacman_conf(){
 kernel(){
 
   echo 0 | whiptail --gauge "Pacstrap: Installing base packages..." 6 50 0
-  clear
+  sleep 1 && clear
   pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt intel-ucode
-  # linux-hardened linux-hardened-headers
   local exitcode1=$?
+
+  echo 0 | whiptail --gauge "Pacstrap: Installing Btrfs progs..." 6 50 0
+  sleep 1 && clear
+  pacstrap /mnt btrfs-progs grub-btrfs lvm2
+  local exitcode2=$?
 
   if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
     echo 0 | whiptail --gauge "Pacstrap: Installing ${dmi} packages..." 6 50 0
-    sleep 1
-    clear
+    sleep 1 && clear
     pacstrap /mnt virtualbox-guest-utils
-    local exitcode2=$?
-  fi
-
-  # Hardened Kernel
-  #Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
-  #ls -lsha /boot
-
-  if [ "${filesystem}" == "ext4" ]; then
-    echo 0 | whiptail --gauge "Pacstrap: Installing lvm2..." 6 50 0
-    sleep 1
-    clear
-    pacstrap /mnt lvm2
     local exitcode3=$?
   fi
 
-  if [ ${filesystem} == "btrfs" ]; then
-    echo 0 | whiptail --gauge "Pacstrap: Installing Btrfs progs..." 6 50 0
-    pacstrap /mnt btrfs-progs grub-btrfs
-    local exitcode4=$?
-  fi
+  # Hardened Kernel
+  # pacstrap: linux-hardened linux-hardened-headers
+  # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
+  # ls -lsha /boot
 
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "An error occurred whilst installing packages.\n
-    Exit status [Main packages]: ${exitcode1}\n
-    Exit status [DMI packages]: ${exitcode2}\n
-    Exit status [Crypt packages]: ${exitcode3}\n
-    Exit status [Btrfs packages]: ${exitcode4}" 18 78
+    Exit status [ Main packages  ]: ${exitcode1}\n
+    Exit status [ Btrfs packages ]: ${exitcode2}\n
+    Exit status [ DMI packages   ]: ${exitcode3}" 18 78
   fi
 
   chroot

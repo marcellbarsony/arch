@@ -189,7 +189,6 @@ system_administration()(
 
       user_group
 
-
     }
 
     user_group(){
@@ -265,7 +264,7 @@ initramfs(){
     echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
     sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
     sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
-    sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
+    #sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
   fi
 
   mkinitcpio -p linux #linux-hardened
@@ -327,7 +326,7 @@ grub()(
     luksuuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
 
     echo "#!/bin/sh" > /etc/grub.d/01_header &>/dev/null
-    echo "echo "cryptomount -u ${luksuuid}"" >> /etc/grub.d/01_header &>/dev/null # Remove dashes from UUID
+    echo "echo "cryptomount -u ${luksuuid}"" >> /etc/grub.d/01_header &>/dev/null
 
     grub_btrfs
 
@@ -336,8 +335,8 @@ grub()(
   grub_btrfs(){
 
     sed -i '/#GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"/s/^#//g' /etc/default/grub-btrfs/config
-    #sed -i "s/GRUB_BTRFS_GRUB_DIRNAME=\"/boot/grub2\"/GRUB_BTRFS_GRUB_DIRNAME=\"/efi/grub\"/g" /etc/mkinitcpio.conf
-    sed -i 's/GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"/GRUB_BTRFS_GRUB_DIRNAME="/efi/grub"/g' /etc/mkinitcpio.conf
+    sed -i 's/GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"/GRUB_BTRFS_GRUB_DIRNAME="/efi/grub"/g' /etc/grub-btrfs/config
+    #sed -i "s/GRUB_BTRFS_GRUB_DIRNAME=\"/boot/grub2\"/GRUB_BTRFS_GRUB_DIRNAME=\"/efi/grub\"/g" /etc/grub-btrfs/config
 
     systemctl enable --now grub-btrfs.path
 
