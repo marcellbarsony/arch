@@ -391,7 +391,7 @@ setup_dialog()(
 
       case $? in
         0)
-          crypt_file
+          crypt_password_check
           ;;
         1)
           crypt_password
@@ -403,7 +403,18 @@ setup_dialog()(
 
     }
 
-    crypt_file(){
+    crypt_password_check(){
+
+      if [[ "${cryptpassword}" != "${cryptpassword_confirm}" ]]; then
+        whiptail --title "ERROR" --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+        crypt_password
+      fi
+
+      crypt_setup
+
+    }
+
+    key_file(){
 
       keydir=/root/luks.key
       keydir2=/root/luks.key2
@@ -443,8 +454,10 @@ crypt_setup()(
 
   cryptsetup_create(){
 
-    cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
+    echo ${cryptpassword} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file=-
     local exitcode=$?
+
+    #https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Keyfiles
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
@@ -460,7 +473,7 @@ crypt_setup()(
 
   cryptsetup_open(){
 
-    cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file ${keydir}
+    echo ${cryptpassword} | cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file=-
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
