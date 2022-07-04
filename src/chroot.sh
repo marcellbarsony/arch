@@ -371,7 +371,7 @@ grub()(
 
   grub_install(){
 
-    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-direcoty=/efi
+    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-directory=/efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
