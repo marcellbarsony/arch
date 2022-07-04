@@ -325,10 +325,9 @@ grub()(
 
     luksuuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
 
-    echo '#!/bin/sh' > /etc/grub.d/01_header &>/dev/null
-    echo -n 'echo "' >> /etc/grub.d/01_header
-    echo -n `echo "cryptomount -u ${luksuuid}"` >> /etc/grub.d/01_header &>/dev/null
-    echo -n '"' >> /etc/grub.d/01_header
+    echo '#!/bin/sh' > /etc/grub.d/01_header
+    echo -n "echo " >> /etc/grub.d/01_header
+    echo -n `echo \"cryptomount -u ${luksuuid}\"` >> /etc/grub.d/01_header
     #chmod
 
     grub_btrfs
@@ -371,9 +370,6 @@ grub()(
   }
 
   grub_install(){
-
-    efidir="/efi"
-    bootdir="/efi"
 
     grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-direcoty=/efi
     local exitcode=$?
