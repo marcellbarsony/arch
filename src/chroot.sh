@@ -280,13 +280,14 @@ locale(){
 initramfs(){
 
   echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
+  sleep 1 && clear
   sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
   sed -i "s/block filesystems/block encrypt btrfs filesystems/g" /etc/mkinitcpio.conf
   #sed -i "s/block filesystems/block encrypt btrfs lvm2 filesystems/g" /etc/mkinitcpio.conf
   #sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
 
   mkinitcpio -P
-  mkinitcpio -p linux #linux-hardened
+  #mkinitcpio -p linux #linux-hardened
 
   grub
 
@@ -398,7 +399,8 @@ grub()(
 
     #}
 
-  grub_password
+  #grub_password
+  grub_header
 
 )
 
