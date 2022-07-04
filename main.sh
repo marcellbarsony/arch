@@ -297,11 +297,11 @@ setup_dialog()(
         options+=("${item}" "")
       done
 
-      efidevice=$(whiptail --title "Partition" --menu "Select partition [EFI]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      efidevice=$(whiptail --title "Partition" --menu "Select device [EFI]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
-          select_boot
+          select_root
           ;;
         1)
           partition
@@ -321,7 +321,7 @@ setup_dialog()(
         options+=("${item}" "")
       done
 
-      bootdevice=$(whiptail --title "Partition" --menu "Select partition [Boot]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      bootdevice=$(whiptail --title "Partition" --menu "Select device [Boot]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -345,14 +345,14 @@ setup_dialog()(
         options+=("${item}" "")
       done
 
-      rootdevice=$(whiptail --title "Partition" --menu "Select partition [Root]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      rootdevice=$(whiptail --title "Partition" --menu "Select device [Root]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
           encryption_dialog
           ;;
         1)
-          select_boot
+          select_efi
           ;;
         *)
           whiptail --title "ERROR" --msgbox "Error status: ${?}" 8 78
@@ -369,7 +369,7 @@ setup_dialog()(
 
     crypt_password(){
 
-      cryptpassword=$(whiptail --passwordbox "Encryption passphrase" 8 78 --title "Crypt" 3>&1 1>&2 2>&3)
+      cryptpassword=$(whiptail --passwordbox "Encryption passphrase" 8 78 --title "Encryption" 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -387,7 +387,7 @@ setup_dialog()(
 
     crypt_password_confirm(){
 
-      cryptpassword_confirm=$(whiptail --passwordbox "Encryption passphrase [confirm]" 8 78 --title "Crypt" 3>&1 1>&2 2>&3)
+      cryptpassword_confirm=$(whiptail --passwordbox "Encryption passphrase [confirm]" 8 78 --title "Encryption" 3>&1 1>&2 2>&3)
 
       case $? in
         0)
