@@ -253,22 +253,6 @@ sudoers(){
   visudo
   rm /etc/sudoers.new
 
-  initramfs
-
-}
-
-initramfs(){
-
-  pacman -Qi btrfs-progs > /dev/null
-  if [ "$?" == "0" ]; then
-    echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
-    sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
-    sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf
-    #sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
-  fi
-
-  mkinitcpio -p linux #linux-hardened
-
   locale
 
 }
@@ -289,24 +273,26 @@ locale(){
     exit ${exitcode}
   fi
 
+  initramfs
+
+}
+
+initramfs(){
+
+  echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
+  sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
+  sed -i "s/block filesystems/block encrypt btrfs filesystems/g" /etc/mkinitcpio.conf
+  #sed -i "s/block filesystems/block encrypt btrfs lvm2 filesystems/g" /etc/mkinitcpio.conf
+  #sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
+
+  mkinitcpio -P
+  mkinitcpio -p linux #linux-hardened
+
   grub
 
 }
 
 grub()(
-
-  grub_packages(){
-
-    pacman -S --noconfirm grub efibootmgr dosfstools os-prober mtools
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB packages were not installed.\nExit status: ${exitcode}" 8 78
-    fi
-
-    grub_password
-
-  }
 
   grub_password(){
 
@@ -382,22 +368,6 @@ grub()(
 
   }
 
-  #grub_customization(){
-
-    # GRUB Theme
-      # https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse
-      # http://wiki.rosalab.ru/en/index.php/Grub2_theme_tutorial
-
-    # GRUB Config
-
-    # GRUB Resolution
-      # Get resolution: hwinfo --framebuffer
-      # Change config: GRUB_GFXMODE=1024x768x32
-      # Change config: GRUB_GFXPAYLOAD_LINUX=keep
-      # Apply changes: grub-mkconfig -o /boot/grub/grub.cfg
-
-  #}
-
   grub_config(){
 
     #grub-mkconfig -o /boot/grub/grub.cfg
@@ -412,7 +382,23 @@ grub()(
 
   }
 
-  grub_packages
+   #grub_customization(){
+
+    # GRUB Theme
+      # https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse
+      # http://wiki.rosalab.ru/en/index.php/Grub2_theme_tutorial
+
+    # GRUB Config
+
+    # GRUB Resolution
+      # Get resolution: hwinfo --framebuffer
+      # Change config: GRUB_GFXMODE=1024x768x32
+      # Change config: GRUB_GFXPAYLOAD_LINUX=keep
+      # Apply changes: grub-mkconfig -o /boot/grub/grub.cfg
+
+    #}
+
+  grub_password
 
 )
 

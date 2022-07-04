@@ -922,11 +922,16 @@ kernel(){
   pacstrap /mnt btrfs-progs grub-btrfs lvm2
   local exitcode2=$?
 
+  echo 0 | whiptail --gauge "Pacstrap: Installing GRUB..." 6 50 0
+  sleep 1 && clear
+  pacstrap /mnt grub efibootmgr dosfstools os-prober mtools
+  local exitcode3=$?
+
   if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
     echo 0 | whiptail --gauge "Pacstrap: Installing ${dmi} packages..." 6 50 0
     sleep 1 && clear
     pacstrap /mnt virtualbox-guest-utils
-    local exitcode3=$?
+    local exitcode4=$?
   fi
 
   # Hardened Kernel
@@ -934,11 +939,12 @@ kernel(){
   # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
   # ls -lsha /boot
 
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
     whiptail --title "ERROR" --msgbox "An error occurred whilst installing packages.\n
     Exit status [ Main packages  ]: ${exitcode1}\n
     Exit status [ Btrfs packages ]: ${exitcode2}\n
-    Exit status [ DMI packages   ]: ${exitcode3}" 18 78
+    Exit status [ GRUB packages  ]: ${exitcode3}\n
+    Exit status [ DMI packages   ]: ${exitcode4}" 18 78
   fi
 
   chroot
