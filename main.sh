@@ -6,8 +6,8 @@ sgdisk -n 0:0:+1GiB -t 0:ef00 -c 0:efi         /dev/sda #EFI
 sgdisk -n 0:0:0     -t 0:8e00 -c 0:cryptsystem /dev/sda #System
 
 # Cryptsetup
-echo ${cryptphrase} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat /dev/sda2 --key-file=-
-echo ${cryptphrase} | cryptsetup open --type luks2 /dev/sda2 cryptroot --key-file=-
+echo ${passphrase} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat /dev/sda2 --key-file=-
+echo ${passphrase} | cryptsetup open --type luks2 /dev/sda2 cryptroot --key-file=-
 
 # Root partition
 mkfs.btrfs -L system /dev/mapper/cryptroot
@@ -85,6 +85,12 @@ echo "cat << EOF" >> /etc/grub.d/00_header
 echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
 echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
 echo "EOF" >> /etc/grub.d/00_header
+
+# GRUB header
+luksuuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
+echo '#!/bin/sh' > /etc/grub.d/01_header
+echo -n "echo " >> /etc/grub.d/01_header
+echo -n `echo \"cryptomount -u ${luksuuid}\"` >> /etc/grub.d/01_header #Kinda hacky at the moment but produces the desired file content
 
 # GRUB Btrfs config
 sed -i '/#GRUB_BTRFS_GRUB_DIRNAME=/s/^#//g' /etc/default/grub-btrfs/config #Uncomment the line
