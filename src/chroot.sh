@@ -375,7 +375,7 @@ grub()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB cannot be installed to [${grubdir}].\nExit status: ${exitcode}" 8 78
+      whiptail --title "ERROR" --msgbox "GRUB cannot be installed.\nExit status: ${exitcode}" 8 78
     fi
 
     grub_config
