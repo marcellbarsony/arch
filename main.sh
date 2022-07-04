@@ -229,8 +229,8 @@ partition()(
       sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem ${disk}
       local exitcode4=$?
 
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
-        whiptail --title "ERROR" --msgbox "Create.\n
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
+        whiptail --title "ERROR" --msgbox "Cannot create partitions [sgdisk].\n
         Exit status [Clear]: ${exitcode1}\n
         Exit status [GPT]: ${exitcode2}\n
         Exit status [/efi]: ${exitcode3}\n
