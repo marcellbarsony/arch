@@ -90,7 +90,7 @@ echo "EOF" >> /etc/grub.d/00_header
 luksuuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
 echo '#!/bin/sh' > /etc/grub.d/01_header
 echo -n "echo " >> /etc/grub.d/01_header
-echo -n `echo \"cryptomount -u ${luksuuid}\"` >> /etc/grub.d/01_header #Kinda hacky at the moment but produces the desired file content
+echo -n `echo \"cryptomount -u ${luksuuid}\"` >> /etc/grub.d/01_header #Kinda hacky for the time being, yet produces the desired file content
 
 # GRUB Btrfs config
 sed -i '/#GRUB_BTRFS_GRUB_DIRNAME=/s/^#//g' /etc/default/grub-btrfs/config #Uncomment the line
@@ -103,7 +103,7 @@ sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ q
 sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub # Add luks2 to the end of the line
 
 # GRUB install
-grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-direcoty=/efi
+grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-directory=/efi
 
 # GRUB config
 grub-mkconfig -o /efi/grub/grub.cfg
