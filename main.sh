@@ -223,8 +223,8 @@ partition()(
       sgdisk -n 0:0:+750MiB -t 0:ef00 -c 0:efi ${disk}
       local exitcode2=$?
 
-      sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
-      local exitcode3=$?
+      #sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
+      #local exitcode3=$?
 
       sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem ${disk}
       local exitcode4=$?
@@ -443,13 +443,16 @@ crypt_setup()(
 
   cryptsetup_create(){
 
-    cryptsetup --type luks2 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
+    cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file ${keydir}
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
       exit ${exitcode}
     fi
+
+    # Check keyslots
+    # cryptsetup luksDump /dev/sda
 
     cryptsetup_open
 
@@ -541,13 +544,13 @@ btrfs_system()(
 
   btrfs_mount(){
 
-    mkdir -p /mnt/{efi,boot,home,var}
-    mkdir -p /mnt/.snapshots
-
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
     local exitcode1=$?
     #Optional:ssd
     # dmesg | grep "BTRFS"
+
+    mkdir -p /mnt/{efi,boot,home,var}
+    mkdir -p /mnt/.snapshots
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
     local exitcode2=$?
@@ -560,7 +563,7 @@ btrfs_system()(
     # dmesg | grep "BTRFS"
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/.snapshots
-    local exitcoder=$?
+    local exitcode4=$?
     #Optional:ssd
     # dmesg | grep "BTRFS"
 
@@ -570,6 +573,7 @@ btrfs_system()(
       ${exitcode2} - Create @home\n
       ${exitcode3} - Create @var\n
       ${exitcode4} - Create @snapshots" 18 78
+      exit 1
     fi
 
     efi_partition
@@ -609,7 +613,7 @@ efi_partition()(
       exit ${exitcode}
     fi
 
-    boot_partition
+    fstab
 
   }
 
