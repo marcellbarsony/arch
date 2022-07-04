@@ -551,6 +551,8 @@ btrfs_system()(
       Exit status [Unmount /mnt      ]: ${exitcode5}" 18 78
     fi
 
+    #btrfs subvolume list .
+
     btrfs_mount
 
   }
@@ -588,6 +590,8 @@ btrfs_system()(
       ${exitcode4} - Create @snapshots" 18 78
       exit 1
     fi
+
+    #df -hT
 
     efi_partition
 
@@ -853,7 +857,7 @@ fstab(){
   mkdir /mnt/etc/ &>/dev/null
   local exitcode1=$?
 
-  genfstab -U /mnt >> /mnt/etc/fstab &>/dev/null
+  genfstab -U /mnt >> /mnt/etc/fstab
   local exitcode2=$?
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
@@ -862,6 +866,8 @@ fstab(){
     Fstab config: ${exitcode2}" 18 78
     exit 1
   fi
+
+  vim /mnt/etc/fstab
 
   mirrorlist
 
