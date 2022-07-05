@@ -235,19 +235,19 @@ hosts(){
 
 sudoers(){
 
-  echo 0 | whiptail --gauge "Uncomment %wheel group..." 6 50 0
+  echo 0 | whiptail --gauge "Sudoers: Uncomment %wheel group..." 6 50 0
   sed 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  echo 33 | whiptail --gauge "Add insults..." 6 50 0
+  echo 33 | whiptail --gauge "Sudoers: Add insults..." 6 50 0
   sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  echo 66 | whiptail --gauge "Disable password prompt timeout..." 6 50 0
+  echo 66 | whiptail --gauge "Sudoers: Disable password prompt timeout..." 6 50 0
   sed '72 i Defaults passwd_timeout=0' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
@@ -259,10 +259,10 @@ sudoers(){
 
 locale(){
 
-  echo 50 | whiptail --gauge "Set locale.gen... [en_US.UTF-8 UTF-8]" 6 50 0
+  echo 50 | whiptail --gauge "Locale: Set locale.gen..." 6 50 0
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
 
-  echo 100 | whiptail --gauge "Set locale.conf... [LANG=en_US.UTF-8]" 6 50 0
+  echo 100 | whiptail --gauge "Locale: Set locale.conf..." 6 50 0
   echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
   locale-gen
@@ -279,7 +279,7 @@ locale(){
 
 initramfs(){
 
-  echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
+  echo 0 | whiptail --gauge "Mkinitcpio: Add Btrfs support..." 6 50 0
   sleep 1 && clear
   sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
   sed -i "s/block filesystems/block encrypt btrfs filesystems/g" /etc/mkinitcpio.conf
