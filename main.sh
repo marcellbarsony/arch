@@ -6,8 +6,8 @@ sgdisk -n 0:0:+1GiB -t 0:ef00 -c 0:efi         /dev/sda #EFI
 sgdisk -n 0:0:0     -t 0:8e00 -c 0:cryptsystem /dev/sda #System
 
 # Cryptsetup
-echo ${passphrase} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat /dev/sda2 --key-file=-
-echo ${passphrase} | cryptsetup open --type luks2 /dev/sda2 cryptroot --key-file=-
+echo ${passphrase} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice}
+echo ${passphrase} | cryptsetup open --type luks2 ${rootdevice} cryptroot
 
 # Root partition
 mkfs.btrfs -L system /dev/mapper/cryptroot
@@ -39,7 +39,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
 
 # Pacstrap
-pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt intel-ucode # with custom pacman.conf
+pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt intel-ucode #with custom pacman.conf
 
 # Chroot
 arch-chroot /mnt
@@ -56,7 +56,7 @@ usermod -aG wheel,audio,video,optical,storage ${username}
 hostnamectl set-hostname ${nodename}
 
 # Locale
-sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen # Uncomment the line
+sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen #Uncomment the line
 echo "LANG=en_US.UTF-8" > /etc/locale.conf
 locale-gen
 
@@ -73,7 +73,7 @@ rm /etc/sudoers.new
 
 # Initramfs
 sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf # Add Btrfs module
-sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf # Add encrypt
+sed -i "s/block filesystems/block encrypt lvm2 filesystems/g" /etc/mkinitcpio.conf #Add encrypt
 mkinitcpio -p linux
 
 # GRUB packages
@@ -100,7 +100,8 @@ systemctl enable --now grub-btrfs.path
 # GRUB crypt
 uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot UUID
 sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
-sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub # Add luks2 to the end of the line
+sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub #Add luks2 to the end of the line
+sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub #Enable cryptodisk
 
 # GRUB install
 grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-directory=/efi
