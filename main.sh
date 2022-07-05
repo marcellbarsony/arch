@@ -422,7 +422,7 @@ crypt_setup()(
 
   cryptsetup_create(){
 
-    echo ${cryptpassword} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice} --key-file=-
+    echo ${cryptpassword} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice}
     local exitcode=$?
 
     #https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Keyfiles
@@ -441,7 +441,7 @@ crypt_setup()(
 
   cryptsetup_open(){
 
-    echo ${cryptpassword} | cryptsetup open --type luks2 ${rootdevice} cryptroot --key-file=-
+    echo ${cryptpassword} | cryptsetup open --type luks2 ${rootdevice} cryptroot
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
