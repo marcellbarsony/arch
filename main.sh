@@ -149,7 +149,7 @@ partition()(
       options+=("${item}" "")
     done
 
-    disk=$(whiptail --title "Diskselect" --menu "Select disk to format" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    disk=$(whiptail --title "Disk" --menu "Select disk to format" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     case $? in
       0)
@@ -166,15 +166,54 @@ partition()(
 
   }
 
-  diskpart(){
+  sgdisk_partition(){
+
+    sgdisk -o ${disk}
+    local exitcode1=$?
+
+    sgdisk -n 0:0:+750MiB -t 0:ef00 -c 0:efi ${disk}
+    local exitcode2=$?
+
+    #sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
+    #local exitcode3=$?
+
+    sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem ${disk}
+    local exitcode4=$?
+
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
+      whiptail --title "ERROR" --msgbox "Cannot create partitions [sgdisk]\n
+      Exit status [Clear ]: ${exitcode1}\n
+      Exit status [/efi  ]: ${exitcode2}\n
+      Exit status [/boot ]: ${exitcode3}\n
+      Exit status [/     ]: ${exitcode4}" 18 78
+      exit 1
+    fi
+
+    diskpart_check
+
+  }
+
+  diskpart_check(){
+
+    items=$( gdisk -l ${disk} | tail -4 )
+
+    if (whiptail --title "Partitions" --yesno "Confirm partitions:\n${items}" 18 78); then
+        setup_dialog
+      else
+        sgdisk --zap-all ${disk}
+        diskpart_manual
+    fi
+
+  }
+
+  diskpart_manual(){
 
     options=()
-    #options+=("cfdisk" "")
+    options+=("cfdisk" "")
     options+=("fdisk" "")
-    #options+=("gdisk" "")
-    options+=("sgdisk" "")
+    options+=("gdisk" "")
 
-    diskpart_tool=$(whiptail --title "Diskpart" --menu "" --noitem --default-item "sgdisk" 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+    diskpart_tool=$(whiptail --title "Diskpart" --menu "" --noitem 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
 
@@ -194,9 +233,6 @@ partition()(
           gdisk ${disk}
           diskpart_check
           ;;
-        "sgdisk")
-          sgdisk_partition
-          ;;
       esac
       else
 
@@ -209,74 +245,6 @@ partition()(
           ;;
         esac
 
-    fi
-
-  }
-
-  sgdisk_partition()(
-
-    sgdisk_create(){
-
-      sgdisk -o ${disk}
-      local exitcode1=$?
-
-      sgdisk -n 0:0:+750MiB -t 0:ef00 -c 0:efi ${disk}
-      local exitcode2=$?
-
-      #sgdisk -n 0:0:+1GiB -t 0:8300 -c 0:boot ${disk}
-      #local exitcode3=$?
-
-      sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem ${disk}
-      local exitcode4=$?
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
-        whiptail --title "ERROR" --msgbox "Cannot create partitions [sgdisk].\n
-        Exit status [Clear]: ${exitcode1}\n
-        Exit status [GPT]: ${exitcode2}\n
-        Exit status [/efi]: ${exitcode3}\n
-        Exit status [/root]: ${exitcode4}" 18 78
-        exit 1
-      fi
-
-      sgdisk_check
-
-    }
-
-    sgdisk_check(){
-
-      items=$( gdisk -l ${disk} | tail -4 )
-
-      if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
-          setup_dialog
-        else
-          sgdisk --zap-all ${disk}
-          partition
-      fi
-
-    }
-
-    sgdisk_sketch(){
-
-      # List partitions
-      gdisk -l ${disk}
-
-      # Partition info
-      #sgdisk -i <partition_no> ${disk}
-
-    }
-
-    sgdisk_create
-
-  )
-
-  diskpart_check(){
-
-    items=$(lsblk -p -n -l -o NAME -e 7,11)
-
-    if (whiptail --title "Confirm partitions" --yesno "${items}" 18 78); then
-        filesystem
-      else
-        partition
     fi
 
   }
@@ -561,7 +529,7 @@ btrfs_system()(
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
     local exitcode1=$?
-    #Optional:ssd
+    # Optional:ssd
     # dmesg | grep "BTRFS"
 
     mkdir -p /mnt/{efi,boot,home,var}
@@ -569,17 +537,17 @@ btrfs_system()(
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
     local exitcode2=$?
-    #Optional:ssd
+    # Optional:ssd
     # dmesg | grep "BTRFS"
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
     local exitcode3=$?
-    #Optional:ssd
+    # Optional:ssd
     # dmesg | grep "BTRFS"
 
     mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/.snapshots
     local exitcode4=$?
-    #Optional:ssd
+    # Optional:ssd
     # dmesg | grep "BTRFS"
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
@@ -619,8 +587,8 @@ efi_partition()(
 
   efi_mount(){
 
-    efimountdir="/mnt/efi"
-    #efimountdir="/mnt/boot"
+    efimountdir="/mnt/boot"
+    #efimountdir="/mnt/efi"
 
     mount ${efidevice} ${efimountdir}
     local exitcode=$?
@@ -651,7 +619,6 @@ boot_partition()(
     fi
 
     boot_mount
-
 
   }
 

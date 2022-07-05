@@ -282,13 +282,14 @@ initramfs(){
   echo 0 | whiptail --gauge "Add Btrfs support to mkinitcpio..." 6 50 0
   sleep 1 && clear
   sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
-  sed -i "s/BINARIES=()/BINARIES=(btrfsck)/g" /etc/mkinitcpio.conf
   sed -i "s/block filesystems/block encrypt btrfs filesystems/g" /etc/mkinitcpio.conf
+
+  #sed -i "s/BINARIES=()/BINARIES=(btrfsck)/g" /etc/mkinitcpio.conf
   #sed -i "s/block filesystems/block encrypt btrfs lvm2 filesystems/g" /etc/mkinitcpio.conf
   #sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
 
-  mkinitcpio -P
-  #mkinitcpio -p linux #linux-hardened
+  mkinitcpio -p linux #linux-hardened
+  #mkinitcpio -P
 
   grub
 
@@ -305,35 +306,42 @@ grub()(
     echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
     echo "EOF" >> /etc/grub.d/00_header
 
+    grub_btrfs
+    #keyb0ardninja
+
+  }
+
+  keyb0ardninja()(
+
+    grub_header(){
+
+      luksuuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
+
+      echo '#!/bin/sh' > /etc/grub.d/01_header
+      echo -n "echo " >> /etc/grub.d/01_header
+      echo -n `echo \"cryptomount -u ${luksuuid}\"` >> /etc/grub.d/01_header
+      #chmod
+
+      grub_btrfs
+
+    }
+
+    grub_btrfs(){
+
+      sed -i '/#GRUB_BTRFS_GRUB_DIRNAME=/s/^#//g' /etc/default/grub-btrfs/config
+      #sed -i 's/GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"/GRUB_BTRFS_GRUB_DIRNAME="/efi/grub"/g' /etc/grub-btrfs/config
+      sed -i 's/boot\/grub2/efi\/grub/g' /etc/default/grub-btrfs/config
+      #sed -i "s/GRUB_BTRFS_GRUB_DIRNAME=\"/boot/grub2\"/GRUB_BTRFS_GRUB_DIRNAME=\"/efi/grub\"/g" /etc/grub-btrfs/config
+
+      systemctl enable --now grub-btrfs.path
+
+      grub_crypt
+
+    }
+
     grub_header
 
-  }
-
-  grub_header(){
-
-    luksuuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 | sed -e 's/-//g' )
-
-    echo '#!/bin/sh' > /etc/grub.d/01_header
-    echo -n "echo " >> /etc/grub.d/01_header
-    echo -n `echo \"cryptomount -u ${luksuuid}\"` >> /etc/grub.d/01_header
-    #chmod
-
-    grub_btrfs
-
-  }
-
-  grub_btrfs(){
-
-    sed -i '/#GRUB_BTRFS_GRUB_DIRNAME=/s/^#//g' /etc/default/grub-btrfs/config
-    #sed -i 's/GRUB_BTRFS_GRUB_DIRNAME="/boot/grub2"/GRUB_BTRFS_GRUB_DIRNAME="/efi/grub"/g' /etc/grub-btrfs/config
-    sed -i 's/boot\/grub2/efi\/grub/g' /etc/default/grub-btrfs/config
-    #sed -i "s/GRUB_BTRFS_GRUB_DIRNAME=\"/boot/grub2\"/GRUB_BTRFS_GRUB_DIRNAME=\"/efi/grub\"/g" /etc/grub-btrfs/config
-
-    systemctl enable --now grub-btrfs.path
-
-    grub_crypt
-
-  }
+  )
 
   grub_crypt(){
 
@@ -359,7 +367,8 @@ grub()(
 
   grub_install(){
 
-    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-directory=/efi
+    grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/boot
+    #grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory=/efi --boot-directory=/efi
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -372,8 +381,8 @@ grub()(
 
   grub_config(){
 
-    #grub-mkconfig -o /boot/grub/grub.cfg
-    grub-mkconfig -o /efi/grub/grub.cfg
+    grub-mkconfig -o /boot/grub/grub.cfg
+    #grub-mkconfig -o /efi/grub/grub.cfg
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -384,7 +393,7 @@ grub()(
 
   }
 
-   #grub_customization(){
+  #grub_customization(){
 
     # GRUB Theme
       # https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse
@@ -398,10 +407,9 @@ grub()(
       # Change config: GRUB_GFXPAYLOAD_LINUX=keep
       # Apply changes: grub-mkconfig -o /boot/grub/grub.cfg
 
-    #}
+  #}
 
-  #grub_password
-  grub_header
+  grub_password
 
 )
 
