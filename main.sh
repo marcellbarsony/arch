@@ -154,7 +154,7 @@ partition()(
     case $? in
       0)
         echo ${disk%%\ *}
-        diskpart
+        sgdisk_partition
         ;;
       1)
         keymap
@@ -833,8 +833,6 @@ fstab(){
     Fstab config: ${exitcode2}" 18 78
     exit 1
   fi
-
-  vim /mnt/etc/fstab
 
   mirrorlist
 

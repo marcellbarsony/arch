@@ -306,7 +306,7 @@ grub()(
     echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
     echo "EOF" >> /etc/grub.d/00_header
 
-    grub_btrfs
+    grub_crypt
     #keyb0ardninja
 
   }
@@ -345,7 +345,6 @@ grub()(
 
   grub_crypt(){
 
-    #Btrfs
     pacman -Qi btrfs-progs > /dev/null
     if [ "$?" == "0" ]; then
       uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot UUID
