@@ -4,12 +4,12 @@ precheck()(
 
   network(){
 
-    echo -n "Checking network..."
+    echo -n "Checking network connection..."
     ping -q -c 3 archlinux.org 2>&1 >/dev/null
 
     case $? in
       0)
-        echo "[Connected]"
+        echo "[OK]"
         bootmode
         ;;
       1)
@@ -74,11 +74,30 @@ precheck()(
 
     case $? in
       0)
-        echo "[Done]"
-        dependencies
+        echo "[OK]"
+        keymap
         ;;
       *)
         echo "\nExit status $?"
+        ;;
+    esac
+
+  }
+
+  keymap(){
+
+    echo -n "Setting US keymap..."
+    loadkeys us &>/dev/null
+    localectl set-keymap --no-convert us &>/dev/null # Systemd reads from /etc/vconsole.conf
+
+    case $? in
+      0)
+        echo "[OK]"
+        dependencies
+        ;;
+      *)
+        echo "[ERROR]"
+        echo "Exit status $?"
         ;;
     esac
 
@@ -91,8 +110,8 @@ precheck()(
 
     case $? in
       0)
-        echo "[Done]"
-        keymap
+        echo "[OK]"
+        partition
         ;;
       *)
         echo "[ERROR]"
@@ -105,28 +124,6 @@ precheck()(
   network
 
 )
-
-keymap(){
-
-  items=$(localectl list-keymaps)
-  options=()
-  options+=("us" "[Default]")
-    for item in ${items}; do
-      options+=("${item}" "")
-    done
-
-  keymap=$(whiptail --title "Keyboard layout" --menu "" --nocancel 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
-
-  if [ "$?" = "0" ]; then
-
-    loadkeys ${keymap} &>/dev/null
-    localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
-
-  fi
-
-  partition
-
-}
 
 partition()(
 
@@ -158,6 +155,7 @@ partition()(
         ;;
       1)
         keymap
+        exit 1
         ;;
       *)
         echo "Exit status $?"
