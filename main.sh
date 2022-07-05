@@ -5,7 +5,7 @@ precheck()(
   network(){
 
     echo -n "Checking network connection..."
-    ping -q -c 3 archlinux.org 2>&1 >/dev/null
+    ping -q -c 3 archlinux.org &>/dev/null
 
     case $? in
       0)
@@ -29,7 +29,7 @@ precheck()(
 
     echo -n "Checking boot mode..."
     sleep 1
-    ls /sys/firmware/efi/efivars 2>&1 >/dev/null
+    ls /sys/firmware/efi/efivars &>/dev/null
 
     case $? in
       0)
@@ -108,6 +108,25 @@ precheck()(
     echo -n "Installing dependencies..."
     pacman -Sy --noconfirm dialog &>/dev/null #libnewt
     DIALOGRC=/root/arch/cfg/dialogrc
+
+    case $? in
+      0)
+        echo "[OK]"
+        configs
+        ;;
+      *)
+        echo "[ERROR]"
+        echo "Exit status $?"
+        ;;
+    esac
+
+  }
+
+  configs(){
+
+    echo -n "Getting configs ready..."
+    sleep 1
+    cp $HOME/arch/cfg/dialogrc $HOME/.dialogrc
 
     case $? in
       0)
@@ -833,83 +852,90 @@ fstab(){
     exit 1
   fi
 
-  mirrorlist
+  sysinstall
 
 }
 
-mirrorlist(){
+sysinstall()(
 
-  cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
-  local exitcode1=$?
+  mirrorlist(){
 
-  reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
-  local exitcode2=$?
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
+    local exitcode1=$?
 
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-    whiptail --title " ERROR " --msgbox "Cannot update mirrorlist.\n
-    Mirrorlist backup: ${exitcode1}\n
-    Mirrorlist update: ${exitcode2}" 18 78
-  fi
+    reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
+    local exitcode2=$?
 
-  clear
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+      whiptail --title " ERROR " --msgbox "Cannot update mirrorlist.\n
+      Mirrorlist backup: ${exitcode1}\n
+      Mirrorlist update: ${exitcode2}" 18 78
+    fi
 
-  pacman_conf
+    clear
 
-}
+    pacman_config
 
-pacman_conf(){
+  }
 
-  cp ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
-  local exitcode1=$?
+  pacman_config(){
 
-  cp ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
-  local exitcode2=$?
+    cp ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
+    local exitcode1=$?
 
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-    whiptail --title " ERROR " --msgbox "Cannot copy pacman.conf.\n
-    pacman.conf >> /etc/pacman.conf - ${exitcode1}\n
-    pacman.conf >> /mnt/etc/pacman.conf - ${exitcode2}" 18 78
-    exit 1
-  fi
+    cp ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
+    local exitcode2=$?
 
-  kernel
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+      whiptail --title " ERROR " --msgbox "Cannot copy pacman.conf.\n
+      pacman.conf >> /etc/pacman.conf - ${exitcode1}\n
+      pacman.conf >> /mnt/etc/pacman.conf - ${exitcode2}" 18 78
+      exit 1
+    fi
 
-}
+    packages
 
-kernel(){
+  }
 
-  pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel git vim libnewt intel-ucode
-  local exitcode1=$?
+  packages(){
 
-  pacstrap /mnt btrfs-progs grub-btrfs lvm2
-  local exitcode2=$?
+    # Linux
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel intel-ucode git vim
+    local exitcode1=$?
 
-  pacstrap /mnt grub efibootmgr dosfstools os-prober mtools
-  local exitcode3=$?
+    # Btrfs
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt btrfs-progs grub-btrfs lvm2
+    local exitcode2=$?
 
-  if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
-    echo 0 | whiptail --gauge "Pacstrap: Installing ${dmi} packages..." 6 50 0
-    sleep 1 && clear
-    pacstrap /mnt virtualbox-guest-utils
-    local exitcode4=$?
-  fi
+    # GRUB
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt grub efibootmgr dosfstools os-prober mtools
+    local exitcode3=$?
 
-  # Hardened Kernel
-  # pacstrap: linux-hardened linux-hardened-headers
-  # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
-  # ls -lsha /boot
+    if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
+      pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
+      local exitcode4=$?
+    fi
 
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-    whiptail --title " ERROR " --msgbox "An error occurred whilst installing packages.\n
-    Exit status [ Main packages  ]: ${exitcode1}\n
-    Exit status [ Btrfs packages ]: ${exitcode2}\n
-    Exit status [ GRUB packages  ]: ${exitcode3}\n
-    Exit status [ DMI packages   ]: ${exitcode4}" 18 78
-  fi
+    # Hardened Kernel
+    # pacstrap: linux-hardened linux-hardened-headers
+    # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
+    # ls -lsha /boot
 
-  chroot
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
+      whiptail --title " ERROR " --msgbox "An error occurred whilst installing packages.\n
+      Exit status [ Main packages  ]: ${exitcode1}\n
+      Exit status [ Btrfs packages ]: ${exitcode2}\n
+      Exit status [ GRUB packages  ]: ${exitcode3}\n
+      Exit status [ DMI packages   ]: ${exitcode4}" 18 78
+    fi
 
-}
+    chroot
+
+  }
+
+  pacman_config
+
+)
 
 chroot(){
 
