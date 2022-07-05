@@ -106,7 +106,8 @@ precheck()(
   dependencies(){
 
     echo -n "Installing dependencies..."
-    pacman -Sy --noconfirm libnewt dialog 2>&1 >/dev/null
+    pacman -Sy --noconfirm dialog &>/dev/null #libnewt
+    DIALOGRC=/root/arch/cfg/dialogrc
 
     case $? in
       0)
