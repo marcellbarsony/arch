@@ -293,7 +293,8 @@ setup_dialog()(
           partition
           ;;
         *)
-          whiptail --title " ERROR " --msgbox "Error status: ${?}" 8 78
+          dialog --title " ERROR " --msgbox "Error status: ${?}" 8 78
+          exit $?
           ;;
       esac
 
@@ -412,7 +413,7 @@ setup_dialog()(
       local exitcode2=$?
 
       if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Key file [${keydir}] cannot be created.\n
+          dialog --title "ERROR" --msgbox "Key file [${keydir}] cannot be created.\n
           Exit status [File 1]: ${exitcode1}\n
           Exit status [File 2]: ${exitcode2}" 12 78
           exit 1
@@ -422,7 +423,7 @@ setup_dialog()(
       if cmp --silent -- "$keydir" "$keydir2"; then
           crypt_setup
         else
-          whiptail --title " ERROR " --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+          dialog --title " ERROR " --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
           crypt_password
       fi
 
@@ -632,7 +633,7 @@ boot_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "Formatting ${bootdevice} to ext4 unsuccessful.\nExit status: ${exitcode}" 8 78
+      dialog --title " ERROR " --msgbox "Formatting ${bootdevice} to ext4 unsuccessful.\nExit status: ${exitcode}" 8 78
       exit ${exitcode}
     fi
 
@@ -646,7 +647,7 @@ boot_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "Boot partition was not mounted\nExit status: ${exitcode}" 8 60
+      dialog --title " ERROR " --msgbox "Boot partition was not mounted\nExit status: ${exitcode}" 8 60
       exit ${exitcode}
     fi
 
@@ -922,11 +923,11 @@ sysinstall()(
     # ls -lsha /boot
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "An error occurred whilst installing packages.\n
+      dialog --title " ERROR " --msgbox "An error occurred whilst installing packages.\n
       Exit status [ Main packages  ]: ${exitcode1}\n
       Exit status [ Btrfs packages ]: ${exitcode2}\n
       Exit status [ GRUB packages  ]: ${exitcode3}\n
-      Exit status [ DMI packages   ]: ${exitcode4}" 18 78
+      Exit status [ DMI packages   ]: ${exitcode4}" 13 78
     fi
 
     chroot

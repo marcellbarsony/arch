@@ -9,7 +9,7 @@ keymap(){
       options+=("${item}" "")
     done
 
-  keymap=$(whiptail --title "Keyboard layout" --menu "" --nocancel 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
+  keymap=$(dialog --title "Keyboard layout" --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
@@ -30,17 +30,17 @@ system_administration()(
 
     root_password(){
 
-      root_password=$(whiptail --passwordbox "Root passphrase" --title "Root" --nocancel 8 78 3>&1 1>&2 2>&3)
+      root_password=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      root_password_confirm=$(whiptail --passwordbox "Root passphrase [confirm]" --title "Root" --nocancel 8 78 3>&1 1>&2 2>&3)
+      root_password_confirm=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
       if [ ! ${root_password} ] || [ ! ${root_password_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "Root passphrase cannot be empty." 8 78
+        dialog --title " ERROR " --msgbox "\nRoot passphrase cannot be empty." 8 45
         root_password
       fi
 
       if [ ${root_password} != ${root_password_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "Root passphrase did not match." 8 78
+        dialog --title " ERROR " --msgbox "\nRoot passphrase did not match." 8 45
         root_password
       fi
 
@@ -50,10 +50,10 @@ system_administration()(
 
     user_account(){
 
-      username=$(whiptail --inputbox "" --title "User account" --nocancel 8 39 3>&1 1>&2 2>&3)
+      username=$(dialog --nocancel --inputbox "Username" 8 45 3>&1 1>&2 2>&3)
 
       if [ ! ${username} ] || [ ${username} == "root" ]; then
-        whiptail --title "ERROR" --msgbox "Username cannot be empty or [root]." 8 78
+        dialog --title " ERROR " --msgbox "\nUsername cannot be empty or [root]." 8 45
         user_account
       fi
 
@@ -63,17 +63,17 @@ system_administration()(
 
     user_password(){
 
-      user_password=$(whiptail --passwordbox "${username}'s passphrase" --title "User" --nocancel 8 78 3>&1 1>&2 2>&3)
+      user_password=$(dialog --nocancel --passwordbox "${username}'s passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      user_password_confirm=$(whiptail --passwordbox "${username}'s passphrase [confirm]" --title "User" --nocancel 8 78 3>&1 1>&2 2>&3)
+      user_password_confirm=$(dialog --nocancel --passwordbox "${username}'s passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
       if [ ! ${user_password} ] || [ ! ${user_password_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "User passphrase cannot be empty." 8 78
+        dialog --title " ERROR " --msgbox "\nUser passphrase cannot be empty." 8 45
         user_password
       fi
 
       if [ ${user_password} != ${user_password_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "User passphrase did not match." 8 78
+        dialog --title " ERROR " --msgbox "\nUser passphrase did not match." 8 45
         user_password
       fi
 
@@ -83,10 +83,10 @@ system_administration()(
 
     domain_name(){
 
-      nodename=$(whiptail --inputbox "" --title "Hostname" --nocancel 8 39 3>&1 1>&2 2>&3)
+      nodename=$(dialog --nocancel --inputbox "Hostname" 8 45 3>&1 1>&2 2>&3)
 
       if [ ! ${nodename} ]; then
-        whiptail --title "ERROR" --msgbox "Hostname cannot be empty." 8 78
+        dialog --title " ERROR " --msgbox "\nHostname cannot be empty." 8 45
         domain_name
       fi
 
@@ -96,16 +96,17 @@ system_administration()(
 
     grub_password(){
 
-      grubpw=$(whiptail --passwordbox "GRUB Passphrase" --title "GRUB" --nocancel 8 78 3>&1 1>&2 2>&3)
-      grubpw_confirm=$(whiptail --passwordbox "GRUB Passphrase [confirm]" --title "GRUB" --nocancel 8 78 3>&1 1>&2 2>&3)
+      grubpw=$(dialog --nocancel --passwordbox "GRUB passphrase" 8 45 3>&1 1>&2 2>&3)
+
+      grubpw_confirm=$(dialog --nocancel --passwordbox "GRUB passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
       if [ ! ${grubpw} ] || [ ! ${grubpw_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "GRUB passphrase cannot be empty." 8 78
+        dialog --title " ERROR " --msgbox "\nGRUB passphrase cannot be empty." 8 45
         grub_password
       fi
 
       if [ ${grubpw} != ${grubpw_confirm} ]; then
-        whiptail --title "ERROR" --msgbox "GRUB passphrase did not match." 8 78
+        dialog --title " ERROR " --msgbox "\nGRUB passphrase did not match." 8 45
         grub_password
       fi
 
@@ -121,22 +122,12 @@ system_administration()(
 
     root_password(){
 
-      error=$( echo "root:${root_password}" | chpasswd 2>&1 )
+      echo "root:${root_password}" | chpasswd 2>&1
+      local exitcode=$?
 
-      if [ $? != "0" ]; then
-        whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-        case $? in
-          0)
-            root_password
-            ;;
-          1)
-            exit 1
-            clear
-            ;;
-          *)
-            echo "Exit status $?"
-            ;;
-        esac
+      if [ ${exitcode} != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nCannot set root password." 8 45
+        exit ${exitcode}
       fi
 
       user_create
@@ -146,21 +137,11 @@ system_administration()(
     user_create(){
 
       useradd -m ${username}
+      local exitcode=$?
 
-      if [ $? != "0" ]; then
-        whiptail --title "ERROR" --yesno "Cannot create user account [${username}].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-        case $? in
-          0)
-            user_create
-            ;;
-          1)
-            exit 1
-            clear
-            ;;
-          *)
-            echo "Exit status $?"
-            ;;
-        esac
+      if [ ${exitcode} != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nCannot create user account [${username}]" 8 45
+        exit ${exitcode}
       fi
 
       user_password
@@ -170,21 +151,11 @@ system_administration()(
     user_password(){
 
       error=$( echo "${username}:${user_password}" | chpasswd 2>&1 )
+      local exitcode=$?
 
-      if [ $? != "0" ]; then
-        whiptail --title "ERROR" --yesno "${error}\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-        case $? in
-          0)
-            user_password
-            ;;
-          1)
-            exit 1
-            clear
-            ;;
-          *)
-            echo "Exit status $?"
-            ;;
-        esac
+      if [ ${exitcode} != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nCannot set user password [${username}]" 8 45
+        exit ${exitcode}
       fi
 
       user_group
@@ -194,9 +165,11 @@ system_administration()(
     user_group(){
 
       usermod -aG wheel,audio,video,optical,storage ${username} 2>&1
+      local exitcode=$?
 
-      if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Cannot add ${username} to groups.\nExit status: $?" 8 78
+      if [ "${exitcode}" != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nCannot add [${username}] to groups" 8 45
+        exit ${exitcode}
       fi
 
       domain_name
@@ -206,9 +179,11 @@ system_administration()(
     domain_name(){
 
       hostnamectl set-hostname ${nodename}
+      local exitcode=$?
 
-      if [ "$?" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Hostname [${nodename}] cannot be set.\nExit status: $?" 8 78
+      if [ "${exitcode}" != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nHostname [${nodename}] cannot be set" 8 45
+        exit ${exitcode}
       fi
 
       hosts
@@ -235,19 +210,16 @@ hosts(){
 
 sudoers(){
 
-  echo 0 | whiptail --gauge "Sudoers: Uncomment %wheel group..." 6 50 0
   sed 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  echo 33 | whiptail --gauge "Sudoers: Add insults..." 6 50 0
   sed '71 i Defaults:%wheel insults' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
   rm /etc/sudoers.new
 
-  echo 66 | whiptail --gauge "Sudoers: Disable password prompt timeout..." 6 50 0
   sed '72 i Defaults passwd_timeout=0' /etc/sudoers > /etc/sudoers.new
   export EDITOR="cp /etc/sudoers.new"
   visudo
@@ -259,17 +231,15 @@ sudoers(){
 
 locale(){
 
-  echo 50 | whiptail --gauge "Locale: Set locale.gen..." 6 50 0
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
 
-  echo 100 | whiptail --gauge "Locale: Set locale.conf..." 6 50 0
   echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
   locale-gen
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
-    whiptail --title "ERROR" --msgbox "Cannot generate locale [locale-gen].\nExit status: ${exitcode}" 18 78
+    dialog --title " ERROR " --msgbox "\nCannot generate locale [locale-gen]" 8 45
     exit ${exitcode}
   fi
 
@@ -279,7 +249,6 @@ locale(){
 
 initramfs(){
 
-  echo 0 | whiptail --gauge "Mkinitcpio: Add Btrfs support..." 6 50 0
   sleep 1 && clear
   sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
   sed -i "s/block filesystems/block encrypt btrfs filesystems/g" /etc/mkinitcpio.conf
@@ -371,7 +340,8 @@ grub()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GRUB cannot be installed.\nExit status: ${exitcode}" 8 78
+      dialog --title " ERROR " --msgbox "\nGRUB cannot be installed" 8 45
+      exit ${exitcode}
     fi
 
     grub_config
@@ -385,7 +355,8 @@ grub()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Grub config cannot be generated.\nExit status: ${exitcode}" 8 78
+      dialog --title " ERROR " --msgbox "\nGRUB config cannot be generated" 8 45
+      exit ${exitcode}
     fi
 
     modules
@@ -420,25 +391,20 @@ modules()(
     if [ "$?" == "0" ]; then
 
       systemctl enable vboxservice.service
-      local exitcode=$?
-
-        if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "VirtualBox service cannot be enabled.\nExit status: ${exitcode}" 8 78
-        fi
+      local exitcode1=$?
 
       modprobe -a vboxguest vboxsf vboxvideo
       local exitcode2=$?
 
-        if [ "${exitcode2}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "VirtualBox kernel modules cannot be loaded.\nExit status: ${exitcode2}" 8 78
-        fi
-
       VBoxClient-all
       local exitcode3=$?
 
-        if [ "${exitcode3}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "VirtualBox guest services cannot be enabled.\nExit status: ${exitcode3}" 8 78
-        fi
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
+        dialog --title " ERROR " --msgbox "\nCannot enable VirtualBox modules\n\n
+        Virtualbox Service [vboxservice.service] - ${exitcode1}\n
+        VirtualBox kernal modules [modprobe -a] - ${exitcode2}\n
+        VirtualBox Guest services [VBoxClient-all] - ${exitcode3}" 13 78
+      fi
 
     fi
 
@@ -451,13 +417,13 @@ modules()(
     pacman -S --noconfirm networkmanager openssh
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "OpenSSH cannot be installed.\nExit status: $?" 8 78
+      dialog --title " ERROR " --msgbox "\nOpenSSH cannot be installed." 8 45
       fi
 
     systemctl enable sshd.service
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "OpenSSH cannot be enabled.\nExit status: $?" 8 78
+      dialog --title " ERROR " --msgbox "\nOpenSSH cannot be enabled." 8 45
       fi
 
     networkmanager
@@ -469,13 +435,13 @@ modules()(
     pacman -S --noconfirm networkmanager
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Network Manager cannot be installed.\nExit status: $?" 8 78
+      dialog --title " ERROR " --msgbox "\nNetwork Manager cannot be installed." 8 45
       fi
 
     systemctl enable NetworkManager
 
       if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Network Manager cannot be enabled.\nExit status: $?" 8 78
+      dialog --title " ERROR " --msgbox "\nNetwork Manager cannot be enabled cannot be enabled." 8 45
       fi
 
     exit 69
