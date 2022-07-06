@@ -215,7 +215,7 @@ partition()(
 
     items=$( gdisk -l ${disk} | tail -4 )
 
-    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 70); then
+    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 80); then
         setup_dialog
       else
         sgdisk --zap-all ${disk}
@@ -901,7 +901,7 @@ sysinstall()(
   packages(){
 
     # Linux
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel intel-ucode git vim
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel intel-ucode dialog git vim
     local exitcode1=$?
 
     # Btrfs
@@ -924,10 +924,10 @@ sysinstall()(
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
       dialog --title " ERROR " --msgbox "An error occurred whilst installing packages.\n
-      Exit status [ Main packages  ]: ${exitcode1}\n
-      Exit status [ Btrfs packages ]: ${exitcode2}\n
-      Exit status [ GRUB packages  ]: ${exitcode3}\n
-      Exit status [ DMI packages   ]: ${exitcode4}" 13 78
+      ${exitcode1} - [ Main packages  ]\n
+      ${exitcode2} - [ Btrfs packages ]\n
+      ${exitcode3} - [ GRUB packages  ]\n
+      ${exitcode4} - [ DMI packages   ]" 13 78
     fi
 
     chroot
@@ -947,17 +947,17 @@ chroot(){
   local exitcode2=$?
 
   chmod +x /mnt/chroot.sh
-  local exitcode3j=$?
+  local exitcode3=$?
 
   arch-chroot /mnt ./chroot.sh
   local exitcode4=$?
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
     dialog --title " ERROR " --msgbox "Arch-chroot [/mnt] failed.\n\n
-    ${exitcode1} - Copy chroot.sh >> /mnt\n
-    ${exitcode2} - Copy dialogrc >> /etc/dialogrc\n
-    ${exitcode3} - Chmod: /mnt/chroot.sh\n
-    ${exitcode4} - Chroot: /mnt" 13 50
+    ${exitcode1} - cp ~/arch/src/chroot.sh >> /mnt\n
+    ${exitcode2} - cp ~/arch/cfg/dialogrc  >> /mnt/etc/dialogrc\n
+    ${exitcode3} - chmod +x /mnt/chroot.sh\n
+    ${exitcode4} - arch-chroot /mnt" 13 50
   fi
 
   #umount -l /mnt
@@ -989,3 +989,4 @@ while (( "$#" )); do
 done
 
 clear
+precheck

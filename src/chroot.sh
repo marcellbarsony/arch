@@ -235,6 +235,8 @@ locale(){
 
   echo "LANG=en_US.UTF-8" > /etc/locale.conf
 
+  clear
+
   locale-gen
   local exitcode=$?
 
@@ -401,9 +403,9 @@ modules()(
 
       if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
         dialog --title " ERROR " --msgbox "\nCannot enable VirtualBox modules\n\n
-        Virtualbox Service [vboxservice.service] - ${exitcode1}\n
-        VirtualBox kernal modules [modprobe -a] - ${exitcode2}\n
-        VirtualBox Guest services [VBoxClient-all] - ${exitcode3}" 13 78
+        ${exitcode1} - Virtualbox Service [vboxservice.service]\n
+        ${exitcode2} - VirtualBox kernel modules [modprobe -a]\n
+        ${exitcode3} - VirtualBox Guest services [VBoxClient-all]" 13 78
       fi
 
     fi
