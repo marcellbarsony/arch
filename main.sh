@@ -149,7 +149,7 @@ partition()(
 
   warning(){
 
-    if (whiptail --title " WARNING " --yesno "Everything not backed up will be lost." --yes-button "Proceed" --no-button "Exit" 8 60); then
+    if (dialog --title " WARNING " --yes-label "Proceed" --no-label "Exit" --yesno "\nEverything not backed up will be lost." 8 60); then
         diskselect
       else
         echo "Installation terminated"
@@ -166,7 +166,7 @@ partition()(
       options+=("${item}" "")
     done
 
-    disk=$(whiptail --title " Disk " --menu "Select disk to format" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    disk=$(dialog --title " Disk " --menu "Select disk to format" 15 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     case $? in
       0)
@@ -199,11 +199,11 @@ partition()(
     local exitcode4=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
-      whiptail --title "ERROR" --msgbox "Cannot create partitions [sgdisk]\n
-      Exit status [Clear ]: ${exitcode1}\n
+      dialog --title " ERROR " --msgbox "\nSgdisk: cannot create partitions\n\n
+      Exit status [clear ]: ${exitcode1}\n
       Exit status [/efi  ]: ${exitcode2}\n
       Exit status [/boot ]: ${exitcode3}\n
-      Exit status [/     ]: ${exitcode4}" 18 78
+      Exit status [/     ]: ${exitcode4}" 13 55
       exit 1
     fi
 
@@ -215,7 +215,7 @@ partition()(
 
     items=$( gdisk -l ${disk} | tail -4 )
 
-    if (whiptail --title " Partitions " --yesno "Confirm partitions:\n${items}" 18 78); then
+    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 70); then
         setup_dialog
       else
         sgdisk --zap-all ${disk}
@@ -231,7 +231,7 @@ partition()(
     options+=("fdisk" "")
     options+=("gdisk" "")
 
-    diskpart_tool=$(whiptail --title " Diskpart " --menu "" --noitem 0 0 0 "${options[@]}" 3>&1 1>&2 2>&3)
+    diskpart_tool=$(dialog --title " Diskpart " --menu "" 10 30 3 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
 
@@ -259,7 +259,7 @@ partition()(
           diskselect
           ;;
         *)
-          echo "Exit status $?"
+          echo "Exit status: $?"
           ;;
         esac
 
@@ -283,7 +283,7 @@ setup_dialog()(
         options+=("${item}" "")
       done
 
-      efidevice=$(whiptail --title " Partition " --menu "Select device [EFI]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      efidevice=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [EFI]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -307,7 +307,7 @@ setup_dialog()(
         options+=("${item}" "")
       done
 
-      bootdevice=$(whiptail --title " Partition " --menu "Select device [Boot]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      bootdevice=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [Boot]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -331,7 +331,7 @@ setup_dialog()(
         options+=("${item}" "")
       done
 
-      rootdevice=$(whiptail --title " Partition" --menu "Select device [Root]" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+      rootdevice=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [Root]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -355,17 +355,14 @@ setup_dialog()(
 
     crypt_password(){
 
-      cryptpassword=$(whiptail --passwordbox "Encryption passphrase" 8 78 --title " Encryption " 3>&1 1>&2 2>&3)
+      cryptpassword=$(dialog --nocancel --passwordbox "Encryption passphrase" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
         0)
           crypt_password_confirm
           ;;
-        1)
-          filesystem
-          ;;
         *)
-          echo "Exit status $?"
+          echo "Exit status: $?"
           ;;
       esac
 
@@ -373,14 +370,11 @@ setup_dialog()(
 
     crypt_password_confirm(){
 
-      cryptpassword_confirm=$(whiptail --passwordbox "Encryption passphrase [confirm]" 8 78 --title " Encryption " 3>&1 1>&2 2>&3)
+      cryptpassword_confirm=$(dialog --nocancel --passwordbox "Encryption passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
         0)
           crypt_password_check
-          ;;
-        1)
-          crypt_password
           ;;
         *)
           echo "Exit status $?"
@@ -391,10 +385,16 @@ setup_dialog()(
 
     crypt_password_check(){
 
-      if [[ "${cryptpassword}" != "${cryptpassword_confirm}" ]]; then
-        whiptail --title " ERROR " --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+      if [ ! ${cryptpassword} ] || [ ! ${cryptpassword_confirm} ]; then
+        dialog --title " ERROR " --msgbox "Encryption passphrase cannot be empty." 8 45
         crypt_password
       fi
+
+      if [[ "${cryptpassword}" != "${cryptpassword_confirm}" ]]; then
+        dialog --title " ERROR " --msgbox "Encryption passphrase did not match." 8 45
+        crypt_password
+      fi
+
 
       crypt_setup
 
@@ -446,7 +446,7 @@ crypt_setup()(
     #https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Keyfiles
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 8 78
+      dialog --title " ERROR " --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 7 50
       exit ${exitcode}
     fi
 
@@ -463,7 +463,7 @@ crypt_setup()(
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      whiptail --title " ERROR " --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
+      dialog --title " ERROR " --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${exitcode}" 7 50
       exit ${exitcode}
     fi
 
@@ -483,8 +483,8 @@ root_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        whiptail --title " ERROR " --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-        exit ${exitcode}
+      dialog --title " ERROR " --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 7 60
+      exit ${exitcode}
     fi
 
     root_mount
@@ -497,7 +497,7 @@ root_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 8 60
+      dialog --title " ERROR " --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 7 50
       exit ${exitcode}
     fi
 
@@ -529,12 +529,12 @@ btrfs_system()(
     local exitcode5=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "An error occurred whilst creating subvolumes.\n
-      Exit status [Create @          ]: ${exitcode1}\n
-      Exit status [Create @home      ]: ${exitcode2}\n
-      Exit status [Create @var       ]: ${exitcode3}\n
-      Exit status [Create @snapshots ]: ${exitcode4}\n
-      Exit status [Unmount /mnt      ]: ${exitcode5}" 18 78
+      dialog --title " ERROR " --msgbox "\nAn error occurred whilst creating subvolumes.\n\n
+      ${exitcode1} - Create @\n
+      ${exitcode2} - Create @home\n
+      ${exitcode3} - Create @var\n
+      ${exitcode4} - Create @snapshots\n
+      ${exitcode5} - Unmount /mnt" 13 78
     fi
 
     #btrfs subvolume list .
@@ -569,11 +569,11 @@ btrfs_system()(
     # dmesg | grep "BTRFS"
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "An error occurred whilst mounting subvolumes.\n
+      dialog --title " ERROR " --msgbox "\nAn error occurred whilst mounting subvolumes.\n\n
       ${exitcode1} - Create @\n
       ${exitcode2} - Create @home\n
       ${exitcode3} - Create @var\n
-      ${exitcode4} - Create @snapshots" 18 78
+      ${exitcode4} - Create @snapshots" 13 78
       exit 1
     fi
 
@@ -595,7 +595,7 @@ efi_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "Cannot format ESP [${efidevice}] to FAT32.\nExit status: ${exitcode}" 18 78
+      dialog --title " ERROR " --msgbox "\nCannot format ESP [${efidevice}] to FAT32.\nExit status: ${exitcode}" 8 50
       exit ${exitcode}
     fi
 
@@ -612,7 +612,7 @@ efi_partition()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "Cannot mount ESP [${efidevice}] to ${efimountdir}.\nExit status: ${exitcode}" 18 78
+      dialog --title " ERROR " --msgbox "\nCannot mount ESP [${efidevice}] to ${efimountdir}.\nExit status: ${exitcode}" 8 50
       exit ${exitcode}
     fi
 
@@ -846,9 +846,9 @@ fstab(){
   local exitcode2=$?
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-    whiptail --title " ERROR " --msgbox "Cannot copy pacman.conf.\n
-    Fstab directory: ${exitcode1}\n
-    Fstab config: ${exitcode2}" 18 78
+    dialog --title " ERROR " --msgbox "\nCannot create fstab configuration.\n\n
+    ${exitcode1} - fstab directory\n
+    ${exitcode2} - fstab configuration" 10 50
     exit 1
   fi
 
@@ -867,9 +867,9 @@ sysinstall()(
     local exitcode2=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "Cannot update mirrorlist.\n
-      Mirrorlist backup: ${exitcode1}\n
-      Mirrorlist update: ${exitcode2}" 18 78
+      dialog --title " ERROR " --msgbox "Cannot update mirrorlist.\n\n
+      ${exitcode1} - Mirrorlist backup\n
+      ${exitcode2} - Mirrorlist update" 10 50
     fi
 
     clear
@@ -887,9 +887,9 @@ sysinstall()(
     local exitcode2=$?
 
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-      whiptail --title " ERROR " --msgbox "Cannot copy pacman.conf.\n
-      pacman.conf >> /etc/pacman.conf - ${exitcode1}\n
-      pacman.conf >> /mnt/etc/pacman.conf - ${exitcode2}" 18 78
+      dialog --title " ERROR " --msgbox "Cannot copy pacman.conf.\n\n
+      ${exitcode1} - pacman.conf >> /etc/pacman.conf\n
+      ${exitcode2} - pacman.conf >> /mnt/etc/pacman.conf" 10 50
       exit 1
     fi
 
@@ -949,10 +949,10 @@ chroot(){
   local exitcode3=$?
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
-    whiptail --title " ERROR " --msgbox "Arch-chroot [/mnt] failed.\n
+    dialog --title " ERROR " --msgbox "Arch-chroot [/mnt] failed.\n\n
     Exit status [copy]: ${exitcode1}\n
     Exit status [chmod]: ${exitcode2}\n
-    Exit status [chroot]: ${exitcode3}" 18 78
+    Exit status [chroot]: ${exitcode3}" 13 50
   fi
 
   #umount -l /mnt
@@ -984,4 +984,3 @@ while (( "$#" )); do
 done
 
 clear
-precheck
