@@ -943,17 +943,21 @@ chroot(){
   cp /root/arch/src/chroot.sh /mnt
   local exitcode1=$?
 
-  chmod +x /mnt/chroot.sh
+  cp $HOME/arch/cfg/dialogrc /mnt/etc/dialogrc
   local exitcode2=$?
 
+  chmod +x /mnt/chroot.sh
+  local exitcode3j=$?
+
   arch-chroot /mnt ./chroot.sh
-  local exitcode3=$?
+  local exitcode4=$?
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
     dialog --title " ERROR " --msgbox "Arch-chroot [/mnt] failed.\n\n
-    Exit status [copy]: ${exitcode1}\n
-    Exit status [chmod]: ${exitcode2}\n
-    Exit status [chroot]: ${exitcode3}" 13 50
+    ${exitcode1} - Copy chroot.sh >> /mnt\n
+    ${exitcode2} - Copy dialogrc >> /etc/dialogrc\n
+    ${exitcode3} - Chmod: /mnt/chroot.sh\n
+    ${exitcode4} - Chroot: /mnt" 13 50
   fi
 
   #umount -l /mnt
