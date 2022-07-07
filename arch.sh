@@ -171,6 +171,7 @@ partition()(
     case $? in
       0)
         echo ${disk%%\ *}
+        clear
         sgdisk_partition
         ;;
       1)
@@ -651,6 +652,8 @@ boot_partition()(
       exit ${exitcode}
     fi
 
+    clear
+
     fstab
 
   }
@@ -950,12 +953,12 @@ chroot(){
   arch-chroot /mnt ./chroot.sh
   local exitcode4=$?
 
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
     dialog --title " ERROR " --msgbox "Arch-chroot [/mnt] failed.\n\n
     ${exitcode1} - cp ~/arch/cfg/dialogrc  >> /mnt/etc/dialogrc\n
     ${exitcode2} - cp ~/arch/src/chroot.sh >> /mnt\n
     ${exitcode3} - chmod +x /mnt/chroot.sh\n
-    ${exitcode4} - arch-chroot /mnt" 13 50
+    ${exitcode4} - arch-chroot /mnt ./chroot.sh" 13 50
   fi
 
   #umount -l /mnt

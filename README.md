@@ -6,6 +6,16 @@ For the documentation please refer to the [Wiki](https://github.com/marcellbarso
 
 The main objective is to create an automated Arch Linux installation script with as few interactions as possible.
 
+## Features
+
+Main features including but not limited to:
+
+- UEFI
+- GRUB
+- LUKS2
+- Btrfs (Snapper)
+- Hardened kernel
+
 
 ## Installation guide
 
@@ -31,7 +41,7 @@ cd arch
 ```
 7.) Launch the installation script
 ```
-./main.sh
+./arch.sh
 ```
 
 ### Post-installation

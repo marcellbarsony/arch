@@ -452,26 +452,42 @@ modules()(
 
   # OpenSSH
   systemctl enable sshd.service
+  local exitcode1=$?
 
   # Network Manager
   systemctl enable NetworkManager
+  local exitcode2=$?
 
   # Fstrim (SSD)
   systemctl enable fstrim.timer
+  local exitcode3=$?
 
-  wathcdog_fix
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+    dialog --title " ERROR " --msgbox "Systemctl: Cannot enable services\n\n
+    ${exitcode1} - sshd.service\n
+    ${exitcode2} - NetworkManager\n
+    ${exitcode3} - fstrim.timer" 13 50
+  fi
+
+  watchdog_fix
 
 )
 
 watchdog_fix(){
 
-    # Fix Watchdog error reports at shutdown
-    sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
+  # Fix Watchdog error reports at shutdown
+  sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
+  local exitcode=$?
 
-    clean_up
+  if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --msgbox "\nCannot fix Watchdog error reports bug\nExit status: ${exitcode}" 8 78
+    exit ${exitcode}
+  fi
+
+
+  clean_up
 
 }
-
 
 clean_up(){
 
