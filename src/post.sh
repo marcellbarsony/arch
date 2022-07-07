@@ -16,7 +16,11 @@ network()(
       network_connect
     fi
 
-    dialog
+    if [ ${defaults} == "yes" ]; then
+      defaults
+    else
+      dialog
+    fi
 
   }
 
@@ -47,7 +51,8 @@ network()(
       exit $1
     fi
 
-    dialog
+    clear
+    network_test
 
   }
 
@@ -64,6 +69,7 @@ dialog()(
     options+=("Pikaur" "[Python]")
     options+=("Yay" "[Go]")
 
+    aurhelper=$(dialog --default-item "Paru" --cancel-label "Exit" --title " AUR helper " --menu "Select AUR helper" 15 70 17 ${options[@]} 3>&1 1>&2 2>&3)
     aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --default-item "Paru" --noitem --cancel-button "Exit" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
@@ -685,13 +691,22 @@ dialog()(
 
 )
 
+defaults(){
+
+  aurhelper=""
+  bwcli="rbw"
+
+  install
+
+}
+
 install()(
 
   reflector(){
 
     pacman -Qi reflector > /dev/null
 
-    if [ "$?" == "0" ]; then
+    if [ "$?" != "0" ]; then
       sudo pacman -S reflector
     fi
 
@@ -1641,5 +1656,36 @@ customization()(
   wallpaper
 
 )
+
+while (( "$#" )); do
+  case ${1} in
+    --help)
+      echo "------"
+      echo "Arch installation script"
+      echo "------"
+      echo
+      echo "Options:"
+      echo "--help    - Get help"
+      echo "--info    - Additional information"
+      echo "--default - Run script with default settings"
+      echo
+      exit 0
+      ;;
+    --info)
+      echo "Author: Marcell Barsony"
+      echo "Repository: https://github.com/marcellbarsony/arch"
+      echo "Important note: This script is under development"
+      exit 0
+      ;;
+    --default)
+      defaults="yes"
+      ;;
+    *)
+      echo "Available options:"
+      echo "Help --help"
+      echo "Info --info"
+  esac
+  shift
+done
 
 network

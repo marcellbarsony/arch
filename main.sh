@@ -900,42 +900,37 @@ sysinstall()(
 
   packages(){
 
-    # Linux
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel intel-ucode dialog git vim
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers \ # Linux
+      grub efibootmgr dosfstools os-prober mtools \ # GRUB
+      btrfs-progs grub-btrfs snapper \ # Btrfs
+      base base-devel \ # Base
+      intel-ucode \ # Intel
+      reflector dialog git vim \ # Tools
     local exitcode1=$?
-
-    # Btrfs
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt btrfs-progs grub-btrfs lvm2
-    local exitcode2=$?
-
-    # GRUB
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt grub efibootmgr dosfstools os-prober mtools
-    local exitcode3=$?
-
-    if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
-      case ${dmi} in
-        "VirtualBox")
-          pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
-          local exitcode4=$?
-          ;;
-        "VMware Virtual Platform")
-          pacstrap -C ~/arch/cfg/pacman.conf /mnt open-vm-tools
-          local exitcode4=$?
-          ;;
-      esac
-    fi
+    #https://www.reddit.com/r/archlinux/comments/szo572/share_your_pacstrap/
 
     # Hardened Kernel
     # pacstrap: linux-hardened linux-hardened-headers
     # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
     # ls -lsha /boot
 
+    if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
+      case ${dmi} in
+        "VirtualBox")
+          pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
+          local exitcode2=$?
+          ;;
+        "VMware Virtual Platform")
+          pacstrap -C ~/arch/cfg/pacman.conf /mnt open-vm-tools
+          local exitcode2=$?
+          ;;
+      esac
+    fi
+
     if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
       dialog --title " ERROR " --msgbox "An error occurred whilst installing packages.\n
       ${exitcode1} - [ Main packages  ]\n
-      ${exitcode2} - [ Btrfs packages ]\n
-      ${exitcode3} - [ GRUB packages  ]\n
-      ${exitcode4} - [ DMI packages   ]" 13 78
+      ${exitcode4} - [ DMI packages ]" 13 78
     fi
 
     chroot
@@ -981,6 +976,9 @@ while (( "$#" )); do
       echo "------"
       echo "Arch installation script"
       echo "------"
+      echo "Options:"
+      echo "--help - Get help"
+      echo "--info - Additional information"
       exit 0
       ;;
     --info)

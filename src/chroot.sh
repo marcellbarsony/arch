@@ -385,119 +385,82 @@ grub()(
 
 )
 
+packages(){
+
+  pacman -S --noconfirm networkmanager openssh
+
+  modules
+
+}
+
 modules()(
 
-  virtual_modules(){
+  # Virtual Box
+  pacman -Qi virtualbox-guest-utils &> /dev/null
+  if [ "$?" == "0" ]; then
 
-    # Virtual Box
-    pacman -Qi virtualbox-guest-utils &> /dev/null
-    if [ "$?" == "0" ]; then
+    dmi="virtualbox"
 
-      dmi="virtualbox"
-
-      systemctl enable vboxservice.service
-      local exitcode1=$?
-
-      modprobe -a vboxguest vboxsf vboxvideo
-      local exitcode2=$?
-
-      VBoxClient-all
-      local exitcode3=$?
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
-        dialog --title " ERROR " --msgbox "\nCannot enable VirtualBox modules\n\n
-        ${exitcode1} - Virtualbox Service [vboxservice.service]\n
-        ${exitcode2} - VirtualBox kernel modules [modprobe -a]\n
-        ${exitcode3} - VirtualBox Guest services [VBoxClient-all]" 13 45
-        clear
-      fi
-
-    fi
-
-    # VMware
-    pacman -Qi open-vm-tools &> /dev/null
-    if [ "$?" == "0" ]; then
-
-      dmi="vmware"
-      systemctl enable vmtoolsd.service
-      local exitcode1=$?
-      systemctl enable vmware-vmblock-fuse.service
-      local exitcode2=$?
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot enable VMware modules\n\n
-        ${exitcode1} - VMware tools.service\n
-        ${exitcode2} - VMware vmblock-fuse" 8 45
-        clear
-      fi
-
-    fi
-
-    openssh
-
-  }
-
-  openssh(){
-
-    pacman -S --noconfirm networkmanager openssh
+    systemctl enable vboxservice.service
     local exitcode1=$?
 
-    systemctl enable sshd.service
+    modprobe -a vboxguest vboxsf vboxvideo
     local exitcode2=$?
 
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nOpenSSH cannot be enabled.\n
-        ${exitcode1} - SSH install\n
-        ${exitcode2} - SSH enable" 8 45
-        clear
-      fi
+    VBoxClient-all
+    local exitcode3=$?
 
-    networkmanager
-
-  }
-
-  networkmanager(){
-
-    pacman -S --noconfirm networkmanager
-    local exitcode1=$?
-
-    systemctl enable NetworkManager
-    local exitcode2=$?
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nNetworkManager cannot be enabled.\n
-        ${exitcode1} - NetworkManager install\n
-        ${exitcode2} - NetworkManager enable" 8 45
-        clear
-      fi
-
-    fstrim
-
-  }
-
-  fstrim(){
-
-    # SSD
-    if [ "${dmi}" != "virtualbox" ] || [ "${dmi}" != "vmware" ]; then
-      systemctl enable fstrim.timer
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] ; then
+      dialog --title " ERROR " --msgbox "\nCannot enable VirtualBox modules\n\n
+      ${exitcode1} - Virtualbox Service [vboxservice.service]\n
+      ${exitcode2} - VirtualBox kernel modules [modprobe -a]\n
+      ${exitcode3} - VirtualBox Guest services [VBoxClient-all]" 13 45
+      clear
     fi
 
-    wathcdog_fix
+  fi
 
-  }
+  # VMware
+  pacman -Qi open-vm-tools &> /dev/null
+  if [ "$?" == "0" ]; then
 
-  watchdog_fix(){
+    dmi="vmware"
+    systemctl enable vmtoolsd.service
+    local exitcode1=$?
+    systemctl enable vmware-vmblock-fuse.service
+    local exitcode2=$?
+
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nCannot enable VMware modules\n\n
+      ${exitcode1} - VMware tools.service\n
+      ${exitcode2} - VMware vmblock-fuse" 8 45
+      clear
+    fi
+
+  fi
+
+  # OpenSSH
+  systemctl enable sshd.service
+
+  # Network Manager
+  systemctl enable NetworkManager
+
+  # Fstrim (SSD)
+  systemctl enable fstrim.timer
+
+  wathcdog_fix
+
+)
+
+watchdog_fix(){
 
     # Fix Watchdog error reports at shutdown
     sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
 
     clean_up
 
-  }
+}
 
-  virtualmodules
-
-)
 
 clean_up(){
 
