@@ -198,10 +198,6 @@ system_administration()(
 
 )
 
-configs(){
-
-}
-
 hosts(){
 
   echo "127.0.0.1        localhost" > /etc/hosts &>/dev/null
@@ -263,7 +259,7 @@ initramfs(){
   #sed -i "s/block filesystems/block encrypt btrfs lvm2 filesystems/g" /etc/mkinitcpio.conf
   #sed -i "s/keyboard fsck/keyboard fsck grub-btrfs-overlayfs/g" /etc/mkinitcpio.conf
 
-  mkinitcpio -p linux #linux-hardened
+  mkinitcpio -p linux-hardened
   #mkinitcpio -P
 
   grub
@@ -393,10 +389,16 @@ packages(){
     networkmanager openssh \
     reflector git neovim \
     intel-ucode \
-    #efibootmgr dosfstools
+    reflector
     #pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber sof-audio
-    #lvm2
     #xorg-server xorg-xinit xorg-prop xwallpaper arandr
+    #lvm2 dosfstools
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nPacman: cannot install packages" 8 45
+      exit ${exitcode}
+    fi
 
   modules
 

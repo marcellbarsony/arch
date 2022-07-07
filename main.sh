@@ -215,7 +215,7 @@ partition()(
 
     items=$( gdisk -l ${disk} | tail -4 )
 
-    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 50); then
+    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 60); then
         setup_dialog
       else
         sgdisk --zap-all ${disk}
@@ -900,8 +900,8 @@ sysinstall()(
 
   packages(){
 
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel grub grub-btrfs dialog
-    #pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-firmware linux-hardened-headers base base-devel grub
+    #pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel grub grub-btrfs efibootmgr dialog
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-firmware linux-hardened-headers base base-devel grub efibootmgr dialog
     local exitcode1=$?
 
     # Hardened Kernel
@@ -932,7 +932,7 @@ sysinstall()(
 
   }
 
-  pacman_config
+  mirrorlist
 
 )
 
