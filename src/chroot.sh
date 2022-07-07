@@ -387,10 +387,13 @@ grub()(
 
 modules()(
 
-  virtualmodules(){
+  virtual_modules(){
 
-    pacman -Qi virtualbox-guest-utils > /dev/null
+    # Virtual Box
+    pacman -Qi virtualbox-guest-utils &> /dev/null
     if [ "$?" == "0" ]; then
+
+      dmi="virtualbox"
 
       systemctl enable vboxservice.service
       local exitcode1=$?
@@ -405,7 +408,27 @@ modules()(
         dialog --title " ERROR " --msgbox "\nCannot enable VirtualBox modules\n\n
         ${exitcode1} - Virtualbox Service [vboxservice.service]\n
         ${exitcode2} - VirtualBox kernel modules [modprobe -a]\n
-        ${exitcode3} - VirtualBox Guest services [VBoxClient-all]" 13 78
+        ${exitcode3} - VirtualBox Guest services [VBoxClient-all]" 13 45
+        clear
+      fi
+
+    fi
+
+    # VMware
+    pacman -Qi open-vm-tools &> /dev/null
+    if [ "$?" == "0" ]; then
+
+      dmi="vmware"
+      systemctl enable vmtoolsd.service
+      local exitcode1=$?
+      systemctl enable vmware-vmblock-fuse.service
+      local exitcode2=$?
+
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nCannot enable VMware modules\n\n
+        ${exitcode1} - VMware tools.service\n
+        ${exitcode2} - VMware vmblock-fuse" 8 45
+        clear
       fi
 
     fi
@@ -417,15 +440,16 @@ modules()(
   openssh(){
 
     pacman -S --noconfirm networkmanager openssh
-
-      if [ "$?" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nOpenSSH cannot be installed." 8 45
-      fi
+    local exitcode1=$?
 
     systemctl enable sshd.service
+    local exitcode2=$?
 
-      if [ "$?" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nOpenSSH cannot be enabled." 8 45
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nOpenSSH cannot be enabled.\n
+        ${exitcode1} - SSH install\n
+        ${exitcode2} - SSH enable" 8 45
+        clear
       fi
 
     networkmanager
@@ -435,36 +459,52 @@ modules()(
   networkmanager(){
 
     pacman -S --noconfirm networkmanager
-
-      if [ "$?" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nNetwork Manager cannot be installed." 8 45
-      fi
+    local exitcode1=$?
 
     systemctl enable NetworkManager
+    local exitcode2=$?
 
-      if [ "$?" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nNetwork Manager cannot be enabled cannot be enabled." 8 45
+      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nNetworkManager cannot be enabled.\n
+        ${exitcode1} - NetworkManager install\n
+        ${exitcode2} - NetworkManager enable" 8 45
+        clear
       fi
 
-    exit 69
+    fstrim
 
   }
 
   fstrim(){
 
-    systemctl enable fstrim.timer
+    # SSD
+    if [ "${dmi}" != "virtualbox" ] || [ "${dmi}" != "vmware" ]; then
+      systemctl enable fstrim.timer
+    fi
+
+    wathcdog_fix
 
   }
 
-  watchdog(){
+  watchdog_fix(){
 
     # Fix Watchdog error reports at shutdown
     sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
+
+    clean_up
 
   }
 
   virtualmodules
 
 )
+
+clean_up(){
+
+  rm /chroot.sh
+
+  exit 69
+
+}
 
 keymap

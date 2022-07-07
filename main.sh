@@ -215,7 +215,7 @@ partition()(
 
     items=$( gdisk -l ${disk} | tail -4 )
 
-    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 90); then
+    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 50); then
         setup_dialog
       else
         sgdisk --zap-all ${disk}
@@ -913,8 +913,16 @@ sysinstall()(
     local exitcode3=$?
 
     if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
-      pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
-      local exitcode4=$?
+      case ${dmi} in
+        "VirtualBox")
+          pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
+          local exitcode4=$?
+          ;;
+        "VMware Virtual Platform")
+          pacstrap -C ~/arch/cfg/pacman.conf /mnt open-vm-tools
+          local exitcode4=$?
+          ;;
+      esac
     fi
 
     # Hardened Kernel
@@ -940,10 +948,10 @@ sysinstall()(
 
 chroot(){
 
-  cp /root/arch/src/chroot.sh /mnt
+  cp $HOME/arch/cfg/dialogrc /mnt/etc/dialogrc
   local exitcode1=$?
 
-  cp $HOME/arch/cfg/dialogrc /mnt/etc/dialogrc
+  cp /root/arch/src/chroot.sh /mnt
   local exitcode2=$?
 
   chmod +x /mnt/chroot.sh
@@ -954,13 +962,14 @@ chroot(){
 
   if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
     dialog --title " ERROR " --msgbox "Arch-chroot [/mnt] failed.\n\n
-    ${exitcode1} - cp ~/arch/src/chroot.sh >> /mnt\n
-    ${exitcode2} - cp ~/arch/cfg/dialogrc  >> /mnt/etc/dialogrc\n
+    ${exitcode1} - cp ~/arch/cfg/dialogrc  >> /mnt/etc/dialogrc\n
+    ${exitcode2} - cp ~/arch/src/chroot.sh >> /mnt\n
     ${exitcode3} - chmod +x /mnt/chroot.sh\n
     ${exitcode4} - arch-chroot /mnt" 13 50
   fi
 
   #umount -l /mnt
+
   clear
   exit 1
 

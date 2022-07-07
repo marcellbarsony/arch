@@ -78,7 +78,7 @@ check_color = dialog_color
 check_selected_color = button_active_color
 
 # Arrow color
-uarrow_color = (MAGENTA,BLACK,OFF)
+uarrow_color = (CYAN,BLACK,OFF)
 darrow_color = uarrow_color
 
 # Item help-text color
