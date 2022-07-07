@@ -4,7 +4,7 @@ For the documentation please refer to the [Wiki](https://github.com/marcellbarso
 
 ## Objective
 
-The main objective is to create an automated Arch Linux installation script with as few interactions as possible.
+The main objective is to create a simple installation script that results in neat Arch system, with focus on security.
 
 ## Features
 
@@ -15,7 +15,6 @@ Main features including but not limited to:
 - LUKS2
 - Btrfs (Snapper)
 - Hardened kernel
-
 
 ## Installation guide
 

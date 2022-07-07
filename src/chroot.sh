@@ -26,22 +26,13 @@ system_administration()(
 
   sysadmin_dialog()(
 
-    # https://wiki.archlinux.org/title/General_recommendations#System_administration
+    domain_name(){
 
-    root_password(){
+      nodename=$(dialog --nocancel --inputbox "Hostname" 8 45 3>&1 1>&2 2>&3)
 
-      root_password=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
-
-      root_password_confirm=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
-
-      if [ ! ${root_password} ] || [ ! ${root_password_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nRoot passphrase cannot be empty." 8 45
-        root_password
-      fi
-
-      if [ ${root_password} != ${root_password_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nRoot passphrase did not match." 8 45
-        root_password
+      if [ ! ${nodename} ]; then
+        dialog --title " ERROR " --msgbox "\nHostname cannot be empty." 8 45
+        domain_name
       fi
 
       user_account
@@ -77,17 +68,24 @@ system_administration()(
         user_password
       fi
 
-      domain_name
+      root_password
 
     }
 
-    domain_name(){
+    root_password(){
 
-      nodename=$(dialog --nocancel --inputbox "Hostname" 8 45 3>&1 1>&2 2>&3)
+      root_password=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${nodename} ]; then
-        dialog --title " ERROR " --msgbox "\nHostname cannot be empty." 8 45
-        domain_name
+      root_password_confirm=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+
+      if [ ! ${root_password} ] || [ ! ${root_password_confirm} ]; then
+        dialog --title " ERROR " --msgbox "\nRoot passphrase cannot be empty." 8 45
+        root_password
+      fi
+
+      if [ ${root_password} != ${root_password_confirm} ]; then
+        dialog --title " ERROR " --msgbox "\nRoot passphrase did not match." 8 45
+        root_password
       fi
 
       grub_password
@@ -114,7 +112,9 @@ system_administration()(
 
     }
 
-    root_password
+    # https://wiki.archlinux.org/title/General_recommendations#System_administration
+
+    user account
 
   )
 
