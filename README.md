@@ -4,7 +4,7 @@ For the documentation please refer to the [Wiki](https://github.com/marcellbarso
 
 ## Objective
 
-The main objective is to create a simple installation script that results in neat Arch system, with focus on security.
+The main objective is to create a simple script that results in neat Arch system, with focus on security.
 
 ## Features
 
