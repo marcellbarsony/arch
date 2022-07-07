@@ -900,12 +900,9 @@ sysinstall()(
 
   packages(){
 
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers \ # Linux
-      grub efibootmgr dosfstools os-prober mtools \ # GRUB
-      btrfs-progs grub-btrfs snapper \ # Btrfs
-      base base-devel \ # Base
-      intel-ucode \ # Intel
-      reflector dialog git vim \ # Tools
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel grub grub-btrfs
+    #pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-firmware linux-hardened-headers base base-devel grub
+
     local exitcode1=$?
     #https://www.reddit.com/r/archlinux/comments/szo572/share_your_pacstrap/
 

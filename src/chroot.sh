@@ -316,13 +316,10 @@ grub()(
 
   grub_crypt(){
 
-    pacman -Qi btrfs-progs > /dev/null
-    if [ "$?" == "0" ]; then
-      uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot UUID
-      sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
-      sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub
-      sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
-    fi
+    uuid=$( blkid | grep /dev/sda2 | cut -d\" -f 2 ) #Root disk UUID, not cryptroot UUID
+    sed -i /GRUB_CMDLINE_LINUX_DEFAULT=/c\GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3\ quiet\ cryptdevice=UUID=${uuid}:cryptroot:allow-discards\ root=/dev/mapper/cryptroot\ video=1920x1080\" /etc/default/grub
+    sed -i /GRUB_PRELOAD_MODULES=/c\GRUB_PRELOAD_MODULES=\"part_gpt\ part_msdos\ luks2\" /etc/default/grub
+    sed -i '/#GRUB_ENABLE_CRYPTODISK=y/s/^#//g' /etc/default/grub
 
     #ext4
     #pacman -Qi lvm2 > /dev/null
@@ -387,7 +384,14 @@ grub()(
 
 packages(){
 
-  pacman -S --noconfirm networkmanager openssh
+  pacman -S --noconfirm btrfs-progs snapper \
+    networkmanager openssh \
+    reflector dialog git neovim \
+    intel-ucode \
+    #efibootmgr dosfstools
+    #pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber sof-audio
+    #lvm2
+    #xorg-server xorg-xinit xorg-prop xwallpaper arandr
 
   modules
 
