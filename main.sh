@@ -215,7 +215,7 @@ partition()(
 
     items=$( gdisk -l ${disk} | tail -4 )
 
-    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 80); then
+    if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 90); then
         setup_dialog
       else
         sgdisk --zap-all ${disk}

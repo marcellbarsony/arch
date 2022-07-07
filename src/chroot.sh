@@ -9,7 +9,7 @@ keymap(){
       options+=("${item}" "")
     done
 
-  keymap=$(dialog --title "Keyboard layout" --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
+  keymap=$(dialog --title " Keyboard layout " --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
 
   if [ "$?" = "0" ]; then
 
