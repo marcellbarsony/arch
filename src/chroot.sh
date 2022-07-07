@@ -198,6 +198,10 @@ system_administration()(
 
 )
 
+configs(){
+
+}
+
 hosts(){
 
   echo "127.0.0.1        localhost" > /etc/hosts &>/dev/null
@@ -385,8 +389,9 @@ grub()(
 packages(){
 
   pacman -S --noconfirm btrfs-progs snapper \
+    zsh zsh-completions \
     networkmanager openssh \
-    reflector dialog git neovim \
+    reflector git neovim \
     intel-ucode \
     #efibootmgr dosfstools
     #pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber sof-audio

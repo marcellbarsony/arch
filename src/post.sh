@@ -1515,20 +1515,14 @@ configs()(
 
     cd $HOME
 
-    systemd
+    copy_configs
 
 
   }
 
-  systemd(){
+  copy_configs(){
 
     sudo cp $HOME/.config/systemd/logind.conf /etc/systemd/
-
-    pacman
-
-  }
-
-  pacman(){
 
     sudo cp $HOME/.config/_system/pacman/pacman.conf /etc/
 
@@ -1546,7 +1540,6 @@ configs()(
 
     # Copy zprofile
     sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
-    copycheck
 
     # ZSH Autocomplete
     git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src/zsh-autocomplete/
