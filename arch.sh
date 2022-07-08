@@ -1,26 +1,5 @@
 #!/bin/bash
 
-set -o errtrace
-
-errorlog(){
-
-  local exitcode=${1}
-  local functionname=${2}
-  local lineno=${3}
-
-  echo "Exit code: {exitcode} > ${SCRIPT_LOG}\nFunction: ${functionname}\nLine number: ${lineno}" > ${SCRIPT_LOG}
-
-  if (dialog --title " ERROR " --yes-label "Exit" --no-label "Log" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
-      exit ${exitcode}
-    else
-      vim ${SCRIPT_LOG}
-      exit ${exitcode}
-  fi
-
-}
-
-trap 'errorlog ${?} ${FUNCNAME-main context} ${LINENO}' ERR
-
 precheck()(
 
   network(){
@@ -114,6 +93,7 @@ precheck()(
     case $? in
       0)
         echo "[OK]"
+        sleep 1
         dependencies
         ;;
       *)
@@ -204,8 +184,6 @@ precheck()(
     echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
     sleep 1
 
-    echo "[OK]"
-
     partition
 
   }
@@ -214,6 +192,25 @@ precheck()(
 
 )
 
+errorlog(){
+
+  local exitcode=${2}
+  local functionname=${3}
+  local lineno=${4}
+
+  echo "Exit code - ${exitcode}" > ${SCRIPT_LOG}
+  echo "Function - ${functionname}" >> ${SCRIPT_LOG}
+  echo "Line no. - ${lineno}" >> ${SCRIPT_LOG}
+
+  if (dialog --title " ERROR " --yes-label "Exit" --no-label "View logs" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
+      exit ${exitcode}
+    else
+      vim ${SCRIPT_LOG}
+      exit ${exitcode}
+  fi
+
+}
+
 partition()(
 
   warning(){
@@ -221,8 +218,7 @@ partition()(
     if (dialog --title " WARNING " --yes-label "Proceed" --no-label "Exit" --yesno "\nEverything not backed up will be lost." 8 60); then
         diskselect
       else
-        echo "Installation terminated"
-        echo "Exit status $?"
+        echo "Installation terminated - $?"
     fi
 
   }
@@ -340,6 +336,11 @@ partition()(
   warning
 
 )
+
+set -o errtrace
+
+trap 'errorlog ${?} ${FUNCNAME-main context} ${LINENO}' ERR
+#trap 'failure "${BASH_LINENO[*]}" "$LINENO" "${FUNCNAME[*]:-script}" "$?" "$BASH_COMMAND"' ERR
 
 setup_dialog()(
 
