@@ -1,5 +1,26 @@
 #!/bin/bash
 
+set -o errtrace
+
+errorlog(){
+
+  local exitcode=${1}
+  local functionname=${2}
+  local lineno=${3}
+
+  echo "Exit code: {exitcode} > ${SCRIPT_LOG}\nFunction: ${functionname}\nLine number: ${lineno}" > ${SCRIPT_LOG}
+
+  if (dialog --title " ERROR " --yes-label "Exit" --no-label "Log" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
+      exit ${exitcode}
+    else
+      vim ${SCRIPT_LOG}
+      exit ${exitcode}
+  fi
+
+}
+
+trap 'errorlog ${?} ${FUNCNAME-main context} ${LINENO}' ERR
+
 precheck()(
 
   network(){
@@ -143,10 +164,13 @@ precheck()(
 
   variables(){
 
-    echo -n "Setting variables..."
+    echo -n "Initializing global variables..."
 
-    # Script directory - https://stackoverflow.com/a/246128/15286303
+    SCRIPT_NAME=$(basename $0)
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    SCRIPT_LOG=${SCRIPT_DIR}/src/${SCRIPT_NAME}.log
+
+    echo "[OK]"
 
     colors
 
@@ -179,6 +203,8 @@ precheck()(
     # Test
     echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
     sleep 1
+
+    echo "[OK]"
 
     partition
 
