@@ -342,6 +342,13 @@ set -o errtrace
 trap 'errorlog ${?} ${FUNCNAME-main context} ${LINENO}' ERR
 #trap 'failure "${BASH_LINENO[*]}" "$LINENO" "${FUNCNAME[*]:-script}" "$?" "$BASH_COMMAND"' ERR
 
+# Note
+# https://stackoverflow.com/questions/31201572/how-to-untrap-after-a-trap-command
+# https://github.com/rtxx/arch-minimal-install/blob/main/install-scripta
+# https://unix.stackexchange.com/questions/462156/how-do-i-find-the-line-number-in-bash-when-an-error-occured
+# https://stackoverflow.com/questions/64786/error-handling-in-bash
+# https://stackoverflow.com/questions/25378845/what-does-set-o-errtrace-do-in-a-shell-script
+
 setup_dialog()(
 
   filesystem_dialog()(
