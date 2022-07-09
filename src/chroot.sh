@@ -2,7 +2,7 @@
 
 sysadmin()(
 
-  keymap(){
+  setkeymap(){
 
     echo "Set keymap [${KEYMAP}]..."
     sleep 1
@@ -44,7 +44,7 @@ sysadmin()(
       exit ${exitcode}
     fi
 
-    USER_PASSWORD
+    user_password
 
   }
 
@@ -99,7 +99,7 @@ sysadmin()(
 
   }
 
-  keymap
+  setkeymap
 
 )
 
@@ -176,7 +176,7 @@ initramfs(){
 security(){
 
   # Delay after a failed login attempt
-  sed -i '6i auth       optional   pam_faildelay.so delay=5000000' > /etc/pam.d/system-login
+  sed -i '6i auth       optional   pam_faildelay.so delay=5000000' /etc/pam.d/system-login
 
   fixes
 

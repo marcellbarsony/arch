@@ -554,7 +554,7 @@ dialogs()(
 
       if [ ! ${NODENAME} ]; then
         dialog --title " ERROR " --msgbox "\nHostname cannot be empty." 8 45
-        domain_name
+        workstation_name
       fi
 
       user_account
@@ -570,7 +570,7 @@ dialogs()(
         user_account
       fi
 
-      root_password
+      user_password
 
     }
 
@@ -578,16 +578,16 @@ dialogs()(
 
       USER_PASSWORD=$(dialog --nocancel --passwordbox "${USERNAME}'s passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      USER_PASSWORD_confirm=$(dialog --nocancel --passwordbox "${USERNAME}'s passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      USER_PASSWORD_CONFIRM=$(dialog --nocancel --passwordbox "${USERNAME}'s passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${USER_PASSWORD} ] || [ ! ${USER_PASSWORD_confirm} ]; then
+      if [ ! ${USER_PASSWORD} ] || [ ! ${USER_PASSWORD_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nUser passphrase cannot be empty." 8 45
-        USER_PASSWORD
+        user_password
       fi
 
-      if [ ${USER_PASSWORD} != ${USER_PASSWORD_confirm} ]; then
+      if [ ${USER_PASSWORD} != ${USER_PASSWORD_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nUser passphrase did not match." 8 45
-        USER_PASSWORD
+        user_password
       fi
 
       root_password
@@ -598,16 +598,16 @@ dialogs()(
 
       ROOT_PASSWORD=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      ROOT_PASSWORD_confirm=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      ROOT_PASSWORD_CONFIRM=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${ROOT_PASSWORD} ] || [ ! ${ROOT_PASSWORD_confirm} ]; then
+      if [ ! ${ROOT_PASSWORD} ] || [ ! ${ROOT_PASSWORD_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nRoot passphrase cannot be empty." 8 45
-        ROOT_PASSWORD
+        root_password
       fi
 
-      if [ ${ROOT_PASSWORD} != ${ROOT_PASSWORD_confirm} ]; then
+      if [ ${ROOT_PASSWORD} != ${ROOT_PASSWORD_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nRoot passphrase did not match." 8 45
-        ROOT_PASSWORD
+        root_password
       fi
 
       grub_password
@@ -618,14 +618,14 @@ dialogs()(
 
       GRUBPW=$(dialog --nocancel --passwordbox "GRUB passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      GRUBPW_confirm=$(dialog --nocancel --passwordbox "GRUB passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      GRUBPW_CONFIRM=$(dialog --nocancel --passwordbox "GRUB passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${GRUBPW} ] || [ ! ${GRUBPW_confirm} ]; then
+      if [ ! ${GRUBPW} ] || [ ! ${GRUBPW_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nGRUB passphrase cannot be empty." 8 45
         grub_password
       fi
 
-      if [ ${GRUBPW} != ${GRUBPW_confirm} ]; then
+      if [ ${GRUBPW} != ${GRUBPW_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nGRUB passphrase did not match." 8 45
         grub_password
       fi
@@ -1116,6 +1116,15 @@ archinstall()(
 )
 
 chroot(){
+
+  clear
+  echo "Keymap - $KEYMAP"
+  echo "Nodename - $NODENAME"
+  echo "Username - $USERNAME"
+  echo "Workstation name - $USER_PASSWORD"
+  echo "Root password - $ROOT_PASSWORD"
+  echo "GRUB - $GRUBPW"
+  sleep 10
 
   export KEYMAP
   export NODENAME
