@@ -95,7 +95,6 @@ pre()(
     case $? in
       0)
         echo "[OK]"
-        sleep 1
         dependencies
         ;;
       *)
@@ -406,10 +405,6 @@ dialogs()(
         1)
           partition
           ;;
-        *)
-          dialog --title " ERROR " --msgbox "Error status: ${?}" 8 78
-          exit $?
-          ;;
       esac
 
     }
@@ -430,9 +425,6 @@ dialogs()(
           ;;
         1)
           select_efi
-          ;;
-        *)
-          whiptail --title " ERROR " --msgbox "Error status: ${?}" 8 78
           ;;
       esac
 
@@ -455,9 +447,6 @@ dialogs()(
         1)
           select_efi
           ;;
-        *)
-          whiptail --title " ERROR " --msgbox "Error status: ${?}" 8 78
-          ;;
       esac
 
     }
@@ -470,7 +459,7 @@ dialogs()(
 
     crypt_password(){
 
-      CRYPTPASSWORD=$(dialog --nocancel --passwordbox "Encryption passphrase" 8 45 3>&1 1>&2 2>&3)
+      CRYPTPASSWORD=$(dialog --nocancel --passwordbox "LUKS encryption passphrase" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -485,7 +474,7 @@ dialogs()(
 
     crypt_password_confirm(){
 
-      CRYPTPASSWORD_confirm=$(dialog --nocancel --passwordbox "Encryption passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      CRYPTPASSWORD_confirm=$(dialog --nocancel --passwordbox "LUKS encryption passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
         0)
@@ -649,14 +638,8 @@ crypt_setup()(
   cryptsetup_create(){
 
     echo ${CRYPTPASSWORD} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice}
-    local exitcode=$?
 
     #https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Keyfiles
-
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "Encrypting [${rootdevice}] unsuccessful.\nExit status: ${exitcode}" 7 50
-      exit ${exitcode}
-    fi
 
     # Check keyslots
     # cryptsetup luksDump /dev/sda
@@ -668,12 +651,6 @@ crypt_setup()(
   cryptsetup_open(){
 
     echo ${CRYPTPASSWORD} | cryptsetup open --type luks2 ${rootdevice} cryptroot
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      dialog --title " ERROR " --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${exitcode}" 7 50
-      exit ${exitcode}
-    fi
 
     filesystem
 
@@ -690,12 +667,6 @@ filesystem()(
     root_format(){
 
       mkfs.btrfs -L system /dev/mapper/cryptroot
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "Formatting ${rootdevice} to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 7 60
-        exit ${exitcode}
-      fi
 
       root_mount
 
@@ -704,12 +675,6 @@ filesystem()(
     root_mount(){
 
       mount /dev/mapper/cryptroot /mnt
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "ROOT partition was not mounted\nExit status: ${exitcode}" 7 50
-        exit ${exitcode}
-      fi
 
       btrfs_filesystem
 
@@ -724,28 +689,14 @@ filesystem()(
     btrfs_subvolumes(){
 
       btrfs subvolume create /mnt/@
-      local exitcode1=$?
 
       btrfs subvolume create /mnt/@home
-      local exitcode2=$?
 
       btrfs subvolume create /mnt/@var
-      local exitcode3=$?
 
       btrfs subvolume create /mnt/@snapshots
-      local exitcode4=$?
 
       umount -R /mnt
-      local exitcode5=$?
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ] || [ "${exitcode5}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nAn error occurred whilst creating subvolumes.\n\n
-        ${exitcode1} - Create @\n
-        ${exitcode2} - Create @home\n
-        ${exitcode3} - Create @var\n
-        ${exitcode4} - Create @snapshots\n
-        ${exitcode5} - Unmount /mnt" 13 78
-      fi
 
       #btrfs subvolume list .
 
@@ -756,36 +707,16 @@ filesystem()(
     btrfs_mount(){
 
       mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
-      local exitcode1=$?
       # Optional:ssd
       # dmesg | grep "BTRFS"
 
-      mkdir -p /mnt/{efi,boot,home,var}
-      mkdir -p /mnt/.snapshots
+      mkdir -p /mnt/{efi,boot,home,var,.snapshots}
 
       mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/home
-      local exitcode2=$?
-      # Optional:ssd
-      # dmesg | grep "BTRFS"
 
       mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/var
-      local exitcode3=$?
-      # Optional:ssd
-      # dmesg | grep "BTRFS"
 
       mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/.snapshots
-      local exitcode4=$?
-      # Optional:ssd
-      # dmesg | grep "BTRFS"
-
-      if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nAn error occurred whilst mounting subvolumes.\n\n
-        ${exitcode1} - Create @\n
-        ${exitcode2} - Create @home\n
-        ${exitcode3} - Create @var\n
-        ${exitcode4} - Create @snapshots" 13 78
-        exit 1
-      fi
 
       #df -hT
 
@@ -802,12 +733,6 @@ filesystem()(
     efi_format(){
 
       mkfs.fat -F32 ${EFIDEVICE}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot format ESP [${EFIDEVICE}] to FAT32.\nExit status: ${exitcode}" 8 50
-        exit ${exitcode}
-      fi
 
       efi_mount
 
@@ -815,16 +740,9 @@ filesystem()(
 
     efi_mount(){
 
-      efimountdir="/mnt/boot"
-      #efimountdir="/mnt/efi"
+      efimountdir="/mnt/boot" #/mnt/efi
 
       mount ${EFIDEVICE} ${efimountdir}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot mount ESP [${EFIDEVICE}] to ${efimountdir}.\nExit status: ${exitcode}" 8 50
-        exit ${exitcode}
-      fi
 
       fstab
 
@@ -839,24 +757,12 @@ filesystem()(
     cryptsetup_open(){
 
     cryptsetup open --type luks2 ${rootdevice} cryptlvm --key-file ${keydir}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      whiptail --title "ERROR" --msgbox "LVM device [${rootdevice}] cannot be opened.\nExit status: ${?}" 8 78
-      exit ${exitcode}
-    fi
 
     }
 
     volume_physical(){
 
       pvcreate /dev/mapper/cryptlvm
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Physical volume cannot be created.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
 
       volume_group
 
@@ -865,12 +771,6 @@ filesystem()(
     volume_group(){
 
       vgcreate volgroup0 /dev/mapper/cryptlvm
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Volume group [volgroup0] cannot be created.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
 
       volume_create_root
 
@@ -879,12 +779,6 @@ filesystem()(
     volume_create_root(){
 
       lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "ROOT filesystem [cryptroot] cannot be created.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
 
       volume_create_home
 
@@ -893,12 +787,6 @@ filesystem()(
     volume_create_home(){
 
       lvcreate -l 100%FREE volgroup0 -n crypthome
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "HOME filesystem [crypthome] cannot be created.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
 
       volume_kernel_module
 
@@ -907,12 +795,6 @@ filesystem()(
     volume_kernel_module(){
 
       modprobe dm_mod
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Activating volume groups [modprobe dm_mod] failed.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
 
       volume_group_scan
 
@@ -921,12 +803,6 @@ filesystem()(
     volume_group_scan(){
 
       vgscan
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Scanning volume groups [vgscan] failed.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
 
       volume_group_activate
 
@@ -935,12 +811,6 @@ filesystem()(
     volume_group_activate(){
 
       vgchange -ay
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Activating volume groups [vgchange -ay] failed.\nExit status: ${?}" 8 78
-        exit ${exitcode}
-      fi
 
       format_root
 
@@ -949,12 +819,6 @@ filesystem()(
     format_root(){
 
       mkfs.${filesystem} /dev/volgroup0/cryptroot
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/cryptroot] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-          exit ${exitcode}
-      fi
 
       mount_root
 
@@ -963,12 +827,6 @@ filesystem()(
     mount_root(){
 
       mount /dev/volgroup0/cryptroot /mnt
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title "ERROR" --msgbox "ROOT partition [/dev/volgroup0/cryptroot] was not mounted.\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
 
       format_home
 
@@ -977,12 +835,6 @@ filesystem()(
     format_home(){
 
       mkfs.${filesystem} /dev/volgroup0/crypthome
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-          whiptail --title "ERROR" --msgbox "Formatting [/dev/volgroup0/crypthome] to ${filesystem} unsuccessful.\nExit status: ${exitcode}" 8 78
-          exit ${exitcode}
-      fi
 
       mount_home
 
@@ -991,20 +843,8 @@ filesystem()(
     mount_home(){
 
       mkdir /mnt/home
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title " ERROR " --msgbox "HOME directory was not created.\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
 
       mount /dev/volgroup0/crypthome /mnt/home
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        whiptail --title " ERROR " --msgbox "HOME partition was not mounted.\nExit status: ${exitcode}" 8 60
-        exit ${exitcode}
-      fi
 
       boot_partition
 
@@ -1020,17 +860,8 @@ filesystem()(
 fstab(){
 
   mkdir /mnt/etc/ &>/dev/null
-  local exitcode1=$?
 
   genfstab -U /mnt >> /mnt/etc/fstab
-  local exitcode2=$?
-
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "\nCannot create fstab configuration.\n\n
-    ${exitcode1} - fstab directory\n
-    ${exitcode2} - fstab configuration" 10 50
-    exit 1
-  fi
 
   archinstall
 
@@ -1040,17 +871,11 @@ archinstall()(
 
   mirrorlist(){
 
+    echo "Reflector: Updating Pacman mirrorlist..."
+
     cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
-    local exitcode1=$?
 
     reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
-    local exitcode2=$?
-
-    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "Cannot update mirrorlist.\n\n
-      ${exitcode1} - Mirrorlist backup\n
-      ${exitcode2} - Mirrorlist update" 10 50
-    fi
 
     clear
 
@@ -1061,17 +886,8 @@ archinstall()(
   pacman_config(){
 
     cp ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
-    local exitcode1=$?
 
     cp ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
-    local exitcode2=$?
-
-    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "Cannot copy pacman.conf.\n\n
-      ${exitcode1} - pacman.conf >> /etc/pacman.conf\n
-      ${exitcode2} - pacman.conf >> /mnt/etc/pacman.conf" 10 50
-      exit 1
-    fi
 
     packages
 
@@ -1079,12 +895,8 @@ archinstall()(
 
   packages(){
 
-    #pacstrap -C ~/arch/cfg/pacman.conf /mnt linux linux-firmware linux-headers base base-devel grub grub-btrfs efibootmgr dialog
     pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-firmware linux-hardened-headers base base-devel grub efibootmgr dialog vim
-    local exitcode1=$?
-
-    # Hardened Kernel
-    # pacstrap: linux-hardened linux-hardened-headers
+    # Hardened kernel
     # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
     # ls -lsha /boot
 
@@ -1101,12 +913,6 @@ archinstall()(
       esac
     fi
 
-    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "An error occurred whilst installing packages.\n
-      ${exitcode1} - [ Main packages  ]\n
-      ${exitcode4} - [ DMI packages ]" 13 78
-    fi
-
     chroot
 
   }
@@ -1116,15 +922,6 @@ archinstall()(
 )
 
 chroot(){
-
-  clear
-  echo "Keymap - $KEYMAP"
-  echo "Nodename - $NODENAME"
-  echo "Username - $USERNAME"
-  echo "Workstation name - $USER_PASSWORD"
-  echo "Root password - $ROOT_PASSWORD"
-  echo "GRUB - $GRUBPW"
-  sleep 10
 
   export KEYMAP
   export NODENAME
