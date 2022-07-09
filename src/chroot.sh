@@ -5,9 +5,9 @@ keymap(){
   items=$(localectl list-keymaps)
   options=()
   options+=("us" "[Default]")
-    for item in ${items}; do
-      options+=("${item}" "")
-    done
+  for item in ${items}; do
+    options+=("${item}" "")
+  done
 
   keymap=$(dialog --title " Keyboard layout " --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
 
@@ -186,11 +186,11 @@ system_administration()(
         exit ${exitcode}
       fi
 
-      hosts
+      security
 
     }
 
-    security
+    root_password
 
   )
 
@@ -201,7 +201,7 @@ system_administration()(
 security(){
 
   # Delay after a failed login attempt
-  echo "auth optional pam_faildelay.so delay=5000000" > /etc/pam.d/system-login
+  sed -i '6i auth       optional   pam_faildelay.so delay=5000000' > /etc/pam.d/system-login
 
   hosts
 
@@ -367,7 +367,7 @@ grub()(
       exit ${exitcode}
     fi
 
-    modules
+    packages
 
   }
 
@@ -471,7 +471,7 @@ modules()(
   systemctl enable fstrim.timer
   local exitcode3=$?
 
-    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
+  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ]; then
     dialog --title " ERROR " --msgbox "Systemctl: Cannot enable services\n\n
     ${exitcode1} - sshd.service\n
     ${exitcode2} - NetworkManager\n
