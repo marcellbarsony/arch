@@ -158,11 +158,13 @@ pre()(
     # Config files
     DIALOGRC=/root/arch/cfg/dialogrc
 
+    echo "[OK]"
+
     colors(){
 
       #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
 
-      echo "Enabling color support..........."
+      echo -n "Enabling color support..........."
       sleep 1
 
       RESTORE=$(echo -en '\033[0m')
@@ -561,14 +563,14 @@ dialogs()(
 
     user_account(){
 
-      USERNAME=$(dialog --nocancel --inputbox "USERNAME" 8 45 3>&1 1>&2 2>&3)
+      USERNAME=$(dialog --nocancel --inputbox "Username" 8 45 3>&1 1>&2 2>&3)
 
       if [ ! ${USERNAME} ] || [ ${USERNAME} == "root" ]; then
         dialog --title " ERROR " --msgbox "\nUSERNAME cannot be empty or [root]." 8 45
         user_account
       fi
 
-      USER_PASSWORD
+      root_password
 
     }
 
@@ -588,7 +590,7 @@ dialogs()(
         USER_PASSWORD
       fi
 
-      ROOT_PASSWORD
+      root_password
 
     }
 

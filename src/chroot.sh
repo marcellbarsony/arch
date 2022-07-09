@@ -1,8 +1,11 @@
 #!/bin/bash
 
-system_administration()(
+sysadmin()(
 
   keymap(){
+
+    echo "Set keymap [${KEYMAP}]..."
+    sleep 1
 
     loadkeys ${KEYMAP} &>/dev/null
     localectl set-keymap --no-convert ${KEYMAP} &>/dev/null # Systemd reads from /etc/vconsole.conf
@@ -12,6 +15,9 @@ system_administration()(
   }
 
   root_password(){
+
+    echo "Set root password..."
+    sleep 1
 
     echo "root:${ROOT_PASSWORD}" | chpasswd 2>&1
     local exitcode=$?
@@ -27,6 +33,9 @@ system_administration()(
 
   user_create(){
 
+    echo "Add user [${USERNAME}]..."
+    sleep 1
+
     useradd -m ${USERNAME}
     local exitcode=$?
 
@@ -40,6 +49,9 @@ system_administration()(
   }
 
   user_password(){
+
+    echo "Set ${USERNAME} password..."
+    sleep 1
 
     error=$( echo "${USERNAME}:${USER_PASSWORD}" | chpasswd 2>&1 )
     local exitcode=$?
@@ -55,6 +67,9 @@ system_administration()(
 
   user_group(){
 
+    echo "Add ${USERNAME} to groups..."
+    sleep 1
+
     usermod -aG wheel,audio,video,optical,storage ${USERNAME} 2>&1
     local exitcode=$?
 
@@ -68,6 +83,9 @@ system_administration()(
   }
 
   domain_name(){
+
+    echo "Set hostname >> ${NODENAME}"
+    sleep 1
 
     hostnamectl set-hostname ${NODENAME}
     local exitcode=$?
@@ -83,10 +101,11 @@ system_administration()(
 
   keymap
 
-
 )
 
 hosts(){
+
+  echo "Set hosts..."
 
   echo "127.0.0.1        localhost" > /etc/hosts &>/dev/null
   echo "::1              localhost" >> /etc/hosts &>/dev/null
@@ -387,4 +406,4 @@ clean_up(){
 
 }
 
-system_administration
+sysadmin
