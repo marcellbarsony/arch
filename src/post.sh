@@ -187,9 +187,9 @@ dialog()(
 
   }
 
-  github_username(){
+  github_USERNAME(){
 
-    gh_username=$(whiptail --inputbox "GitHub username" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    gh_USERNAME=$(whiptail --inputbox "GitHub USERNAME" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -204,9 +204,9 @@ dialog()(
       esac
     fi
 
-    if [ ! ${gh_username} ] ; then
-      whiptail --title "ERROR" --msgbox "GitHub username cannot be empty." 8 78
-      github_username
+    if [ ! ${gh_USERNAME} ] ; then
+      whiptail --title "ERROR" --msgbox "GitHub USERNAME cannot be empty." 8 78
+      github_USERNAME
     fi
 
     github_pubkey
@@ -1507,11 +1507,11 @@ configs()(
 
   clone(){
 
-    git clone git@github.com:${gh_username}/dotfiles.git $HOME/.config
+    git clone git@github.com:${gh_USERNAME}/dotfiles.git $HOME/.config
 
     cd $HOME/.config
 
-    git remote set-url origin git@github.com:${gh_username}/dotfiles.git
+    git remote set-url origin git@github.com:${gh_USERNAME}/dotfiles.git
 
     cd $HOME
 

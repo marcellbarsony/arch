@@ -1,217 +1,96 @@
 #!/bin/bash
 
-keymap(){
-
-  items=$(localectl list-keymaps)
-  options=()
-  options+=("us" "[Default]")
-  for item in ${items}; do
-    options+=("${item}" "")
-  done
-
-  keymap=$(dialog --title " Keyboard layout " --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
-
-  if [ "$?" = "0" ]; then
-
-    loadkeys ${keymap} &>/dev/null
-    localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
-
-  fi
-
-  system_administration
-
-}
-
 system_administration()(
 
-  sysadmin_dialog()(
+  keymap(){
 
-    domain_name(){
-
-      nodename=$(dialog --nocancel --inputbox "Hostname" 8 45 3>&1 1>&2 2>&3)
-
-      if [ ! ${nodename} ]; then
-        dialog --title " ERROR " --msgbox "\nHostname cannot be empty." 8 45
-        domain_name
-      fi
-
-      user_account
-
-    }
-
-    user_account(){
-
-      username=$(dialog --nocancel --inputbox "Username" 8 45 3>&1 1>&2 2>&3)
-
-      if [ ! ${username} ] || [ ${username} == "root" ]; then
-        dialog --title " ERROR " --msgbox "\nUsername cannot be empty or [root]." 8 45
-        user_account
-      fi
-
-      user_password
-
-    }
-
-    user_password(){
-
-      user_password=$(dialog --nocancel --passwordbox "${username}'s passphrase" 8 45 3>&1 1>&2 2>&3)
-
-      user_password_confirm=$(dialog --nocancel --passwordbox "${username}'s passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
-
-      if [ ! ${user_password} ] || [ ! ${user_password_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nUser passphrase cannot be empty." 8 45
-        user_password
-      fi
-
-      if [ ${user_password} != ${user_password_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nUser passphrase did not match." 8 45
-        user_password
-      fi
-
-      root_password
-
-    }
-
-    root_password(){
-
-      root_password=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
-
-      root_password_confirm=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
-
-      if [ ! ${root_password} ] || [ ! ${root_password_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nRoot passphrase cannot be empty." 8 45
-        root_password
-      fi
-
-      if [ ${root_password} != ${root_password_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nRoot passphrase did not match." 8 45
-        root_password
-      fi
-
-      grub_password
-
-    }
-
-    grub_password(){
-
-      grubpw=$(dialog --nocancel --passwordbox "GRUB passphrase" 8 45 3>&1 1>&2 2>&3)
-
-      grubpw_confirm=$(dialog --nocancel --passwordbox "GRUB passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
-
-      if [ ! ${grubpw} ] || [ ! ${grubpw_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nGRUB passphrase cannot be empty." 8 45
-        grub_password
-      fi
-
-      if [ ${grubpw} != ${grubpw_confirm} ]; then
-        dialog --title " ERROR " --msgbox "\nGRUB passphrase did not match." 8 45
-        grub_password
-      fi
-
-      sysadmin
-
-    }
-
-    # https://wiki.archlinux.org/title/General_recommendations#System_administration
-
-    user account
-
-  )
-
-  sysadmin()(
-
-    root_password(){
-
-      echo "root:${root_password}" | chpasswd 2>&1
-      local exitcode=$?
-
-      if [ ${exitcode} != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot set root password." 8 45
-        exit ${exitcode}
-      fi
-
-      user_create
-
-    }
-
-    user_create(){
-
-      useradd -m ${username}
-      local exitcode=$?
-
-      if [ ${exitcode} != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot create user account [${username}]" 8 45
-        exit ${exitcode}
-      fi
-
-      user_password
-
-    }
-
-    user_password(){
-
-      error=$( echo "${username}:${user_password}" | chpasswd 2>&1 )
-      local exitcode=$?
-
-      if [ ${exitcode} != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot set user password [${username}]" 8 45
-        exit ${exitcode}
-      fi
-
-      user_group
-
-    }
-
-    user_group(){
-
-      usermod -aG wheel,audio,video,optical,storage ${username} 2>&1
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot add [${username}] to groups" 8 45
-        exit ${exitcode}
-      fi
-
-      domain_name
-
-    }
-
-    domain_name(){
-
-      hostnamectl set-hostname ${nodename}
-      local exitcode=$?
-
-      if [ "${exitcode}" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nHostname [${nodename}] cannot be set" 8 45
-        exit ${exitcode}
-      fi
-
-      security
-
-    }
+    loadkeys ${KEYMAP} &>/dev/null
+    localectl set-keymap --no-convert ${KEYMAP} &>/dev/null # Systemd reads from /etc/vconsole.conf
 
     root_password
 
-  )
+  }
 
-  sysadmin_dialog
+  root_password(){
+
+    echo "root:${ROOT_PASSWORD}" | chpasswd 2>&1
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nCannot set root password." 8 45
+      exit ${exitcode}
+    fi
+
+    user_create
+
+  }
+
+  user_create(){
+
+    useradd -m ${USERNAME}
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nCannot create user account [${USERNAME}]" 8 45
+      exit ${exitcode}
+    fi
+
+    USER_PASSWORD
+
+  }
+
+  user_password(){
+
+    error=$( echo "${USERNAME}:${USER_PASSWORD}" | chpasswd 2>&1 )
+    local exitcode=$?
+
+    if [ ${exitcode} != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nCannot set user password [${USERNAME}]" 8 45
+      exit ${exitcode}
+    fi
+
+    user_group
+
+  }
+
+  user_group(){
+
+    usermod -aG wheel,audio,video,optical,storage ${USERNAME} 2>&1
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nCannot add [${USERNAME}] to groups" 8 45
+      exit ${exitcode}
+    fi
+
+    domain_name
+
+  }
+
+  domain_name(){
+
+    hostnamectl set-hostname ${NODENAME}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nHostname [${NODENAME}] cannot be set" 8 45
+      exit ${exitcode}
+    fi
+
+    hosts
+
+  }
+
+  keymap
+
 
 )
-
-security(){
-
-  # Delay after a failed login attempt
-  sed -i '6i auth       optional   pam_faildelay.so delay=5000000' > /etc/pam.d/system-login
-
-  hosts
-
-}
 
 hosts(){
 
   echo "127.0.0.1        localhost" > /etc/hosts &>/dev/null
   echo "::1              localhost" >> /etc/hosts &>/dev/null
-  echo "127.0.1.1        ${nodename}" >> /etc/hosts &>/dev/null
+  echo "127.0.1.1        ${NODENAME}" >> /etc/hosts &>/dev/null
 
   sudoers
 
@@ -271,6 +150,24 @@ initramfs(){
   mkinitcpio -p linux-hardened
   #mkinitcpio -P
 
+  security
+
+}
+
+security(){
+
+  # Delay after a failed login attempt
+  sed -i '6i auth       optional   pam_faildelay.so delay=5000000' > /etc/pam.d/system-login
+
+  fixes
+
+}
+
+fixes(){
+
+  # Fix Watchdog error reports at shutdown
+  sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
+
   grub
 
 }
@@ -279,11 +176,11 @@ grub()(
 
   grub_password(){
 
-    grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
+    grubpass=$(echo -e "${GRUBPW}\n${GRUBPW}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
     echo "cat << EOF" >> /etc/grub.d/00_header
-    echo "set superusers=\"${username}\"" >> /etc/grub.d/00_header
-    echo "password_pbkdf2 ${username} ${grubpass}" >> /etc/grub.d/00_header
+    echo "set superusers=\"${USERNAME}\"" >> /etc/grub.d/00_header
+    echo "password_pbkdf2 ${USERNAME} ${grubpass}" >> /etc/grub.d/00_header
     echo "EOF" >> /etc/grub.d/00_header
 
     grub_crypt
@@ -478,25 +375,9 @@ modules()(
     ${exitcode3} - fstrim.timer" 13 50
   fi
 
-  watchdog_fix
-
-)
-
-watchdog_fix(){
-
-  # Fix Watchdog error reports at shutdown
-  sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "\nCannot fix Watchdog error reports bug\nExit status: ${exitcode}" 8 78
-    exit ${exitcode}
-  fi
-
-
   clean_up
 
-}
+)
 
 clean_up(){
 
@@ -506,4 +387,4 @@ clean_up(){
 
 }
 
-keymap
+system_administration

@@ -52,12 +52,12 @@ echo "# Create user account"
 echo "------------------------------"
 echo
 
-read -p "Enter your username: " username
+read -p "Enter your USERNAME: " USERNAME
 echo
-useradd -m ${username}
+useradd -m ${USERNAME}
 
-echo "Enter the password of ${username}"
-passwd ${username}
+echo "Enter the password of ${USERNAME}"
+passwd ${USERNAME}
 $wait
 clear
 
@@ -70,13 +70,13 @@ echo "# User group management"
 echo "------------------------------"
 echo
 
-echo "Adding ${username} to basic groups"
-usermod -aG wheel,audio,video,optical,storage ${username}
+echo "Adding ${USERNAME} to basic groups"
+usermod -aG wheel,audio,video,optical,storage ${USERNAME}
 echo
 $wait
 
 echo "Verifying group memebership"
-id ${username}
+id ${USERNAME}
 echo
 $wait
 clear
