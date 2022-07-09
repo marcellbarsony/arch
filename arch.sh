@@ -87,6 +87,7 @@ precheck()(
   keymap(){
 
     echo -n "Setting US keymap..."
+    sleep 1
     loadkeys us &>/dev/null
     localectl set-keymap --no-convert us &>/dev/null # Systemd reads from /etc/vconsole.conf
 
@@ -107,6 +108,7 @@ precheck()(
   dependencies(){
 
     echo -n "Installing dependencies..."
+    sleep 1
     pacman -Sy --noconfirm dialog &>/dev/null #libnewt
     DIALOGRC=/root/arch/cfg/dialogrc
 
@@ -145,6 +147,7 @@ precheck()(
   variables(){
 
     echo -n "Initializing global variables..."
+    sleep 1
 
     SCRIPT_NAME=$(basename $0)
     SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -160,7 +163,8 @@ precheck()(
 
     #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
 
-    echo -n "Enable color support..."
+    echo "Enable color support..."
+    sleep 1
 
     RESTORE=$(echo -en '\033[0m')
     RED=$(echo -en '\033[00;31m')
@@ -182,7 +186,6 @@ precheck()(
 
     # Test
     echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
-    sleep 1
 
     partition
 
@@ -211,12 +214,24 @@ errorlog(){
 
 }
 
+set -o errtrace
+
+trap 'errorlog ${?} ${FUNCNAME-main context} ${LINENO}' ERR
+#trap 'failure "${BASH_LINENO[*]}" "$LINENO" "${FUNCNAME[*]:-script}" "$?" "$BASH_COMMAND"' ERR
+
+# Note
+# https://stackoverflow.com/questions/31201572/how-to-untrap-after-a-trap-command
+# https://github.com/rtxx/arch-minimal-install/blob/main/install-scripta
+# https://unix.stackexchange.com/questions/462156/how-do-i-find-the-line-number-in-bash-when-an-error-occured
+# https://stackoverflow.com/questions/64786/error-handling-in-bash
+# https://stackoverflow.com/questions/25378845/what-does-set-o-errtrace-do-in-a-shell-script
+
 partition()(
 
   warning(){
 
     if (dialog --title " WARNING " --yes-label "Proceed" --no-label "Exit" --yesno "\nEverything not backed up will be lost." 8 60); then
-        diskselect
+        diskselect || true
       else
         echo "Installation terminated - $?"
     fi
@@ -240,7 +255,7 @@ partition()(
         sgdisk_partition
         ;;
       1)
-        keymap
+        warning
         exit 1
         ;;
       *)
@@ -322,7 +337,7 @@ partition()(
 
       case $? in
         1)
-          diskselect
+          diskselect || true
           ;;
         *)
           echo "Exit status: $?"
@@ -336,18 +351,6 @@ partition()(
   warning
 
 )
-
-set -o errtrace
-
-trap 'errorlog ${?} ${FUNCNAME-main context} ${LINENO}' ERR
-#trap 'failure "${BASH_LINENO[*]}" "$LINENO" "${FUNCNAME[*]:-script}" "$?" "$BASH_COMMAND"' ERR
-
-# Note
-# https://stackoverflow.com/questions/31201572/how-to-untrap-after-a-trap-command
-# https://github.com/rtxx/arch-minimal-install/blob/main/install-scripta
-# https://unix.stackexchange.com/questions/462156/how-do-i-find-the-line-number-in-bash-when-an-error-occured
-# https://stackoverflow.com/questions/64786/error-handling-in-bash
-# https://stackoverflow.com/questions/25378845/what-does-set-o-errtrace-do-in-a-shell-script
 
 setup_dialog()(
 
@@ -365,7 +368,7 @@ setup_dialog()(
 
       case $? in
         0)
-          select_root
+          select_root || true
           ;;
         1)
           partition
@@ -417,7 +420,7 @@ setup_dialog()(
           encryption_dialog
           ;;
         1)
-          select_efi
+          select_efi || true
           ;;
         *)
           whiptail --title " ERROR " --msgbox "Error status: ${?}" 8 78

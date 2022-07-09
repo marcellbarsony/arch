@@ -190,13 +190,22 @@ system_administration()(
 
     }
 
-    root_password
+    security
 
   )
 
   sysadmin_dialog
 
 )
+
+security(){
+
+  # Delay after a failed login attempt
+  echo "auth optional pam_faildelay.so delay=5000000" > /etc/pam.d/system-login
+
+  hosts
+
+}
 
 hosts(){
 
