@@ -27,6 +27,17 @@ trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
 
 network() (
 
+  root() (
+
+    if [ id -u == "0" ]; then
+      whiptail "Not allowed to run as sudo."
+      exit 1
+    fi
+
+    network_test
+
+  )
+
   network_test() {
 
     for ((i = 0; i <= 100; i += 25)); do
@@ -81,17 +92,9 @@ network() (
 
   }
 
-  network_test
+  root
 
 )
-
-root() {
-
-  if [ id -u == "0" ]; then
-    whiptail "Not allowed to run as sudo."
-  fi
-
-}
 
 dialog() (
 
@@ -327,7 +330,7 @@ dialog() (
     options+=("kitty" "[Python]")
     options+=("st" "[C]")
 
-    terminal_select=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    terminal=$(whiptail --title "Terminal" --menu "Select a terminal emulator" --default-item "Alacritty" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -354,7 +357,7 @@ dialog() (
     options+=("qutebrowser" "[qt5]")
     options+=("None" "[-]")
 
-    browser_select=$(whiptail --title "Browser" --menu "Select a browser" --default-item "LibreWolf" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    browser=$(whiptail --title "Browser" --menu "Select a browser" --default-item "LibreWolf" --noitem --cancel-button "Back" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -680,8 +683,8 @@ defaults() {
   # joshuto - https://github.com/kamiyaa/joshuto
   # felix - https://github.com/kyoheiu/felix
   window_manager="qtile"
-  terminal_select="alacritty"
-  browser_select="librewolf"
+  terminal="alacritty"
+  browser="librewolf"
   ide="vscodium-bin"
   text_editor="neovim"
   application_launcher="dmenu-rs"
@@ -891,7 +894,7 @@ install() (
 
   terminal() {
 
-    case ${terminal_select} in
+    case ${terminal} in
     "Alacritty")
       sudo pacman -S --noconfirm alacritty
       local exitcode=$?
@@ -907,7 +910,7 @@ install() (
     esac
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install [${terminal_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      whiptail --title "ERROR" --yesno "Cannot install [${terminal}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
       0)
         terminal
@@ -924,7 +927,7 @@ install() (
 
   browser() {
 
-    case ${browser_select} in
+    case ${browser} in
     "Chromium")
       pacman -S --noconfirm chromium
       local exitcode=$?
@@ -943,7 +946,7 @@ install() (
     esac
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install [${browser_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      whiptail --title "ERROR" --yesno "Cannot install [${browser}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
       0)
         browser

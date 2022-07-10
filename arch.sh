@@ -2,6 +2,78 @@
 
 pre() (
 
+  variables() (
+
+    echo -n "Initializing global variables...." && sleep 1
+
+    # Script properties
+    script_name=$(basename $0)
+    script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+
+    # Logs
+    script_log=${script_dir}/src/${script_name}.log
+    error_log=${script_dir}/src/error.log
+
+    # Configs
+    dialogrc=${script_dir}/cfg/dialogrc
+    pacmanconf=${script_dir}/cfg/pacman.conf
+
+    echo "[OK]"
+
+    colors() {
+
+      #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
+
+      echo -n "Enabling color support..........."
+      sleep 1
+
+      RESTORE=$(echo -en '\033[0m')
+      RED=$(echo -en '\033[00;31m')
+      GREEN=$(echo -en '\033[00;32m')
+      YELLOW=$(echo -en '\033[00;33m')
+      BLUE=$(echo -en '\033[00;34m')
+      MAGENTA=$(echo -en '\033[00;35m')
+      PURPLE=$(echo -en '\033[00;35m')
+      CYAN=$(echo -en '\033[00;36m')
+      LIGHTGRAY=$(echo -en '\033[00;37m')
+      LRED=$(echo -en '\033[01;31m')
+      LGREEN=$(echo -en '\033[01;32m')
+      LYELLOW=$(echo -en '\033[01;33m')
+      LBLUE=$(echo -en '\033[01;34m')
+      LMAGENTA=$(echo -en '\033[01;35m')
+      LPURPLE=$(echo -en '\033[01;35m')
+      LCYAN=$(echo -en '\033[01;36m')
+      WHITE=$(echo -en '\033[01;37m')
+
+      # Test
+      #echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
+
+      echo "[OK]"
+
+      logs
+
+    }
+
+    colors
+
+  )
+
+  logs() {
+
+    echo -n "Initializing log files..........." && sleep 1
+
+    if [ ! -f "${error_log}" && ! -f "${script_log}" ]; then
+      touch ${error_log} && touch ${script_log}
+    else
+      >${error_log} && >${script_log}
+    fi
+
+    echo "[OK]"
+
+    network
+
+  }
+
   network() {
 
     echo -n "Checking network connection......"
@@ -108,7 +180,7 @@ pre() (
 
     echo -n "Installing dependencies.........."
     sleep 1
-    pacman -Sy --noconfirm dialog &>/dev/null #libnewt
+    pacman -Sy --noconfirm dialog &>/dev/null
 
     case $? in
     0)
@@ -127,7 +199,8 @@ pre() (
 
     echo -n "Getting configs ready............"
     sleep 1
-    cp $HOME/arch/cfg/dialogrc $HOME/.dialogrc
+    cp -f ${dialogrc} $HOME/.dialogrc &>/dev/null
+    cp -f ${pacmanconf} /etc/pacman.conf &>/dev/null
 
     case $? in
     0)
@@ -142,61 +215,7 @@ pre() (
 
   }
 
-  variables() (
-
-    echo -n "Initializing global variables...."
-    sleep 1
-
-    # Script properties
-    SCRIPT_NAME=$(basename $0)
-    #SCRIPT_NAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
-    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-    SCRIPT_LOG=${SCRIPT_DIR}/src/${SCRIPT_NAME}.log
-
-    # Config files
-    DIALOGRC=/root/arch/cfg/dialogrc
-
-    echo "[OK]"
-
-    colors() {
-
-      #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
-
-      echo -n "Enabling color support..........."
-      sleep 1
-
-      RESTORE=$(echo -en '\033[0m')
-      RED=$(echo -en '\033[00;31m')
-      GREEN=$(echo -en '\033[00;32m')
-      YELLOW=$(echo -en '\033[00;33m')
-      BLUE=$(echo -en '\033[00;34m')
-      MAGENTA=$(echo -en '\033[00;35m')
-      PURPLE=$(echo -en '\033[00;35m')
-      CYAN=$(echo -en '\033[00;36m')
-      LIGHTGRAY=$(echo -en '\033[00;37m')
-      LRED=$(echo -en '\033[01;31m')
-      LGREEN=$(echo -en '\033[01;32m')
-      LYELLOW=$(echo -en '\033[01;33m')
-      LBLUE=$(echo -en '\033[01;34m')
-      LMAGENTA=$(echo -en '\033[01;35m')
-      LPURPLE=$(echo -en '\033[01;35m')
-      LCYAN=$(echo -en '\033[01;36m')
-      WHITE=$(echo -en '\033[01;37m')
-
-      # Test
-      #echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
-
-      echo "[OK]"
-
-      partition
-
-    }
-
-    colors
-
-  )
-
-  network
+  variables
 
 )
 
@@ -206,12 +225,14 @@ errorlog() {
   local functionname=${2}
   local lineno=${3}
 
-  echo "Exit code - ${exitcode}" >${SCRIPT_LOG}
-  echo "Function - ${functionname}" >>${SCRIPT_LOG}
-  echo "Line no. - ${lineno}" >>${SCRIPT_LOG}
+  echo "Directory - ${script_dir}" >${error_log}
+  echo "Script - ${script_name}" >>${error_log}
+  echo "Function - ${functionname}" >>${error_log}
+  echo "Line no. - ${lineno}" >>${error_log}
+  echo "Exit code - ${exitcode}" >>${error_log}
 
-  if (dialog --title " ERROR " --yes-label "View logs" --no-label "Exit" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
-    vim ${SCRIPT_LOG}
+  if (dialog --title " ERROR " --yes-label "View logs" --no-label "Exit" --yesno "\nAn error has occurred\nCheck the log file for details\nExit status: ${exitcode}" 10 60); then
+    vim ${error_log}
     clear
     exit ${exitcode}
   else
@@ -222,13 +243,14 @@ errorlog() {
 }
 
 set -o errtrace
+exec 2>${error_log}
 
 trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
 #trap 'failure "${BASH_LINENO[*]}" "$LINENO" "${FUNCNAME[*]:-script}" "$?" "$BASH_COMMAND"' ERR
 
 # Note
 # https://stackoverflow.com/questions/31201572/how-to-untrap-after-a-trap-command
-# https://github.com/rtxx/arch-minimal-install/blob/main/install-scripta
+# https://github.com/rtxx/arch-minimal-install/blob/main/install-script
 # https://unix.stackexchange.com/questions/462156/how-do-i-find-the-line-number-in-bash-when-an-error-occured
 # https://stackoverflow.com/questions/64786/error-handling-in-bash
 # https://stackoverflow.com/questions/25378845/what-does-set-o-errtrace-do-in-a-shell-script
@@ -868,21 +890,11 @@ archinstall() (
 
     echo "Reflector: Updating Pacman mirrorlist..."
 
-    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
 
-    reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
+    reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
 
     clear
-
-    pacman_config
-
-  }
-
-  pacman_config() {
-
-    cp -f ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
-
-    cp -f ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
 
     packages
 
@@ -891,19 +903,14 @@ archinstall() (
   packages() {
 
     pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-firmware linux-hardened-headers base base-devel grub efibootmgr dialog vim
-    # Hardened kernel
-    # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
-    # ls -lsha /boot
 
     if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
       case ${dmi} in
       "VirtualBox")
         pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
-        local exitcode2=$?
         ;;
       "VMware Virtual Platform")
         pacstrap -C ~/arch/cfg/pacman.conf /mnt open-vm-tools
-        local exitcode2=$?
         ;;
       esac
     fi
@@ -926,7 +933,8 @@ chroot() {
   export GRUBPW
   export dmi
 
-  cp -f $HOME/arch/cfg/dialogrc /mnt/etc/dialogrc
+  cp -f ${dialogrc} /mnt/etc/dialogrc
+  cp -f ${pacmanconf} /mnt/etc/pacman.conf
   cp -f /root/arch/src/chroot.sh /mnt
   chmod +x /mnt/chroot.sh
 
