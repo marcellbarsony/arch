@@ -1,5 +1,30 @@
 #!/bin/bash
 
+errorlog(){
+
+  local exitcode=${1}
+  local functionname=${2}
+  local lineno=${3}
+
+  echo "Exit code - ${exitcode}" > ${SCRIPT_LOG}
+  echo "Function - ${functionname}" >> ${SCRIPT_LOG}
+  echo "Line no. - ${lineno}" >> ${SCRIPT_LOG}
+
+  if (dialog --title " ERROR " --yes-label "View logs" --no-label "Exit" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
+      vim ${SCRIPT_LOG}
+      clear
+      exit ${exitcode}
+    else
+      clear
+      exit ${exitcode}
+  fi
+
+}
+
+set -o errtrace
+
+trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
+
 network()(
 
   network_test(){
@@ -60,6 +85,14 @@ network()(
 
 )
 
+root(){
+
+  if [ id -u == "0" ]; then
+    whiptail "Not allowed to run as sudo."
+  fi
+
+}
+
 dialog()(
 
   aur(){
@@ -69,23 +102,23 @@ dialog()(
     options+=("Pikaur" "[Python]")
     options+=("Yay" "[Go]")
 
-    aurhelper=$(dialog --default-item "Paru" --cancel-label "Exit" --title " AUR helper " --menu "Select AUR helper" 15 70 17 ${options[@]} 3>&1 1>&2 2>&3)
-    aurhelper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --default-item "Paru" --noitem --cancel-button "Exit" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    aur_helper=$(dialog --default-item "Paru" --cancel-label "Exit" --title " AUR helper " --menu "Select AUR helper" 15 70 17 ${options[@]} 3>&1 1>&2 2>&3)
+    aur_helper=$(whiptail --title "AUR helper" --menu "Select AUR helper" --default-item "Paru" --noitem --cancel-button "Exit" 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" == "0" ]; then
-        case ${aurhelper} in
+        case ${aur_helper} in
           "Paru")
-            aurhelper="paru"
-            aurhelper_package="paru-bin"
+            aur_helper="paru"
+            aur_helper_package="paru-bin"
             ;;
           "Pikaur")
-            aurhelper="pikaur"
-            aurhelper_package="pikaur"
+            aur_helper="pikaur"
+            aur_helper_package="pikaur"
             ;;
           "Yay")
-            aurhelper="yay"
-            aurhelper_package="yay-bin"
+            aur_helper="yay"
+            aur_helper_package="yay-bin"
             ;;
         esac
         bw_client
@@ -107,15 +140,15 @@ dialog()(
   bw_client(){
 
     options=()
-    options+=("Bitwarden_CLI" "[Bitwarden]")
+    options+=("bitwarden_cli" "[Bitwarden]")
     options+=("rbw" "[Bitwarden]")
 
-    bwcli=$(whiptail --title "Bitwarden CLI" --menu "Select Bitwarden CLI" --default-item "rbw" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    bitwarden_cli=$(whiptail --title "Bitwarden CLI" --menu "Select Bitwarden CLI" --default-item "rbw" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" == "0" ]; then
         case ${bwcli} in
-          "Bitwarden_CLI")
+          "bitwarden_cli")
             whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
             bw_client
             ;;
@@ -183,13 +216,13 @@ dialog()(
       github_email
     fi
 
-    github_pubkey
+    github_user
 
   }
 
-  github_USERNAME(){
+  github_user(){
 
-    gh_USERNAME=$(whiptail --inputbox "GitHub USERNAME" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    github_username=$(whiptail --inputbox "GitHub username" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -204,9 +237,9 @@ dialog()(
       esac
     fi
 
-    if [ ! ${gh_USERNAME} ] ; then
-      whiptail --title "ERROR" --msgbox "GitHub USERNAME cannot be empty." 8 78
-      github_USERNAME
+    if [ ! ${github_username} ] ; then
+      whiptail --title "ERROR" --msgbox "GitHub username cannot be empty." 8 78
+      github_user
     fi
 
     github_pubkey
@@ -255,11 +288,11 @@ dialog()(
       ssh_passphrase
     fi
 
-    window_manager
+    windowmanager
 
   }
 
-  window_manager(){
+  windowmanager(){
 
     options=()
     options+=("dwm" "[C]")
@@ -268,7 +301,7 @@ dialog()(
     options+=("OpenBox" "[C]") # bar dependency
     options+=("Qtile" "[Python]")
 
-    windowmanager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
+    window_manager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -300,7 +333,7 @@ dialog()(
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
         1)
-          window_manager
+          windowmanager
           ;;
         *)
           echo "Exit status ${exitcode}"
@@ -634,8 +667,33 @@ dialog()(
 
 defaults(){
 
-  aurhelper=""
-  bwcli="rbw"
+  aur_helper="paru"
+  aur_helper_package="paru-bin"
+  bitwarden_cli="rbw"
+  xwaylan='xorg-wayland'
+  diaplay_manager=
+  #https://wiki.archlinux.org/title/Display_manager#List_of_display_managers
+  #sudo systemctl enable ly.service
+  file_manager=
+  # https://wiki.archlinux.org/title/List_of_applications/Utilities#File_managers
+  # xplr - https://github.com/sayanarijit/xplr
+  # joshuto - https://github.com/kamiyaa/joshuto
+  # felix - https://github.com/kyoheiu/felix
+  window_manager="qtile"
+  terminal_select="alacritty"
+  browser_select="librewolf"
+  ide="vscodium-bin"
+  text_editor="neovim"
+  application_launcher="dmenu-rs"
+  task_manager="htop"
+  system_monitor="conky"
+  music="spotify-tui"
+  zsh_prmopt="starship"
+  manpages="tldr"
+  compositor="picom"
+  languages=
+  coreutils=
+  coreutils_rust=
 
   install
 
@@ -681,17 +739,17 @@ install()(
 
   aur()(
 
-    aurdir="$HOME/.local/src/${aurhelper}"
+    aurdir="$HOME/.local/src/${aur_helper}"
 
     if [ -d "${aurdir}" ]; then
       rm -rf ${aurdir}
     fi
 
-    git clone https://aur.archlinux.org/${aurhelper_package}.git ${aurdir}
+    git clone https://aur.archlinux.org/${aur_helper_package}.git ${aurdir}
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot clone ${aurhelper_package} repository to ${aurdir}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      whiptail --title "ERROR" --yesno "Cannot clone ${aur_helper} repository to ${aurdir}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
      case $? in
         0)
           aur
@@ -712,7 +770,7 @@ install()(
     local exitcode2=$?
 
     if [ "${exitcode2}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot make package [${aurhelper}]\nExit status: ${exitcode2}" --yes-button "Retry" --no-button "Exit" 18 78
+      whiptail --title "ERROR" --yesno "Cannot make package [${aur_helper-package}]\nExit status: ${exitcode2}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
         0)
           aur
@@ -734,11 +792,11 @@ install()(
 
   bwclient(){
 
-    sudo pacman -S --noconfirm --quiet ${bwcli}
+    sudo pacman -S --noconfirm --quiet ${bitwarden_cli}
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install package [${bwcli}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      whiptail --title "ERROR" --yesno "Cannot install package [${bitwarden_cli}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
         0)
           bwclient
@@ -782,7 +840,7 @@ install()(
 
   window_manager(){
 
-    case ${windowmanager} in
+    case ${window_manager} in
       "dwm")
         git clone git://git.suckless.org/dwm $HOME/.local/src/dwm
         cd $HOME/.local/src/dwm
@@ -797,7 +855,7 @@ install()(
         # Overwrite .xinitrc
         ;;
       "LeftWM")
-        ${aurhelper} -S --noconfirm leftwm
+        ${aur_helper} -S --noconfirm leftwm
         local exitcode=$?
         # Overwrite .xinitrc
         # Bar dependency
@@ -816,7 +874,7 @@ install()(
     esac
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install [${windowmanager}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      whiptail --title "ERROR" --yesno "Cannot install [${window_manager}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
         0)
           window_manager
@@ -843,7 +901,7 @@ install()(
         local exitcode=$?
         ;;
       "st")
-        ${aurhelper} -S --noconfirm st
+        ${aur_helper} -S --noconfirm st
         local exitcode=$?
     esac
 
@@ -907,7 +965,7 @@ install()(
         local exitcode=$?
         ;;
       "VSCodium")
-        ${aurhelper} -S --noconfirm vscodium-bin
+        ${aur_helper} -S --noconfirm vscodium-bin
         local exitcode=$?
         ;;
       "None")
@@ -983,11 +1041,11 @@ install()(
         local exitcode=$?
         ;;
       "dmenu2")
-        ${aurhelper} -S --noconfirm dmenu2
+        ${aur_helper} -S --noconfirm dmenu2
         local exitcode=$?
         ;;
       "dmenu-rs")
-        ${aurhelper} -S --noconfirm dmenu-rs
+        ${aur_helper} -S --noconfirm dmenu-rs
         local exitcode=$?
         ;;
       "rofi")
@@ -1111,11 +1169,11 @@ install()(
 
     case ${music_select} in
       "Spotify")
-        ${aurhelper} -S --noconfirm spotify
+        ${aur_helper} -S --noconfirm spotify
         local exitcode=$?
         ;;
       "Spotify_TUI")
-        ${aurhelper} -S --noconfirm spotify-tui-bin spotifyd
+        ${aur_helper} -S --noconfirm spotify-tui-bin spotifyd
         local exitcode=$?
         ;;
       "None")
@@ -1147,7 +1205,7 @@ install()(
 
     case ${prompt_select} in
       "Spaceship")
-        ${aurhelper} -S --noconfirm spaceship-prompt
+        ${aur_helper} -S --noconfirm spaceship-prompt
         local exitcode=$?
         ;;
       "Starship")
@@ -1507,11 +1565,11 @@ configs()(
 
   clone(){
 
-    git clone git@github.com:${gh_USERNAME}/dotfiles.git $HOME/.config
+    git clone git@github.com:${github_username}/dotfiles.git $HOME/.config
 
     cd $HOME/.config
 
-    git remote set-url origin git@github.com:${gh_USERNAME}/dotfiles.git
+    git remote set-url origin git@github.com:${github_username}/dotfiles.git
 
     cd $HOME
 
@@ -1535,10 +1593,8 @@ configs()(
     # Change shell to ZSH
     chsh -s /usr/bin/zsh
 
-    # Copy zshenv
+    # Copy zshenv & zprofile
     sudo cp $HOME/.config/zsh/global/zshenv /etc/zsh/zshenv
-
-    # Copy zprofile
     sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
 
     # ZSH Autocomplete
@@ -1551,6 +1607,20 @@ configs()(
 )
 
 customization()(
+
+  spotify_tui(){
+
+    spotify_password=$(rbw get Spotify)
+    spotify_token=$(rbw get Spotify_TUI)
+
+    sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "/home/${USER}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+
+    sed -i '/^client_secret:/ s/$/ ${spotify_token}/' spotify-tui/client.yml
+
+    wallpaper
+
+  }
 
   wallpaper(){
 
@@ -1587,7 +1657,7 @@ customization()(
 
   }
 
-  wallpaper
+  spotify_tui
 
 )
 
