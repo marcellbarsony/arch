@@ -1,91 +1,90 @@
 #!/bin/bash
 
-pre()(
+pre() (
 
-
-  network(){
+  network() {
 
     echo -n "Checking network connection......"
     ping -q -c 3 archlinux.org &>/dev/null
 
     case $? in
-      0)
-        echo "[OK]"
-        bootmode
-        ;;
-      1)
-        echo "[DISCONNECTED]"
-        echo "Please connect to a network and try again."
-        exit 1
-        ;;
-      *)
-        echo "[ERROR]"
-        echo "Exit status $?"
-        ;;
+    0)
+      echo "[OK]"
+      bootmode
+      ;;
+    1)
+      echo "[DISCONNECTED]"
+      echo "Please connect to a network and try again."
+      exit 1
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
     esac
 
   }
 
-  bootmode(){
+  bootmode() {
 
     echo -n "Checking boot mode..............."
     sleep 1
     ls /sys/firmware/efi/efivars &>/dev/null
 
     case $? in
-      0)
-        echo "[UEFI]"
-        dmidata
-        ;;
-      1)
-        echo "[BIOS]"
-        echo "BIOS is not supported."
-        exit 1
-        ;;
-      *)
-        echo "[ERROR]"
-        echo "Exit status $?"
-        echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
-        ;;
+    0)
+      echo "[UEFI]"
+      dmidata
+      ;;
+    1)
+      echo "[BIOS]"
+      echo "BIOS is not supported."
+      exit 1
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
+      ;;
     esac
 
   }
 
-  dmidata(){
+  dmidata() {
 
     echo -n "Fetching DMI data................"
     sleep 1
-    DMI=$(dmidecode -s system-product-name)
+    dmi=$(dmidecode -s system-product-name)
 
-    if [ ${DMI} == "VirtualBox" ] || ${DMI} == "VMware Virtual Platform" ]; then
-        echo "[VM]"
-      else
-        echo "[Physical Machine]"
+    if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
+      echo "[VM]"
+    else
+      echo "[Physical Machine]"
     fi
 
     systemclock
 
   }
 
-  systemclock(){
+  systemclock() {
 
     echo -n "Updating system clock............"
     sleep 1
     timedatectl set-ntp true --no-ask-password
 
     case $? in
-      0)
-        echo "[OK]"
-        keymap
-        ;;
-      *)
-        echo "\nExit status $?"
-        ;;
+    0)
+      echo "[OK]"
+      keymap
+      ;;
+    *)
+      echo "\nExit status $?"
+      ;;
     esac
 
   }
 
-  keymap(){
+  keymap() {
 
     echo -n "Setting US keymap................"
     sleep 1
@@ -93,57 +92,57 @@ pre()(
     localectl set-keymap --no-convert us &>/dev/null # Systemd reads from /etc/vconsole.conf
 
     case $? in
-      0)
-        echo "[OK]"
-        dependencies
-        ;;
-      *)
-        echo "[ERROR]"
-        echo "Exit status $?"
-        ;;
+    0)
+      echo "[OK]"
+      dependencies
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
     esac
 
   }
 
-  dependencies(){
+  dependencies() {
 
     echo -n "Installing dependencies.........."
     sleep 1
     pacman -Sy --noconfirm dialog &>/dev/null #libnewt
 
     case $? in
-      0)
-        echo "[OK]"
-        configs
-        ;;
-      *)
-        echo "[ERROR]"
-        echo "Exit status $?"
-        ;;
+    0)
+      echo "[OK]"
+      configs
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
     esac
 
   }
 
-  configs(){
+  configs() {
 
     echo -n "Getting configs ready............"
     sleep 1
     cp $HOME/arch/cfg/dialogrc $HOME/.dialogrc
 
     case $? in
-      0)
-        echo "[OK]"
-        variables
-        ;;
-      *)
-        echo "[ERROR]"
-        echo "Exit status $?"
-        ;;
+    0)
+      echo "[OK]"
+      variables
+      ;;
+    *)
+      echo "[ERROR]"
+      echo "Exit status $?"
+      ;;
     esac
 
   }
 
-  variables()(
+  variables() (
 
     echo -n "Initializing global variables...."
     sleep 1
@@ -151,7 +150,7 @@ pre()(
     # Script properties
     SCRIPT_NAME=$(basename $0)
     #SCRIPT_NAME="$(basename "$(test -L "$0" && readlink "$0" || echo "$0")")"
-    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
     SCRIPT_LOG=${SCRIPT_DIR}/src/${SCRIPT_NAME}.log
 
     # Config files
@@ -159,7 +158,7 @@ pre()(
 
     echo "[OK]"
 
-    colors(){
+    colors() {
 
       #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
 
@@ -201,23 +200,23 @@ pre()(
 
 )
 
-errorlog(){
+errorlog() {
 
   local exitcode=${1}
   local functionname=${2}
   local lineno=${3}
 
-  echo "Exit code - ${exitcode}" > ${SCRIPT_LOG}
-  echo "Function - ${functionname}" >> ${SCRIPT_LOG}
-  echo "Line no. - ${lineno}" >> ${SCRIPT_LOG}
+  echo "Exit code - ${exitcode}" >${SCRIPT_LOG}
+  echo "Function - ${functionname}" >>${SCRIPT_LOG}
+  echo "Line no. - ${lineno}" >>${SCRIPT_LOG}
 
   if (dialog --title " ERROR " --yes-label "View logs" --no-label "Exit" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
-      vim ${SCRIPT_LOG}
-      clear
-      exit ${exitcode}
-    else
-      clear
-      exit ${exitcode}
+    vim ${SCRIPT_LOG}
+    clear
+    exit ${exitcode}
+  else
+    clear
+    exit ${exitcode}
   fi
 
 }
@@ -234,9 +233,9 @@ trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
 # https://stackoverflow.com/questions/64786/error-handling-in-bash
 # https://stackoverflow.com/questions/25378845/what-does-set-o-errtrace-do-in-a-shell-script
 
-partition()(
+partition() (
 
-  keymap(){
+  keymap() {
 
     items=$(localectl list-keymaps)
     options=()
@@ -248,29 +247,28 @@ partition()(
     KEYMAP=$(dialog --title " Keyboard layout " --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
-        loadkeys ${KEYMAP} &>/dev/null
-        localectl set-keymap --no-convert ${KEYMAP} &>/dev/null # Systemd reads from /etc/vconsole.conf
-      else
-        exit 1
+      loadkeys ${KEYMAP} &>/dev/null
+      localectl set-keymap --no-convert ${KEYMAP} &>/dev/null # Systemd reads from /etc/vconsole.conf
+    else
+      exit 1
 
     fi
-
 
     warning
 
   }
 
-  warning(){
+  warning() {
 
     if (dialog --title " WARNING " --yes-label "Proceed" --no-label "Exit" --yesno "\nEverything not backed up will be lost." 8 60); then
-        diskselect || true
-      else
-        echo "Installation terminated - $?"
+      diskselect || true
+    else
+      echo "Installation terminated - $?"
     fi
 
   }
 
-  diskselect(){
+  diskselect() {
 
     options=()
     items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -281,23 +279,23 @@ partition()(
     disk=$(dialog --title " Disk " --menu "Select disk to format" 15 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
     case $? in
-      0)
-        echo ${disk%%\ *}
-        clear
-        sgdisk_partition
-        ;;
-      1)
-        warning
-        exit 1
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
+    0)
+      echo ${disk%%\ *}
+      clear
+      sgdisk_partition
+      ;;
+    1)
+      warning
+      exit 1
+      ;;
+    *)
+      echo "Exit status $?"
+      ;;
     esac
 
   }
 
-  sgdisk_partition(){
+  sgdisk_partition() {
 
     sgdisk -o ${disk}
     local exitcode1=$?
@@ -311,7 +309,7 @@ partition()(
     sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem ${disk}
     local exitcode4=$?
 
-    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ] ; then
+    if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode4}" != "0" ]; then
       dialog --title " ERROR " --msgbox "\nSgdisk: cannot create partitions\n\n
       Exit status [clear ]: ${exitcode1}\n
       Exit status [/efi  ]: ${exitcode2}\n
@@ -324,20 +322,20 @@ partition()(
 
   }
 
-  diskpart_check(){
+  diskpart_check() {
 
-    items=$( gdisk -l ${disk} | tail -4 )
+    items=$(gdisk -l ${disk} | tail -4)
 
     if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 60); then
-        dialogs || true
-      else
-        sgdisk --zap-all ${disk}
-        diskpart_manual
+      dialogs || true
+    else
+      sgdisk --zap-all ${disk}
+      diskpart_manual
     fi
 
   }
 
-  diskpart_manual(){
+  diskpart_manual() {
 
     options=()
     options+=("cfdisk" "")
@@ -347,35 +345,32 @@ partition()(
     diskpart_tool=$(dialog --title " Diskpart " --menu "" 10 30 3 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
-
       case ${diskpart_tool} in
-        "cfdisk")
-          clear
-          cfdisk ${disk}
-          diskpart_check
-          ;;
-        "fdisk")
-          clear
-          fdisk ${disk}
-          diskpart_check
-          ;;
-        "gdisk")
-          clear
-          gdisk ${disk}
-          diskpart_check
-          ;;
+      "cfdisk")
+        clear
+        cfdisk ${disk}
+        diskpart_check
+        ;;
+      "fdisk")
+        clear
+        fdisk ${disk}
+        diskpart_check
+        ;;
+      "gdisk")
+        clear
+        gdisk ${disk}
+        diskpart_check
+        ;;
       esac
-      else
-
+    else
       case $? in
-        1)
-          diskselect
-          ;;
-        *)
-          echo "Exit status: $?"
-          ;;
-        esac
-
+      1)
+        diskselect
+        ;;
+      *)
+        echo "Exit status: $?"
+        ;;
+      esac
     fi
 
   }
@@ -384,11 +379,11 @@ partition()(
 
 )
 
-dialogs()(
+dialogs() (
 
-  filesystem_dialog()(
+  filesystem_dialog() (
 
-    select_efi(){
+    select_efi() {
 
       options=()
       items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -399,17 +394,17 @@ dialogs()(
       EFIDEVICE=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [EFI]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
-        0)
-          select_root
-          ;;
-        1)
-          partition
-          ;;
+      0)
+        select_root
+        ;;
+      1)
+        partition
+        ;;
       esac
 
     }
 
-    select_boot(){
+    select_boot() {
 
       options=()
       items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -420,17 +415,17 @@ dialogs()(
       BOOTDEVICE=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [Boot]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
-        0)
-          select_root
-          ;;
-        1)
-          select_efi
-          ;;
+      0)
+        select_root
+        ;;
+      1)
+        select_efi
+        ;;
       esac
 
     }
 
-    select_root(){
+    select_root() {
 
       options=()
       items=$(lsblk -p -n -l -o NAME,SIZE -e 7,11)
@@ -441,12 +436,12 @@ dialogs()(
       rootdevice=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [Root]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
-        0)
-          encryption_dialog
-          ;;
-        1)
-          select_efi
-          ;;
+      0)
+        encryption_dialog
+        ;;
+      1)
+        select_efi
+        ;;
       esac
 
     }
@@ -455,39 +450,39 @@ dialogs()(
 
   )
 
-  encryption_dialog()(
+  encryption_dialog() (
 
-    crypt_password(){
+    crypt_password() {
 
       CRYPTPASSWORD=$(dialog --nocancel --passwordbox "LUKS encryption passphrase" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
-        0)
-          crypt_password_confirm
-          ;;
-        *)
-          echo "Exit status: $?"
-          ;;
+      0)
+        crypt_password_confirm
+        ;;
+      *)
+        echo "Exit status: $?"
+        ;;
       esac
 
     }
 
-    crypt_password_confirm(){
+    crypt_password_confirm() {
 
       CRYPTPASSWORD_confirm=$(dialog --nocancel --passwordbox "LUKS encryption passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
-        0)
-          crypt_password_check
-          ;;
-        *)
-          echo "Exit status $?"
-          ;;
+      0)
+        crypt_password_check
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
       esac
 
     }
 
-    crypt_password_check(){
+    crypt_password_check() {
 
       if [ ! ${CRYPTPASSWORD} ] || [ ! ${CRYPTPASSWORD_confirm} ]; then
         dialog --title " ERROR " --msgbox "Encryption passphrase cannot be empty." 8 45
@@ -503,30 +498,30 @@ dialogs()(
 
     }
 
-    key_file(){
+    key_file() {
 
       keydir=/root/luks.key
       keydir2=/root/luks.key2
 
-      echo "$CRYPTPASSWORD" > "$keydir"
+      echo "$CRYPTPASSWORD" >"$keydir"
       local exitcode1=$?
 
-      echo "$CRYPTPASSWORD_confirm" > "$keydir2"
+      echo "$CRYPTPASSWORD_confirm" >"$keydir2"
       local exitcode2=$?
 
       if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-          dialog --title "ERROR" --msgbox "Key file [${keydir}] cannot be created.\n
+        dialog --title "ERROR" --msgbox "Key file [${keydir}] cannot be created.\n
           Exit status [File 1]: ${exitcode1}\n
           Exit status [File 2]: ${exitcode2}" 12 78
-          exit 1
+        exit 1
       fi
 
       # Password match
       if cmp --silent -- "$keydir" "$keydir2"; then
-          crypt_setup
-        else
-          dialog --title " ERROR " --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
-          crypt_password
+        crypt_setup
+      else
+        dialog --title " ERROR " --msgbox "Encryption password did not match.\nExit status: ${exitcode}" 8 78
+        crypt_password
       fi
 
     }
@@ -535,9 +530,9 @@ dialogs()(
 
   )
 
-  sysadmin_dialog()(
+  sysadmin_dialog() (
 
-    workstation_name(){
+    workstation_name() {
 
       NODENAME=$(dialog --nocancel --inputbox "Hostname" 8 45 3>&1 1>&2 2>&3)
 
@@ -550,7 +545,7 @@ dialogs()(
 
     }
 
-    user_account(){
+    user_account() {
 
       USERNAME=$(dialog --nocancel --inputbox "Username" 8 45 3>&1 1>&2 2>&3)
 
@@ -563,7 +558,7 @@ dialogs()(
 
     }
 
-    user_password(){
+    user_password() {
 
       USER_PASSWORD=$(dialog --nocancel --passwordbox "${USERNAME}'s passphrase" 8 45 3>&1 1>&2 2>&3)
 
@@ -583,7 +578,7 @@ dialogs()(
 
     }
 
-    root_password(){
+    root_password() {
 
       ROOT_PASSWORD=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
 
@@ -603,7 +598,7 @@ dialogs()(
 
     }
 
-    grub_password(){
+    grub_password() {
 
       GRUBPW=$(dialog --nocancel --passwordbox "GRUB passphrase" 8 45 3>&1 1>&2 2>&3)
 
@@ -633,9 +628,9 @@ dialogs()(
 
 )
 
-crypt_setup()(
+crypt_setup() (
 
-  cryptsetup_create(){
+  cryptsetup_create() {
 
     echo ${CRYPTPASSWORD} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice}
 
@@ -648,7 +643,7 @@ crypt_setup()(
 
   }
 
-  cryptsetup_open(){
+  cryptsetup_open() {
 
     echo ${CRYPTPASSWORD} | cryptsetup open --type luks2 ${rootdevice} cryptroot
 
@@ -660,11 +655,11 @@ crypt_setup()(
 
 )
 
-filesystem()(
+filesystem() (
 
-  root_partition()(
+  root_partition() (
 
-    root_format(){
+    root_format() {
 
       mkfs.btrfs -L system /dev/mapper/cryptroot
 
@@ -672,7 +667,7 @@ filesystem()(
 
     }
 
-    root_mount(){
+    root_mount() {
 
       mount /dev/mapper/cryptroot /mnt
 
@@ -684,9 +679,9 @@ filesystem()(
 
   )
 
-  btrfs_filesystem()(
+  btrfs_filesystem() (
 
-    btrfs_subvolumes(){
+    btrfs_subvolumes() {
 
       btrfs subvolume create /mnt/@
 
@@ -704,7 +699,7 @@ filesystem()(
 
     }
 
-    btrfs_mount(){
+    btrfs_mount() {
 
       mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
       # Optional:ssd
@@ -728,9 +723,9 @@ filesystem()(
 
   )
 
-  efi_partition()(
+  efi_partition() (
 
-    efi_format(){
+    efi_format() {
 
       mkfs.fat -F32 ${EFIDEVICE}
 
@@ -738,7 +733,7 @@ filesystem()(
 
     }
 
-    efi_mount(){
+    efi_mount() {
 
       efimountdir="/mnt/boot" #/mnt/efi
 
@@ -752,15 +747,15 @@ filesystem()(
 
   )
 
-  ext4()(
+  ext4() (
 
-    cryptsetup_open(){
+    cryptsetup_open() {
 
-    cryptsetup open --type luks2 ${rootdevice} cryptlvm --key-file ${keydir}
+      cryptsetup open --type luks2 ${rootdevice} cryptlvm --key-file ${keydir}
 
     }
 
-    volume_physical(){
+    volume_physical() {
 
       pvcreate /dev/mapper/cryptlvm
 
@@ -768,7 +763,7 @@ filesystem()(
 
     }
 
-    volume_group(){
+    volume_group() {
 
       vgcreate volgroup0 /dev/mapper/cryptlvm
 
@@ -776,7 +771,7 @@ filesystem()(
 
     }
 
-    volume_create_root(){
+    volume_create_root() {
 
       lvcreate -L ${rootsize}GB volgroup0 -n cryptroot
 
@@ -784,7 +779,7 @@ filesystem()(
 
     }
 
-    volume_create_home(){
+    volume_create_home() {
 
       lvcreate -l 100%FREE volgroup0 -n crypthome
 
@@ -792,7 +787,7 @@ filesystem()(
 
     }
 
-    volume_kernel_module(){
+    volume_kernel_module() {
 
       modprobe dm_mod
 
@@ -800,7 +795,7 @@ filesystem()(
 
     }
 
-    volume_group_scan(){
+    volume_group_scan() {
 
       vgscan
 
@@ -808,7 +803,7 @@ filesystem()(
 
     }
 
-    volume_group_activate(){
+    volume_group_activate() {
 
       vgchange -ay
 
@@ -816,7 +811,7 @@ filesystem()(
 
     }
 
-    format_root(){
+    format_root() {
 
       mkfs.${filesystem} /dev/volgroup0/cryptroot
 
@@ -824,7 +819,7 @@ filesystem()(
 
     }
 
-    mount_root(){
+    mount_root() {
 
       mount /dev/volgroup0/cryptroot /mnt
 
@@ -832,7 +827,7 @@ filesystem()(
 
     }
 
-    format_home(){
+    format_home() {
 
       mkfs.${filesystem} /dev/volgroup0/crypthome
 
@@ -840,7 +835,7 @@ filesystem()(
 
     }
 
-    mount_home(){
+    mount_home() {
 
       mkdir /mnt/home
 
@@ -857,19 +852,19 @@ filesystem()(
 
 )
 
-fstab(){
+fstab() {
 
   mkdir /mnt/etc/ &>/dev/null
 
-  genfstab -U /mnt >> /mnt/etc/fstab
+  genfstab -U /mnt >>/mnt/etc/fstab
 
   archinstall
 
 }
 
-archinstall()(
+archinstall() (
 
-  mirrorlist(){
+  mirrorlist() {
 
     echo "Reflector: Updating Pacman mirrorlist..."
 
@@ -883,33 +878,33 @@ archinstall()(
 
   }
 
-  pacman_config(){
+  pacman_config() {
 
-    cp ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
+    cp -f ~/arch/cfg/pacman.conf /etc/pacman.conf &>/dev/null
 
-    cp ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
+    cp -f ~/arch/cfg/pacman.conf /mnt/etc/pacman.conf &>/dev/null
 
     packages
 
   }
 
-  packages(){
+  packages() {
 
     pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-firmware linux-hardened-headers base base-devel grub efibootmgr dialog vim
     # Hardened kernel
     # Check if initramfs-linux-hardened.img and initramfs-linux-hardened-fallback.img exists.
     # ls -lsha /boot
 
-    if [ ${DMI} == "VirtualBox" ] || [ ${DMI} == "VMware Virtual Platform" ]; then
-      case ${DMI} in
-        "VirtualBox")
-          pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
-          local exitcode2=$?
-          ;;
-        "VMware Virtual Platform")
-          pacstrap -C ~/arch/cfg/pacman.conf /mnt open-vm-tools
-          local exitcode2=$?
-          ;;
+    if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
+      case ${dmi} in
+      "VirtualBox")
+        pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
+        local exitcode2=$?
+        ;;
+      "VMware Virtual Platform")
+        pacstrap -C ~/arch/cfg/pacman.conf /mnt open-vm-tools
+        local exitcode2=$?
+        ;;
       esac
     fi
 
@@ -921,7 +916,7 @@ archinstall()(
 
 )
 
-chroot(){
+chroot() {
 
   export KEYMAP
   export NODENAME
@@ -929,25 +924,18 @@ chroot(){
   export USER_PASSWORD
   export ROOT_PASSWORD
   export GRUBPW
+  export dmi
 
-  cp $HOME/arch/cfg/dialogrc /mnt/etc/dialogrc
-  local exitcode1=$?
-
-  cp /root/arch/src/chroot.sh /mnt
-  local exitcode2=$?
-
+  cp -f $HOME/arch/cfg/dialogrc /mnt/etc/dialogrc
+  cp -f /root/arch/src/chroot.sh /mnt
   chmod +x /mnt/chroot.sh
-  local exitcode3=$?
 
   arch-chroot /mnt ./chroot.sh
-  local exitcode4=$?
+  local exitcode=$?
 
-  if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ] || [ "${exitcode3}" != "0" ] || [ "${exitcode4}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "Arch-chroot [/mnt] failed.\n\n
-    ${exitcode1} - cp ~/arch/cfg/dialogrc  >> /mnt/etc/dialogrc\n
-    ${exitcode2} - cp ~/arch/src/chroot.sh >> /mnt\n
-    ${exitcode3} - chmod +x /mnt/chroot.sh\n
-    ${exitcode4} - arch-chroot /mnt ./chroot.sh" 13 50
+  if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --msgbox "\nArch-chroot [/mnt] failed.\n\n
+    ${exitcode} - arch-chroot /mnt ./chroot.sh" 13 50
   fi
 
   #umount -l /mnt
@@ -957,27 +945,28 @@ chroot(){
 
 }
 
-while (( "$#" )); do
+while (("$#")); do
   case ${1} in
-    --help)
-      echo "------"
-      echo "Arch installation script"
-      echo "------"
-      echo "Options:"
-      echo "--help - Get help"
-      echo "--info - Additional information"
-      exit 0
-      ;;
-    --info)
-      echo "Author: Marcell Barsony"
-      echo "Repository: https://github.com/marcellbarsony/arch"
-      echo "Important note: This script is under development"
-      exit 0
-      ;;
-    *)
-      echo "Available options:"
-      echo "Help --help"
-      echo "Info --info"
+  --help)
+    echo "------"
+    echo "Arch installation script"
+    echo "------"
+    echo "Options:"
+    echo "--help - Get help"
+    echo "--info - Additional information"
+    exit 0
+    ;;
+  --info)
+    echo "Author: Marcell Barsony"
+    echo "Repository: https://github.com/marcellbarsony/arch"
+    echo "Important note: This script is under development"
+    exit 0
+    ;;
+  *)
+    echo "Available options:"
+    echo "Help --help"
+    echo "Info --info"
+    ;;
   esac
   shift
 done

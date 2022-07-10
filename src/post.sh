@@ -1,22 +1,22 @@
 #!/bin/bash
 
-errorlog(){
+errorlog() {
 
   local exitcode=${1}
   local functionname=${2}
   local lineno=${3}
 
-  echo "Exit code - ${exitcode}" > ${SCRIPT_LOG}
-  echo "Function - ${functionname}" >> ${SCRIPT_LOG}
-  echo "Line no. - ${lineno}" >> ${SCRIPT_LOG}
+  echo "Exit code - ${exitcode}" >${SCRIPT_LOG}
+  echo "Function - ${functionname}" >>${SCRIPT_LOG}
+  echo "Line no. - ${lineno}" >>${SCRIPT_LOG}
 
   if (dialog --title " ERROR " --yes-label "View logs" --no-label "Exit" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
-      vim ${SCRIPT_LOG}
-      clear
-      exit ${exitcode}
-    else
-      clear
-      exit ${exitcode}
+    vim ${SCRIPT_LOG}
+    clear
+    exit ${exitcode}
+  else
+    clear
+    exit ${exitcode}
   fi
 
 }
@@ -25,15 +25,15 @@ set -o errtrace
 
 trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
 
-network()(
+network() (
 
-  network_test(){
+  network_test() {
 
-    for ((i = 0 ; i <= 100 ; i+=25)); do
-        ping -q -c 1 archlinux.org &>/dev/null
-        local exitcode=$?
-        echo $i
-        sleep 1
+    for ((i = 0; i <= 100; i += 25)); do
+      ping -q -c 1 archlinux.org &>/dev/null
+      local exitcode=$?
+      echo $i
+      sleep 1
     done | whiptail --gauge "Checking network connection..." 6 50 0
 
     if [ "$?" != "0" ]; then
@@ -49,7 +49,7 @@ network()(
 
   }
 
-  network_connect(){
+  network_connect() {
 
     nmcli radio wifi on
 
@@ -57,17 +57,17 @@ network()(
 
     ssid=$(whiptail --inputbox "Network SSID" --title "Network connection" 8 39 3>&1 1>&2 2>&3)
 
-      if [ $? != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Invalid network SSID.\Exit status: ${?}" 8 78
-        network_connect
-      fi
+    if [ $? != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Invalid network SSID.\Exit status: ${?}" 8 78
+      network_connect
+    fi
 
     password=$(whiptail --passwordbox "Network passphrase" 8 78 --title "Network connection" 3>&1 1>&2 2>&3)
 
-      if [ $? != "0" ]; then
-        whiptail --title "ERROR" --msgbox "Invalid network password.\Exit status: ${?}" 8 78
-        network_connect
-      fi
+    if [ $? != "0" ]; then
+      whiptail --title "ERROR" --msgbox "Invalid network password.\Exit status: ${?}" 8 78
+      network_connect
+    fi
 
     nmcli device wifi connect ${ssid} password ${password}
 
@@ -85,7 +85,7 @@ network()(
 
 )
 
-root(){
+root() {
 
   if [ id -u == "0" ]; then
     whiptail "Not allowed to run as sudo."
@@ -93,9 +93,9 @@ root(){
 
 }
 
-dialog()(
+dialog() (
 
-  aur(){
+  aur() {
 
     options=()
     options+=("Paru" "[Rust]")
@@ -107,37 +107,37 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" == "0" ]; then
-        case ${aur_helper} in
-          "Paru")
-            aur_helper="paru"
-            aur_helper_package="paru-bin"
-            ;;
-          "Pikaur")
-            aur_helper="pikaur"
-            aur_helper_package="pikaur"
-            ;;
-          "Yay")
-            aur_helper="yay"
-            aur_helper_package="yay-bin"
-            ;;
-        esac
-        bw_client
-      else
-        case ${exitcode} in
-          1)
-            clear
-            exit ${exitcode}
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${aur_helper} in
+      "Paru")
+        aur_helper="paru"
+        aur_helper_package="paru-bin"
+        ;;
+      "Pikaur")
+        aur_helper="pikaur"
+        aur_helper_package="pikaur"
+        ;;
+      "Yay")
+        aur_helper="yay"
+        aur_helper_package="yay-bin"
+        ;;
+      esac
+      bw_client
+    else
+      case ${exitcode} in
+      1)
+        clear
+        exit ${exitcode}
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
   }
 
-  bw_client(){
+  bw_client() {
 
     options=()
     options+=("bitwarden_cli" "[Bitwarden]")
@@ -147,41 +147,41 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" == "0" ]; then
-        case ${bwcli} in
-          "bitwarden_cli")
-            whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
-            bw_client
-            ;;
-        esac
+      case ${bwcli} in
+      "bitwarden_cli")
+        whiptail --title "ERROR" --msgbox "The official Bitwarden CLI is not supported yet." 8 78
+        bw_client
+        ;;
+      esac
       bw_email
-      else
-        case ${exitcode} in
-          1)
-            aur
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+    else
+      case ${exitcode} in
+      1)
+        aur
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
   }
 
-  bw_email(){
+  bw_email() {
 
     bw_email=$(whiptail --inputbox "Bitwarden e-mail" --title "Bitwarden CLI" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
-        1)
-          bw_client
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          exit $?
-          ;;
+      1)
+        bw_client
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit $?
+        ;;
       esac
     fi
 
@@ -194,20 +194,20 @@ dialog()(
 
   }
 
-  github_email(){
+  github_email() {
 
     gh_email=$(whiptail --inputbox "GitHub e-mail" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
-        1)
-          bw_email
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
+      1)
+        bw_email
+        ;;
+      *)
+        echo "Exit status $?"
+        exit $?
+        ;;
       esac
     fi
 
@@ -220,24 +220,24 @@ dialog()(
 
   }
 
-  github_user(){
+  github_user() {
 
     github_username=$(whiptail --inputbox "GitHub username" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
-        1)
-          github_email
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
+      1)
+        github_email
+        ;;
+      *)
+        echo "Exit status $?"
+        exit $?
+        ;;
       esac
     fi
 
-    if [ ! ${github_username} ] ; then
+    if [ ! ${github_username} ]; then
       whiptail --title "ERROR" --msgbox "GitHub username cannot be empty." 8 78
       github_user
     fi
@@ -246,24 +246,24 @@ dialog()(
 
   }
 
-  github_pubkey(){
+  github_pubkey() {
 
     gh_pubkeyname=$(whiptail --inputbox "GitHub SSH Key" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
-        1)
-          github_email
-          ;;
-        *)
-          echo "Exit status $?"
-          exit $?
-          ;;
+      1)
+        github_email
+        ;;
+      *)
+        echo "Exit status $?"
+        exit $?
+        ;;
       esac
     fi
 
-    if [ ! ${gh_pubkeyname} ] ; then
+    if [ ! ${gh_pubkeyname} ]; then
       whiptail --title "ERROR" --msgbox "GitHub SSH key name cannot be empty." 8 78
       github_pubkey
     fi
@@ -272,7 +272,7 @@ dialog()(
 
   }
 
-  ssh_passphrase(){
+  ssh_passphrase() {
 
     ssh_passphrase=$(whiptail --passwordbox "SSH passphrase" --title "SSH" --nocancel 8 78 3>&1 1>&2 2>&3)
 
@@ -292,35 +292,35 @@ dialog()(
 
   }
 
-  windowmanager(){
+  windowmanager() {
 
     options=()
     options+=("dwm" "[C]")
     options+=("i3" "[C]")
     options+=("LeftWM" "[Rust]") # bar dependency
-    options+=("OpenBox" "[C]") # bar dependency
+    options+=("OpenBox" "[C]")   # bar dependency
     options+=("Qtile" "[Python]")
 
     window_manager=$(whiptail --title "Window Manager" --menu "Select a window manager" --default-item "Qtile" --cancel-button "Back" --noitem 25 78 17 ${options[@]} 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            github_email
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit $?
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        github_email
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit $?
+        ;;
+      esac
     fi
 
     terminal
 
   }
 
-  terminal(){
+  terminal() {
 
     options=()
     options+=("Alacritty" "[Rust]")
@@ -332,13 +332,13 @@ dialog()(
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
-        1)
-          windowmanager
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          exit ${exitcode}
-          ;;
+      1)
+        windowmanager
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
       esac
     fi
 
@@ -346,7 +346,7 @@ dialog()(
 
   }
 
-  browser(){
+  browser() {
 
     options=()
     options+=("Chromium" "[Chromium]")
@@ -359,13 +359,13 @@ dialog()(
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
-        1)
-          terminal
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          exit ${exitcode}
-          ;;
+      1)
+        terminal
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
       esac
     fi
 
@@ -373,7 +373,7 @@ dialog()(
 
   }
 
-  ide(){
+  ide() {
 
     options=()
     options+=("Visual_Studio_Code" "[Visual_Studio_Code]")
@@ -385,13 +385,13 @@ dialog()(
 
     if [ "${exitcode}" != "0" ]; then
       case ${exitcode} in
-        1)
-          browser
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          exit ${exitcode}
-          ;;
+      1)
+        browser
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
       esac
     fi
 
@@ -399,7 +399,7 @@ dialog()(
 
   }
 
-  texteditor(){
+  texteditor() {
 
     options=()
     options+=("Emacs" "[Emacs]")
@@ -412,22 +412,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            ide
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        ide
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     application_launcher
 
   }
 
-  application_launcher(){
+  application_launcher() {
 
     options=()
     options+=("dmenu" "[Suckless]")
@@ -440,22 +440,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            texteditor
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        texteditor
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     task_manager
 
   }
 
-  task_manager()(
+  task_manager() (
 
     options=()
     options+=("bpytop" "[aristocratos]")
@@ -466,22 +466,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            application_launcher
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        application_launcher
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     system_monitor
 
   )
 
-  system_monitor()(
+  system_monitor() (
 
     options=()
     options+=("Conky" "[Emacs]")
@@ -491,22 +491,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            task_manager
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        task_manager
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     music
 
   )
 
-  music(){
+  music() {
 
     options=()
     options+=("Spotify" "[Spotify_GmbH]")
@@ -517,22 +517,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            audio
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        audio
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     zsh_prompt
 
   }
 
-  zsh_prompt(){
+  zsh_prompt() {
 
     options=()
     options+=("Spaceship" "[spaceship-prompt]")
@@ -542,22 +542,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            music
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        music
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     manpages
 
   }
 
-  manpages(){
+  manpages() {
 
     options=()
     options+=("All" "[-]")
@@ -570,22 +570,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            zsh_prompt
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcodemanpages}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        zsh_prompt
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcodemanpages}
+        ;;
+      esac
     fi
 
     microcode
 
   }
 
-  compositor(){
+  compositor() {
 
     options=()
     options+=("Picom" "[Picom]")
@@ -595,22 +595,22 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            microcode
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        microcode
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     languages
 
   }
 
-  languages(){
+  languages() {
 
     options=()
     options+=("All" "[-]")
@@ -622,39 +622,39 @@ dialog()(
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-        case ${exitcode} in
-          1)
-            compositor
-            ;;
-          *)
-            echo "Exit status ${exitcode}"
-            exit ${exitcode}
-            ;;
-        esac
+      case ${exitcode} in
+      1)
+        compositor
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
+      esac
     fi
 
     coreutils
 
   }
 
-  coreutils(){
+  coreutils() {
 
     if (whiptail --title "Core utilities" --yesno "Install core utilities\n[cmatrix, neofetch, unzip, zip]" 8 78); then
-        coreutils_install="yes"
-      else
-        coreutils_rust
+      coreutils_install="yes"
+    else
+      coreutils_rust
     fi
 
     coreutils_rust
 
   }
 
-  coreutils_rust(){
+  coreutils_rust() {
 
     if (whiptail --title "Core utilities [Rust]" --yesno "Install core utilities [Rust]\n[bat, lsd, zoxide]" 8 78); then
-        coreutils_install_rust="yes"
-      else
-        configs
+      coreutils_install_rust="yes"
+    else
+      configs
     fi
 
     install
@@ -665,7 +665,7 @@ dialog()(
 
 )
 
-defaults(){
+defaults() {
 
   aur_helper="paru"
   aur_helper_package="paru-bin"
@@ -699,11 +699,11 @@ defaults(){
 
 }
 
-install()(
+install() (
 
-  reflector(){
+  reflector() {
 
-    pacman -Qi reflector > /dev/null
+    pacman -Qi reflector >/dev/null
 
     if [ "$?" != "0" ]; then
       sudo pacman -S reflector
@@ -713,7 +713,7 @@ install()(
 
   }
 
-  mirrorlist(){
+  mirrorlist() {
 
     echo 50 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
     sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
@@ -737,7 +737,7 @@ install()(
 
   }
 
-  aur()(
+  aur() (
 
     aurdir="$HOME/.local/src/${aur_helper}"
 
@@ -750,17 +750,17 @@ install()(
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot clone ${aur_helper} repository to ${aurdir}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-     case $? in
-        0)
-          aur
-          ;;
-        1)
-          exit 1
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          exit ${exitcode}
-          ;;
+      case $? in
+      0)
+        aur
+        ;;
+      1)
+        exit 1
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        exit ${exitcode}
+        ;;
       esac
     fi
 
@@ -772,15 +772,15 @@ install()(
     if [ "${exitcode2}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot make package [${aur_helper-package}]\nExit status: ${exitcode2}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          aur
-          ;;
-        1)
-          exit 1
-          ;;
-        *)
-          echo "Exit status ${exitcode2}"
-          ;;
+      0)
+        aur
+        ;;
+      1)
+        exit 1
+        ;;
+      *)
+        echo "Exit status ${exitcode2}"
+        ;;
       esac
     fi
 
@@ -790,7 +790,7 @@ install()(
 
   )
 
-  bwclient(){
+  bwclient() {
 
     sudo pacman -S --noconfirm --quiet ${bitwarden_cli}
     local exitcode=$?
@@ -798,15 +798,15 @@ install()(
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install package [${bitwarden_cli}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          bwclient
-          ;;
-        1)
-          exit 1
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          ;;
+      0)
+        bwclient
+        ;;
+      1)
+        exit 1
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        ;;
       esac
     fi
 
@@ -814,7 +814,7 @@ install()(
 
   }
 
-  github_cli(){
+  github_cli() {
 
     sudo pacman -S --noconfirm github-cli
     local exitcode=$?
@@ -822,15 +822,15 @@ install()(
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install package [github-cli]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          github_cli
-          ;;
-        1)
-          exit 1
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          ;;
+      0)
+        github_cli
+        ;;
+      1)
+        exit 1
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        ;;
       esac
     fi
 
@@ -838,50 +838,50 @@ install()(
 
   }
 
-  window_manager(){
+  window_manager() {
 
     case ${window_manager} in
-      "dwm")
-        git clone git://git.suckless.org/dwm $HOME/.local/src/dwm
-        cd $HOME/.local/src/dwm
-        make
-        make install
-        local exitcode=$?
-        cd $HOME
-        ;;
-      "i3")
-        sudo pacman -S --needed --noconfirm i3-wm
-        local exitcode=$?
-        # Overwrite .xinitrc
-        ;;
-      "LeftWM")
-        ${aur_helper} -S --noconfirm leftwm
-        local exitcode=$?
-        # Overwrite .xinitrc
-        # Bar dependency
-        ;;
-      "OpenBox")
-        sudo pacman -S --needed --noconfirm openbox tint2
-        local exitcode=$?
-        # Overwrite .xinitrc
-        # Bar dependency
-        ;;
-      "Qtile")
-        sudo pacman -S --needed --noconfirm qtile
-        local exitcode=$?
-        # Overwrite .xinitrc
-        ;;
+    "dwm")
+      git clone git://git.suckless.org/dwm $HOME/.local/src/dwm
+      cd $HOME/.local/src/dwm
+      make
+      make install
+      local exitcode=$?
+      cd $HOME
+      ;;
+    "i3")
+      sudo pacman -S --needed --noconfirm i3-wm
+      local exitcode=$?
+      # Overwrite .xinitrc
+      ;;
+    "LeftWM")
+      ${aur_helper} -S --noconfirm leftwm
+      local exitcode=$?
+      # Overwrite .xinitrc
+      # Bar dependency
+      ;;
+    "OpenBox")
+      sudo pacman -S --needed --noconfirm openbox tint2
+      local exitcode=$?
+      # Overwrite .xinitrc
+      # Bar dependency
+      ;;
+    "Qtile")
+      sudo pacman -S --needed --noconfirm qtile
+      local exitcode=$?
+      # Overwrite .xinitrc
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${window_manager}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          window_manager
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        window_manager
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -889,31 +889,32 @@ install()(
 
   }
 
-  terminal(){
+  terminal() {
 
     case ${terminal_select} in
-      "Alacritty")
-        sudo pacman -S --noconfirm alacritty
-        local exitcode=$?
-        ;;
-      "kitty")
-        sudo pacman -S --noconfirm kitty
-        local exitcode=$?
-        ;;
-      "st")
-        ${aur_helper} -S --noconfirm st
-        local exitcode=$?
+    "Alacritty")
+      sudo pacman -S --noconfirm alacritty
+      local exitcode=$?
+      ;;
+    "kitty")
+      sudo pacman -S --noconfirm kitty
+      local exitcode=$?
+      ;;
+    "st")
+      ${aur_helper} -S --noconfirm st
+      local exitcode=$?
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${terminal_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          terminal
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        terminal
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -921,35 +922,35 @@ install()(
 
   }
 
-  browser(){
+  browser() {
 
     case ${browser_select} in
-      "Chromium")
-        pacman -S --noconfirm chromium
-        local exitcode=$?
-        ;;
-      "LibreWolf")
-        paru -S --noconfirm librewolf-bin
-        local exitcode=$?
-        ;;
-      "qutebrowser")
-        pacman -S --noconfirm qutebrowser
-        local exitcode=$?
-        ;;
-      "None")
-        ide
-        ;;
+    "Chromium")
+      pacman -S --noconfirm chromium
+      local exitcode=$?
+      ;;
+    "LibreWolf")
+      paru -S --noconfirm librewolf-bin
+      local exitcode=$?
+      ;;
+    "qutebrowser")
+      pacman -S --noconfirm qutebrowser
+      local exitcode=$?
+      ;;
+    "None")
+      ide
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${browser_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -957,31 +958,31 @@ install()(
 
   }
 
-  ide(){
+  ide() {
 
     case ${ide_select} in
-      "Visual_Studio_Code")
-        sudo pacman -S --noconfirm code
-        local exitcode=$?
-        ;;
-      "VSCodium")
-        ${aur_helper} -S --noconfirm vscodium-bin
-        local exitcode=$?
-        ;;
-      "None")
-        texteditor
-        ;;
+    "Visual_Studio_Code")
+      sudo pacman -S --noconfirm code
+      local exitcode=$?
+      ;;
+    "VSCodium")
+      ${aur_helper} -S --noconfirm vscodium-bin
+      local exitcode=$?
+      ;;
+    "None")
+      texteditor
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${ide_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -989,43 +990,43 @@ install()(
 
   }
 
-  texteditor(){
+  texteditor() {
 
     case ${texteditor_select} in
-      "Emacs")
-        sudo pacman -S --noconfirm emacs
-        local exitcode=$?
-        ;;
-      "Nano")
-        sudo pacman -S --noconfirm nano
-        local exitcode=$?
-        ;;
-      "Neovim")
-        sudo pacman -S --noconfirm neovim
-        local exitcode=$?
-        ;;
-      "Vi")
-        sudo pacman -S --noconfirm vi
-        local exitcode=$?
-        ;;
-      "Vim")
-        sudo pacman -S --noconfirm vim
-        local exitcode=$?
-        ;;
-      "None")
-        application_launcher
-        ;;
+    "Emacs")
+      sudo pacman -S --noconfirm emacs
+      local exitcode=$?
+      ;;
+    "Nano")
+      sudo pacman -S --noconfirm nano
+      local exitcode=$?
+      ;;
+    "Neovim")
+      sudo pacman -S --noconfirm neovim
+      local exitcode=$?
+      ;;
+    "Vi")
+      sudo pacman -S --noconfirm vi
+      local exitcode=$?
+      ;;
+    "Vim")
+      sudo pacman -S --noconfirm vim
+      local exitcode=$?
+      ;;
+    "None")
+      application_launcher
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${texteditor_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1033,39 +1034,39 @@ install()(
 
   }
 
-  application_launcher(){
+  application_launcher() {
 
     case ${applauncher_select} in
-      "dmenu")
-        sudo pacman -S dmenu
-        local exitcode=$?
-        ;;
-      "dmenu2")
-        ${aur_helper} -S --noconfirm dmenu2
-        local exitcode=$?
-        ;;
-      "dmenu-rs")
-        ${aur_helper} -S --noconfirm dmenu-rs
-        local exitcode=$?
-        ;;
-      "rofi")
-        sudo pacman -S --noconfirm rofi
-        local exitcode=$?
-        ;;
-      "None")
-        task_manager
-        ;;
+    "dmenu")
+      sudo pacman -S dmenu
+      local exitcode=$?
+      ;;
+    "dmenu2")
+      ${aur_helper} -S --noconfirm dmenu2
+      local exitcode=$?
+      ;;
+    "dmenu-rs")
+      ${aur_helper} -S --noconfirm dmenu-rs
+      local exitcode=$?
+      ;;
+    "rofi")
+      sudo pacman -S --noconfirm rofi
+      local exitcode=$?
+      ;;
+    "None")
+      task_manager
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${applauncher_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1073,31 +1074,31 @@ install()(
 
   }
 
-  task_manager(){
+  task_manager() {
 
     case ${taskmanager_select} in
-      "bpytop")
-        sudo pacman -S --noconfirm bpytop
-        local exitcode=$?
-        ;;
-      "htop")
-        sudo pacman -S --noconfirm htop
-        local exitcode=$?
-        ;;
-      "None")
-        system_monitor
-        ;;
+    "bpytop")
+      sudo pacman -S --noconfirm bpytop
+      local exitcode=$?
+      ;;
+    "htop")
+      sudo pacman -S --noconfirm htop
+      local exitcode=$?
+      ;;
+    "None")
+      system_monitor
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${taskmanager_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1105,27 +1106,27 @@ install()(
 
   }
 
-  system_monitor(){
+  system_monitor() {
 
     case ${systemmonitor_select} in
-      "Conky")
-        sudo pacman -S --noconfirm conky
-        local exitcode=$?
-        ;;
-      "None")
-        audio
-        ;;
+    "Conky")
+      sudo pacman -S --noconfirm conky
+      local exitcode=$?
+      ;;
+    "None")
+      audio
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${systemmonitor_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1133,31 +1134,31 @@ install()(
 
   }
 
-  audio(){
+  audio() {
 
     case ${audio_select} in
-      "ALSA")
-        sudo pacman -S --noconfirm alsa alsa-firmware alsa-utils sof-firmware
-        local exitcode=$?
-        ;;
-      "PipWire")
-        sudo pacman -S --noconfirm pipewire pipewire-alsa pavucontrol sof-firmware
-        local exitcode=$?
-        ;;
-      "None")
-        texteditor
-        ;;
+    "ALSA")
+      sudo pacman -S --noconfirm alsa alsa-firmware alsa-utils sof-firmware
+      local exitcode=$?
+      ;;
+    "PipWire")
+      sudo pacman -S --noconfirm pipewire pipewire-alsa pavucontrol sof-firmware
+      local exitcode=$?
+      ;;
+    "None")
+      texteditor
+      ;;
     esac
 
-        if [ "${exitcode}" != "0" ]; then
+    if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${audio_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1165,31 +1166,31 @@ install()(
 
   }
 
-  music(){
+  music() {
 
     case ${music_select} in
-      "Spotify")
-        ${aur_helper} -S --noconfirm spotify
-        local exitcode=$?
-        ;;
-      "Spotify_TUI")
-        ${aur_helper} -S --noconfirm spotify-tui-bin spotifyd
-        local exitcode=$?
-        ;;
-      "None")
-        x11
-        ;;
+    "Spotify")
+      ${aur_helper} -S --noconfirm spotify
+      local exitcode=$?
+      ;;
+    "Spotify_TUI")
+      ${aur_helper} -S --noconfirm spotify-tui-bin spotifyd
+      local exitcode=$?
+      ;;
+    "None")
+      x11
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${music_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1199,30 +1200,30 @@ install()(
 
   #x11
 
-  zsh_prompt(){
+  zsh_prompt() {
 
     sudo pacman -S --noconfirm zsh zsh-syntax-highlighting
 
     case ${prompt_select} in
-      "Spaceship")
-        ${aur_helper} -S --noconfirm spaceship-prompt
-        local exitcode=$?
-        ;;
-      "Starship")
-        sudo pacman -S --noconfirm starship
-        local exitcode=$?
-        ;;
+    "Spaceship")
+      ${aur_helper} -S --noconfirm spaceship-prompt
+      local exitcode=$?
+      ;;
+    "Starship")
+      sudo pacman -S --noconfirm starship
+      local exitcode=$?
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${prompt_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1230,35 +1231,35 @@ install()(
 
   }
 
-  man(){
+  man() {
 
     case ${manpages_select} in
-      "All")
-        sudo pacman -S --noconfirm man-db tldr
-        local exitcode=$?
-        ;;
-      "man-db")
-        sudo pacman -S --noconfirm man-db
-        local exitcode=$?
-        ;;
-      "tldr")
-        sudo pacman -S --noconfirm tldr
-        local exitcode=$?
-        ;;
-      "None")
-        microcode
-        ;;
+    "All")
+      sudo pacman -S --noconfirm man-db tldr
+      local exitcode=$?
+      ;;
+    "man-db")
+      sudo pacman -S --noconfirm man-db
+      local exitcode=$?
+      ;;
+    "tldr")
+      sudo pacman -S --noconfirm tldr
+      local exitcode=$?
+      ;;
+    "None")
+      microcode
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${manpages_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1266,61 +1267,60 @@ install()(
 
   }
 
-  microcode(){
+  microcode() {
 
     case ${microcode} in
-      "AMD")
-        sudo pacman -S --needed --noconfirm amd-ucode
-        local exitcode=$?
-        ;;
-      "Intel")
-        sudo pacman -S --needed --noconfirm intel-ucode xf-86-video-intel
-        local exitcode=$?
-        ;;
-      "None")
-        compositor
-        ;;
+    "AMD")
+      sudo pacman -S --needed --noconfirm amd-ucode
+      local exitcode=$?
+      ;;
+    "Intel")
+      sudo pacman -S --needed --noconfirm intel-ucode xf-86-video-intel
+      local exitcode=$?
+      ;;
+    "None")
+      compositor
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${microcode}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
     compositor
 
-
   }
 
-  compositor(){
+  compositor() {
 
     case ${compositor_select} in
-      "Picom")
-        sudo pacman -S --needed --noconfirm picom
-        local exitcode=$?
-        ;;
-      "None")
-        languages
-        local exitcode=$?
-        ;;
+    "Picom")
+      sudo pacman -S --needed --noconfirm picom
+      local exitcode=$?
+      ;;
+    "None")
+      languages
+      local exitcode=$?
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${compositor_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1328,35 +1328,35 @@ install()(
 
   }
 
-  languages(){
+  languages() {
 
     case ${language_select} in
-      "All")
-        sudo pacman -S --needed --noconfirm python python-pip rust
-        local exitcode=$?
-        ;;
-      "Python")
-        sudo pacman -S --needed --noconfirm python python-pip
-        local exitcode=$?
-        ;;
-      "Rust")
-        sudo pacman -S --needed --noconfirm rust
-        local exitcode=$?
-        ;;
-      "None")
-        coreutils
-        ;;
+    "All")
+      sudo pacman -S --needed --noconfirm python python-pip rust
+      local exitcode=$?
+      ;;
+    "Python")
+      sudo pacman -S --needed --noconfirm python python-pip
+      local exitcode=$?
+      ;;
+    "Rust")
+      sudo pacman -S --needed --noconfirm rust
+      local exitcode=$?
+      ;;
+    "None")
+      coreutils
+      ;;
     esac
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot install [${language_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case $? in
-        0)
-          browser
-          ;;
-        1)
-          exit 1
-          ;;
+      0)
+        browser
+        ;;
+      1)
+        exit 1
+        ;;
       esac
     fi
 
@@ -1364,7 +1364,7 @@ install()(
 
   }
 
-  coreutils(){
+  coreutils() {
 
     if [ ${coreutils_install} == "yes" ]; then
       sudo pacman -S --needed --noconfirm cmatrix neofetch unzip zip
@@ -1382,16 +1382,16 @@ install()(
 
 )
 
-bitwarden()(
+bitwarden() (
 
-  rbw_register(){
+  rbw_register() {
 
     # E-mail
     rbw config set email ${bw_email}
     local exitcode=$?
 
     # Register
-    error=$( rbw register 2>&1 )
+    error=$(rbw register 2>&1)
     local exitcode2=$?
 
     if [ "${exitcode}" != "0" ] || [ "${exitcode2}" != "0" ]; then
@@ -1400,19 +1400,19 @@ bitwarden()(
       Exit status [rbw register]: ${exitcode2}"
       --yes-button "Retry" --no-button "Exit" 18 78
       case ${exitcode} in
-        0)
-          rbw_register
-          ;;
-        1)
-          clear
-          echo "${error}"
-          exit 1
-          ;;
-        *)
-          clear
-          echo "${error}"
-          echo "Exit status $?"
-          ;;
+      0)
+        rbw_register
+        ;;
+      1)
+        clear
+        echo "${error}"
+        exit 1
+        ;;
+      *)
+        clear
+        echo "${error}"
+        echo "Exit status $?"
+        ;;
       esac
     fi
 
@@ -1420,23 +1420,23 @@ bitwarden()(
 
   }
 
-  rbw_login(){
+  rbw_login() {
 
-    error=$( rbw sync 2>&1 )
+    error=$(rbw sync 2>&1)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "${error}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case ${exitcode} in
-        0)
-          rbw_login
-          ;;
-        1)
-          exit ${exitcode}
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          ;;
+      0)
+        rbw_login
+        ;;
+      1)
+        exit ${exitcode}
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        ;;
       esac
     fi
 
@@ -1451,9 +1451,9 @@ bitwarden()(
 
 )
 
-openssh(){
+openssh() {
 
-  openssh_client(){
+  openssh_client() {
 
     # Start SSH agent
     eval "$(ssh-agent -s)"
@@ -1462,15 +1462,15 @@ openssh(){
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
       case ${exitcode} in
-        0)
-          openssh_client
-          ;;
-        1)
-          exit ${exitcode}
-          ;;
-        *)
-          echo "Exit status ${exitcode}"
-          ;;
+      0)
+        openssh_client
+        ;;
+      1)
+        exit ${exitcode}
+        ;;
+      *)
+        echo "Exit status ${exitcode}"
+        ;;
       esac
     fi
 
@@ -1482,9 +1482,9 @@ openssh(){
 
 }
 
-github(){
+github() {
 
-  gh_ssh_keygen(){
+  gh_ssh_keygen() {
 
     ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f $HOME/.ssh/id_ed25519.pub
     local exitcode=$?
@@ -1508,28 +1508,28 @@ github(){
 
   }
 
-  gh_login(){
+  gh_login() {
 
     set -u
     cd $HOME
-    echo "$ghpat" > .ghpat
+    echo "$ghpat" >.ghpat
     unset ghpat
-    gh auth login --with-token < .ghpat
+    gh auth login --with-token <.ghpat
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
       whiptail --title "ERROR" --yesno "Cannot authenticate github with token [.ghpat].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
       case ${exitcode} in
-        0)
-          gh_install_login
-          ;;
-        1)
-          clear
-          exit ${exitcode}
-          ;;
-        *)
-          echo "Exit status $?"
-          ;;
+      0)
+        gh_install_login
+        ;;
+      1)
+        clear
+        exit ${exitcode}
+        ;;
+      *)
+        echo "Exit status $?"
+        ;;
       esac
     fi
 
@@ -1541,7 +1541,7 @@ github(){
 
   }
 
-  gh_pubkey(){
+  gh_pubkey() {
 
     gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
     local exitcode=$?
@@ -1561,9 +1561,9 @@ github(){
 
 }
 
-configs()(
+configs() (
 
-  clone(){
+  clone() {
 
     git clone git@github.com:${github_username}/dotfiles.git $HOME/.config
 
@@ -1575,10 +1575,9 @@ configs()(
 
     copy_configs
 
-
   }
 
-  copy_configs(){
+  copy_configs() {
 
     sudo cp $HOME/.config/systemd/logind.conf /etc/systemd/
 
@@ -1588,7 +1587,7 @@ configs()(
 
   }
 
-  zsh(){
+  zsh() {
 
     # Change shell to ZSH
     chsh -s /usr/bin/zsh
@@ -1606,9 +1605,9 @@ configs()(
 
 )
 
-customization()(
+customization() (
 
-  spotify_tui(){
+  spotify_tui() {
 
     spotify_password=$(rbw get Spotify)
     spotify_token=$(rbw get Spotify_TUI)
@@ -1622,7 +1621,7 @@ customization()(
 
   }
 
-  wallpaper(){
+  wallpaper() {
 
     mkdir $HOME/Downloads
 
@@ -1636,7 +1635,7 @@ customization()(
 
   }
 
-  cleanup(){
+  cleanup() {
 
     #Cargo
     mkdir $HOME/.local/share/cargo
@@ -1650,7 +1649,7 @@ customization()(
 
   }
 
-  success(){
+  success() {
 
     whiptail --title "SUCCESS" --msgbox "Arch installation has finished." 8 78
     exit 69
@@ -1661,33 +1660,34 @@ customization()(
 
 )
 
-while (( "$#" )); do
+while (("$#")); do
   case ${1} in
-    --help)
-      echo "------"
-      echo "Arch installation script"
-      echo "------"
-      echo
-      echo "Options:"
-      echo "--help    - Get help"
-      echo "--info    - Additional information"
-      echo "--default - Run script with default settings"
-      echo
-      exit 0
-      ;;
-    --info)
-      echo "Author: Marcell Barsony"
-      echo "Repository: https://github.com/marcellbarsony/arch"
-      echo "Important note: This script is under development"
-      exit 0
-      ;;
-    --default)
-      defaults="yes"
-      ;;
-    *)
-      echo "Available options:"
-      echo "Help --help"
-      echo "Info --info"
+  --help)
+    echo "------"
+    echo "Arch installation script"
+    echo "------"
+    echo
+    echo "Options:"
+    echo "--help    - Get help"
+    echo "--info    - Additional information"
+    echo "--default - Run script with default settings"
+    echo
+    exit 0
+    ;;
+  --info)
+    echo "Author: Marcell Barsony"
+    echo "Repository: https://github.com/marcellbarsony/arch"
+    echo "Important note: This script is under development"
+    exit 0
+    ;;
+  --default)
+    defaults="yes"
+    ;;
+  *)
+    echo "Available options:"
+    echo "Help --help"
+    echo "Info --info"
+    ;;
   esac
   shift
 done
