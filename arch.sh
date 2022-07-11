@@ -4,28 +4,44 @@ pre() (
 
   variables() (
 
-    echo -n "Initializing global variables...." && sleep 1
+    echo -n "Global variables............." && sleep 1
 
-    # Script properties
-    script_name=$(basename $0)
-    script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+    dialogs() {
 
-    # Logs
-    script_log=${script_dir}/src/${script_name}.log
-    error_log=${script_dir}/src/error.log
+      info_logs="Log files...................."
+      info_network="Network connection..........."
+      info_bootmode="Boot mode...................."
+      info_dmidata="DMI data....................."
+      info_systemclock="System clock................."
+      info_keymap="Keymap......................."
+      info_configs="Configs......................"
+      info_dependencies="Dependencies................."
 
-    # Configs
-    dialogrc=${script_dir}/cfg/dialogrc
-    pacmanconf=${script_dir}/cfg/pacman.conf
+      script_vars
 
-    echo "[OK]"
+    }
+
+    script_vars() {
+
+      # Script properties
+      script_name=$(basename $0)
+      script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+
+      # Logs
+      script_log=${script_dir}/src/${script_name}.log
+      error_log=${script_dir}/src/error.log
+
+      # Configs
+      dialogrc=${script_dir}/cfg/dialogrc
+      pacmanconf=${script_dir}/cfg/pacman.conf
+
+      colors
+
+    }
 
     colors() {
 
       #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
-
-      echo -n "Enabling color support..........."
-      sleep 1
 
       RESTORE=$(echo -en '\033[0m')
       RED=$(echo -en '\033[00;31m')
@@ -54,13 +70,13 @@ pre() (
 
     }
 
-    colors
+    dialogs
 
   )
 
   logs() {
 
-    echo -n "Initializing log files..........." && sleep 1
+    echo -n ${info_logs} && sleep 1
 
     if [ ! -f "${error_log}" && ! -f "${script_log}" ]; then
       touch ${error_log} && touch ${script_log}
@@ -76,7 +92,7 @@ pre() (
 
   network() {
 
-    echo -n "Checking network connection......"
+    echo -n ${info_network}
     ping -q -c 3 archlinux.org &>/dev/null
 
     case $? in
@@ -99,13 +115,12 @@ pre() (
 
   bootmode() {
 
-    echo -n "Checking boot mode..............."
-    sleep 1
+    echo -n ${info_bootmode} && sleep 1
     ls /sys/firmware/efi/efivars &>/dev/null
 
     case $? in
     0)
-      echo "[UEFI]"
+      echo "[OK]"
       dmidata
       ;;
     1)
@@ -124,8 +139,7 @@ pre() (
 
   dmidata() {
 
-    echo -n "Fetching DMI data................"
-    sleep 1
+    echo -n ${info_dmidata} && sleep 1
     dmi=$(dmidecode -s system-product-name)
 
     if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
@@ -140,8 +154,7 @@ pre() (
 
   systemclock() {
 
-    echo -n "Updating system clock............"
-    sleep 1
+    echo -n ${info_systemclock} && sleep 1
     timedatectl set-ntp true --no-ask-password
 
     case $? in
@@ -158,8 +171,7 @@ pre() (
 
   keymap() {
 
-    echo -n "Setting US keymap................"
-    sleep 1
+    echo -n ${info_keymap} && sleep 1
     loadkeys us &>/dev/null
     localectl set-keymap --no-convert us &>/dev/null # Systemd reads from /etc/vconsole.conf
 
@@ -176,16 +188,16 @@ pre() (
 
   }
 
-  dependencies() {
+  configs() {
 
-    echo -n "Installing dependencies.........."
-    sleep 1
-    pacman -Sy --noconfirm dialog &>/dev/null
+    echo -n ${info_configs} && sleep 1
+    cp -f ${dialogrc} $HOME/.dialogrc &>/dev/null
+    cp -f ${pacmanconf} /etc/pacman.conf &>/dev/null
 
     case $? in
     0)
       echo "[OK]"
-      configs
+      dependencies
       ;;
     *)
       echo "[ERROR]"
@@ -195,17 +207,15 @@ pre() (
 
   }
 
-  configs() {
+  dependencies() {
 
-    echo -n "Getting configs ready............"
-    sleep 1
-    cp -f ${dialogrc} $HOME/.dialogrc &>/dev/null
-    cp -f ${pacmanconf} /etc/pacman.conf &>/dev/null
+    echo -n ${info_dependencies} && sleep 1
+    pacman -Sy --noconfirm dialog &>/dev/null
 
     case $? in
     0)
       echo "[OK]"
-      variables
+      partition
       ;;
     *)
       echo "[ERROR]"
@@ -243,7 +253,7 @@ errorlog() {
 }
 
 set -o errtrace
-exec 2>${error_log}
+exec 2>>${error_log}
 
 trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
 #trap 'failure "${BASH_LINENO[*]}" "$LINENO" "${FUNCNAME[*]:-script}" "$?" "$BASH_COMMAND"' ERR
