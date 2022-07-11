@@ -4,18 +4,18 @@ pre() (
 
   variables() (
 
-    echo -n "Global variables............." && sleep 1
+    echo -n "Global variables............. " && sleep 1
 
-    dialogs() {
+    infos() {
 
-      info_logs="Log files...................."
-      info_network="Network connection..........."
-      info_bootmode="Boot mode...................."
-      info_dmidata="DMI data....................."
-      info_systemclock="System clock................."
-      info_keymap="Keymap......................."
-      info_configs="Configs......................"
-      info_dependencies="Dependencies................."
+      info_logs="Log files.................... "
+      info_network="Network connection........... "
+      info_bootmode="Boot mode.................... "
+      info_dmidata="DMI data..................... "
+      info_systemclock="System clock................. "
+      info_keymap="Keymap....................... "
+      info_configs="Configs...................... "
+      info_dependencies="Dependencies................. "
 
       script_vars
 
@@ -70,7 +70,7 @@ pre() (
 
     }
 
-    dialogs
+    infos
 
   )
 
@@ -78,7 +78,7 @@ pre() (
 
     echo -n ${info_logs} && sleep 1
 
-    if [ ! -f "${error_log}" && ! -f "${script_log}" ]; then
+    if [ ! -f "${error_log}" ] || [ ! -f "${script_log}" ]; then
       touch ${error_log} && touch ${script_log}
     else
       >${error_log} && >${script_log}
