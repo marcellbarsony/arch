@@ -1,36 +1,11 @@
 #!/bin/bash
 
-errorlog() {
-
-  local exitcode=${1}
-  local functionname=${2}
-  local lineno=${3}
-
-  echo "Exit code - ${exitcode}" >${SCRIPT_LOG}
-  echo "Function - ${functionname}" >>${SCRIPT_LOG}
-  echo "Line no. - ${lineno}" >>${SCRIPT_LOG}
-
-  if (dialog --title " ERROR " --yes-label "View logs" --no-label "Exit" --yesno "\nAn error has occurred\nExit code: ${exitcode}\nFunction: ${functionname}\nLine no.: ${lineno}" 10 60); then
-    vim ${SCRIPT_LOG}
-    clear
-    exit ${exitcode}
-  else
-    clear
-    exit ${exitcode}
-  fi
-
-}
-
-set -o errtrace
-
-trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
-
-check() (
+check_funct() (
 
   dependencies() (
 
+    echo "Dependencies........." && sleep 1
     pacman -Qi dialog >/dev/null
-
     if [ "$?" != "0" ]; then
       sudo pacman -S dialog
     fi
@@ -41,72 +16,76 @@ check() (
 
   root() (
 
+    echo "Root................." && sleep 1
     if [ id -u == "0" ]; then
       dialog --title " ERROR " --msgbox "\nCannot run script as root [UID 0]" 13 50
       exit 1
     fi
 
-    network || true
+    network
+
+  )
+
+
+  network() (
+
+    network_test() {
+
+      echo "Network test................." && sleep 1
+
+      for ((i = 0; i <= 100; i += 25)); do
+        ping -q -c 1 archlinux.org &>/dev/null
+        local exitcode=$?
+        echo $i
+        sleep 1
+      done | whiptail --gauge "Checking network connection..." 6 50 0
+
+      if [ "$?" != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nNetwork unreachable.\nExit status: ${?}" 13 50
+        network_connect
+      fi
+
+      dialog
+
+    }
+
+    network_connect() {
+
+      nmcli radio wifi on
+
+      # List WiFi devices: nmcli device wifi list
+
+      ssid=$(dialog --nocancel --inputbox "Network SSID" --title "Network connection" 8 45 3>&1 1>&2 2>&3)
+
+      if [ $? != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nInvalid network SSID.\nExit status: ${?}" 13 50
+        network_connect
+      fi
+
+      password=$(dialog --nocancel --passwordbox "Network passphrase" 8 45 3>&1 1>&2 2>&3)
+
+      if [ $? != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nInvalid network password.\nExit status: ${?}" 13 50
+        network_connect
+      fi
+
+      nmcli device wifi connect ${ssid} password ${password}
+
+      if [ "$?" != "0" ]; then
+        dialog --title " ERROR " --msgbox "\nCannot connect to network.\nExit status: ${?}" 13 50
+        exit $1
+      fi
+
+      clear
+      network_test
+
+    }
+
+    network_test
 
   )
 
   dependencies
-
-)
-
-network() (
-
-  network_test() {
-
-    for ((i = 0; i <= 100; i += 25)); do
-      ping -q -c 1 archlinux.org &>/dev/null
-      local exitcode=$?
-      echo $i
-      sleep 1
-    done | whiptail --gauge "Checking network connection..." 6 50 0
-
-    if [ "$?" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nNetwork unreachable.\nExit status: ${?}" 13 50
-      network_connect
-    fi
-
-    dialog || true
-
-  }
-
-  network_connect() {
-
-    nmcli radio wifi on
-
-    # List WiFi devices: nmcli device wifi list
-
-    ssid=$(dialog --nocancel --inputbox "Network SSID" --title "Network connection" 8 45 3>&1 1>&2 2>&3)
-
-    if [ $? != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nInvalid network SSID.\nExit status: ${?}" 13 50
-      network_connect
-    fi
-
-    password=$(dialog --nocancel --passwordbox "Network passphrase" 8 45 3>&1 1>&2 2>&3)
-
-    if [ $? != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nInvalid network password.\nExit status: ${?}" 13 50
-      network_connect
-    fi
-
-    nmcli device wifi connect ${ssid} password ${password}
-
-    if [ "$?" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nCannot connect to network.\nExit status: ${?}" 13 50
-      exit $1
-    fi
-
-    clear
-    network_test
-
-  }
-
-  root
 
 )
 
@@ -236,7 +215,7 @@ dialog() (
 
   }
 
-  aur
+  bw_email
 
 )
 
@@ -304,9 +283,9 @@ install() (
 
   }
 
-  aur() (
+  aur() {
 
-    aur_helper=(grep -o '"package": "[^"]*' ${package_data} | grep -o '[^"]*$' )
+    aur_helper=( grep -o '"package": "[^"]*' ${package_data} | grep -o '[^"]*$' )
 
     aurdir="$HOME/.local/src/${aur_helper}"
 
@@ -357,7 +336,7 @@ install() (
 
     github_cli
 
-  )
+  }
 
   pacinstall() {
 
@@ -844,4 +823,4 @@ while (("$#")); do
   shift
 done
 
-network || true
+check_funct
