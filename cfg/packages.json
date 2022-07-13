@@ -1,0 +1,198 @@
+[
+
+  {
+  "base":
+    [
+      {
+        "name": "AUR Helper",
+        "aur": "paru-bin",
+        "_alternative": "pikaur",
+        "_alternative2": "yay-bin"
+      },
+
+      {
+        "name": "Bitwarden CLI",
+        "bitwarden": "rbw",
+        "_alternative": "bitwarden_cli"
+      }
+    ]
+  },
+
+  {
+    "name": "Window Manager",
+    "package": "qtile",
+    "_alternative2": "i3",
+    "_alternative4": "openbox",
+    "_package":
+    [
+      {
+        "description": "AUR package",
+        "name": "leftwm"
+      },
+      {
+        "description": "Compile",
+        "compile": "dwm",
+        "repository": "git://git.suckless.org/dwm"
+      }
+    ]
+  },
+
+  {
+    "name": "Terminal",
+    "package": "alacritty",
+    "_alternative": "kitty",
+    "_alternative2": "st"
+  },
+
+  {
+    "name": "GitHub CLI",
+    "package": "github-cli"
+  },
+
+  {
+    "name": "Browser",
+    "package": "librewolf-bin",
+    "_alternative": "chromium",
+    "_alternative2": "qutebrowser"
+  },
+
+  {
+    "name": "IDE",
+    "package": "vscodium-bin",
+    "_alternative": "code"
+  },
+
+  {
+    "name": "Text Editor",
+    "package": "neovim",
+    "_alternative": "emacs",
+    "_alternative2": "vim"
+  },
+
+  {
+    "name": "Text Editor",
+    "package": "neovim",
+    "_alternative": "emacs",
+    "_alternative2": "vim"
+  },
+
+  {
+    "name": "Application Launcher",
+    "package": "dmenu-rs",
+    "_alternative": "dmenu",
+    "_alternative2": "dmenu2",
+    "_alternative3": "rofi"
+  },
+
+  {
+    "name": "Task Manager",
+    "package": "htop",
+    "_alternative": "bpytop"
+  },
+
+  {
+    "name": "System Monitor",
+    "package": "conky"
+  },
+
+  {
+    "name": "Music",
+    "package": "spotify-tui",
+    "_alternative": "spotify"
+  },
+
+    {
+    "name": "Audio & Music",
+    "package": "sof-firmware",
+    "sytem_audio":
+    [
+      {
+        "description": "ALSA",
+        "package": "alsa",
+        "package2": "alsa-firmware",
+        "package3": "alsa-utils"
+      },
+      {
+        "description": "Pipewire",
+        "package": "pipewire",
+        "package2": "pipewire-alsa",
+        "package3": "pacvucontrol"
+      },
+      {
+        "description": "Spotify",
+        "aur_package": "spotify-tui-bin",
+        "aur_package2": "spotifyd",
+        "aur_alternative": "spotify"
+      }
+    ]
+  },
+
+  {
+    "name": "ZSH",
+    "package": "zsh",
+    "package2": "zsh-syntax-highlighting",
+    "_alternative":
+      {
+        "description": "ZSH Prompt",
+        "aur_package": "spaceship-prompt",
+        "_alternative": "starship"
+      }
+  },
+
+  {
+    "name": "Man pages",
+    "package": "man-db",
+    "_alternative": "texinfo",
+    "_alternative2": "tldr"
+  },
+
+  {
+    "name": "Programming Languages",
+    "package": "python",
+    "package2": "python-pip",
+    "package3": "rust"
+  },
+
+  {
+    "name": "CPU Microcode",
+    "package": "intel-ucode",
+    "package2": "xf-86-video-intel",
+    "_alternative": "amd-ucode"
+  },
+
+  {
+  "Core utilities":
+    [
+      {
+        "name": "GNU",
+        "package": "zip",
+        "package2": "unzip",
+      },
+      {
+        "name": "Rust",
+        "package": "bat",
+        "package2": "exa",
+        "package3": "lsd",
+        "package4": "zoxide"
+      }
+    ]
+  },
+
+  {
+    "name": "Terminal Bling",
+    "package": "cmatrix",
+    "package2": "cbonsai",
+    "package3": "neofetch"
+  },
+
+  {
+  "NOT IN USE":
+    [
+      {
+        "name": "Compositor",
+        "package": "picom",
+      }
+    ]
+  }
+
+]
