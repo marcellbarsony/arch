@@ -276,11 +276,11 @@ partition() (
       options+=("${item}" "")
     done
 
-    KEYMAP=$(dialog --title " Keyboard layout " --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
+    keymap=$(dialog --title " Keyboard layout " --nocancel --menu "" 30 50 20 "${options[@]}" 3>&1 1>&2 2>&3)
 
     if [ "$?" = "0" ]; then
-      loadkeys ${KEYMAP} &>/dev/null
-      localectl set-keymap --no-convert ${KEYMAP} &>/dev/null # Systemd reads from /etc/vconsole.conf
+      loadkeys ${keymap} &>/dev/null
+      localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
     else
       exit 1
 
@@ -566,9 +566,9 @@ dialogs() (
 
     workstation_name() {
 
-      NODENAME=$(dialog --nocancel --inputbox "Hostname" 8 45 3>&1 1>&2 2>&3)
+      nodename=$(dialog --nocancel --inputbox "Hostname" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${NODENAME} ]; then
+      if [ ! ${nodename} ]; then
         dialog --title " ERROR " --msgbox "\nHostname cannot be empty." 8 45
         workstation_name
       fi
@@ -579,51 +579,51 @@ dialogs() (
 
     user_account() {
 
-      USERNAME=$(dialog --nocancel --inputbox "Username" 8 45 3>&1 1>&2 2>&3)
+      username=$(dialog --nocancel --inputbox "Username" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${USERNAME} ] || [ ${USERNAME} == "root" ]; then
-        dialog --title " ERROR " --msgbox "\nUSERNAME cannot be empty or [root]." 8 45
+      if [ ! ${username} ] || [ ${username} == "root" ]; then
+        dialog --title " ERROR " --msgbox "\nUsername cannot be empty or [root]." 8 45
         user_account
       fi
 
-      user_password
+      user_passphrase
 
     }
 
-    user_password() {
+    user_passphrase() {
 
-      USER_PASSWORD=$(dialog --nocancel --passwordbox "${USERNAME}'s passphrase" 8 45 3>&1 1>&2 2>&3)
+      user_password=$(dialog --nocancel --passwordbox "${username}'s passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      USER_PASSWORD_CONFIRM=$(dialog --nocancel --passwordbox "${USERNAME}'s passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      user_password_confirm=$(dialog --nocancel --passwordbox "${username}'s passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${USER_PASSWORD} ] || [ ! ${USER_PASSWORD_CONFIRM} ]; then
+      if [ ! ${user_password} ] || [ ! ${user_password_confirm} ]; then
         dialog --title " ERROR " --msgbox "\nUser passphrase cannot be empty." 8 45
-        user_password
+        user_passphrase
       fi
 
-      if [ ${USER_PASSWORD} != ${USER_PASSWORD_CONFIRM} ]; then
+      if [ ${user_password} != ${user_password_confirm} ]; then
         dialog --title " ERROR " --msgbox "\nUser passphrase did not match." 8 45
-        user_password
+        user_passphrase
       fi
 
-      root_password
+      root_passphrase
 
     }
 
-    root_password() {
+    root_passphrase() {
 
-      ROOT_PASSWORD=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
+      root_password=$(dialog --nocancel --passwordbox "Root passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      ROOT_PASSWORD_CONFIRM=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      root_password_confirm=$(dialog --nocancel --passwordbox "Root passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${ROOT_PASSWORD} ] || [ ! ${ROOT_PASSWORD_CONFIRM} ]; then
+      if [ ! ${root_password} ] || [ ! ${root_password_confirm} ]; then
         dialog --title " ERROR " --msgbox "\nRoot passphrase cannot be empty." 8 45
-        root_password
+        root_passphrase
       fi
 
-      if [ ${ROOT_PASSWORD} != ${ROOT_PASSWORD_CONFIRM} ]; then
+      if [ ${root_password} != ${root_password_confirm} ]; then
         dialog --title " ERROR " --msgbox "\nRoot passphrase did not match." 8 45
-        root_password
+        root_passphrase
       fi
 
       grub_password
@@ -935,11 +935,11 @@ archinstall() (
 
 chroot() {
 
-  export KEYMAP
-  export NODENAME
-  export USERNAME
-  export USER_PASSWORD
-  export ROOT_PASSWORD
+  export keymap
+  export nodename
+  export username
+  export user_password
+  export root_password
   export GRUBPW
   export dmi
 

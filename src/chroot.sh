@@ -4,22 +4,22 @@ sysadmin() (
 
   setkeymap() {
 
-    echo "Set keymap [${KEYMAP}]..."
+    echo "Set keymap [${keymap}]..."
     sleep 1
 
-    loadkeys ${KEYMAP} &>/dev/null
-    localectl set-keymap --no-convert ${KEYMAP} &>/dev/null # Systemd reads from /etc/vconsole.conf
+    loadkeys ${keymap} &>/dev/null
+    localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
 
-    root_password
+    root_passphrase
 
   }
 
-  root_password() {
+  root_passphrase() {
 
     echo "Set root password..."
     sleep 1
 
-    echo "root:${ROOT_PASSWORD}" | chpasswd 2>&1
+    echo "root:${root_password}" | chpasswd 2>&1
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
@@ -33,31 +33,31 @@ sysadmin() (
 
   user_create() {
 
-    echo "Add user [${USERNAME}]..."
+    echo "Add user [${username}]..."
     sleep 1
 
-    useradd -m ${USERNAME}
+    useradd -m ${username}
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nCannot create user account [${USERNAME}]" 8 45
+      dialog --title " ERROR " --msgbox "\nCannot create user account [${username}]" 8 45
       exit ${exitcode}
     fi
 
-    user_password
+    user_passphrase
 
   }
 
-  user_password() {
+  user_passphrase() {
 
-    echo "Set ${USERNAME} password..."
+    echo "Set ${username} password..."
     sleep 1
 
-    error=$(echo "${USERNAME}:${USER_PASSWORD}" | chpasswd 2>&1)
+    error=$(echo "${username}:${user_password}" | chpasswd 2>&1)
     local exitcode=$?
 
     if [ ${exitcode} != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nCannot set user password [${USERNAME}]" 8 45
+      dialog --title " ERROR " --msgbox "\nCannot set user password [${username}]" 8 45
       exit ${exitcode}
     fi
 
@@ -67,14 +67,14 @@ sysadmin() (
 
   user_group() {
 
-    echo "Add ${USERNAME} to groups..."
+    echo "Add ${username} to groups..."
     sleep 1
 
-    usermod -aG wheel,audio,video,optical,storage ${USERNAME} 2>&1
+    usermod -aG wheel,audio,video,optical,storage ${username} 2>&1
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nCannot add [${USERNAME}] to groups" 8 45
+      dialog --title " ERROR " --msgbox "\nCannot add [${username}] to groups" 8 45
       exit ${exitcode}
     fi
 
@@ -84,14 +84,14 @@ sysadmin() (
 
   domain_name() {
 
-    echo "Set hostname >> ${NODENAME}"
+    echo "Set hostname >> ${nodename}"
     sleep 1
 
-    hostnamectl set-hostname ${NODENAME}
+    hostnamectl set-hostname ${nodename}
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nHostname [${NODENAME}] cannot be set" 8 45
+      dialog --title " ERROR " --msgbox "\nHostname [${nodename}] cannot be set" 8 45
       exit ${exitcode}
     fi
 
@@ -109,7 +109,7 @@ hosts() {
 
   echo "127.0.0.1        localhost" >/etc/hosts &>/dev/null
   echo "::1              localhost" >>/etc/hosts &>/dev/null
-  echo "127.0.1.1        ${NODENAME}" >>/etc/hosts &>/dev/null
+  echo "127.0.1.1        ${nodename}" >>/etc/hosts &>/dev/null
 
   sudoers
 
@@ -197,8 +197,8 @@ grub() (
     grubpass=$(echo -e "${GRUBPW}\n${GRUBPW}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
     echo "cat << EOF" >>/etc/grub.d/00_header
-    echo "set superusers=\"${USERNAME}\"" >>/etc/grub.d/00_header
-    echo "password_pbkdf2 ${USERNAME} ${grubpass}" >>/etc/grub.d/00_header
+    echo "set superusers=\"${username}\"" >>/etc/grub.d/00_header
+    echo "password_pbkdf2 ${username} ${grubpass}" >>/etc/grub.d/00_header
     echo "EOF" >>/etc/grub.d/00_header
 
     grub_crypt

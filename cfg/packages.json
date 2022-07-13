@@ -5,43 +5,24 @@
     [
       {
         "name": "AUR Helper",
-        "aur": "paru-bin",
-        "_alternative": "pikaur",
-        "_alternative2": "yay-bin"
+        "aur": "paru-bin"
       },
 
       {
         "name": "Bitwarden CLI",
-        "bitwarden": "rbw",
-        "_alternative": "bitwarden_cli"
+        "bitwarden": "rbw"
       }
     ]
   },
 
   {
     "name": "Window Manager",
-    "package": "qtile",
-    "_alternative2": "i3",
-    "_alternative4": "openbox",
-    "_package":
-    [
-      {
-        "description": "AUR package",
-        "name": "leftwm"
-      },
-      {
-        "description": "Compile",
-        "compile": "dwm",
-        "repository": "git://git.suckless.org/dwm"
-      }
-    ]
+    "package": "qtile"
   },
 
   {
     "name": "Terminal",
-    "package": "alacritty",
-    "_alternative": "kitty",
-    "_alternative2": "st"
+    "package": "alacritty"
   },
 
   {
@@ -51,43 +32,27 @@
 
   {
     "name": "Browser",
-    "package": "librewolf-bin",
-    "_alternative": "chromium",
-    "_alternative2": "qutebrowser"
+    "package": "librewolf-bin"
   },
 
   {
     "name": "IDE",
-    "package": "vscodium-bin",
-    "_alternative": "code"
+    "package": "vscodium-bin"
   },
 
   {
     "name": "Text Editor",
-    "package": "neovim",
-    "_alternative": "emacs",
-    "_alternative2": "vim"
-  },
-
-  {
-    "name": "Text Editor",
-    "package": "neovim",
-    "_alternative": "emacs",
-    "_alternative2": "vim"
+    "package": "neovim"
   },
 
   {
     "name": "Application Launcher",
-    "package": "dmenu-rs",
-    "_alternative": "dmenu",
-    "_alternative2": "dmenu2",
-    "_alternative3": "rofi"
+    "package": "dmenu-rs"
   },
 
   {
     "name": "Task Manager",
-    "package": "htop",
-    "_alternative": "bpytop"
+    "package": "bpytop"
   },
 
   {
@@ -103,7 +68,6 @@
 
     {
     "name": "Audio & Music",
-    "package": "sof-firmware",
     "sytem_audio":
     [
       {
@@ -121,8 +85,7 @@
       {
         "description": "Spotify",
         "aur_package": "spotify-tui-bin",
-        "aur_package2": "spotifyd",
-        "aur_alternative": "spotify"
+        "aur_package2": "spotifyd"
       }
     ]
   },
@@ -131,19 +94,18 @@
     "name": "ZSH",
     "package": "zsh",
     "package2": "zsh-syntax-highlighting",
-    "_alternative":
+    "prompt":
       {
         "description": "ZSH Prompt",
-        "aur_package": "spaceship-prompt",
-        "_alternative": "starship"
+        "aur_package": "starship"
       }
   },
 
   {
     "name": "Man pages",
     "package": "man-db",
-    "_alternative": "texinfo",
-    "_alternative2": "tldr"
+    "package2": "texinfo",
+    "package3": "tldr"
   },
 
   {
@@ -156,8 +118,7 @@
   {
     "name": "CPU Microcode",
     "package": "intel-ucode",
-    "package2": "xf-86-video-intel",
-    "_alternative": "amd-ucode"
+    "package2": "xf-86-video-intel"
   },
 
   {
@@ -166,7 +127,7 @@
       {
         "name": "GNU",
         "package": "zip",
-        "package2": "unzip",
+        "package2": "unzip"
       },
       {
         "name": "Rust",
@@ -183,16 +144,6 @@
     "package": "cmatrix",
     "package2": "cbonsai",
     "package3": "neofetch"
-  },
-
-  {
-  "NOT IN USE":
-    [
-      {
-        "name": "Compositor",
-        "package": "picom",
-      }
-    ]
   }
 
 ]

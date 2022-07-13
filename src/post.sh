@@ -25,18 +25,36 @@ set -o errtrace
 
 trap 'errorlog ${?} ${FUNCNAME-main} ${LINENO}' ERR
 
-network() (
+check() (
+
+  dependencies() (
+
+    pacman -Qi dialog >/dev/null
+
+    if [ "$?" != "0" ]; then
+      sudo pacman -S dialog
+    fi
+
+    root
+
+  )
 
   root() (
 
     if [ id -u == "0" ]; then
-      whiptail "Not allowed to run as sudo."
+      dialog --title " ERROR " --msgbox "\nCannot run script as root [UID 0]" 13 50
       exit 1
     fi
 
-    network_test
+    network || true
 
   )
+
+  dependencies
+
+)
+
+network() (
 
   network_test() {
 
@@ -48,7 +66,7 @@ network() (
     done | whiptail --gauge "Checking network connection..." 6 50 0
 
     if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Network unreachable.\Exit status: ${?}" 8 78
+      dialog --title " ERROR " --msgbox "\nNetwork unreachable.\nExit status: ${?}" 13 50
       network_connect
     fi
 
@@ -62,24 +80,24 @@ network() (
 
     # List WiFi devices: nmcli device wifi list
 
-    ssid=$(whiptail --inputbox "Network SSID" --title "Network connection" 8 39 3>&1 1>&2 2>&3)
+    ssid=$(dialog --nocancel --inputbox "Network SSID" --title "Network connection" 8 45 3>&1 1>&2 2>&3)
 
     if [ $? != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Invalid network SSID.\Exit status: ${?}" 8 78
+      dialog --title " ERROR " --msgbox "\nInvalid network SSID.\nExit status: ${?}" 13 50
       network_connect
     fi
 
-    password=$(whiptail --passwordbox "Network passphrase" 8 78 --title "Network connection" 3>&1 1>&2 2>&3)
+    password=$(dialog --nocancel --passwordbox "Network passphrase" 8 45 3>&1 1>&2 2>&3)
 
     if [ $? != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Invalid network password.\Exit status: ${?}" 8 78
+      dialog --title " ERROR " --msgbox "\nInvalid network password.\nExit status: ${?}" 13 50
       network_connect
     fi
 
     nmcli device wifi connect ${ssid} password ${password}
 
     if [ "$?" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "cannot connect to network.\nExit status: ${?}" 8 78
+      dialog --title " ERROR " --msgbox "\nCannot connect to network.\nExit status: ${?}" 13 50
       exit $1
     fi
 
@@ -96,7 +114,7 @@ dialog() (
 
   bw_email() {
 
-    bw_email=$(whiptail --inputbox "Bitwarden e-mail" --title "Bitwarden CLI" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    bw_email=$(dialog --nocancel --inputbox "Bitwarden e-mail" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -112,7 +130,7 @@ dialog() (
     fi
 
     if [ ! ${bw_email} ]; then
-      whiptail --title "ERROR" --msgbox "Bitwarden e-mail cannot be empty." 8 78
+      dialog --title " ERROR " --msgbox "\nBitwarden e-mail cannot be empty." 13 50
       bw_email
     fi
 
@@ -122,7 +140,7 @@ dialog() (
 
   github_email() {
 
-    gh_email=$(whiptail --inputbox "GitHub e-mail" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    gh_email=$(dialog --inputbox "GitHub e-mail" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -138,7 +156,7 @@ dialog() (
     fi
 
     if [ ! ${gh_email} ]; then
-      whiptail --title "ERROR" --msgbox "GitHub e-mail cannot be empty." 8 78
+      dialog --title " ERROR " --msgbox "GitHub e-mail cannot be empty." 13 50
       github_email
     fi
 
@@ -148,7 +166,7 @@ dialog() (
 
   github_user() {
 
-    github_username=$(whiptail --inputbox "GitHub username" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    github_username=$(dialog --inputbox "GitHub username" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -164,7 +182,7 @@ dialog() (
     fi
 
     if [ ! ${github_username} ]; then
-      whiptail --title "ERROR" --msgbox "GitHub username cannot be empty." 8 78
+      dialog --title " ERROR " --msgbox "GitHub username cannot be empty." 13 50
       github_user
     fi
 
@@ -174,7 +192,7 @@ dialog() (
 
   github_pubkey() {
 
-    gh_pubkeyname=$(whiptail --inputbox "GitHub SSH Key" --title "GitHub" --cancel-button "Back" 8 39 3>&1 1>&2 2>&3)
+    gh_pubkeyname=$(dialog --inputbox "GitHub SSH Key" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -190,7 +208,7 @@ dialog() (
     fi
 
     if [ ! ${gh_pubkeyname} ]; then
-      whiptail --title "ERROR" --msgbox "GitHub SSH key name cannot be empty." 8 78
+      dialog --title " ERROR " --msgbox "GitHub SSH key name cannot be empty." 13 50
       github_pubkey
     fi
 
@@ -235,10 +253,7 @@ variables() {
   pacmanconf=${script_dir}/cfg/pacman.conf
   package_data=${script_dir}/cfg/packages.json
 
-  aur_helper="paru"
-  aur_helper_package="paru-bin"
-  bitwarden_cli="rbw"
-  xwaylan='xorg-wayland'
+  xwayland='xorg-wayland'
   diaplay_manager=
   #https://wiki.archlinux.org/title/Display_manager#List_of_display_managers
   file_manager=
@@ -246,21 +261,6 @@ variables() {
   # xplr - https://github.com/sayanarijit/xplr
   # joshuto - https://github.com/kamiyaa/joshuto
   # felix - https://github.com/kyoheiu/felix
-  window_manager="qtile"
-  terminal="alacritty"
-  browser="librewolf"
-  ide="vscodium-bin"
-  text_editor="neovim"
-  application_launcher="dmenu-rs"
-  task_manager="htop"
-  system_monitor="conky"
-  music="spotify-tui"
-  zsh_prmopt="starship"
-  manpages="tldr"
-  compositor="picom"
-  languages=
-  coreutils=
-  coreutils_rust=
 
   install
 
