@@ -194,7 +194,7 @@ grub() (
 
   grub_password() {
 
-    grubpass=$(echo -e "${GRUBPW}\n${GRUBPW}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
+    grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
 
     echo "cat << EOF" >>/etc/grub.d/00_header
     echo "set superusers=\"${username}\"" >>/etc/grub.d/00_header
@@ -322,6 +322,16 @@ packages() {
     dialog --title " ERROR " --msgbox "\nPacman: cannot install packages" 8 45
     exit ${exitcode}
   fi
+
+  btrfs_config
+
+}
+
+btrfs_config() {
+
+  # https://wiki.archlinux.org/title/snapper
+  # snapper -c config create-config /path/to/subvolume
+  snapper -c home create-config /home
 
   modules
 

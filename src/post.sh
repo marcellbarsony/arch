@@ -1,51 +1,55 @@
 #!/bin/bash
 
-check_funct() (
+main_check() (
 
-  dependencies() (
+  check_dependencies() {
 
-    echo "Dependencies........." && sleep 1
+    echo -n "Dependencies.................." && sleep 1
     pacman -Qi dialog >/dev/null
     if [ "$?" != "0" ]; then
       sudo pacman -S dialog
     fi
 
-    root
+    echo "[OK]"
 
-  )
+    check_root
 
-  root() (
+  }
 
-    echo "Root................." && sleep 1
+  check_root() {
+
+    echo -n "Root.........................." && sleep 1
     if [ id -u == "0" ]; then
       dialog --title " ERROR " --msgbox "\nCannot run script as root [UID 0]" 13 50
       exit 1
     fi
 
-    network
+    echo "[OK]"
 
-  )
+    check_network
 
+  }
 
-  network() (
+  check_network() (
 
     network_test() {
 
-      echo "Network test................." && sleep 1
+      echo -n "Network connection............" && sleep 1
 
       for ((i = 0; i <= 100; i += 25)); do
         ping -q -c 1 archlinux.org &>/dev/null
         local exitcode=$?
         echo $i
         sleep 1
-      done | whiptail --gauge "Checking network connection..." 6 50 0
+      done
 
       if [ "$?" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nNetwork unreachable.\nExit status: ${?}" 13 50
         network_connect
       fi
 
-      dialog
+      echo "[OK]"
+
+      variables
 
     }
 
@@ -57,26 +61,27 @@ check_funct() (
 
       ssid=$(dialog --nocancel --inputbox "Network SSID" --title "Network connection" 8 45 3>&1 1>&2 2>&3)
 
-      if [ $? != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nInvalid network SSID.\nExit status: ${?}" 13 50
+      if [ ! ${network_password} ]; then
+        dialog --title " ERROR " --msgbox "Network passphrase cannot be empty." 13 50
         network_connect
       fi
 
-      password=$(dialog --nocancel --passwordbox "Network passphrase" 8 45 3>&1 1>&2 2>&3)
+      network_password=$(dialog --nocancel --passwordbox "Network passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      if [ $? != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nInvalid network password.\nExit status: ${?}" 13 50
+      if [ ! ${network_password} ]; then
+        dialog --title " ERROR " --msgbox "Network passphrase cannot be empty." 13 50
         network_connect
       fi
 
-      nmcli device wifi connect ${ssid} password ${password}
+      nmcli device wifi connect ${ssid} password ${network_password}
 
       if [ "$?" != "0" ]; then
-        dialog --title " ERROR " --msgbox "\nCannot connect to network.\nExit status: ${?}" 13 50
-        exit $1
+        dialog --title " ERROR " --msgbox "\nCannot connect to network: ${ssid}" 13 50
+        network_connect
       fi
 
       clear
+
       network_test
 
     }
@@ -85,32 +90,50 @@ check_funct() (
 
   )
 
-  dependencies
+  variables() {
+
+    script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+
+    # Logs
+    script_log=${script_dir}/src/${script_name}.log
+    error_log=${script_dir}/src/error.log
+
+    # Configs
+    dialogrc=${script_dir}/cfg/dialogrc
+    pacmanconf=${script_dir}/cfg/pacman.conf
+    package_data=${script_dir}/cfg/packages.json
+
+    configs
+
+  }
+
+  configs() {
+
+    cp -f ${dialogrc} /etc/dialogrc
+
+    dialogs
+
+  }
+
+  check_dependencies
 
 )
 
-dialog() (
+dialogs() (
 
-  bw_email() {
+  bitwarden_email() {
 
-    bw_email=$(dialog --nocancel --inputbox "Bitwarden e-mail" 8 45 3>&1 1>&2 2>&3)
+    bw_email=$(dialog --cancel-label "Exit" --inputbox "Bitwarden e-mail" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      case ${exitcode} in
-      1)
-        bw_client
-        ;;
-      *)
-        echo "Exit status ${exitcode}"
-        exit $?
-        ;;
-      esac
+      echo "The script has terminated"
+      exit ${exitcode}
     fi
 
     if [ ! ${bw_email} ]; then
-      dialog --title " ERROR " --msgbox "\nBitwarden e-mail cannot be empty." 13 50
-      bw_email
+      dialog --title " ERROR " --msgbox "\nE-mail cannot be empty [Bitwarden]" 13 50
+      bitwarden_email
     fi
 
     github_email
@@ -119,23 +142,15 @@ dialog() (
 
   github_email() {
 
-    gh_email=$(dialog --inputbox "GitHub e-mail" 8 45 3>&1 1>&2 2>&3)
+    gh_email=$(dialog --cancel-label "Back" --inputbox "GitHub e-mail" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      case ${exitcode} in
-      1)
-        bw_email
-        ;;
-      *)
-        echo "Exit status $?"
-        exit $?
-        ;;
-      esac
+      bitwarden_email
     fi
 
     if [ ! ${gh_email} ]; then
-      dialog --title " ERROR " --msgbox "GitHub e-mail cannot be empty." 13 50
+      dialog --title " ERROR " --msgbox "\nE-mail cannot be empty [GitHub]" 13 50
       github_email
     fi
 
@@ -145,22 +160,14 @@ dialog() (
 
   github_user() {
 
-    github_username=$(dialog --inputbox "GitHub username" 8 45 3>&1 1>&2 2>&3)
+    gh_username=$(dialog --cancel-label "Back" --inputbox "GitHub username" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      case ${exitcode} in
-      1)
-        github_email
-        ;;
-      *)
-        echo "Exit status $?"
-        exit $?
-        ;;
-      esac
+      github_email
     fi
 
-    if [ ! ${github_username} ]; then
+    if [ ! ${gh_username} ]; then
       dialog --title " ERROR " --msgbox "GitHub username cannot be empty." 13 50
       github_user
     fi
@@ -171,23 +178,15 @@ dialog() (
 
   github_pubkey() {
 
-    gh_pubkeyname=$(dialog --inputbox "GitHub SSH Key" 8 45 3>&1 1>&2 2>&3)
+    gh_pubkeyname=$(dialog --cancel-label "Back" --inputbox "GitHub SSH Key" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      case ${exitcode} in
-      1)
-        github_email
-        ;;
-      *)
-        echo "Exit status $?"
-        exit $?
-        ;;
-      esac
+      github_user
     fi
 
     if [ ! ${gh_pubkeyname} ]; then
-      dialog --title " ERROR " --msgbox "GitHub SSH key name cannot be empty." 13 50
+      dialog --title " ERROR " --msgbox "\nGitHub SSH key name cannot be empty." 13 50
       github_pubkey
     fi
 
@@ -197,97 +196,40 @@ dialog() (
 
   ssh_passphrase() {
 
-    ssh_passphrase=$(whiptail --passwordbox "SSH passphrase" --title "SSH" --nocancel 8 78 3>&1 1>&2 2>&3)
+    ssh_passphrase=$(dialog --passwordbox "SSH passphrase" 8 45 3>&1 1>&2 2>&3)
+    local exitcode=$?
 
-    ssh_passphrase_confirm=$(whiptail --passwordbox "SSH passphrase [confirm]" --title "SSH" --nocancel 8 78 3>&1 1>&2 2>&3)
+    if [ "${exitcode}" != "0" ]; then
+      github_pubkey
+    fi
+
+    ssh_passphrase_confirm=$(dialog --no-cancel --passwordbox "SSH passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
     if [ ! ${ssh_passphrase} ] || [ ! ${ssh_passphrase_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "SSH passphrase cannot be empty." 8 78
+      dialog --title " ERROR " --msgbox "Passphrase cannot be empty." 8 45
       ssh_passphrase
     fi
 
     if [ ${ssh_passphrase} != ${ssh_passphrase_confirm} ]; then
-      whiptail --title "ERROR" --msgbox "SSH passphrase did not match." 8 78
+      dialog --title " ERROR " --msgbox "Passphrase did not match." 8 45
       ssh_passphrase
     fi
 
-    variables
+    install
 
   }
 
-  bw_email
+  bitwarden_email
 
 )
 
-variables() {
-
-  script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-
-  # Logs
-  script_log=${script_dir}/src/${script_name}.log
-  error_log=${script_dir}/src/error.log
-
-  # Configs
-  dialogrc=${script_dir}/cfg/dialogrc
-  pacmanconf=${script_dir}/cfg/pacman.conf
-  package_data=${script_dir}/cfg/packages.json
-
-  xwayland='xorg-wayland'
-  diaplay_manager=
-  #https://wiki.archlinux.org/title/Display_manager#List_of_display_managers
-  file_manager=
-  # https://wiki.archlinux.org/title/List_of_applications/Utilities#File_managers
-  # xplr - https://github.com/sayanarijit/xplr
-  # joshuto - https://github.com/kamiyaa/joshuto
-  # felix - https://github.com/kyoheiu/felix
-
-  install
-
-}
-
 install() (
-
-  reflector() {
-
-    pacman -Qi reflector >/dev/null
-
-    if [ "$?" != "0" ]; then
-      sudo pacman -S reflector
-    fi
-
-    mirrorlist
-
-  }
-
-  mirrorlist() {
-
-    echo 50 | whiptail --gauge "Backing up mirrorlist..." 6 50 0
-    sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak &>/dev/null
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Mirrorlist cannot be backed up.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    echo 100 | whiptail --gauge "Reflector: Update mirrorlist..." 6 50 0
-    sudo reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist &>/dev/null
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Mirrorlist cannot be updated.\nExit status: ${exitcode}" 8 60
-      exit ${exitcode}
-    fi
-
-    aur
-
-  }
 
   aur() {
 
     aur_helper=( grep -o '"package": "[^"]*' ${package_data} | grep -o '[^"]*$' )
 
-    aurdir="$HOME/.local/src/${aur_helper}"
+    aurdir="${HOME}/.local/src/${aur_helper}"
 
     if [ -d "${aurdir}" ]; then
       rm -rf ${aurdir}
@@ -332,7 +274,7 @@ install() (
       esac
     fi
 
-    cd $HOME
+    cd ${HOME}
 
     github_cli
 
@@ -345,160 +287,7 @@ install() (
 
   }
 
-  compile() {
-
-      git clone git://git.suckless.org/dwm $HOME/.local/src/dwm
-      cd $HOME/.local/src/dwm
-      make
-      make install
-      local exitcode=$?
-      cd $HOME
-
-  }
-
-  terminal() {
-
-    case ${terminal} in
-    "Alacritty")
-      sudo pacman -S --noconfirm alacritty
-      local exitcode=$?
-      ;;
-    "kitty")
-      sudo pacman -S --noconfirm kitty
-      local exitcode=$?
-      ;;
-    "st")
-      ${aur_helper} -S --noconfirm st
-      local exitcode=$?
-      ;;
-    esac
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install [${terminal}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-      0)
-        terminal
-        ;;
-      1)
-        exit 1
-        ;;
-      esac
-    fi
-
-    browser
-
-  }
-
-  browser() {
-
-    case ${browser} in
-    "Chromium")
-      pacman -S --noconfirm chromium
-      local exitcode=$?
-      ;;
-    "LibreWolf")
-      paru -S --noconfirm librewolf-bin
-      local exitcode=$?
-      ;;
-    "qutebrowser")
-      pacman -S --noconfirm qutebrowser
-      local exitcode=$?
-      ;;
-    "None")
-      ide
-      ;;
-    esac
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install [${browser}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-      0)
-        browser
-        ;;
-      1)
-        exit 1
-        ;;
-      esac
-    fi
-
-    ide
-
-  }
-
-  ide() {
-
-    case ${ide_select} in
-    "Visual_Studio_Code")
-      sudo pacman -S --noconfirm code
-      local exitcode=$?
-      ;;
-    "VSCodium")
-      ${aur_helper} -S --noconfirm vscodium-bin
-      local exitcode=$?
-      ;;
-    "None")
-      texteditor
-      ;;
-    esac
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install [${ide_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-      0)
-        browser
-        ;;
-      1)
-        exit 1
-        ;;
-      esac
-    fi
-
-    texteditor
-
-  }
-
-  application_launcher() {
-
-    case ${applauncher_select} in
-    "dmenu")
-      sudo pacman -S dmenu
-      local exitcode=$?
-      ;;
-    "dmenu2")
-      ${aur_helper} -S --noconfirm dmenu2
-      local exitcode=$?
-      ;;
-    "dmenu-rs")
-      ${aur_helper} -S --noconfirm dmenu-rs
-      local exitcode=$?
-      ;;
-    "rofi")
-      sudo pacman -S --noconfirm rofi
-      local exitcode=$?
-      ;;
-    "None")
-      task_manager
-      ;;
-    esac
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot install [${applauncher_select}]\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-      0)
-        browser
-        ;;
-      1)
-        exit 1
-        ;;
-      esac
-    fi
-
-    task_manager
-
-  }
-
-
-  mirrorlist
+  aur
 
 )
 
@@ -515,25 +304,11 @@ bitwarden() (
     local exitcode2=$?
 
     if [ "${exitcode}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "${error}\n
+      dialog --title " ERROR " --msgbox "\n
       Exit status [rbw e-mail]: ${exitcode}\n
-      Exit status [rbw register]: ${exitcode2}"
-      --yes-button "Retry" --no-button "Exit" 18 78
-      case ${exitcode} in
-      0)
-        rbw_register
-        ;;
-      1)
-        clear
-        echo "${error}"
-        exit 1
-        ;;
-      *)
-        clear
-        echo "${error}"
-        echo "Exit status $?"
-        ;;
-      esac
+      Exit status [rbw register]: ${exitcode2}\n
+      ${error}" 18 78
+      exit 1
     fi
 
     rbw_login
@@ -546,18 +321,10 @@ bitwarden() (
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "${error}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-      case ${exitcode} in
-      0)
-        rbw_login
-        ;;
-      1)
-        exit ${exitcode}
-        ;;
-      *)
-        echo "Exit status ${exitcode}"
-        ;;
-      esac
+      dialog --title " ERROR " --msgbox "\n
+      Exit status [rbw sync]: ${exitcode}\n
+      ${error}" 18 78
+      exit 1
     fi
 
     # GitHub PAT
@@ -567,7 +334,7 @@ bitwarden() (
 
   }
 
-  bwclient_register
+  rbw_register
 
 )
 
@@ -580,7 +347,7 @@ openssh() {
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
+      dialog --title " ERROR " --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-label "Retry" --no-label "Exit" 18 78
       case ${exitcode} in
       0)
         openssh_client
@@ -606,7 +373,7 @@ github() {
 
   gh_ssh_keygen() {
 
-    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f $HOME/.ssh/id_ed25519.pub
+    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -616,7 +383,7 @@ github() {
 
     clear
 
-    ssh-add $HOME/.ssh/id_ed25519
+    ssh-add ${HOME}/.ssh/id_ed25519
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -631,7 +398,7 @@ github() {
   gh_login() {
 
     set -u
-    cd $HOME
+    cd ${HOME}
     echo "$ghpat" >.ghpat
     unset ghpat
     gh auth login --with-token <.ghpat
@@ -681,56 +448,56 @@ github() {
 
 }
 
-configs() (
+dotfiles() (
 
-  clone() {
+  fetch_dotfiles() {
 
-    git clone git@github.com:${github_username}/dotfiles.git $HOME/.config
+    git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
 
-    cd $HOME/.config
+    cd ${HOME}/.config
 
-    git remote set-url origin git@github.com:${github_username}/dotfiles.git
+    git remote set-url origin git@github.com:${gh_username}/dotfiles.git
 
-    cd $HOME
+    cd ${HOME}
 
-    copy_configs
-
-  }
-
-  copy_configs() {
-
-    sudo cp $HOME/.config/systemd/logind.conf /etc/systemd/
-
-    sudo cp $HOME/.config/_system/pacman/pacman.conf /etc/
-
-    zsh
+    copy_dotfiles
 
   }
 
-  zsh() {
+  copy_dotfiles() {
 
-    # Change shell to ZSH
-    chsh -s /usr/bin/zsh
+    sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
 
-    # Copy zshenv & zprofile
-    sudo cp $HOME/.config/zsh/global/zshenv /etc/zsh/zshenv
-    sudo cp $HOME/.config/zsh/global/zprofile /etc/zsh/zprofile
+    sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
 
-    # ZSH Autocomplete
-    git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git $HOME/.local/src/zsh-autocomplete/
-
-    services
+    shell
 
   }
+
+  fetch_dotfiles
 
 )
 
+
+shell() {
+
+  # Change shell to ZSH
+  chsh -s /usr/bin/zsh
+
+  # Copy zshenv & zprofile
+  sudo cp ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
+  sudo cp ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
+
+  # ZSH Autocomplete
+  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
+
+  services
+
+}
+
 services() {
 
-  pacman -Qi ${diaplay_manager} >/dev/null
-  if [ "$?" != "0" ]; then
-    sudo systemctl enable ly.service
-  fi
+  sudo systemctl enable ly.service
 
   customization
 
@@ -744,7 +511,7 @@ customization() (
     spotify_token=$(rbw get Spotify_TUI)
 
     sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "/home/${USER}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "${HOME}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
 
     sed -i '/^client_secret:/ s/$/ ${spotify_token}/' spotify-tui/client.yml
 
@@ -754,13 +521,13 @@ customization() (
 
   wallpaper() {
 
-    mkdir $HOME/Downloads
+    mkdir ${HOME}/Downloads
 
-    # Fetch wallpapers from Dropbox
-    curl -L -o $HOME/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
+    # Fetch wallpapers
+    curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
 
     # Unzip
-    unzip $HOME/Downloads/wallpapers.zip -d $HOME/Downloads/Wallpapers/ -x /
+    unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
 
     cleanup
 
@@ -769,12 +536,12 @@ customization() (
   cleanup() {
 
     #Cargo
-    mkdir $HOME/.local/share/cargo
-    mv $HOME/.cargo $HOME/.local/share/cargo
+    mkdir ${HOME}/.local/share/cargo
+    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
 
-    #Bash: Removing files from $HOME
-    mkdir $HOME/.local/share/bash
-    mv $HOME/.bash* $HOME/.local/share/bash
+    #Bash: Moving files
+    mkdir ${HOME}/.local/share/bash
+    mv ${HOME}/.bash* ${HOME}/.local/share/bash
 
     success
 
@@ -823,4 +590,4 @@ while (("$#")); do
   shift
 done
 
-check_funct
+main_check

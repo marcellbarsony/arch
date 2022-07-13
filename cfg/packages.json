@@ -21,6 +21,11 @@
   },
 
   {
+    "name": "Login Manager",
+    "aur_package": "ly"
+  },
+
+  {
     "name": "Terminal",
     "package": "alacritty"
   },

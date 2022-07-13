@@ -486,7 +486,7 @@ dialogs() (
 
     crypt_password() {
 
-      CRYPTPASSWORD=$(dialog --nocancel --passwordbox "LUKS encryption passphrase" 8 45 3>&1 1>&2 2>&3)
+      cryptpassword=$(dialog --nocancel --passwordbox "LUKS encryption passphrase" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
       0)
@@ -501,7 +501,7 @@ dialogs() (
 
     crypt_password_confirm() {
 
-      CRYPTPASSWORD_confirm=$(dialog --nocancel --passwordbox "LUKS encryption passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      cryptpassword_confirm=$(dialog --nocancel --passwordbox "LUKS encryption passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
       case $? in
       0)
@@ -516,12 +516,12 @@ dialogs() (
 
     crypt_password_check() {
 
-      if [ ! ${CRYPTPASSWORD} ] || [ ! ${CRYPTPASSWORD_confirm} ]; then
+      if [ ! ${cryptpassword} ] || [ ! ${cryptpassword_confirm} ]; then
         dialog --title " ERROR " --msgbox "Encryption passphrase cannot be empty." 8 45
         crypt_password
       fi
 
-      if [[ "${CRYPTPASSWORD}" != "${CRYPTPASSWORD_confirm}" ]]; then
+      if [[ "${cryptpassword}" != "${cryptpassword_confirm}" ]]; then
         dialog --title " ERROR " --msgbox "Encryption passphrase did not match." 8 45
         crypt_password
       fi
@@ -535,10 +535,10 @@ dialogs() (
       keydir=/root/luks.key
       keydir2=/root/luks.key2
 
-      echo "$CRYPTPASSWORD" >"$keydir"
+      echo "$cryptpassword" >"$keydir"
       local exitcode1=$?
 
-      echo "$CRYPTPASSWORD_confirm" >"$keydir2"
+      echo "$cryptpassword_confirm" >"$keydir2"
       local exitcode2=$?
 
       if [ "${exitcode1}" != "0" ] || [ "${exitcode2}" != "0" ]; then
@@ -632,16 +632,16 @@ dialogs() (
 
     grub_password() {
 
-      GRUBPW=$(dialog --nocancel --passwordbox "GRUB passphrase" 8 45 3>&1 1>&2 2>&3)
+      grubpw=$(dialog --nocancel --passwordbox "GRUB passphrase" 8 45 3>&1 1>&2 2>&3)
 
-      GRUBPW_CONFIRM=$(dialog --nocancel --passwordbox "GRUB passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
+      grubpw_CONFIRM=$(dialog --nocancel --passwordbox "GRUB passphrase [confirm]" 8 45 3>&1 1>&2 2>&3)
 
-      if [ ! ${GRUBPW} ] || [ ! ${GRUBPW_CONFIRM} ]; then
+      if [ ! ${grubpw} ] || [ ! ${grubpw_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nGRUB passphrase cannot be empty." 8 45
         grub_password
       fi
 
-      if [ ${GRUBPW} != ${GRUBPW_CONFIRM} ]; then
+      if [ ${grubpw} != ${grubpw_CONFIRM} ]; then
         dialog --title " ERROR " --msgbox "\nGRUB passphrase did not match." 8 45
         grub_password
       fi
@@ -664,7 +664,7 @@ crypt_setup() (
 
   cryptsetup_create() {
 
-    echo ${CRYPTPASSWORD} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice}
+    echo ${cryptpassword} | cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat ${rootdevice}
 
     #https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Keyfiles
 
@@ -677,7 +677,7 @@ crypt_setup() (
 
   cryptsetup_open() {
 
-    echo ${CRYPTPASSWORD} | cryptsetup open --type luks2 ${rootdevice} cryptroot
+    echo ${cryptpassword} | cryptsetup open --type luks2 ${rootdevice} cryptroot
 
     filesystem
 
@@ -940,7 +940,7 @@ chroot() {
   export username
   export user_password
   export root_password
-  export GRUBPW
+  export grubpw
   export dmi
 
   cp -f ${dialogrc} /mnt/etc/dialogrc
