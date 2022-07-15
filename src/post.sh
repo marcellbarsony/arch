@@ -18,8 +18,9 @@ main_check() (
 
   check_root() {
 
+    userid=(id -u)
     echo -n "Root.........................." && sleep 1
-    if [ id -u == "0" ]; then
+    if [ ${userid} == "0" ]; then
       dialog --title " ERROR " --msgbox "\nCannot run script as root [UID 0]" 13 50
       exit 1
     fi
@@ -36,14 +37,10 @@ main_check() (
 
       echo -n "Network connection............" && sleep 1
 
-      for ((i = 0; i <= 100; i += 25)); do
-        ping -q -c 1 archlinux.org &>/dev/null
-        local exitcode=$?
-        echo $i
-        sleep 1
-      done
+      ping -q -c 1 archlinux.org &>/dev/null
+      local exitcode=$?
 
-      if [ "$?" != "0" ]; then
+      if [ "${exitcode}" != "0" ]; then
         network_connect
       fi
 
@@ -111,7 +108,7 @@ main_check() (
 
     cp -f ${dialogrc} /etc/dialogrc
 
-    dialogs
+    main_dialogs
 
   }
 
@@ -119,7 +116,7 @@ main_check() (
 
 )
 
-dialogs() (
+main_dialog() (
 
   bitwarden_email() {
 
@@ -196,7 +193,7 @@ dialogs() (
 
   ssh_passphrase() {
 
-    ssh_passphrase=$(dialog --passwordbox "SSH passphrase" 8 45 3>&1 1>&2 2>&3)
+    ssh_passphrase=$(dialog --passwordbox "SSH passphrase" --cancel-label "Back" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -215,7 +212,7 @@ dialogs() (
       ssh_passphrase
     fi
 
-    install
+    main_install
 
   }
 
@@ -223,7 +220,7 @@ dialogs() (
 
 )
 
-install() (
+main_install() (
 
   aur() {
 
@@ -276,7 +273,7 @@ install() (
 
     cd ${HOME}
 
-    github_cli
+    pacinstall
 
   }
 
@@ -285,15 +282,17 @@ install() (
     grep -o '"package": "[^"]*' ${package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm -
     # Overwrite .xinitrc
 
+    bitwarden
+
   }
 
   aur
 
 )
 
-bitwarden() (
+main_bitwarden() (
 
-  rbw_register() {
+  bitwarden_register() {
 
     # E-mail
     rbw config set email ${bw_email}
@@ -311,11 +310,11 @@ bitwarden() (
       exit 1
     fi
 
-    rbw_login
+    bitwarden_login
 
   }
 
-  rbw_login() {
+  bitwarden_login() {
 
     error=$(rbw sync 2>&1)
     local exitcode=$?
@@ -330,15 +329,15 @@ bitwarden() (
     # GitHub PAT
     ghpat=$(rbw get GitHub_PAT)
 
-    openssh
+    main_openssh
 
   }
 
-  rbw_register
+  bitwarden_register
 
 )
 
-openssh() {
+main_openssh() {
 
   openssh_client() {
 
@@ -361,7 +360,7 @@ openssh() {
       esac
     fi
 
-    github
+    main_github
 
   }
 
@@ -369,7 +368,7 @@ openssh() {
 
 }
 
-github() {
+main_github() {
 
   gh_ssh_keygen() {
 
@@ -440,7 +439,7 @@ github() {
       exit ${exitcode}
     fi
 
-    configs
+    main_dotfiles
 
   }
 
@@ -448,9 +447,9 @@ github() {
 
 }
 
-dotfiles() (
+main_dotfiles() (
 
-  fetch_dotfiles() {
+  dotfiles_fetch() {
 
     git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
 
@@ -460,26 +459,25 @@ dotfiles() (
 
     cd ${HOME}
 
-    copy_dotfiles
+    dotfiles_copy
 
   }
 
-  copy_dotfiles() {
+  dotfiles_copy() {
 
     sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
 
     sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
 
-    shell
+    main_shell
 
   }
 
-  fetch_dotfiles
+  dotfiles_fetch
 
 )
 
-
-shell() {
+main_shell() {
 
   # Change shell to ZSH
   chsh -s /usr/bin/zsh
@@ -491,19 +489,19 @@ shell() {
   # ZSH Autocomplete
   git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
 
-  services
+  main_services
 
 }
 
-services() {
+main_services() {
 
   sudo systemctl enable ly.service
 
-  customization
+  main_customization
 
 }
 
-customization() (
+main_customization() (
 
   spotify_tui() {
 
@@ -590,4 +588,5 @@ while (("$#")); do
   shift
 done
 
+clear
 main_check
