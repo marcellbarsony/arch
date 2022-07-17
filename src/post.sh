@@ -333,7 +333,7 @@ main_bitwarden() (
 
 main_openssh() {
 
-  echo -n "SSH: start agent.............." && sleep 1
+  # SSH client
   eval "$(ssh-agent -s)"
   local exitcode=$?
 
@@ -351,7 +351,6 @@ main_openssh() {
   fi
 
   # SSH key generate
-  echo -n "SSH: generate key............." && sleep 1
   ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
   local exitcode=$?
 
@@ -361,7 +360,6 @@ main_openssh() {
   fi
 
   # SSH key add
-  echo -n "SSH: add key to agent........." && sleep 1
   ssh-add ${HOME}/.ssh/id_ed25519.pub
   local exitcode=$?
 
@@ -379,7 +377,6 @@ main_github() {
 
   gh_install() {
 
-    echo -n "GH: installing................" && sleep 1
     sudo pacman -Sy github-cli --noconfirm
 
     clear
@@ -390,16 +387,16 @@ main_github() {
 
   gh_login() {
 
-    echo -n "GH: set \$gh_pat.............." && sleep 1
+    echo "GH: set \$gh_pat.............." && sleep 1
     gh_pat=$(rbw get GitHub_PAT)
 
-    echo -n "GH: set token................." && sleep 1
+    echo "GH: set token................." && sleep 1
     set -u
     cd ${HOME}
     echo "${gh_pat}" >.ghpat
     unset gh_pat
 
-    echo -n "GH: authenticate with oken...." && sleep 1
+    echo "GH: authenticate with oken...." && sleep 1
     gh auth login --with-token <.ghpat
     local exitcode=$?
     if [ "${exitcode}" != "0" ]; then
@@ -407,10 +404,10 @@ main_github() {
       exit ${exitcode}
     fi
 
-    echo -n "GH: remove token.............." && sleep 1
+    echo "GH: remove token.............." && sleep 1
     rm ${HOME}/.ghpat
 
-    echo -n "GH: authentication status....." && sleep 1
+    echo "GH: authentication status....." && sleep 1
     gh auth status && sleep 5
 
     gh_pubkey
@@ -419,15 +416,15 @@ main_github() {
 
   gh_pubkey() {
 
-    echo -n "GH: add ssh key..............." && sleep 1
-    gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
+    echo "GH: add ssh key..............." && sleep 1
+    gh ssh-key add ${HOME}/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
     local exitcode=$?
     if [ "${exitcode}" != "0" ]; then
       dialog --title " ERROR " --msgbox "GitHub SSH authentication usuccessfull" 8 45
       exit ${exitcode}
     fi
 
-    echo -n "GH: ssh test.................." && sleep 1
+    echo "GH: ssh test.................." && sleep 1
     ssh -T git@github.com
     local exitcode2=$?
     if [ "${exitcode2}" != "0" ]; then
@@ -440,7 +437,7 @@ main_github() {
 
   }
 
-  gh_ssh_keygen
+  gh_install
 
 }
 
