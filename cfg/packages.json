@@ -21,8 +21,27 @@
   },
 
   {
+    "name": "Display Protocol",
+    "sytem_audio":
+    [
+      { "description": "Wayland",
+        "package1": "wayland",
+        "package2": "wayland-protocols",
+        "package3": "xdg-desktop-portal-wlr"
+      },
+      { "description": "X11",
+        "xorg1": "xorg-server",
+        "xorg2": "xorg-xinit",
+        "xorg3": "xorg-prop",
+        "xorg4": "xwallpaper",
+        "xorg5": "arandr"
+      }
+    ]
+  },
+
+  {
     "name": "Login Manager",
-    "aur_package": "ly"
+    "aurinstall": "ly"
   },
 
   {
@@ -37,12 +56,12 @@
 
   {
     "name": "Browser",
-    "package": "librewolf-bin"
+    "aurinstall": "librewolf-bin"
   },
 
   {
     "name": "IDE",
-    "package": "vscodium-bin"
+    "aurinstall": "vscodium-bin"
   },
 
   {
@@ -52,7 +71,7 @@
 
   {
     "name": "Application Launcher",
-    "package": "dmenu-rs"
+    "aurinstall": "dmenu-rs"
   },
 
   {
@@ -65,65 +84,64 @@
     "package": "conky"
   },
 
-  {
-    "name": "Music",
-    "package": "spotify-tui",
-    "_alternative": "spotify"
-  },
-
     {
     "name": "Audio & Music",
+    "package": "sof-audio",
     "sytem_audio":
     [
       {
         "description": "ALSA",
-        "package": "alsa",
+        "package1": "alsa",
         "package2": "alsa-firmware",
         "package3": "alsa-utils"
       },
       {
         "description": "Pipewire",
-        "package": "pipewire",
+        "package1": "pipewire",
         "package2": "pipewire-alsa",
-        "package3": "pavucontrol"
+        "package4": "pipewire-jack",
+        "package3": "pipewire-pulse",
+        "package5": "pavucontrol",
+        "package6": "wireplumber"
       },
       {
         "description": "Spotify",
-        "aur_package": "spotify-tui-bin",
-        "aur_package2": "spotifyd"
+        "aurinstall1": "spotify-tui-bin",
+        "aurinstall2": "spotifyd",
+        "_alternative": "spotify"
       }
     ]
   },
 
   {
     "name": "ZSH",
-    "package": "zsh",
+    "package1": "zsh",
     "package2": "zsh-syntax-highlighting",
     "prompt":
       {
         "description": "ZSH Prompt",
-        "aur_package": "starship"
+        "aurinstall": "starship"
       }
   },
 
   {
     "name": "Man pages",
-    "package": "man-db",
+    "package1": "man-db",
     "package2": "texinfo",
     "package3": "tldr"
   },
 
   {
     "name": "Programming Languages",
-    "package": "python",
+    "package1": "python",
     "package2": "python-pip",
     "package3": "rust"
   },
 
   {
     "name": "CPU Microcode",
-    "package": "intel-ucode",
-    "package2": "xf-86-video-intel"
+    "package1": "intel-ucode",
+    "package2": "xf86-video-intel"
   },
 
   {
@@ -146,9 +164,9 @@
 
   {
     "name": "Terminal Bling",
-    "package": "cmatrix",
-    "package2": "cbonsai",
-    "package3": "neofetch"
+    "package1": "cmatrix",
+    "package2": "neofetch",
+    "aurinstall": "cbonsai"
   }
 
 ]

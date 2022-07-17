@@ -313,9 +313,8 @@ packages() {
   reflector git neovim \
   intel-ucode \
   reflector
-  #pipewire pipewire-alsa pipewire-jack pipewire-pulse wireplumber sof-audio
-  #xorg-server xorg-xinit xorg-prop xwallpaper arandr
   #lvm2 dosfstools
+  # Pipewire - https://roosnaflak.com/tech-and-research/transitioning-to-pipewire/
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then

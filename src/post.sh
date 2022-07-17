@@ -99,7 +99,10 @@ main_check() (
     dialogrc=${HOME}/.local/git/arch/cfg/dialogrc
     pacmanconf=${script_dir}/cfg/pacman.conf
     #package_data=${script_dir}/cfg/packages.json
+
+    # Temporary
     TEMPORARY_package_data=${HOME}/.local/git/arch/cfg/packages.json
+    TEMPORARY_aurhelper="paru"
 
     configs
 
@@ -208,7 +211,6 @@ main_aur() {
 
   aur_helper=$( grep -o '"aurhelper": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' )
 
-  #aurdir="${HOME}/.local/src/${aur_helper}"
   aurdir="${HOME}/.local/src/${aur_helper}"
 
   if [ -d "${aurdir}" ]; then
@@ -219,7 +221,7 @@ main_aur() {
   local exitcode=$?
 
   if [ "${exitcode}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "Passphrase cannot be empty." 8 45
+    dialog --title " ERROR " --msgbox "Cannot clone ${aur_helper} repository" 8 45
     exit ${exitcode}
   fi
 
@@ -229,13 +231,14 @@ main_aur() {
   local exitcode2=$?
 
   if [ "${exitcode2}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "Passphrase cannot be empty." 8 45
-    exit ${exitcode}
+    dialog --title " ERROR " --msgbox "Cannot make ${aur_helper} package" 8 45
+    exit ${exitcode2}
   fi
 
   cd ${HOME}
 
-  main_bitwarden
+  #main_bitwarden
+  main_install
 
 }
 
@@ -243,7 +246,7 @@ main_bitwarden() (
 
   bitwarden_install() {
 
-    paru -S rbw --noconfirm
+    ${TEMPORARY_aurhelper} -S rbw --noconfirm
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -284,9 +287,16 @@ main_bitwarden() (
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nExit status [rbw register]: ${exitcode2}\n
-      ${error}" 12 78
-      exit ${exitcode}
+      dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nRBW register failed" 8 60
+      case ${?} in
+      0)
+        bitwarden_email
+        ;;
+      1)
+        echo "Installation terminated - $?"
+        exit ${exitcode}
+      ;;
+      esac
     fi
 
     bitwarden_login
@@ -299,14 +309,20 @@ main_bitwarden() (
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\n
-      Exit status [rbw sync]: ${exitcode}\n
-      ${error}" 18 78
-      exit 1
+      dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nRBW sync failed\n${error}" 8 60
+      case ${?} in
+      0)
+        bitwarden_email
+        ;;
+      1)
+        echo "Installation terminated - $?"
+        exit ${exitcode}
+      ;;
+      esac
     fi
 
     # GitHub PAT
-    ghpat=$(rbw get GitHub_PAT)
+    gh_pat=$(rbw get GitHub_PAT)
 
     main_openssh
 
@@ -318,175 +334,169 @@ main_bitwarden() (
 
 main_install() {
 
+  # Pacman
   grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm -
-  # Overwrite .xinitrc
+
+  # AUR
+  grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm -
+
+  main_openssh
 
 }
 
-#main_openssh() {
-#
-#  openssh_client() {
-#
-#    # Start SSH agent
-#    eval "$(ssh-agent -s)"
-#    local exitcode=$?
-#
-#    if [ "${exitcode}" != "0" ]; then
-#      dialog --title " ERROR " --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-label "Retry" --no-label "Exit" 18 78
-#      case ${exitcode} in
-#      0)
-#        openssh_client
-#        ;;
-#      1)
-#        exit ${exitcode}
-#        ;;
-#      *)
-#        echo "Exit status ${exitcode}"
-#        ;;
-#      esac
-#    fi
-#
-#    main_github
-#
-#  }
-#
-#  openssh_client
-#
-#}
-#
-#main_github() {
-#
-#  gh_ssh_keygen() {
-#
-#    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
-#    local exitcode=$?
-#
-#    if [ "${exitcode}" != "0" ]; then
-#      whiptail --title "ERROR" --msgbox "Cannot generate SSH key.\Exit status: ${exitcode}" 8 78
-#      exit ${exitcode}
-#    fi
-#
-#    clear
-#
-#    ssh-add ${HOME}/.ssh/id_ed25519
-#    local exitcode=$?
-#
-#    if [ "${exitcode}" != "0" ]; then
-#      whiptail --title "ERROR" --msgbox "Cannot add SSH key to SSH agent.\Exit status: ${exitcode}" 8 78
-#      exit ${exitcode}
-#    fi
-#
-#    gh_login
-#
-#  }
-#
-#  gh_login() {
-#
-#    set -u
-#    cd ${HOME}
-#    echo "$ghpat" >.ghpat
-#    unset ghpat
-#    gh auth login --with-token <.ghpat
-#    local exitcode=$?
-#
-#    if [ "${exitcode}" != "0" ]; then
-#      whiptail --title "ERROR" --yesno "Cannot authenticate github with token [.ghpat].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-#      case ${exitcode} in
-#      0)
-#        gh_install_login
-#        ;;
-#      1)
-#        clear
-#        exit ${exitcode}
-#        ;;
-#      *)
-#        echo "Exit status $?"
-#        ;;
-#      esac
-#    fi
-#
-#    rm .ghpat
-#    gh auth status
-#    sleep 5
-#
-#    gh_pubkey
-#
-#  }
-#
-#  gh_pubkey() {
-#
-#    gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
-#    local exitcode=$?
-#
-#    ssh -T git@github.com
-#
-#    if [ "${exitcode}" != "0" ]; then
-#      whiptail --title "ERROR" --msgbox "GitHub SSH authentication unsuccessfull.\nExit status: ${exitcode}" 8 78
-#      exit ${exitcode}
-#    fi
-#
-#    main_dotfiles
-#
-#  }
-#
-#  gh_ssh_keygen
-#
-#}
-#
-#main_dotfiles() (
-#
-#  dotfiles_fetch() {
-#
-#    git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
-#
-#    cd ${HOME}/.config
-#
-#    git remote set-url origin git@github.com:${gh_username}/dotfiles.git
-#
-#    cd ${HOME}
-#
-#    dotfiles_copy
-#
-#  }
-#
-#  dotfiles_copy() {
-#
-#    sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
-#
-#    sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
-#
-#    main_shell
-#
-#  }
-#
-#  dotfiles_fetch
-#
-#)
-#
-#main_shell() {
-#
-#  # Change shell to ZSH
-#  chsh -s /usr/bin/zsh
-#
-#  # Copy zshenv & zprofile
-#  sudo cp ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
-#  sudo cp ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
-#
-#  # ZSH Autocomplete
-#  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
-#
-#  main_services
-#
-#}
-#
-#main_services() {
-#
-#  sudo systemctl enable ly.service
-#
-#  main_customization
-#
-#}
-#
+main_openssh() {
+
+  eval "$(ssh-agent -s)"
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-label "Retry" --no-label "Exit" 18 78
+    case ${exitcode} in
+    0)
+      main_openssh
+      ;;
+    *)
+      echo "Exit status ${exitcode}"
+      exit ${exitcode}
+      ;;
+    esac
+  fi
+
+  main_github
+
+}
+
+main_github() {
+
+  gh_ssh_keygen() {
+
+    # SSH key generate
+    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "Cannot generate SSH key" 8 45
+      exit ${exitcode}
+    fi
+
+    clear
+
+    # SSH key add
+    ssh-add ${HOME}/.ssh/id_ed25519
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "Cannot SSH key to agent" 8 45
+      exit ${exitcode}
+    fi
+
+    gh_login
+
+  }
+
+  gh_login() {
+
+    set -u
+    cd ${HOME}
+    echo "$gh_pat" >.ghpat
+    unset gh_pat
+
+    gh auth login --with-token <.ghpat
+    local exitcode=$?
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "Cannot authenticate GitHub with token [~/.ghpat]" 8 45
+      exit ${exitcode}
+    fi
+
+    rm ${HOME}/.ghpat
+
+    gh auth status
+    sleep 5
+
+    gh_pubkey
+
+  }
+
+  gh_pubkey() {
+
+    gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "GitHub SSH authentication usuccessfull" 8 45
+      exit ${exitcode}
+    fi
+
+    ssh -T git@github.com
+    local exitcode2=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "GitHub SSH authentication test failed" 8 45
+      exit ${exitcode}
+    fi
+
+    main_dotfiles
+
+  }
+
+  gh_ssh_keygen
+
+}
+
+main_dotfiles() (
+
+  dotfiles_fetch() {
+
+    git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
+
+    cd ${HOME}/.config
+
+    git remote set-url origin git@github.com:${gh_username}/dotfiles.git
+
+    cd ${HOME}
+
+    dotfiles_copy
+
+  }
+
+  dotfiles_copy() {
+
+    sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
+
+    sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
+
+    main_shell
+
+  }
+
+  dotfiles_fetch
+
+)
+
+main_shell() {
+
+  # Change shell to ZSH
+  chsh -s /usr/bin/zsh
+
+  # Copy zshenv & zprofile
+  sudo cp ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
+  sudo cp ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
+
+  # ZSH Autocomplete
+  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
+
+  main_services
+
+}
+
+main_services() {
+
+  sudo systemctl enable ly.service
+
+  main_customization
+
+}
+
 #main_customization() (
 #
 #  spotify_tui() {
