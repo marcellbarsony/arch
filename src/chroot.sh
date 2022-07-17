@@ -310,7 +310,9 @@ packages() {
   pacman -S --noconfirm btrfs-progs snapper \
   zsh zsh-completions \
   networkmanager openssh \
-  reflector git neovim \
+  git git-cli \
+  reflector \
+  neovim \
   intel-ucode \
   reflector
   #lvm2 dosfstools

@@ -101,7 +101,7 @@ main_check() (
     #package_data=${script_dir}/cfg/packages.json
 
     # Temporary
-    TEMPORARY_package_data=${HOME}/.local/git/arch/cfg/packages.json
+    TEMPORARY_package_data=${HOME}/arch/cfg/packages.json
     TEMPORARY_aurhelper="paru"
 
     configs
@@ -333,6 +333,7 @@ main_bitwarden() (
 
 main_openssh() {
 
+  echo -n "SSH: start agent.............." && sleep 1
   eval "$(ssh-agent -s)"
   local exitcode=$?
 
@@ -349,6 +350,26 @@ main_openssh() {
     esac
   fi
 
+  # SSH key generate
+  echo -n "SSH: generate key............." && sleep 1
+  ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --msgbox "Cannot generate SSH key" 8 45
+    exit ${exitcode}
+  fi
+
+  # SSH key add
+  echo -n "SSH: add key to agent........." && sleep 1
+  ssh-add ${HOME}/.ssh/id_ed25519.pub
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --msgbox "Cannot add SSH key to agent" 8 45
+    exit ${exitcode}
+  fi
+
   sleep 3 && clear
   main_github
 
@@ -356,27 +377,12 @@ main_openssh() {
 
 main_github() {
 
-  gh_ssh_keygen() {
+  gh_install() {
 
-    # SSH key generate
-    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "Cannot generate SSH key" 8 45
-      exit ${exitcode}
-    fi
+    echo -n "GH: installing................" && sleep 1
+    sudo pacman -Sy github-cli --noconfirm
 
     clear
-
-    # SSH key add
-    ssh-add ${HOME}/.ssh/id_ed25519.pub
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "Cannot add SSH key to agent" 8 45
-      exit ${exitcode}
-    fi
 
     gh_login
 
@@ -384,11 +390,16 @@ main_github() {
 
   gh_login() {
 
+    echo -n "GH: set \$gh_pat.............." && sleep 1
+    gh_pat=$(rbw get GitHub_PAT)
+
+    echo -n "GH: set token................." && sleep 1
     set -u
     cd ${HOME}
-    echo "$gh_pat" >.ghpat
+    echo "${gh_pat}" >.ghpat
     unset gh_pat
 
+    echo -n "GH: authenticate with oken...." && sleep 1
     gh auth login --with-token <.ghpat
     local exitcode=$?
     if [ "${exitcode}" != "0" ]; then
@@ -396,10 +407,11 @@ main_github() {
       exit ${exitcode}
     fi
 
+    echo -n "GH: remove token.............." && sleep 1
     rm ${HOME}/.ghpat
 
-    gh auth status
-    sleep 5
+    echo -n "GH: authentication status....." && sleep 1
+    gh auth status && sleep 5
 
     gh_pubkey
 
@@ -407,27 +419,27 @@ main_github() {
 
   gh_pubkey() {
 
+    echo -n "GH: add ssh key..............." && sleep 1
     gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
     local exitcode=$?
-
     if [ "${exitcode}" != "0" ]; then
       dialog --title " ERROR " --msgbox "GitHub SSH authentication usuccessfull" 8 45
       exit ${exitcode}
     fi
 
+    echo -n "GH: ssh test.................." && sleep 1
     ssh -T git@github.com
     local exitcode2=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "GitHub SSH authentication test failed" 8 45
-      exit ${exitcode}
+    if [ "${exitcode2}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "GitHub SSH test failed" 8 45
+      exit ${exitcode2}
     fi
 
+    sleep 3 && clear
     main_dotfiles
 
   }
 
-  sleep 3 && clear
   gh_ssh_keygen
 
 }
@@ -454,7 +466,7 @@ main_dotfiles() (
 
     sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
 
-    main_shell
+    main_install
 
   }
 
@@ -498,60 +510,60 @@ main_services() {
 
 }
 
-#main_customization() (
-#
-#  spotify_tui() {
-#
-#    spotify_password=$(rbw get Spotify)
-#    spotify_token=$(rbw get Spotify_TUI)
-#
-#    sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-#    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "${HOME}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-#
-#    sed -i '/^client_secret:/ s/$/ ${spotify_token}/' spotify-tui/client.yml
-#
-#    wallpaper
-#
-#  }
-#
-#  wallpaper() {
-#
-#    mkdir ${HOME}/Downloads
-#
-#    # Fetch wallpapers
-#    curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
-#
-#    # Unzip
-#    unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
-#
-#    cleanup
-#
-#  }
-#
-#  cleanup() {
-#
-#    #Cargo
-#    mkdir ${HOME}/.local/share/cargo
-#    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
-#
-#    #Bash: Moving files
-#    mkdir ${HOME}/.local/share/bash
-#    mv ${HOME}/.bash* ${HOME}/.local/share/bash
-#
-#    success
-#
-#  }
-#
-#  success() {
-#
-#    whiptail --title "SUCCESS" --msgbox "Arch installation has finished." 8 78
-#    exit 69
-#
-#  }
-#
-#  spotify_tui
-#
-#)
+main_customization() (
+
+  spotify_tui() {
+
+    spotify_password=$(rbw get Spotify)
+    spotify_token=$(rbw get Spotify_TUI)
+
+    sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "${HOME}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+
+    sed -i '/^client_secret:/ s/$/ ${spotify_token}/' spotify-tui/client.yml
+
+    wallpaper
+
+  }
+
+  wallpaper() {
+
+    mkdir ${HOME}/Downloads
+
+    # Fetch wallpapers
+    curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
+
+    # Unzip
+    unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
+
+    cleanup
+
+  }
+
+  cleanup() {
+
+    #Cargo
+    mkdir ${HOME}/.local/share/cargo
+    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
+
+    #Bash: Moving files
+    mkdir ${HOME}/.local/share/bash
+    mv ${HOME}/.bash* ${HOME}/.local/share/bash
+
+    success
+
+  }
+
+  success() {
+
+    dialog --msgbox "Arch installation has finished." 8 78
+    exit 69
+
+  }
+
+  spotify_tui
+
+)
 
 while (("$#")); do
   case ${1} in
