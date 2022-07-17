@@ -237,8 +237,7 @@ main_aur() {
 
   cd ${HOME}
 
-  #main_bitwarden
-  main_install
+  main_bitwarden
 
 }
 
@@ -332,18 +331,6 @@ main_bitwarden() (
 
 )
 
-main_install() {
-
-  # Pacman
-  grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm -
-
-  # AUR
-  grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm -
-
-  main_openssh
-
-}
-
 main_openssh() {
 
   eval "$(ssh-agent -s)"
@@ -362,6 +349,7 @@ main_openssh() {
     esac
   fi
 
+  sleep 3 && clear
   main_github
 
 }
@@ -382,11 +370,11 @@ main_github() {
     clear
 
     # SSH key add
-    ssh-add ${HOME}/.ssh/id_ed25519
+    ssh-add ${HOME}/.ssh/id_ed25519.pub
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "Cannot SSH key to agent" 8 45
+      dialog --title " ERROR " --msgbox "Cannot add SSH key to agent" 8 45
       exit ${exitcode}
     fi
 
@@ -439,6 +427,7 @@ main_github() {
 
   }
 
+  sleep 3 && clear
   gh_ssh_keygen
 
 }
@@ -472,6 +461,18 @@ main_dotfiles() (
   dotfiles_fetch
 
 )
+
+main_install() {
+
+  # Pacman
+  grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm -
+
+  # AUR
+  grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm -
+
+  main_shell
+
+}
 
 main_shell() {
 
