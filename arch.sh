@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pre() (
+main_check() (
 
   variables() (
 
@@ -990,4 +990,4 @@ while (("$#")); do
 done
 
 clear
-pre
+main_check

@@ -5,7 +5,7 @@
     [
       {
         "name": "AUR Helper",
-        "aur": "paru-bin"
+        "aurhelper": "paru-bin"
       },
 
       {
@@ -85,7 +85,7 @@
         "description": "Pipewire",
         "package": "pipewire",
         "package2": "pipewire-alsa",
-        "package3": "pacvucontrol"
+        "package3": "pavucontrol"
       },
       {
         "description": "Spotify",

@@ -96,9 +96,10 @@ main_check() (
     error_log=${script_dir}/src/error.log
 
     # Configs
-    dialogrc=${script_dir}/cfg/dialogrc
+    dialogrc=${HOME}/.local/git/arch/cfg/dialogrc
     pacmanconf=${script_dir}/cfg/pacman.conf
-    package_data=${script_dir}/cfg/packages.json
+    #package_data=${script_dir}/cfg/packages.json
+    TEMPORARY_package_data=${HOME}/.local/git/arch/cfg/packages.json
 
     configs
 
@@ -108,7 +109,7 @@ main_check() (
 
     cp -f ${dialogrc} /etc/dialogrc
 
-    main_dialogs
+    main_dialog
 
   }
 
@@ -118,9 +119,9 @@ main_check() (
 
 main_dialog() (
 
-  bitwarden_email() {
+  github_email() {
 
-    bw_email=$(dialog --cancel-label "Exit" --inputbox "Bitwarden e-mail" 8 45 3>&1 1>&2 2>&3)
+    gh_email=$(dialog --cancel-label "Exit" --inputbox "GitHub e-mail" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -128,26 +129,8 @@ main_dialog() (
       exit ${exitcode}
     fi
 
-    if [ ! ${bw_email} ]; then
-      dialog --title " ERROR " --msgbox "\nE-mail cannot be empty [Bitwarden]" 13 50
-      bitwarden_email
-    fi
-
-    github_email
-
-  }
-
-  github_email() {
-
-    gh_email=$(dialog --cancel-label "Back" --inputbox "GitHub e-mail" 8 45 3>&1 1>&2 2>&3)
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      bitwarden_email
-    fi
-
     if [ ! ${gh_email} ]; then
-      dialog --title " ERROR " --msgbox "\nE-mail cannot be empty [GitHub]" 13 50
+      dialog --title " ERROR " --msgbox "\nE-mail cannot be empty" 8 45
       github_email
     fi
 
@@ -165,7 +148,7 @@ main_dialog() (
     fi
 
     if [ ! ${gh_username} ]; then
-      dialog --title " ERROR " --msgbox "GitHub username cannot be empty." 13 50
+      dialog --title " ERROR " --msgbox "GitHub username cannot be empty." 8 45
       github_user
     fi
 
@@ -183,7 +166,7 @@ main_dialog() (
     fi
 
     if [ ! ${gh_pubkeyname} ]; then
-      dialog --title " ERROR " --msgbox "\nGitHub SSH key name cannot be empty." 13 50
+      dialog --title " ERROR " --msgbox "\nGitHub SSH key name cannot be empty." 8 45
       github_pubkey
     fi
 
@@ -193,7 +176,7 @@ main_dialog() (
 
   ssh_passphrase() {
 
-    ssh_passphrase=$(dialog --passwordbox "SSH passphrase" --cancel-label "Back" 8 45 3>&1 1>&2 2>&3)
+    ssh_passphrase=$(dialog --cancel-label "Back" --passwordbox "SSH passphrase" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -212,102 +195,98 @@ main_dialog() (
       ssh_passphrase
     fi
 
-    main_install
+    clear
+    main_aur
 
   }
 
-  bitwarden_email
+  github_email
 
 )
 
-main_install() (
+main_aur() {
 
-  aur() {
+  aur_helper=$( grep -o '"aurhelper": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' )
 
-    aur_helper=( grep -o '"package": "[^"]*' ${package_data} | grep -o '[^"]*$' )
+  #aurdir="${HOME}/.local/src/${aur_helper}"
+  aurdir="${HOME}/.local/src/${aur_helper}"
 
-    aurdir="${HOME}/.local/src/${aur_helper}"
+  if [ -d "${aurdir}" ]; then
+    rm -rf ${aurdir}
+  fi
 
-    if [ -d "${aurdir}" ]; then
-      rm -rf ${aurdir}
-    fi
+  git clone https://aur.archlinux.org/${aur_helper}.git ${aurdir}
+  local exitcode=$?
 
-    git clone https://aur.archlinux.org/${aur_helper_package}.git ${aurdir}
-    local exitcode=$?
+  if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --msgbox "Passphrase cannot be empty." 8 45
+    exit ${exitcode}
+  fi
 
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot clone ${aur_helper} repository to ${aurdir}\nExit status: ${exitcode}" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-      0)
-        aur
-        ;;
-      1)
-        exit 1
-        ;;
-      *)
-        echo "Exit status ${exitcode}"
-        exit ${exitcode}
-        ;;
-      esac
-    fi
+  cd ${aurdir}
 
-    cd ${aurdir}
+  makepkg -si --noconfirm
+  local exitcode2=$?
 
-    makepkg -si --noconfirm
-    local exitcode2=$?
+  if [ "${exitcode2}" != "0" ]; then
+    dialog --title " ERROR " --msgbox "Passphrase cannot be empty." 8 45
+    exit ${exitcode}
+  fi
 
-    if [ "${exitcode2}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot make package [${aur_helper-package}]\nExit status: ${exitcode2}" --yes-button "Retry" --no-button "Exit" 18 78
-      case $? in
-      0)
-        aur
-        ;;
-      1)
-        exit 1
-        ;;
-      *)
-        echo "Exit status ${exitcode2}"
-        ;;
-      esac
-    fi
+  cd ${HOME}
 
-    cd ${HOME}
+  main_bitwarden
 
-    pacinstall
-
-  }
-
-  pacinstall() {
-
-    grep -o '"package": "[^"]*' ${package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm -
-    # Overwrite .xinitrc
-
-    bitwarden
-
-  }
-
-  aur
-
-)
+}
 
 main_bitwarden() (
 
-  bitwarden_register() {
+  bitwarden_install() {
 
-    # E-mail
-    rbw config set email ${bw_email}
+    paru -S rbw --noconfirm
     local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "Cannot install rbw" 8 45
+      exit ${exitcode}
+    fi
+
+
+    bitwarden_email
+
+  }
+
+  bitwarden_email() {
+
+    bw_email=$(dialog --cancel-label "Exit" --inputbox "Bitwarden e-mail" 8 45 3>&1 1>&2 2>&3)
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      echo "The script has terminated"
+      exit ${exitcode}
+    fi
+
+    if [ ! ${bw_email} ]; then
+      dialog --title " ERROR " --msgbox "\nE-mail cannot be empty" 8 45
+      bitwarden_email
+    fi
+
+    rbw config set email ${bw_email}
+
+    bitwarden_register
+
+  }
+
+  bitwarden_register() {
 
     # Register
     error=$(rbw register 2>&1)
-    local exitcode2=$?
+    local exitcode=$?
 
-    if [ "${exitcode}" != "0" ] || [ "${exitcode2}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\n
-      Exit status [rbw e-mail]: ${exitcode}\n
-      Exit status [rbw register]: ${exitcode2}\n
-      ${error}" 18 78
-      exit 1
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "\nExit status [rbw register]: ${exitcode2}\n
+      ${error}" 12 78
+      exit ${exitcode}
     fi
 
     bitwarden_login
@@ -333,228 +312,235 @@ main_bitwarden() (
 
   }
 
-  bitwarden_register
+  bitwarden_install
 
 )
 
-main_openssh() {
+main_install() {
 
-  openssh_client() {
-
-    # Start SSH agent
-    eval "$(ssh-agent -s)"
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-label "Retry" --no-label "Exit" 18 78
-      case ${exitcode} in
-      0)
-        openssh_client
-        ;;
-      1)
-        exit ${exitcode}
-        ;;
-      *)
-        echo "Exit status ${exitcode}"
-        ;;
-      esac
-    fi
-
-    main_github
-
-  }
-
-  openssh_client
+  grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm -
+  # Overwrite .xinitrc
 
 }
 
-main_github() {
-
-  gh_ssh_keygen() {
-
-    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Cannot generate SSH key.\Exit status: ${exitcode}" 8 78
-      exit ${exitcode}
-    fi
-
-    clear
-
-    ssh-add ${HOME}/.ssh/id_ed25519
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "Cannot add SSH key to SSH agent.\Exit status: ${exitcode}" 8 78
-      exit ${exitcode}
-    fi
-
-    gh_login
-
-  }
-
-  gh_login() {
-
-    set -u
-    cd ${HOME}
-    echo "$ghpat" >.ghpat
-    unset ghpat
-    gh auth login --with-token <.ghpat
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --yesno "Cannot authenticate github with token [.ghpat].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
-      case ${exitcode} in
-      0)
-        gh_install_login
-        ;;
-      1)
-        clear
-        exit ${exitcode}
-        ;;
-      *)
-        echo "Exit status $?"
-        ;;
-      esac
-    fi
-
-    rm .ghpat
-    gh auth status
-    sleep 5
-
-    gh_pubkey
-
-  }
-
-  gh_pubkey() {
-
-    gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
-    local exitcode=$?
-
-    ssh -T git@github.com
-
-    if [ "${exitcode}" != "0" ]; then
-      whiptail --title "ERROR" --msgbox "GitHub SSH authentication unsuccessfull.\nExit status: ${exitcode}" 8 78
-      exit ${exitcode}
-    fi
-
-    main_dotfiles
-
-  }
-
-  gh_ssh_keygen
-
-}
-
-main_dotfiles() (
-
-  dotfiles_fetch() {
-
-    git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
-
-    cd ${HOME}/.config
-
-    git remote set-url origin git@github.com:${gh_username}/dotfiles.git
-
-    cd ${HOME}
-
-    dotfiles_copy
-
-  }
-
-  dotfiles_copy() {
-
-    sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
-
-    sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
-
-    main_shell
-
-  }
-
-  dotfiles_fetch
-
-)
-
-main_shell() {
-
-  # Change shell to ZSH
-  chsh -s /usr/bin/zsh
-
-  # Copy zshenv & zprofile
-  sudo cp ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
-  sudo cp ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
-
-  # ZSH Autocomplete
-  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
-
-  main_services
-
-}
-
-main_services() {
-
-  sudo systemctl enable ly.service
-
-  main_customization
-
-}
-
-main_customization() (
-
-  spotify_tui() {
-
-    spotify_password=$(rbw get Spotify)
-    spotify_token=$(rbw get Spotify_TUI)
-
-    sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "${HOME}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-
-    sed -i '/^client_secret:/ s/$/ ${spotify_token}/' spotify-tui/client.yml
-
-    wallpaper
-
-  }
-
-  wallpaper() {
-
-    mkdir ${HOME}/Downloads
-
-    # Fetch wallpapers
-    curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
-
-    # Unzip
-    unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
-
-    cleanup
-
-  }
-
-  cleanup() {
-
-    #Cargo
-    mkdir ${HOME}/.local/share/cargo
-    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
-
-    #Bash: Moving files
-    mkdir ${HOME}/.local/share/bash
-    mv ${HOME}/.bash* ${HOME}/.local/share/bash
-
-    success
-
-  }
-
-  success() {
-
-    whiptail --title "SUCCESS" --msgbox "Arch installation has finished." 8 78
-    exit 69
-
-  }
-
-  spotify_tui
-
-)
+#main_openssh() {
+#
+#  openssh_client() {
+#
+#    # Start SSH agent
+#    eval "$(ssh-agent -s)"
+#    local exitcode=$?
+#
+#    if [ "${exitcode}" != "0" ]; then
+#      dialog --title " ERROR " --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-label "Retry" --no-label "Exit" 18 78
+#      case ${exitcode} in
+#      0)
+#        openssh_client
+#        ;;
+#      1)
+#        exit ${exitcode}
+#        ;;
+#      *)
+#        echo "Exit status ${exitcode}"
+#        ;;
+#      esac
+#    fi
+#
+#    main_github
+#
+#  }
+#
+#  openssh_client
+#
+#}
+#
+#main_github() {
+#
+#  gh_ssh_keygen() {
+#
+#    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
+#    local exitcode=$?
+#
+#    if [ "${exitcode}" != "0" ]; then
+#      whiptail --title "ERROR" --msgbox "Cannot generate SSH key.\Exit status: ${exitcode}" 8 78
+#      exit ${exitcode}
+#    fi
+#
+#    clear
+#
+#    ssh-add ${HOME}/.ssh/id_ed25519
+#    local exitcode=$?
+#
+#    if [ "${exitcode}" != "0" ]; then
+#      whiptail --title "ERROR" --msgbox "Cannot add SSH key to SSH agent.\Exit status: ${exitcode}" 8 78
+#      exit ${exitcode}
+#    fi
+#
+#    gh_login
+#
+#  }
+#
+#  gh_login() {
+#
+#    set -u
+#    cd ${HOME}
+#    echo "$ghpat" >.ghpat
+#    unset ghpat
+#    gh auth login --with-token <.ghpat
+#    local exitcode=$?
+#
+#    if [ "${exitcode}" != "0" ]; then
+#      whiptail --title "ERROR" --yesno "Cannot authenticate github with token [.ghpat].\nExit status: $?" --yes-button "Retry" --no-button "Exit" 18 78
+#      case ${exitcode} in
+#      0)
+#        gh_install_login
+#        ;;
+#      1)
+#        clear
+#        exit ${exitcode}
+#        ;;
+#      *)
+#        echo "Exit status $?"
+#        ;;
+#      esac
+#    fi
+#
+#    rm .ghpat
+#    gh auth status
+#    sleep 5
+#
+#    gh_pubkey
+#
+#  }
+#
+#  gh_pubkey() {
+#
+#    gh ssh-key add $HOME/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
+#    local exitcode=$?
+#
+#    ssh -T git@github.com
+#
+#    if [ "${exitcode}" != "0" ]; then
+#      whiptail --title "ERROR" --msgbox "GitHub SSH authentication unsuccessfull.\nExit status: ${exitcode}" 8 78
+#      exit ${exitcode}
+#    fi
+#
+#    main_dotfiles
+#
+#  }
+#
+#  gh_ssh_keygen
+#
+#}
+#
+#main_dotfiles() (
+#
+#  dotfiles_fetch() {
+#
+#    git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
+#
+#    cd ${HOME}/.config
+#
+#    git remote set-url origin git@github.com:${gh_username}/dotfiles.git
+#
+#    cd ${HOME}
+#
+#    dotfiles_copy
+#
+#  }
+#
+#  dotfiles_copy() {
+#
+#    sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
+#
+#    sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
+#
+#    main_shell
+#
+#  }
+#
+#  dotfiles_fetch
+#
+#)
+#
+#main_shell() {
+#
+#  # Change shell to ZSH
+#  chsh -s /usr/bin/zsh
+#
+#  # Copy zshenv & zprofile
+#  sudo cp ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
+#  sudo cp ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
+#
+#  # ZSH Autocomplete
+#  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
+#
+#  main_services
+#
+#}
+#
+#main_services() {
+#
+#  sudo systemctl enable ly.service
+#
+#  main_customization
+#
+#}
+#
+#main_customization() (
+#
+#  spotify_tui() {
+#
+#    spotify_password=$(rbw get Spotify)
+#    spotify_token=$(rbw get Spotify_TUI)
+#
+#    sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+#    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "${HOME}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+#
+#    sed -i '/^client_secret:/ s/$/ ${spotify_token}/' spotify-tui/client.yml
+#
+#    wallpaper
+#
+#  }
+#
+#  wallpaper() {
+#
+#    mkdir ${HOME}/Downloads
+#
+#    # Fetch wallpapers
+#    curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
+#
+#    # Unzip
+#    unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
+#
+#    cleanup
+#
+#  }
+#
+#  cleanup() {
+#
+#    #Cargo
+#    mkdir ${HOME}/.local/share/cargo
+#    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
+#
+#    #Bash: Moving files
+#    mkdir ${HOME}/.local/share/bash
+#    mv ${HOME}/.bash* ${HOME}/.local/share/bash
+#
+#    success
+#
+#  }
+#
+#  success() {
+#
+#    whiptail --title "SUCCESS" --msgbox "Arch installation has finished." 8 78
+#    exit 69
+#
+#  }
+#
+#  spotify_tui
+#
+#)
 
 while (("$#")); do
   case ${1} in
