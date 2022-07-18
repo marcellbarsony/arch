@@ -323,7 +323,7 @@ main_bitwarden() (
     # GitHub PAT
     gh_pat=$(rbw get GitHub_PAT)
 
-    main_openssh
+    main_ssh
 
   }
 
@@ -331,47 +331,48 @@ main_bitwarden() (
 
 )
 
-main_openssh() {
+main_ssh() (
 
-  # SSH client
-  eval "$(ssh-agent -s)"
-  local exitcode=$?
+  ssh_agent() {
 
-  if [ "${exitcode}" != "0" ]; then
-    dialog --title " ERROR " --yesno "Cannot start SSH client.\nExit status: ${exitcode}" --yes-label "Retry" --no-label "Exit" 18 78
-    case ${exitcode} in
-    0)
-      main_openssh
-      ;;
-    *)
-      echo "Exit status ${exitcode}"
+    # SSH process kill
+    sudo pkill -9 -f ssh
+
+    # SSH client start
+    eval "$(ssh-agent -s)"
+
+    ssh_key
+
+  }
+
+  ssh_key() {
+
+    # SSH key generate
+    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "Cannot generate SSH key" 8 45
       exit ${exitcode}
-      ;;
-    esac
-  fi
+    fi
 
-  # SSH key generate
-  ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
-  local exitcode=$?
+    # SSH key add
+    ssh-add ${HOME}/.ssh/id_ed25519.pub
+    local exitcode2=$?
 
-  if [ "${exitcode}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "Cannot generate SSH key" 8 45
-    exit ${exitcode}
-  fi
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --msgbox "Cannot add SSH key to agent" 8 45
+      exit ${exitcode2}
+    fi
 
-  # SSH key add
-  ssh-add ${HOME}/.ssh/id_ed25519.pub
-  local exitcode=$?
+    sleep 3 && clear
+    main_github
 
-  if [ "${exitcode}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "Cannot add SSH key to agent" 8 45
-    exit ${exitcode}
-  fi
+  }
 
-  sleep 3 && clear
-  main_github
+  ssh_agent
 
-}
+)
 
 main_github() {
 
