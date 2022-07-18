@@ -1,6 +1,6 @@
 #!/bin/bash
 
-main_check() (
+main_setup() (
 
   check_dependencies() {
 
@@ -122,50 +122,13 @@ main_check() (
 
 main_dialog() (
 
-  github_email() {
-
-    gh_email=$(dialog --cancel-label "Exit" --inputbox "GitHub e-mail" 8 45 3>&1 1>&2 2>&3)
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      echo "The script has terminated"
-      exit ${exitcode}
-    fi
-
-    if [ ! ${gh_email} ]; then
-      dialog --title " ERROR " --msgbox "\nE-mail cannot be empty" 8 45
-      github_email
-    fi
-
-    github_user
-
-  }
-
-  github_user() {
-
-    gh_username=$(dialog --cancel-label "Back" --inputbox "GitHub username" 8 45 3>&1 1>&2 2>&3)
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      github_email
-    fi
-
-    if [ ! ${gh_username} ]; then
-      dialog --title " ERROR " --msgbox "GitHub username cannot be empty." 8 45
-      github_user
-    fi
-
-    github_pubkey
-
-  }
-
   github_pubkey() {
 
-    gh_pubkeyname=$(dialog --cancel-label "Back" --inputbox "GitHub SSH Key" 8 45 3>&1 1>&2 2>&3)
+    gh_pubkeyname=$(dialog --cancel-label "Exit" --inputbox "GitHub SSH Key" 8 45 3>&1 1>&2 2>&3)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      github_user
+      exit ${exitcode}
     fi
 
     if [ ! ${gh_pubkeyname} ]; then
@@ -203,7 +166,7 @@ main_dialog() (
 
   }
 
-  github_email
+  github_pubkey
 
 )
 
@@ -323,6 +286,18 @@ main_bitwarden() (
     # GitHub PAT
     gh_pat=$(rbw get GitHub_PAT)
 
+    bitwarden_data
+
+  }
+
+  bitwarden_data() {
+
+    # Github
+    gh_email=$( rbw get GitHub --full | grep "E-mail:" | cut -d " " -f 2 )
+    gh_username=$( rbw get GitHub --full | grep "Username:" | cut -d " " -f 2 )
+
+    clear
+
     main_ssh
 
   }
@@ -397,7 +372,7 @@ main_github() {
     echo "${gh_pat}" >.ghpat
     unset gh_pat
 
-    echo "GH: authenticate with oken...." && sleep 1
+    echo "GH: authenticate with token..." && sleep 1
     gh auth login --with-token <.ghpat
     local exitcode=$?
     if [ "${exitcode}" != "0" ]; then
@@ -421,7 +396,7 @@ main_github() {
     gh ssh-key add ${HOME}/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
     local exitcode=$?
     if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "GitHub SSH authentication usuccessfull" 8 45
+      dialog --title " ERROR " --msgbox "GitHub SSH authentication unsuccessfull" 8 45
       exit ${exitcode}
     fi
 
@@ -596,4 +571,4 @@ while (("$#")); do
 done
 
 clear
-main_check
+main_setup
