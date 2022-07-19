@@ -401,16 +401,41 @@ main_github() {
       exit ${exitcode}
     fi
 
+    gh_test
+
+  }
+
+  gh_test() {
+
     echo "GH: ssh test.................." && sleep 1
     ssh -T git@github.com
-    local exitcode2=$?
-    if [ "${exitcode2}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "GitHub SSH test failed" 8 45
-      exit ${exitcode2}
-    fi
+    local exitcode=$?
+
+    if [ "${exitcode}" != "0" ]; then
+      dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nGitHub SSH test failed" 8 60
+      case ${?} in
+      0)
+        gh_fix
+        ;;
+      1)
+        echo "Installation terminated - $?"
+        exit ${exitcode}
+      ;;
+      esac
 
     sleep 3 && clear
     main_dotfiles
+
+  }
+
+  gh_fix() {
+
+    echo "GH: applying fix.............."
+    ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+    sleep 2
+
+    gh_pubkey
 
   }
 
