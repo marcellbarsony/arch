@@ -22,17 +22,15 @@
 [ ] [Snapper](https://wiki.archlinux.org/title/snapper)
 [ ] [Timeshift]()
 
-### Libnewt
+### Ncurses
 
-[ ] Libnewt theme
+[x] Ncurses theme
 
 ## Chroot
 
-[ ] Locale - Additional options
-
 ## Kernel
 
-[ ] Hardened Linux kernel
+[x] Hardened Linux kernel
 
 ## Script
 
@@ -46,6 +44,7 @@
 
 ### Bitwarden
 
+[ ] [rbw](https://github.com/doy/rbw) support
 [ ] [Bitwarden CLI](https://bitwarden.com/help/cli/) support
 
 # Install sequence sketch
@@ -82,39 +81,38 @@
   - Format Boot
   - Mount Boot /mnt/boot
 
-  - Btrfs [Plain]
-    * Make: `mkfs.btrfs ${rootdevice}"`
-    * Mount: `mount ${rootdevice} /mnt`
-    * Create subvolumes: {/mnt/@, /mnt/@home, /mnt/@var or /mtn@var_log}
-    * Unmount: umount /mnt
-    * Mount: `mount -o`
-
-  - ext4 [Plain]
-    * Make: `mkfs.ext4 ${rootdevice}`
-    * Mount: `mount ${rootdevice} /mnt`
-
-  - Btrfs & ext4 [Encrypted]
+  - Cryptsetup
     * cryptsetup luksFormat rootdevice
     * cryptsetup open rootdevice
 
-  - Btrfs [Encrypted]
+  - Btrfs
     * Make: `mkfs.btrfs /dev/mapper/cryptroot`
     * Mount: `mount /dev/mapper/cryptroot /mnt`
     * Create subvolumes: {/mnt/@, /mnt/@home, /mnt/@var}
     * Unmount: umount /mnt
     * Mount: `mount -o`
 
-  - ext4 [Encrypted]
-    * pvcreate /dev/mapper/cryptlvm
-    * vgcreate volgroup0 /dev/mapper/cryptlvm
-    * lvcreate -L 30GB volgroup0 -n cryptroot
-    * lvcreate -L 100%FREE volgroup0 -n crypthome
-    * modprobe dm_mod
-    * vgscan
-    * vgchange -ay
-
     * Format cryptroot
     * Mount cryptroot
 
     * Format home
     * Mount home
+
+# XDGBDS
+
+[XDG Based Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) latest<br>
+Linux [FHS - Filesystem Hierarchy Standard](https://www.pathname.com/fhs/pub/fhs-2.3.html#PURPOSE18)
+
+| Variable            | Path                            | Description                                    |
+| ------------------- | ------------------------------- | ---------------------------------------------- |
+| `$XDG_DATA_HOME`    | `$HOME/.local/share`            | User-specific data                             |
+| `$XDG_CONFIG_HOME`  | `$HOME/.config`                 | User configuration files                       |
+| `$XDG_CACHE_HOME`   | `$HOME/.cache`                  | Cache files                                    |
+| `$XDG_STATE_HOME`   | `$HOME/.local/state`            | State data between application restarts        |
+| `$XDG_DATA_DIRS`    | `/usr/local/share/:/usr/share/` | Search for additional data files               |
+| `$XDG_CONFIG_DIRS`  | `/etc/xdg`                      | Indicate where config files should be searched |
+|                     | `$HOME/.local/bin`              | User-specific executable files                 |
+
+- `$HOME/.local/bin` - Distributions should ensure this directory shows up in the UNIX $PATH environment variable, at an appropriate place.
+- `$XDG_RUNTIME_DIR` - Communication and synchronization
+  * The directory MUST be owned by the user, and he MUST be the only one having read and write access to it. Its Unix access mode MUST be 0700.

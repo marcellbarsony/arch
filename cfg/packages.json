@@ -166,6 +166,7 @@
     "name": "Terminal Bling",
     "package1": "cmatrix",
     "package2": "neofetch",
+    "package3": "unclutter",
     "aurinstall": "cbonsai"
   }
 

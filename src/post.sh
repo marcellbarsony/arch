@@ -283,9 +283,6 @@ main_bitwarden() (
       esac
     fi
 
-    # GitHub PAT
-    gh_pat=$(rbw get GitHub_PAT)
-
     bitwarden_data
 
   }
@@ -295,6 +292,13 @@ main_bitwarden() (
     # Github
     gh_email=$( rbw get GitHub --full | grep "E-mail:" | cut -d " " -f 2 )
     gh_username=$( rbw get GitHub --full | grep "Username:" | cut -d " " -f 2 )
+    gh_pat=$( rbw get GitHub --full | grep "Personal Access Token:" | cut -d " " -f 2 )
+
+    # Spotify
+    spotify_username=$( rbw get Spotify --full | grep "Username:" | cut -d " " -f 2 )
+    spotify_username_tui=$( rbw get Spotify --full | grep "TUI Username:" | cut -d " " -f 2 )
+    spotify_token=$( rbw get Spotify --full | grep "TUI Token:" | cut -d " " -f 2 )
+    spotify_password=$( rbw get Spotify )
 
     clear
 
@@ -332,7 +336,7 @@ main_ssh() (
     fi
 
     # SSH key add
-    ssh-add ${HOME}/.ssh/id_ed25519.pub
+    ssh-add ${HOME}/.ssh/id_ed25519
     local exitcode2=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -461,14 +465,17 @@ main_install() {
 
 main_shell() {
 
-  # Change shell to ZSH
+  # Change shell to Zsh
   chsh -s /usr/bin/zsh
 
-  # Copy zshenv & zprofile
-  sudo cp ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
-  sudo cp ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
+  # Copy Zsh files
+  # https://web.cs.elte.hu/zsh-manual/zsh_4.html
+  # https://zsh.sourceforge.io/Intro/intro_3.html
+  sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
+  sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
+  sudo cp -f ${HOME}/.config/zsh/global/zlogout /etc/zsh/zlogout
 
-  # ZSH Autocomplete
+  # Zsh Autocomplete
   git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
 
   main_services
@@ -487,13 +494,12 @@ main_customization() (
 
   spotify_tui() {
 
-    spotify_password=$(rbw get Spotify)
-    spotify_token=$(rbw get Spotify_TUI)
-
+    # Add Spotify password
     sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    # Adjust cache directory to hostname
     sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "${HOME}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-
-    sed -i '/^client_secret:/ s/$/ ${spotify_token}/' spotify-tui/client.yml
+    # Add client secret
+    sed -i "/^client_secret:/ s/$/ ${spotify_token}/" spotify-tui/client.yml
 
     wallpaper
 

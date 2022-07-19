@@ -15,6 +15,9 @@ Main features including but not limited to:
 - LUKS2
 - Btrfs (Snapper)
 - Hardened kernel
+- Wayland
+- Zsh
+- XDGBDS
 
 ## Installation guide
 
@@ -45,9 +48,9 @@ cd arch
 
 ### Post-installation
 
-1.) Launch `post.sh` located in the user's home folder
+1.) Launch `post.sh`
 ```
-./post.sh
+~/arch/src/post.sh
 ```
 
 ## File system
