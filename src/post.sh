@@ -292,12 +292,12 @@ main_bitwarden() (
     # Github
     gh_email=$( rbw get GitHub --full | grep "E-mail:" | cut -d " " -f 2 )
     gh_username=$( rbw get GitHub --full | grep "Username:" | cut -d " " -f 2 )
-    gh_pat=$( rbw get GitHub --full | grep "Personal Access Token:" | cut -d " " -f 2 )
+    gh_pat=$( rbw get GitHub --full | grep "Personal Access Token:" | cut -d " " -f 4 )
 
     # Spotify
     spotify_username=$( rbw get Spotify --full | grep "Username:" | cut -d " " -f 2 )
-    spotify_username_tui=$( rbw get Spotify --full | grep "TUI Username:" | cut -d " " -f 2 )
-    spotify_token=$( rbw get Spotify --full | grep "TUI Token:" | cut -d " " -f 2 )
+    spotify_username_tui=$( rbw get Spotify --full | grep "TUI Username:" | cut -d " " -f 3 )
+    spotify_token=$( rbw get Spotify --full | grep "TUI Token:" | cut -d " " -f 3 )
     spotify_password=$( rbw get Spotify )
 
     clear
@@ -327,7 +327,7 @@ main_ssh() (
   ssh_key() {
 
     # SSH key generate
-    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519.pub
+    ssh-keygen -t ed25519 -N ${ssh_passphrase} -C ${gh_email} -f ${HOME}/.ssh/id_ed25519
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
@@ -366,9 +366,6 @@ main_github() {
   }
 
   gh_login() {
-
-    echo "GH: set \$gh_pat.............." && sleep 1
-    gh_pat=$(rbw get GitHub_PAT)
 
     echo "GH: set token................." && sleep 1
     set -u
