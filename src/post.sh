@@ -511,7 +511,8 @@ main_shell() {
   # Zsh Autocomplete
   git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
 
-  main_services
+  #main_services
+  main_customization
 
 }
 
