@@ -86,7 +86,7 @@
 
     {
     "name": "Audio & Music",
-    "package": "sof-audio",
+    "package": "sof-firmware",
     "sytem_audio":
     [
       {
@@ -99,7 +99,7 @@
         "description": "Pipewire",
         "package1": "pipewire",
         "package2": "pipewire-alsa",
-        "package4": "pipewire-jack",
+        "conflict-package4-jack2": "pipewire-jack",
         "package3": "pipewire-pulse",
         "package5": "pavucontrol",
         "package6": "wireplumber"

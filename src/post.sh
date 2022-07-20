@@ -407,22 +407,22 @@ main_github() {
 
   gh_test() {
 
-    echo "GH: ssh test.................." && sleep 1
+    echo "GH: ssh test.................."
     ssh -T git@github.com
     local exitcode=$?
 
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nGitHub SSH test failed" 8 60
-      case ${?} in
-      0)
-        gh_fix
-        ;;
-      1)
-        echo "Installation terminated - $?"
-        exit ${exitcode}
+    case ${exitcode} in
+    0)
+      main_dotfiles
       ;;
-      esac
-    fi
+    1)
+      main_dotfiles
+      ;;
+    *)
+      echo "An error has occurred - ${exitcode}"
+      exit ${exitcode}
+      ;;
+    esac
 
     main_dotfiles
 
@@ -435,7 +435,7 @@ main_github() {
 
     sleep 2
 
-    gh_pubkey
+    gh_test
 
   }
 
@@ -449,6 +449,8 @@ main_dotfiles() (
 
     echo "Dotfiles: fetching............"
 
+    mv ${HOME}/.config/rbw /tmp && mv ${HOME}/.config/gh /tmp
+
     git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
 
     cd ${HOME}/.config
@@ -456,6 +458,8 @@ main_dotfiles() (
     git remote set-url origin git@github.com:${gh_username}/dotfiles.git
 
     cd ${HOME}
+
+    mv /tmp/rbw ${HOME}/.config && mv /tmp/gh ${HOME}/.config
 
     dotfiles_copy
 
@@ -469,7 +473,7 @@ main_dotfiles() (
 
     sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
 
-    main_install
+    clear && main_install
 
   }
 
