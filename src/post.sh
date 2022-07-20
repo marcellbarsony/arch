@@ -424,7 +424,7 @@ main_github() {
       ;;
     esac
 
-    main_dotfiles
+    clear && main_dotfiles
 
   }
 
@@ -526,6 +526,20 @@ main_services() {
 }
 
 main_customization() (
+
+  wayland() {
+
+    # Touchpad gestures
+    # https://wiki.archlinux.org/title/Libinput
+
+  }
+
+  ly() {
+
+    # Configuration
+    # /etc/ly/config.ini
+
+  }
 
   spotify_tui() {
 
