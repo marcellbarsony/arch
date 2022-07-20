@@ -450,6 +450,7 @@ main_dotfiles() (
     echo "Dotfiles: fetching............"
 
     mv ${HOME}/.config/rbw /tmp && mv ${HOME}/.config/gh /tmp
+    rm -rf ${HOME}/.config
 
     git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
 
@@ -484,10 +485,10 @@ main_dotfiles() (
 main_install() {
 
   # Pacman
-  grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm -
+  grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
   # AUR
-  grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm -
+  grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm - && clear
 
   main_shell
 
@@ -505,7 +506,7 @@ main_shell() {
   # https://zsh.sourceforge.io/Intro/intro_3.html
   sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
   sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
-  sudo cp -f ${HOME}/.config/zsh/global/zlogout /etc/zsh/zlogout
+  sudo cp -f ${HOME}/.config/zsh/.zlogout /etc/zsh/zlogout
 
   # Zsh Autocomplete
   git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
@@ -554,13 +555,13 @@ main_customization() (
 
   cleanup() {
 
-    #Cargo
-    mkdir ${HOME}/.local/share/cargo
-    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
+    mkdir ${HOME}/.local/src/{cargo,bash}
 
-    #Bash: Moving files
-    mkdir ${HOME}/.local/share/bash
-    mv ${HOME}/.bash* ${HOME}/.local/share/bash
+    #Cargo
+    mv ${HOME}/.cargo ${HOME}/.local/src/cargo
+
+    #Bash
+    mv ${HOME}/.bash* ${HOME}/.local/src/bash
 
     success
 
