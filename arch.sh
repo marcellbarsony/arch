@@ -1,6 +1,6 @@
 #!/bin/bash
 
-main_check() (
+main_setup() (
 
   variables() (
 
@@ -990,4 +990,4 @@ while (("$#")); do
 done
 
 clear
-main_check
+main_setup

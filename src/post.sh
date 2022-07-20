@@ -422,8 +422,8 @@ main_github() {
         exit ${exitcode}
       ;;
       esac
+    fi
 
-    sleep 3 && clear
     main_dotfiles
 
   }
@@ -447,6 +447,8 @@ main_dotfiles() (
 
   dotfiles_fetch() {
 
+    echo "Dotfiles: fetching............"
+
     git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
 
     cd ${HOME}/.config
@@ -460,6 +462,8 @@ main_dotfiles() (
   }
 
   dotfiles_copy() {
+
+    echo "Dotfiles: copying............."
 
     sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
 
@@ -487,6 +491,8 @@ main_install() {
 
 main_shell() {
 
+  echo "Shell: changing shell........."
+
   # Change shell to Zsh
   chsh -s /usr/bin/zsh
 
@@ -506,6 +512,7 @@ main_shell() {
 
 main_services() {
 
+  # ly
   sudo systemctl enable ly.service
 
   main_customization
