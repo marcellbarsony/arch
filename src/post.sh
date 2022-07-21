@@ -167,7 +167,13 @@ main_dialog() (
 
   displayprotocol() {
 
-    display_protocol=$( dialog --yes-label "X11" --no-label "Wayland" --yesno "\nDisplay Protocol" 8 45 )
+    dialog --yes-label "X11" --no-label "Wayland" --yesno "\nDisplay Protocol" 8 45
+
+    if [ ${?} == "0" ]; then
+      display_protocol="X11"
+    else
+      display_protocol="Wayland"
+    fi
 
     clear && main_aur
 
@@ -523,11 +529,11 @@ main_shell() {
   # https://zsh.sourceforge.io/Intro/intro_3.html
   sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
   sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
-  sudo cp -f ${HOME}/.config/zsh/global/zlogin /etc/zsh/zprofile
+  sudo cp -f ${HOME}/.config/zsh/global/zlogin /etc/zsh/zlogin
   sudo cp -f ${HOME}/.config/zsh/.zlogout /etc/zsh/zlogout
 
   # Zsh Autocomplete
-  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
+  #git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
 
   #main_services
   main_customization
@@ -554,7 +560,7 @@ main_customization() (
     #python-xkbcommon
     #python-pywayland
     #python-cffi
-    #cairo python-cairo python-cairo-cffi
+    #cairo python-cairo python-cairocffi
     #pango
     #python-dbus-next
 

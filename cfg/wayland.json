@@ -5,8 +5,15 @@
     "package1": "wayland",
     "package2": "wayland-protocols",
     "package3": "xorg-xwayland",
-    "package4": "xorg-xlsclient",
+    "package4": "xorg-xlsclients",
     "package5": "xdg-desktop-portal-wlr"
+  },
+  {
+    "name": "Qtile",
+    "package1": "qtile",
+    "package2": "terminus-font",
+    "package3": "python-pip",
+    "package4": "pip install pywlroots",
+    "package5": "wlroots"
   }
-
 ]

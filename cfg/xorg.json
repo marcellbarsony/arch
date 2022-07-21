@@ -2,11 +2,12 @@
 
   {
     "name": "X11",
-    "package1": "xorg-server",
+    "package1": "xorg",
     "package2": "xorg-xinit",
-    "package3": "xorg-prop",
-    "package4": "xwallpaper",
-    "package5": "arandr"
+    "package3": "xwallpaper",
+    "package4": "arandr",
+    "package5": "xf86-video-fbdev",
+    "package6": "xf86-video-intel"
   }
 
 ]

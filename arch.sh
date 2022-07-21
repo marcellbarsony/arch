@@ -283,7 +283,6 @@ partition() (
       localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
     else
       exit 1
-
     fi
 
     warning
@@ -423,7 +422,7 @@ dialogs() (
         options+=("${item}" "")
       done
 
-      EFIDEVICE=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [EFI]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
+      efidevice=$(dialog --title " Partition " --cancel-label "Back" --menu "Select device [EFI]" 13 70 17 ${options[@]} 3>&1 1>&2 2>&3)
 
       case $? in
       0)
@@ -759,7 +758,7 @@ filesystem() (
 
     efi_format() {
 
-      mkfs.fat -F32 ${EFIDEVICE}
+      mkfs.fat -F32 ${efidevice}
 
       efi_mount
 
@@ -769,7 +768,7 @@ filesystem() (
 
       efimountdir="/mnt/boot" #/mnt/efi
 
-      mount ${EFIDEVICE} ${efimountdir}
+      mount ${efidevice} ${efimountdir}
 
       fstab
 
