@@ -1,0 +1,12 @@
+[
+
+  {
+    "name": "Wayland",
+    "package1": "wayland",
+    "package2": "wayland-protocols",
+    "package3": "xorg-xwayland",
+    "package4": "xorg-xlsclient",
+    "package5": "xdg-desktop-portal-wlr"
+  }
+
+]

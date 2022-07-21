@@ -161,8 +161,15 @@ main_dialog() (
       ssh_passphrase
     fi
 
-    clear
-    main_aur
+    displayprotocol
+
+  }
+
+  displayprotocol() {
+
+    display_protocol=$( dialog --yes-label "X11" --no-label "Wayland" --yesno "\nDisplay Protocol" 8 45 )
+
+    clear && main_aur
 
   }
 
@@ -488,7 +495,17 @@ main_install() {
   grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
   # AUR
-  grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm - && clear
+  #grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm - && clear
+
+  # Display protocol
+  case ${display_protocol} in
+  X11)
+    grep -o '"package[^"]*": "[^"]*' ${HOME}/arch/cfg/xorg.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    ;;
+  Wayland)
+    grep -o '"package[^"]*": "[^"]*' ${HOME}/arch/cfg/wayland.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    ;;
+  esac
 
   main_shell
 
@@ -506,6 +523,7 @@ main_shell() {
   # https://zsh.sourceforge.io/Intro/intro_3.html
   sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
   sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
+  sudo cp -f ${HOME}/.config/zsh/global/zlogin /etc/zsh/zprofile
   sudo cp -f ${HOME}/.config/zsh/.zlogout /etc/zsh/zlogout
 
   # Zsh Autocomplete
@@ -527,24 +545,30 @@ main_services() {
 
 main_customization() (
 
-  wayland() {
+  qtile_custom() {
 
+    echo "Qtile"
     # Touchpad gestures
     # https://wiki.archlinux.org/title/Libinput
-    sudo pacman -S wlroots pywlroots
-    python-xkbcommon
-    python-pywayland
-    python-cffi
-    cairo python-cairo python-cairo-cffi
-    pango
-    python-dbus-next
+    #sudo pacman -S wlroots pywlroots
+    #python-xkbcommon
+    #python-pywayland
+    #python-cffi
+    #cairo python-cairo python-cairo-cffi
+    #pango
+    #python-dbus-next
+
+    ly custom
 
   }
 
-  ly() {
+  ly_custom() {
 
+    echo "ly"
     # Configuration
     # /etc/ly/config.ini
+
+    spotify_tui
 
   }
 
@@ -596,7 +620,7 @@ main_customization() (
 
   }
 
-  spotify_tui
+  qtile_custom
 
 )
 

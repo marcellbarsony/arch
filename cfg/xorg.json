@@ -1,0 +1,12 @@
+[
+
+  {
+    "name": "X11",
+    "package1": "xorg-server",
+    "package2": "xorg-xinit",
+    "package3": "xorg-prop",
+    "package4": "xwallpaper",
+    "package5": "arandr"
+  }
+
+]
