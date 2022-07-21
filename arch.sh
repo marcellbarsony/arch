@@ -4,7 +4,7 @@ main_setup() (
 
   variables() (
 
-    echo -n "Global variables............. " && sleep 1
+    echo -n "Global variables............." && sleep 1
 
     infos() {
 
@@ -191,8 +191,8 @@ main_setup() (
   configs() {
 
     echo -n ${info_configs} && sleep 1
-    cp -f ${dialogrc} $HOME/.dialogrc &>/dev/null
-    cp -f ${pacmanconf} /etc/pacman.conf &>/dev/null
+    cp -f ${dialogrc} ${HOME}/.dialogrc
+    cp -f ${pacmanconf} /etc/pacman.conf
 
     case $? in
     0)
@@ -912,7 +912,7 @@ archinstall() (
 
   packages() {
 
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-firmware linux-hardened-headers base base-devel grub efibootmgr dialog vim
+    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-hardened-headers linux-firmware base base-devel grub efibootmgr dialog vim
 
     if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
       case ${dmi} in
