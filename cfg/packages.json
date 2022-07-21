@@ -97,7 +97,8 @@
   {
     "name": "ZSH",
     "package1": "zsh",
-    "package2": "zsh-syntax-highlighting",
+    "package2": "zsh-completions",
+    "package3": "zsh-syntax-highlighting",
     "prompt":
       {
         "description": "ZSH Prompt",

@@ -307,7 +307,7 @@ grub() (
 
 packages() {
 
-  pacman -S --noconfirm btrfs-progs snapper zsh zsh-completions networkmanager openssh git github-cli reflector neovim intel-ucode
+  pacman -S --noconfirm btrfs-progs snapper zsh networkmanager openssh git github-cli reflector neovim intel-ucode
   #lvm2 dosfstools
   # Pipewire - https://roosnaflak.com/tech-and-research/transitioning-to-pipewire/
   local exitcode=$?
