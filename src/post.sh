@@ -531,6 +531,13 @@ main_customization() (
 
     # Touchpad gestures
     # https://wiki.archlinux.org/title/Libinput
+    sudo pacman -S wlroots pywlroots
+    python-xkbcommon
+    python-pywayland
+    python-cffi
+    cairo python-cairo python-cairo-cffi
+    pango
+    python-dbus-next
 
   }
 
