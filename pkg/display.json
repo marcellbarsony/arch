@@ -1,0 +1,16 @@
+[
+
+  {
+    "pkg_xorg1": "xorg-server",
+    "pkg_xorg2": "xorg-xinit",
+    "pkg_xorg3": "xorg-xwayland",
+    "pkg_xorg4": "xwallpaper",
+    "pkg_xorg5": "arandr",
+    "pkg_wayland1": "wayland",
+    "pkg_wayland2": "wayland-protocols",
+    "pkg_wayland3": "xorg-xwayland",
+    "pkg_wayland4": "xorg-xlsclients",
+    "pkg_wayland5": "xdg-desktop-portal-wlr"
+  }
+
+]

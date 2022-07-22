@@ -165,19 +165,34 @@ main_dialog() (
 
   }
 
-  displayprotocol() {
+  display_protocol() {
 
-    dialog --yes-label "X11" --no-label "Wayland" --yesno "\nDisplay Protocol" 8 45
+    dialog --yes-label "X11" --no-label "Wayland" --yesno "\nDisplay protocol" 8 45
 
     if [ ${?} == "0" ]; then
-      display_protocol="X11"
+      displayprotocol="X11"
     else
-      display_protocol="Wayland"
+      displayprotocol="Wayland"
+    fi
+
+    audio_backend
+
+  }
+
+  audio_backend() {
+
+    dialog --yes-label "ALSA" --no-label "Pipewire" --yesno "\nAudio backend" 8 45
+
+    if [ ${?} == "0" ]; then
+      audiobackend="ALSA"
+    else
+      audiobackend="Pipewire"
     fi
 
     clear && main_aur
 
   }
+
 
   github_pubkey
 
@@ -185,7 +200,7 @@ main_dialog() (
 
 main_aur() {
 
-  aur_helper=$( grep -o '"aurhelper": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' )
+  aur_helper=$( grep -o '"aurhelper": "[^"]*' ${HOME}/arch/pkg/base.json | grep -o '[^"]*$' )
 
   aurdir="${HOME}/.local/src/${aur_helper}"
 
@@ -497,19 +512,32 @@ main_dotfiles() (
 
 main_install() {
 
+  # Base
+  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/base.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+
   # Pacman
-  grep -o '"package[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/pacman.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
   # AUR
-  #grep -o '"aurinstall[^"]*": "[^"]*' ${TEMPORARY_package_data} | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm - && clear
+  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/aur.json | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm - && clear
+
+  # Audio backend
+  case ${audiobackend} in
+  ALSA)
+    grep -o '"pkg_alsa[^"]*": "[^"]*' ${HOME}/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    ;;
+  Pipewire)
+    grep -o '"pkg_pipewire[^"]*": "[^"]*' ~/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    ;;
+  esac
 
   # Display protocol
-  case ${display_protocol} in
+  case ${displayprotocol} in
   X11)
-    grep -o '"package[^"]*": "[^"]*' ${HOME}/arch/cfg/xorg.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    grep -o '"pkg_xorg[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
     ;;
   Wayland)
-    grep -o '"package[^"]*": "[^"]*' ${HOME}/arch/cfg/wayland.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    grep -o '"pkg_wayland[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
     ;;
   esac
 
@@ -551,18 +579,18 @@ main_services() {
 
 main_customization() (
 
-  qtile_custom() {
+  qtile_wayland() {
 
-    echo "Qtile"
+    echo "Qtile - Wayland"
+
     # Touchpad gestures
     # https://wiki.archlinux.org/title/Libinput
-    #sudo pacman -S wlroots pywlroots
-    #python-xkbcommon
-    #python-pywayland
-    #python-cffi
-    #cairo python-cairo python-cairocffi
-    #pango
-    #python-dbus-next
+
+    # Desktop
+    /usr/qtile.desktop
+
+    # Log
+    ~/.local/share/qtile/qtile.log
 
     ly custom
 
@@ -626,7 +654,7 @@ main_customization() (
 
   }
 
-  qtile_custom
+  qtile_wayland
 
 )
 

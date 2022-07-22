@@ -1,0 +1,13 @@
+[
+  {
+    "pkg_alsa1": "alsa",
+    "pkg_alsa2": "alsa-firmware",
+    "pkg_alsa3": "alsa-utils",
+    "pkg_pipewire1": "pipewire",
+    "pkg_pipewire2": "pipewire-alsa",
+    "pkg_pipewire3": "pipewire-pulse",
+    "pkg_pipewire5": "pavucontrol",
+    "pkg_pipewire6": "wireplumber",
+    "pipewire_conflict_jack2": "pipewire-jack"
+  }
+]

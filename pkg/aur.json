@@ -1,0 +1,14 @@
+[
+
+  {
+    "pkg_applauncher": "dmenu-rs",
+    "noinstall_browser": "librewolf-bin",
+    "pkg_ide": "vscodium-bin",
+    "pkg_loginmanager": "ly",
+    "noinstall_spotify1": "spotify-tui-bin",
+    "noinstall_spotify2": "spotifyd",
+    "noinstall_terminal": "cbonsai",
+    "pkg_zsh_prompt": "starship"
+  }
+
+]

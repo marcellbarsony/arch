@@ -1,0 +1,49 @@
+[
+
+  {
+    "pkg_audio": "sof-firmware",
+    "pkg_coreutils1": "zip",
+    "pkg_cureutils2": "unzip",
+    "pkg_coreutils3": "bat",
+    "pkg_coreutils4": "exa",
+    "pkg_coreutils5": "lsd",
+    "pkg_coreutils6": "zoxide",
+    "pkg_driver1": "intel-ucode",
+    "pkg_driver2": "xf86-video-intel",
+    "pkg_driver3": "xf86-video-vmware",
+    "pkg_man1": "man-db",
+    "pkg_man2": "texinfo",
+    "pkg_man3": "tldr",
+    "pkg_notification": "dunst",
+    "pkg_txteditor": "neovim",
+    "pkg_python1": "python",
+    "pkg_python2": "python-pip",
+    "pkg_rust": "rust",
+    "pkg_sysmonitor1": "bpytop",
+    "pkg_sysmonitor2": "conky",
+    "pkg_terminal": "alacritty",
+    "pkg_terminal_progs_1": "cmatrix",
+    "pkg_terminal_progs_2": "neofetch",
+    "pkg_unclutter": "unclutter",
+    "pkg_zsh1": "zsh",
+    "pkg_zsh2": "zsh-completions",
+    "pkg_zsh3": "zsh-syntax-highlighting"
+  },
+
+  {
+    "pkg_qtile1": "qtile",
+    "pkg_qtile2": "terminus-font",
+    "pkg_qtile3": "wlroots",
+    "dependency0": "pip install pywlroots",
+    "dependency1": "pywlroots",
+    "dependency2": "python-xkbcommon",
+    "dependency3": "python-pywayland",
+    "dependency4": "python-cffi",
+    "dependency5": "cairo",
+    "dependency6": "python-cairo",
+    "dependency7": "python-cairocffi",
+    "dependency8": "pango",
+    "dependency9": "python-dbus-next"
+  }
+
+]
