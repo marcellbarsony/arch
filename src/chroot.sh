@@ -37,12 +37,6 @@ sysadmin() (
     sleep 1
 
     useradd -m ${username}
-    local exitcode=$?
-
-    if [ ${exitcode} != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nCannot create user account [${username}]" 8 45
-      exit ${exitcode}
-    fi
 
     user_passphrase
 
@@ -50,7 +44,7 @@ sysadmin() (
 
   user_passphrase() {
 
-    echo "Set ${username} password..."
+    echo "Set ${username}'s password..."
     sleep 1
 
     error=$(echo "${username}:${user_password}" | chpasswd 2>&1)
@@ -71,12 +65,6 @@ sysadmin() (
     sleep 1
 
     usermod -aG wheel,audio,video,optical,storage ${username} 2>&1
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nCannot add [${username}] to groups" 8 45
-      exit ${exitcode}
-    fi
 
     domain_name
 
@@ -84,16 +72,10 @@ sysadmin() (
 
   domain_name() {
 
-    echo "Set hostname >> ${nodename}"
-    sleep 1
+    echo "Set hostname >> ${nodename}" && sleep 1
 
+    echo ${nodename} > /etc/hostname
     hostnamectl set-hostname ${nodename}
-    local exitcode=$?
-
-    if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --msgbox "\nHostname [${nodename}] cannot be set" 8 45
-      exit ${exitcode}
-    fi
 
     hosts
 
@@ -139,18 +121,9 @@ sudoers() {
 locale() {
 
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
-
   echo "LANG=en_US.UTF-8" >/etc/locale.conf
 
-  clear
-
   locale-gen
-  local exitcode=$?
-
-  if [ "${exitcode}" != "0" ]; then
-    dialog --title " ERROR " --msgbox "\nCannot generate locale [locale-gen]" 8 45
-    exit ${exitcode}
-  fi
 
   initramfs
 
@@ -285,7 +258,7 @@ grub() (
 
   }
 
-  #grub_customization(){
+  #grub_customization() {
 
   # GRUB Theme
   # https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse
@@ -308,9 +281,8 @@ grub() (
 packages() {
 
   pacman -S --noconfirm btrfs-progs snapper zsh networkmanager openssh git github-cli reflector intel-ucode
-  #lvm2 dosfstools
-  # Pipewire - https://roosnaflak.com/tech-and-research/transitioning-to-pipewire/
   local exitcode=$?
+  # Pipewire - https://roosnaflak.com/tech-and-research/transitioning-to-pipewire/
 
   if [ "${exitcode}" != "0" ]; then
     dialog --title " ERROR " --msgbox "\nPacman: cannot install packages" 8 45

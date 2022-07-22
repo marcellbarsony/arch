@@ -645,7 +645,7 @@ dialogs() (
         grub_password
       fi
 
-      crypt_setup
+      clear && crypt_setup
 
     }
 
@@ -889,7 +889,7 @@ fstab() {
 
   genfstab -U /mnt >>/mnt/etc/fstab
 
-  archinstall
+  clear && archinstall
 
 }
 
@@ -903,9 +903,7 @@ archinstall() (
 
     reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
 
-    clear
-
-    packages
+    clear && packages
 
   }
 
