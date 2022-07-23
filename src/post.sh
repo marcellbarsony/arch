@@ -181,12 +181,12 @@ main_dialog() (
 
   audio_backend() {
 
-    dialog --yes-label "ALSA" --no-label "Pipewire" --yesno "\nAudio backend" 8 45
+    dialog --yes-label "Pipewire" --no-label "ALSA" --yesno "\nAudio backend" 8 45
 
     if [ ${?} == "0" ]; then
-      audiobackend="ALSA"
-    else
       audiobackend="Pipewire"
+    else
+      audiobackend="ALSA"
     fi
 
     clear && main_aur
@@ -553,12 +553,10 @@ main_shell() {
   chsh -s /usr/bin/zsh
 
   # Copy Zsh files
-  # https://web.cs.elte.hu/zsh-manual/zsh_4.html
+  # https://zsh.sourceforge.io/Doc/Release/Files.html
   # https://zsh.sourceforge.io/Intro/intro_3.html
   sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
   sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
-  sudo cp -f ${HOME}/.config/zsh/global/zlogin /etc/zsh/zlogin
-  sudo cp -f ${HOME}/.config/zsh/.zlogout /etc/zsh/zlogout
 
   # Zsh Autocomplete
   #git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
@@ -587,10 +585,10 @@ main_customization() (
     # https://wiki.archlinux.org/title/Libinput
 
     # Desktop
-    /usr/qtile.desktop
+    #/usr/qtile.desktop
 
     # Log
-    ~/.local/share/qtile/qtile.log
+    #~/.local/share/qtile/qtile.log
 
     ly custom
 

@@ -260,10 +260,6 @@ grub() (
 
   #grub_customization() {
 
-  # GRUB Theme
-  # https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse
-  # http://wiki.rosalab.ru/en/index.php/Grub2_theme_tutorial
-
   # GRUB Config
 
   # GRUB Resolution

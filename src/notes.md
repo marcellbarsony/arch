@@ -11,9 +11,9 @@
 ### Boot
 
 [ ] [Secure boot](https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot)
-[ ] Encrypted `/boot` partition
 [x] [GRUB Passphrase](https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu)
-[ ] GRUB Theme
+[ ] [GRUB Theme](http://wiki.rosalab.ru/en/index.php/Grub2_theme_tutorial)
+[ ] [GRUB Theme - Virtuaverse](https://github.com/Patato777/dotfiles/tree/main/grub/themes/virtuaverse)
 
 ### File system
 
@@ -99,6 +99,8 @@
     * Mount home
 
 # XDGBDS
+
+XDG directories are sourced from `.zshenv`
 
 [XDG Based Directory Specification](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) latest<br>
 Linux [FHS - Filesystem Hierarchy Standard](https://www.pathname.com/fhs/pub/fhs-2.3.html#PURPOSE18)

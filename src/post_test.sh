@@ -68,18 +68,9 @@ main_aur() {
 
     echo "Dotfiles: fetching............"
 
-    mv ${HOME}/.config/rbw /tmp && mv ${HOME}/.config/gh /tmp
     rm -rf ${HOME}/.config
 
-    git clone git@github.com:marcellbarsony/dotfiles.git ${HOME}/.config
-
-    cd ${HOME}/.config
-
-    git remote set-url origin git@github.com:marcellbarsony/dotfiles.git
-
-    cd ${HOME}
-
-    mv /tmp/rbw ${HOME}/.config && mv /tmp/gh ${HOME}/.config
+    git clone https://github.com/marcellbarsony/dotfiles.git ${HOME}/.config
 
     dotfiles_copy
 
