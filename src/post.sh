@@ -6,6 +6,11 @@ main_setup() (
 
     echo -n "Update keyring................" && sleep 1
     sudo pacman -Sy archlinux-keyring
+    if [ "$?" != "0" ]; then
+      clear && echo "Cannot update archlinux-keyring - ${?}"
+    fi
+
+    echo "[OK]"
 
     clear && check_dependencies
 
@@ -138,6 +143,34 @@ main_setup() (
 
 main_dialog() (
 
+  display_protocol() {
+
+    dialog --yes-label "X11" --no-label "Wayland" --yesno "\nDisplay protocol" 8 45
+
+    if [ ${?} == "0" ]; then
+      displayprotocol="X11"
+    else
+      displayprotocol="Wayland"
+    fi
+
+    audio_backend
+
+  }
+
+  audio_backend() {
+
+    dialog --yes-label "Pipewire" --no-label "ALSA" --yesno "\nAudio backend" 8 45
+
+    if [ ${?} == "0" ]; then
+      audiobackend="Pipewire"
+    else
+      audiobackend="ALSA"
+    fi
+
+    github_pubkey
+
+  }
+
   github_pubkey() {
 
     gh_pubkeyname=$(dialog --cancel-label "Exit" --inputbox "GitHub SSH Key" 8 45 3>&1 1>&2 2>&3)
@@ -177,40 +210,11 @@ main_dialog() (
       ssh_passphrase
     fi
 
-    displayprotocol
-
-  }
-
-  display_protocol() {
-
-    dialog --yes-label "X11" --no-label "Wayland" --yesno "\nDisplay protocol" 8 45
-
-    if [ ${?} == "0" ]; then
-      displayprotocol="X11"
-    else
-      displayprotocol="Wayland"
-    fi
-
-    audio_backend
-
-  }
-
-  audio_backend() {
-
-    dialog --yes-label "Pipewire" --no-label "ALSA" --yesno "\nAudio backend" 8 45
-
-    if [ ${?} == "0" ]; then
-      audiobackend="Pipewire"
-    else
-      audiobackend="ALSA"
-    fi
-
     clear && main_aur
 
   }
 
-
-  github_pubkey
+  display_protocol
 
 )
 
@@ -226,7 +230,6 @@ main_aur() {
 
   git clone https://aur.archlinux.org/${aur_helper}.git ${aurdir}
   local exitcode=$?
-
   if [ "${exitcode}" != "0" ]; then
     dialog --title " ERROR " --msgbox "Cannot clone ${aur_helper} repository" 8 45
     exit ${exitcode}
@@ -236,7 +239,6 @@ main_aur() {
 
   makepkg -si --noconfirm
   local exitcode2=$?
-
   if [ "${exitcode2}" != "0" ]; then
     dialog --title " ERROR " --msgbox "Cannot make ${aur_helper} package" 8 45
     exit ${exitcode2}
@@ -637,12 +639,11 @@ main_customization() (
 
   xdg_standard() {
 
+    # Create directories
     mkdir ${HOME}/.local/share/{cargo,bash}
 
-    #Cargo
+    # Move files
     mv ${HOME}/.cargo ${HOME}/.local/share/cargo
-
-    #Bash
     mv ${HOME}/.bash* ${HOME}/.local/share/bash
 
     clear && success
@@ -651,7 +652,7 @@ main_customization() (
 
   success() {
 
-    dialog --msgbox "Arch installation has finished." 8 78
+    dialog --msgbox "Arch installation has finished.\nYou may now reboot the computer." 8 78
     exit 69
 
   }
@@ -692,5 +693,4 @@ while (("$#")); do
   shift
 done
 
-clear
-main_setup
+clear && main_setup
