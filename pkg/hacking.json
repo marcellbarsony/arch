@@ -1,0 +1,8 @@
+[
+
+  {
+    "pkg_wireshark1": "wireshark-cli",
+    "pkg_wireshark2": "wireshark-qt"
+  }
+
+]

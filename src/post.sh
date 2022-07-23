@@ -2,12 +2,28 @@
 
 main_setup() (
 
+  arch_keyring() {
+
+    echo -n "Update keyring................" && sleep 1
+    sudo pacman -Sy archlinux-keyring
+
+    clear && check_dependencies
+
+  }
+
   check_dependencies() {
 
     echo -n "Dependencies.................." && sleep 1
     pacman -Qi dialog >/dev/null
     if [ "$?" != "0" ]; then
       sudo pacman -S dialog
+      clear
+    fi
+
+    pacman -Qi github-cli >/dev/null
+    if [ "$?" != "0" ]; then
+      sudo pacman -S github-cli
+      clear
     fi
 
     echo "[OK]"
@@ -116,7 +132,7 @@ main_setup() (
 
   }
 
-  check_dependencies
+  arch_keyring
 
 )
 
@@ -383,16 +399,6 @@ main_ssh() (
 
 main_github() {
 
-  gh_install() {
-
-    sudo pacman -Sy github-cli --noconfirm
-
-    clear
-
-    gh_login
-
-  }
-
   gh_login() {
 
     echo "GH: set token................." && sleep 1
@@ -467,7 +473,7 @@ main_github() {
 
   }
 
-  gh_install
+  gh_login
 
 }
 
@@ -547,19 +553,19 @@ main_install() {
 
 main_shell() {
 
-  echo "Shell: changing shell........."
-
-  # Change shell to Zsh
-  chsh -s /usr/bin/zsh
-
-  # Copy Zsh files
+  # Notes
   # https://zsh.sourceforge.io/Doc/Release/Files.html
   # https://zsh.sourceforge.io/Intro/intro_3.html
+
+  # Change shell
+  chsh -s /usr/bin/zsh
+
+  # Copy config
   sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
   sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
 
   # Zsh Autocomplete
-  #git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
+  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
 
   #main_services
   main_customization
@@ -590,11 +596,11 @@ main_customization() (
     # Log
     #~/.local/share/qtile/qtile.log
 
-    ly custom
+   customize_ly
 
   }
 
-  ly_custom() {
+  customize_ly() {
 
     echo "ly"
     # Configuration
@@ -621,27 +627,25 @@ main_customization() (
 
     mkdir ${HOME}/Downloads
 
-    # Fetch wallpapers
+    # Fetch & unzip wallpapers
     curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
-
-    # Unzip
     unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
 
-    cleanup
+    clear && xdg_standard
 
   }
 
-  cleanup() {
+  xdg_standard() {
 
-    mkdir ${HOME}/.local/src/{cargo,bash}
+    mkdir ${HOME}/.local/share/{cargo,bash}
 
     #Cargo
-    mv ${HOME}/.cargo ${HOME}/.local/src/cargo
+    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
 
     #Bash
-    mv ${HOME}/.bash* ${HOME}/.local/src/bash
+    mv ${HOME}/.bash* ${HOME}/.local/share/bash
 
-    success
+    clear && success
 
   }
 
