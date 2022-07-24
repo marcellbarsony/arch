@@ -4,15 +4,22 @@ main_setup() (
 
   arch_keyring() {
 
-    echo -n "Update keyring................" && sleep 1
+    echo "Update keyring................"
     sudo pacman -Sy archlinux-keyring
     if [ "$?" != "0" ]; then
       clear && echo "Cannot update archlinux-keyring - ${?}"
     fi
 
-    echo "[OK]"
-
     clear && check_dependencies
+
+  }
+
+  time_date() {
+
+    echo -n "Set Time & Date..............." && sleep 1
+    sudo timedatectl set-timezone Europe/Amsterdam
+
+    echo "[OK]"
 
   }
 
@@ -608,7 +615,16 @@ main_customization() (
     # Configuration
     # /etc/ly/config.ini
 
-    spotify_tui
+    clear && pipewire
+
+  }
+
+  pipewire() {
+
+    echo "Pipewire"
+    # https://roosnaflak.com/tech-and-research/transitioning-to-pipewire/
+
+    clear && spotify_tui
 
   }
 
@@ -639,8 +655,10 @@ main_customization() (
 
   xdg_standard() {
 
-    # Create directories
-    mkdir ${HOME}/.local/share/{cargo,bash}
+    # Create XDG directories
+    LC_ALL=C.UTF-8 xdg-user-dirs-update --force
+    mkdir ${HOME}/.local/state
+    mkdir ${HOME}/.local/share/{cargo,bash,Trash}
 
     # Move files
     mv ${HOME}/.cargo ${HOME}/.local/share/cargo

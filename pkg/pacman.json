@@ -18,6 +18,9 @@
     "pkg_txteditor": "neovim",
     "pkg_python1": "python",
     "pkg_python2": "python-pip",
+    "pkg_qtile1": "qtile",
+    "pkg_qtile2": "terminus-font",
+    "pkg_qtile3": "wlroots",
     "pkg_rust": "rust",
     "pkg_sysmonitor1": "bpytop",
     "pkg_sysmonitor2": "conky",
@@ -25,15 +28,13 @@
     "pkg_terminal_progs_1": "cmatrix",
     "pkg_terminal_progs_2": "neofetch",
     "pkg_unclutter": "unclutter",
+    "pkg_xdg_dirs": "xdg-user-dirs",
     "pkg_zsh1": "zsh",
     "pkg_zsh2": "zsh-completions",
     "pkg_zsh3": "zsh-syntax-highlighting"
   },
 
   {
-    "pkg_qtile1": "qtile",
-    "pkg_qtile2": "terminus-font",
-    "pkg_qtile3": "wlroots",
     "dependency0": "pip install pywlroots",
     "dependency1": "pywlroots",
     "dependency2": "python-xkbcommon",

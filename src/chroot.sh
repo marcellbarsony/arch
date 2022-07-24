@@ -254,7 +254,7 @@ grub() (
       exit ${exitcode}
     fi
 
-    packages
+    clear && packages
 
   }
 
@@ -276,30 +276,25 @@ grub() (
 
 packages() {
 
-  pacman -S --noconfirm btrfs-progs snapper zsh networkmanager openssh git github-cli reflector intel-ucode
+  pacman -S --noconfirm btrfs-progs snapper networkmanager openssh git github-cli reflector ntp
   local exitcode=$?
-  # Pipewire - https://roosnaflak.com/tech-and-research/transitioning-to-pipewire/
 
   if [ "${exitcode}" != "0" ]; then
     dialog --title " ERROR " --msgbox "\nPacman: cannot install packages" 8 45
     exit ${exitcode}
   fi
 
-  btrfs_config
+  clear && services
 
 }
 
-btrfs_config() {
 
-  # https://wiki.archlinux.org/title/snapper
-  # snapper -c config create-config /path/to/subvolume
-  snapper -c home create-config /home
+services() (
 
-  modules
-
-}
-
-modules() (
+  systemctl enable ntpd.service
+  systemctl enable sshd.service
+  systemctl enable NetworkManager
+  systemctl enable fstrim.timer
 
   case ${dmi} in
   "VirtualBox")
@@ -313,21 +308,23 @@ modules() (
     ;;
   esac
 
-  systemctl enable sshd.service
-
-  systemctl enable NetworkManager
-
-  systemctl enable fstrim.timer
-
-  clean_up
+  clear && btrfs_config
 
 )
 
+btrfs_config() {
+
+  # https://wiki.archlinux.org/title/snapper
+  # snapper -c config create-config /path/to/subvolume
+  snapper -c home create-config /home
+
+  clean_up
+
+}
+
 clean_up() {
 
-  rm /chroot.sh
-
-  exit 69
+  rm /chroot.sh && exit 69
 
 }
 
