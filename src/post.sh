@@ -388,6 +388,8 @@ main_ssh() (
       exit ${exitcode}
     fi
 
+    clear
+
     # SSH key add
     ssh-add ${HOME}/.ssh/id_ed25519
     local exitcode2=$?
@@ -534,7 +536,7 @@ main_install() {
   grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/pacman.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
   # AUR
-  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/aur.json | grep -o '[^"]*$' | ${TEMPORARY_aurhelper} -S --noconfirm - && clear
+  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/aur.json | grep -o '[^"]*$' | paru -S --noconfirm - && clear
 
   # Audio backend
   case ${audiobackend} in
@@ -670,8 +672,11 @@ main_customization() (
 
   success() {
 
-    dialog --msgbox "Arch installation has finished.\nYou may now reboot the computer." 8 78
-    exit 69
+    if (dialog --title " Success " --yes-label "Reboot" --no-label "Exit" --yesno "\nArch installation has finished.\nPlease reboot the machine." 15 60); then
+      sudo reboot now
+    else
+      exit 69
+    fi
 
   }
 
