@@ -132,8 +132,8 @@ locale() {
 initramfs() {
 
   sleep 1 && clear
-  sed -i "s/MODULES=()/MODULES=(btrfs)/g" /etc/mkinitcpio.conf
-  sed -i "s/block filesystems/block encrypt btrfs filesystems/g" /etc/mkinitcpio.conf
+  sed -i 's/MODULES=()/MODULES=(btrfs)/g' /etc/mkinitcpio.conf
+  sed -i 's/block filesystems/block encrypt btrfs filesystems/g' /etc/mkinitcpio.conf
 
   #sed -i "s/BINARIES=()/BINARIES=(btrfsck)/g" /etc/mkinitcpio.conf
   #sed -i "s/block filesystems/block encrypt btrfs lvm2 filesystems/g" /etc/mkinitcpio.conf
@@ -158,6 +158,7 @@ fixes() {
 
   # Watchdog error reports at shutdown
   sed -i /\#RebootWatchdogSec=10min/c\RebootWatchdogSec=0 /etc/systemd/system.conf
+  #sed -i 's/RebootWatchdogSec=10min/RebootWatchdogSec=0/g' /etc/systemd/system.conf
 
   grub
 

@@ -347,7 +347,8 @@ main_bitwarden() (
 
     # Spotify
     spotify_username=$( rbw get spotify --full | grep "Username:" | cut -d " " -f 2 )
-    spotify_username_tui=$( rbw get spotify --full | grep "TUI Username:" | cut -d " " -f 3 )
+    spotify_username_tui=$( rbw get spotif --full | grep "TUI Username:" | cut -d " " -f 3 )
+    spotify_userid=$( rbw get spotify --full | grep "User ID:" | cut -d " " -f 3 )
     spotify_token=$( rbw get spotify --full | grep "TUI Token:" | cut -d " " -f 3 )
     spotify_password=$( rbw get spotify )
 
@@ -533,11 +534,11 @@ main_install() (
     # AUR
     grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/aur.json | grep -o '[^"]*$' | paru -S --noconfirm - && clear
 
-    clear && install_display_audio
+    clear && install_display
 
   }
 
-  install_display_audio() {
+  install_display() {
 
     case ${displayprotocol} in
     X11)
@@ -547,6 +548,12 @@ main_install() (
       grep -o '"pkg_wayland[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
       ;;
     esac
+
+    clear && install_audio
+
+  }
+
+  install_audio() {
 
     case ${audiobackend} in
     ALSA)
@@ -569,7 +576,7 @@ main_install() (
     grep -o '"pkg_latin[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
     # Japanese
-    grep -o '"pkg_japanese[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    #grep -o '"pkg_japanese[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
     clear && main_shell
 
@@ -662,12 +669,14 @@ main_customization() (
 
   spotify_tui() {
 
-    # Add Spotify password
-    sed -i "s/password = ""/password = \"${spotify_password}\"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-    # Adjust cache directory to hostname
-    sed -i "s/cache_path = "/home/username/.cache/spotifyd"/cache_path = "${HOME}/.cache/spotifyd"/g" ${HOME}/.config/spotifyd/spotifyd.conf
-    # Add client secret
-    sed -i "/^client_secret:/ s/$/ ${spotify_token}/" spotify-tui/client.yml
+    # Spotifyd.conf
+    sed -i "s/username/${spotify_userid}/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/password/${spotify_password}/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/cache_path/home/${USER}/.cache/spotifyd/g" ${HOME}/.config/spotifyd/spotifyd.conf
+
+    # Client.yml
+    sed -i "s/clientid/${spotify_username_tui}/g" ${HOME}/.config/spotify-tui/client.yml
+    sed -i "s/clientsecret/${spotify_token}/g" ${HOME}/.config/spotify-tui/client.yml
 
     clear && xdg_dirs
 
@@ -698,13 +707,11 @@ main_customization() (
 
     # Fetch & unzip wallpapers
     curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
-    unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
+    unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Pictures/Wallpapers/ -x /
 
     clear && success
 
   }
-
-
 
   success() {
 
