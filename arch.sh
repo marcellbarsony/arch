@@ -41,8 +41,6 @@ main_setup() (
 
     colors() {
 
-      #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
-
       RESTORE=$(echo -en '\033[0m')
       RED=$(echo -en '\033[00;31m')
       GREEN=$(echo -en '\033[00;32m')
@@ -61,10 +59,12 @@ main_setup() (
       LCYAN=$(echo -en '\033[01;36m')
       WHITE=$(echo -en '\033[01;37m')
 
+      #https://gist.github.com/elucify/c7ccfee9f13b42f11f81
+
       # Test
       #echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
 
-      echo "[OK]"
+      echo "[${CYAN}OK${RESTORE}]"
 
       logs
 
@@ -84,7 +84,7 @@ main_setup() (
       >${error_log} && >${script_log}
     fi
 
-    echo "[OK]"
+    echo "[${CYAN}OK${RESTORE}]"
 
     network
 
@@ -95,21 +95,14 @@ main_setup() (
     echo -n ${info_network}
     ping -q -c 3 archlinux.org &>/dev/null
 
-    case $? in
-    0)
-      echo "[OK]"
-      bootmode
-      ;;
-    1)
-      echo "[DISCONNECTED]"
+    if [ "$?" != "0" ]; then
+      echo "[${RED}ERROR${RESTORE}]"
       echo "Please connect to a network and try again."
-      exit 1
-      ;;
-    *)
-      echo "[ERROR]"
       echo "Exit status $?"
-      ;;
-    esac
+    fi
+
+    echo "[${CYAN}OK${RESTORE}]"
+    bootmode
 
   }
 
@@ -118,22 +111,14 @@ main_setup() (
     echo -n ${info_bootmode} && sleep 1
     ls /sys/firmware/efi/efivars &>/dev/null
 
-    case $? in
-    0)
-      echo "[OK]"
-      dmidata
-      ;;
-    1)
-      echo "[BIOS]"
-      echo "BIOS is not supported."
-      exit 1
-      ;;
-    *)
-      echo "[ERROR]"
-      echo "Exit status $?"
+    if [ "$?" != "0" ]; then
+      echo "[${RED}ERROR${RESTORE}]"
+      echo "Please verify the boot mode - Exit status $?"
       echo "https://wiki.archlinux.org/title/installation_guide#Verify_the_boot_mode"
-      ;;
-    esac
+    fi
+
+    echo "[${CYAN}OK${RESTORE}]"
+    dmidata
 
   }
 
@@ -143,9 +128,9 @@ main_setup() (
     dmi=$(dmidecode -s system-product-name)
 
     if [ ${dmi} == "VirtualBox" ] || ${dmi} == "VMware Virtual Platform" ]; then
-      echo "[VM]"
+      echo "[${CYAN}VM${RESTORE}]"
     else
-      echo "[Physical Machine]"
+      echo "[${CYAN}PM${RESTORE}]"
     fi
 
     systemclock
@@ -157,15 +142,13 @@ main_setup() (
     echo -n ${info_systemclock} && sleep 1
     timedatectl set-ntp true --no-ask-password
 
-    case $? in
-    0)
-      echo "[OK]"
-      keymap
-      ;;
-    *)
-      echo "\nExit status $?"
-      ;;
-    esac
+    if [ "$?" != "0" ]; then
+      echo "[${RED}ERROR${RESTORE}]"
+      echo "Exit status $?"
+    fi
+
+    echo "[${CYAN}OK${RESTORE}]"
+    keymap
 
   }
 
@@ -175,16 +158,13 @@ main_setup() (
     loadkeys us &>/dev/null
     localectl set-keymap --no-convert us &>/dev/null # Systemd reads from /etc/vconsole.conf
 
-    case $? in
-    0)
-      echo "[OK]"
-      dependencies
-      ;;
-    *)
-      echo "[ERROR]"
+    if [ "$?" != "0" ]; then
+      echo "[${RED}ERROR${RESTORE}]"
       echo "Exit status $?"
-      ;;
-    esac
+    fi
+
+    echo "[${CYAN}OK${RESTORE}]"
+    configs
 
   }
 
@@ -194,16 +174,13 @@ main_setup() (
     cp -f ${dialogrc} ${HOME}/.dialogrc
     cp -f ${pacmanconf} /etc/pacman.conf
 
-    case $? in
-    0)
-      echo "[OK]"
-      dependencies
-      ;;
-    *)
-      echo "[ERROR]"
+    if [ "$?" != "0" ]; then
+      echo "[${RED}ERROR${RESTORE}]"
       echo "Exit status $?"
-      ;;
-    esac
+    fi
+
+    echo "[${CYAN}OK${RESTORE}]"
+    dependencies
 
   }
 
@@ -212,16 +189,13 @@ main_setup() (
     echo -n ${info_dependencies} && sleep 1
     pacman -Sy --noconfirm dialog &>/dev/null
 
-    case $? in
-    0)
-      echo "[OK]"
-      partition
-      ;;
-    *)
-      echo "[ERROR]"
+    if [ "$?" != "0" ]; then
+      echo "[${RED}ERROR${RESTORE}]"
       echo "Exit status $?"
-      ;;
-    esac
+    fi
+
+    echo "[${CYAN}OK${RESTORE}]"
+    partition
 
   }
 
