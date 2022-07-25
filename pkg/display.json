@@ -5,7 +5,7 @@
     "pkg_xorg2": "xorg-xinit",
     "pkg_xorg3": "xorg-xwayland",
     "pkg_xorg4": "xwallpaper",
-    "pkg_xorg5": "arandr",
+    "pkg_xorg5": "autoarandr",
     "pkg_wayland1": "wayland",
     "pkg_wayland2": "wayland-protocols",
     "pkg_wayland3": "xorg-xwayland",

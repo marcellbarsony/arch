@@ -5,7 +5,7 @@ main_setup() (
   arch_keyring() {
 
     echo "Update keyring................"
-    sudo pacman -Sy archlinux-keyring
+    sudo pacman -Sy --noconfirm archlinux-keyring
     if [ "$?" != "0" ]; then
       clear && echo "Cannot update archlinux-keyring - ${?}"
     fi
@@ -253,7 +253,7 @@ main_aur() {
 
   cd ${HOME}
 
-  main_bitwarden
+  clean && main_bitwarden
 
 }
 
@@ -268,7 +268,6 @@ main_bitwarden() (
       dialog --title " ERROR " --msgbox "Cannot install rbw" 8 45
       exit ${exitcode}
     fi
-
 
     bitwarden_email
 
@@ -297,12 +296,11 @@ main_bitwarden() (
 
   bitwarden_register() {
 
-    # Register
     error=$(rbw register 2>&1)
     local exitcode=$?
 
     if [ "${exitcode}" != "0" ]; then
-      dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nRBW register failed" 8 60
+      dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nRBW register failed\n${error}" 8 60
       case ${?} in
       0)
         bitwarden_email
@@ -343,19 +341,17 @@ main_bitwarden() (
   bitwarden_data() {
 
     # Github
-    gh_email=$( rbw get GitHub --full | grep "E-mail:" | cut -d " " -f 2 )
-    gh_username=$( rbw get GitHub --full | grep "Username:" | cut -d " " -f 2 )
-    gh_pat=$( rbw get GitHub --full | grep "Personal Access Token:" | cut -d " " -f 4 )
+    gh_email=$( rbw get github --full | grep "E-mail:" | cut -d " " -f 2 )
+    gh_username=$( rbw get github --full | grep "Username:" | cut -d " " -f 2 )
+    gh_pat=$( rbw get github --full | grep "Personal Access Token:" | cut -d " " -f 4 )
 
     # Spotify
-    spotify_username=$( rbw get Spotify --full | grep "Username:" | cut -d " " -f 2 )
-    spotify_username_tui=$( rbw get Spotify --full | grep "TUI Username:" | cut -d " " -f 3 )
-    spotify_token=$( rbw get Spotify --full | grep "TUI Token:" | cut -d " " -f 3 )
-    spotify_password=$( rbw get Spotify )
+    spotify_username=$( rbw get spotify --full | grep "Username:" | cut -d " " -f 2 )
+    spotify_username_tui=$( rbw get spotify --full | grep "TUI Username:" | cut -d " " -f 3 )
+    spotify_token=$( rbw get spotify --full | grep "TUI Token:" | cut -d " " -f 3 )
+    spotify_password=$( rbw get spotify )
 
-    clear
-
-    main_ssh
+    clear && main_ssh
 
   }
 
@@ -367,13 +363,13 @@ main_ssh() (
 
   ssh_agent() {
 
-    # SSH process kill
+    # Kill process
     sudo pkill -9 -f ssh
 
-    # SSH client start
+    # Start client
     eval "$(ssh-agent -s)"
 
-    ssh_key
+    clear && ssh_key
 
   }
 
@@ -412,7 +408,7 @@ main_github() {
 
   gh_login() {
 
-    echo "GH: set token................." && sleep 1
+    echo "GH: set token..." && sleep 1
     set -u
     cd ${HOME}
     echo "${gh_pat}" >.ghpat
@@ -426,10 +422,10 @@ main_github() {
       exit ${exitcode}
     fi
 
-    echo "GH: remove token.............." && sleep 1
+    echo "GH: remove token..." && sleep 1
     rm ${HOME}/.ghpat
 
-    echo "GH: authentication status....." && sleep 1
+    echo "GH: authentication status..." && sleep 1
     gh auth status && sleep 5
 
     gh_pubkey
@@ -438,7 +434,7 @@ main_github() {
 
   gh_pubkey() {
 
-    echo "GH: add ssh key..............." && sleep 1
+    echo "GH: add ssh key..." && sleep 1
     gh ssh-key add ${HOME}/.ssh/id_ed25519.pub -t ${gh_pubkeyname}
     local exitcode=$?
     if [ "${exitcode}" != "0" ]; then
@@ -452,7 +448,7 @@ main_github() {
 
   gh_test() {
 
-    echo "GH: ssh test.................."
+    echo "GH: ssh test..."
     ssh -T git@github.com
     local exitcode=$?
 
@@ -492,17 +488,14 @@ main_dotfiles() (
 
   dotfiles_fetch() {
 
-    echo "Dotfiles: fetching............"
+    echo "Dotfiles: fetching..."
 
     mv ${HOME}/.config/rbw /tmp && mv ${HOME}/.config/gh /tmp
     rm -rf ${HOME}/.config
 
     git clone git@github.com:${gh_username}/dotfiles.git ${HOME}/.config
-
     cd ${HOME}/.config
-
     git remote set-url origin git@github.com:${gh_username}/dotfiles.git
-
     cd ${HOME}
 
     mv /tmp/rbw ${HOME}/.config && mv /tmp/gh ${HOME}/.config
@@ -513,7 +506,7 @@ main_dotfiles() (
 
   dotfiles_copy() {
 
-    echo "Dotfiles: copying............."
+    echo "Dotfiles: copying..."
 
     sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
 
@@ -527,59 +520,96 @@ main_dotfiles() (
 
 )
 
-main_install() {
+main_install() (
 
-  # Base
-  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/base.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+  install_base() {
 
-  # Pacman
-  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/pacman.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    # Base
+    grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/base.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
-  # AUR
-  grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/aur.json | grep -o '[^"]*$' | paru -S --noconfirm - && clear
+    # Pacman
+    grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/pacman.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
-  # Audio backend
-  case ${audiobackend} in
-  ALSA)
-    grep -o '"pkg_alsa[^"]*": "[^"]*' ${HOME}/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
-    ;;
-  Pipewire)
-    grep -o '"pkg_pipewire[^"]*": "[^"]*' ~/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
-    ;;
-  esac
+    # AUR
+    grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/aur.json | grep -o '[^"]*$' | paru -S --noconfirm - && clear
 
-  # Display protocol
-  case ${displayprotocol} in
-  X11)
-    grep -o '"pkg_xorg[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
-    ;;
-  Wayland)
-    grep -o '"pkg_wayland[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
-    ;;
-  esac
+    clear && install_display_audio
 
-  main_shell
+  }
 
-}
+  install_display_audio() {
+
+    case ${displayprotocol} in
+    X11)
+      grep -o '"pkg_xorg[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      ;;
+    Wayland)
+      grep -o '"pkg_wayland[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      ;;
+    esac
+
+    case ${audiobackend} in
+    ALSA)
+      grep -o '"pkg_alsa[^"]*": "[^"]*' ${HOME}/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      ;;
+    Pipewire)
+      grep -o '"pkg_pipewire[^"]*": "[^"]*' ~/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      ;;
+    esac
+
+    clear && install_fonts
+
+  }
+
+  install_fonts() {
+
+    echo "Installing fonts..."
+
+    # Latin
+    grep -o '"pkg_latin[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+
+    # Japanese
+    grep -o '"pkg_japanese[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+
+    clear && main_shell
+
+  }
+
+  install_base
+
+)
 
 main_shell() {
+
+  # Change shell
+  chsh -s /usr/bin/zsh
+  local exitcode=$?
+
+  if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nZSH: Cannot change shell" 8 60
+    case ${?} in
+    0)
+      main_shell
+      ;;
+    1)
+      echo "Installation terminated - $?"
+      exit ${exitcode}
+    ;;
+    esac
+  fi
+
+  # Config
+  sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
+  sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
+
+  # Autocomplete
+  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
 
   # Notes
   # https://zsh.sourceforge.io/Doc/Release/Files.html
   # https://zsh.sourceforge.io/Intro/intro_3.html
 
-  # Change shell
-  chsh -s /usr/bin/zsh
-
-  # Copy config
-  sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
-  sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
-
-  # Zsh Autocomplete
-  git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
-
-  #main_services
-  main_customization
+  clear && main_customization #main_services
 
 }
 
@@ -639,7 +669,26 @@ main_customization() (
     # Add client secret
     sed -i "/^client_secret:/ s/$/ ${spotify_token}/" spotify-tui/client.yml
 
-    wallpaper
+    clear && xdg_dirs
+
+  }
+
+  xdg_dirs() {
+
+    # Generate XDG directories
+    LC_ALL=C.UTF-8 xdg-user-dirs-update --force
+    mkdir ${HOME}/.local/state
+    mkdir ${HOME}/.local/share/{bash,cargo,Trash,vim}
+
+    # Move files
+    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
+    mv ${HOME}/.bash* ${HOME}/.local/share/bash
+    mv ${HOME}/.viminfo* ${HOME}/.local/share/vim
+
+    # Delete files
+    rm -rf ${HOME}/arch
+
+    clear && wallpaper
 
   }
 
@@ -651,28 +700,15 @@ main_customization() (
     curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
     unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Downloads/Wallpapers/ -x /
 
-    clear && xdg_standard
-
-  }
-
-  xdg_standard() {
-
-    # Create XDG directories
-    LC_ALL=C.UTF-8 xdg-user-dirs-update --force
-    mkdir ${HOME}/.local/state
-    mkdir ${HOME}/.local/share/{cargo,bash,Trash}
-
-    # Move files
-    mv ${HOME}/.cargo ${HOME}/.local/share/cargo
-    mv ${HOME}/.bash* ${HOME}/.local/share/bash
-
     clear && success
 
   }
 
+
+
   success() {
 
-    if (dialog --title " Success " --yes-label "Reboot" --no-label "Exit" --yesno "\nArch installation has finished.\nPlease reboot the machine." 15 60); then
+    if (dialog --title " Success " --yes-label "Reboot" --no-label "Exit" --yesno "\nArch installation has finished.\nPlease reboot the machine." 10 50); then
       sudo reboot now
     else
       exit 69

@@ -43,8 +43,8 @@
     "dependency5": "cairo",
     "dependency6": "python-cairo",
     "dependency7": "python-cairocffi",
-    "dependency8": "pango",
-    "dependency9": "python-dbus-next"
+    "dependency8": "python-dbus-next",
+    "dependency9": "pango"
   }
 
 ]
