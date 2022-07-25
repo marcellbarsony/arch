@@ -34,7 +34,7 @@
 
 ## Script
 
-[ ] Implement proper error handling
+[ ] Error handling
 [ ] Suppress unnecessary command outputs
 [ ] Wayland support
 
@@ -44,7 +44,7 @@
 
 ### Bitwarden
 
-[ ] [rbw](https://github.com/doy/rbw) support
+[x] [rbw](https://github.com/doy/rbw) support
 [ ] [Bitwarden CLI](https://bitwarden.com/help/cli/) support
 
 # Install sequence sketch
