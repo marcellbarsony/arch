@@ -960,5 +960,4 @@ while (("$#")); do
   shift
 done
 
-clear
-main_setup
+clear && main_setup

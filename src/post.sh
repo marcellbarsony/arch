@@ -253,7 +253,7 @@ main_aur() {
 
   cd ${HOME}
 
-  clean && main_bitwarden
+  clear && main_bitwarden
 
 }
 
@@ -346,11 +346,12 @@ main_bitwarden() (
     gh_pat=$( rbw get github --full | grep "Personal Access Token:" | cut -d " " -f 4 )
 
     # Spotify
+    spotify_email=$( rbw get spotify --full | grep "E-mail:" | cut -d " " -f 2 )
     spotify_username=$( rbw get spotify --full | grep "Username:" | cut -d " " -f 2 )
-    spotify_username_tui=$( rbw get spotif --full | grep "TUI Username:" | cut -d " " -f 3 )
-    spotify_userid=$( rbw get spotify --full | grep "User ID:" | cut -d " " -f 3 )
-    spotify_token=$( rbw get spotify --full | grep "TUI Token:" | cut -d " " -f 3 )
     spotify_password=$( rbw get spotify )
+    spotify_client_id=$( rbw get spotify --full | grep "Client ID:" | cut -d " " -f 3 )
+    spotify_device_id=$( rbw get spotify --full | grep "Device ID:" | cut -d " " -f 3 )
+    spotify_client_secret=$( rbw get spotify --full | grep "Client Secret:" | cut -d " " -f 3 )
 
     clear && main_ssh
 
@@ -663,20 +664,23 @@ main_customization() (
     echo "Pipewire"
     # https://roosnaflak.com/tech-and-research/transitioning-to-pipewire/
 
-    clear && spotify_tui
+    clear && spotify_client
 
   }
 
-  spotify_tui() {
+  spotify_client() {
+
+    killall spotifyd
 
     # Spotifyd.conf
-    sed -i "s/username/${spotify_userid}/g" ${HOME}/.config/spotifyd/spotifyd.conf
-    sed -i "s/password/${spotify_password}/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/replace_username/${spotify_username}/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/replace_password/${spotify_password}/g" ${HOME}/.config/spotifyd/spotifyd.conf
     sed -i "s/cache_path/home/${USER}/.cache/spotifyd/g" ${HOME}/.config/spotifyd/spotifyd.conf
 
     # Client.yml
-    sed -i "s/clientid/${spotify_username_tui}/g" ${HOME}/.config/spotify-tui/client.yml
-    sed -i "s/clientsecret/${spotify_token}/g" ${HOME}/.config/spotify-tui/client.yml
+    sed -i "s/clientid/${spotify_client_id}/g" ${HOME}/.config/spotify-tui/client.yml
+    sed -i "s/clientsecret/${spotify_client_secret}/g" ${HOME}/.config/spotify-tui/client.yml
+    sed -i "s/deviceid/${spotify_device_id}/g" ${HOME}/.config/spotify-tui/client.yml
 
     clear && xdg_dirs
 
@@ -695,6 +699,7 @@ main_customization() (
     mv ${HOME}/.viminfo* ${HOME}/.local/share/vim
 
     # Delete files
+    rm -rf ${HOME}/{Desktop,Music,Public,Templates,Videos}
     rm -rf ${HOME}/arch
 
     clear && wallpaper
