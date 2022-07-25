@@ -121,10 +121,7 @@ sudoers() {
 locale() {
 
   sed -i '/#en_US.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
-  sed -i '/#ja_JP.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
-
   echo "LANG=en_US.UTF-8" >/etc/locale.conf
-  echo "LANG=ja_JP.UTF-8" >>/etc/locale.conf
 
   locale-gen
 

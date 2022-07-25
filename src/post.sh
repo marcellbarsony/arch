@@ -467,7 +467,7 @@ main_github() {
       ;;
     esac
 
-    clear && main_dotfiles
+    main_dotfiles
 
   }
 
@@ -518,7 +518,7 @@ main_dotfiles() (
 
   }
 
-  dotfiles_fetch
+  clear && dotfiles_fetch
 
 )
 
@@ -579,6 +579,8 @@ main_install() (
     # Japanese
     #grep -o '"pkg_japanese[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
+
+
     clear && main_shell
 
   }
@@ -623,8 +625,8 @@ main_shell() {
 
 main_services() {
 
-  # ly
   sudo systemctl enable ly.service
+  sudo systemctl enable spotifyd.service
 
   main_customization
 
@@ -673,9 +675,9 @@ main_customization() (
     killall spotifyd
 
     # Spotifyd.conf
-    sed -i "s/replace_username/${spotify_username}/g" ${HOME}/.config/spotifyd/spotifyd.conf
-    sed -i "s/replace_password/${spotify_password}/g" ${HOME}/.config/spotifyd/spotifyd.conf
-    sed -i "s/cache_path/home/${USER}/.cache/spotifyd/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/usr/${spotify_username}/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s/pswd/${spotify_password}/g" ${HOME}/.config/spotifyd/spotifyd.conf
+    sed -i "s#cachedir#/home/${USER}/.cache/spotifyd/#g" ${HOME}/.config/spotifyd/spotifyd.conf
 
     # Client.yml
     sed -i "s/clientid/${spotify_client_id}/g" ${HOME}/.config/spotify-tui/client.yml
@@ -701,6 +703,16 @@ main_customization() (
     # Delete files
     rm -rf ${HOME}/{Desktop,Music,Public,Templates,Videos}
     rm -rf ${HOME}/arch
+
+    clear && font_support
+
+  }
+
+  font_support() {
+
+    # Japanese font support
+    sudo sed -i '/#ja_JP.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
+    sudo echo "LANG=ja_JP.UTF-8" >>/etc/locale.conf
 
     clear && wallpaper
 

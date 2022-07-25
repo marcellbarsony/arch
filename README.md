@@ -15,9 +15,11 @@ Main features including but not limited to:
 - LUKS2
 - Btrfs (Snapper)
 - Hardened kernel
-- Wayland
+- X11 (TBA: Wayland)
 - Zsh
+- Qtile
 - XDGBDS
+- Powered by Python & Rust
 
 ## Installation guide
 
