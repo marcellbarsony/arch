@@ -323,4 +323,4 @@ clean_up() {
 
 }
 
-sysadmin
+clear && sysadmin

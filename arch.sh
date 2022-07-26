@@ -885,7 +885,7 @@ archinstall() (
 
     echo "Pacman: Updating Arch Linux keyring..."
 
-    pacman -Sy archlinux-keyring
+    pacman -Sy --noconfirm archlinux-keyring
 
     clear && packages
 
