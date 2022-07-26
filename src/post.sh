@@ -386,7 +386,7 @@ main_ssh() (
       exit ${exitcode}
     fi
 
-    clear
+    sleep 1 && clear
 
     # SSH key add
     ssh-add ${HOME}/.ssh/id_ed25519
@@ -396,9 +396,20 @@ main_ssh() (
       dialog --title " ERROR " --msgbox "Cannot add SSH key to agent" 8 45
       exit ${exitcode2}
     fi
+      if [ "${exitcode}" != "0" ]; then
+    dialog --title " ERROR " --yes-label "Retry" --no-label "Exit" --yesno "\nZSH: Cannot change shell" 8 60
+    case ${?} in
+    0)
+      main_shell
+      ;;
+    1)
+      echo "Installation terminated - $?"
+      exit ${exitcode}
+    ;;
+    esac
+  fi
 
-    sleep 3 && clear
-    main_github
+    sleep 1 && clear && main_github
 
   }
 
@@ -612,23 +623,29 @@ main_shell() {
   sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
   sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
 
-  # Autocomplete
+  # Zsh-Autocomplete
   git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
+
+  # Zsh-Completions
+  git clone https://github.com/zsh-users/zsh-completions.git ${HOME}/.local/src/zsh-completions/
+
+  # Zsh-Autosuggestions
+  git clone https://github.com/zsh-users/zsh-autosuggestions ${HOME}/.local/src/zsh-autosuggestions/
 
   # Notes
   # https://zsh.sourceforge.io/Doc/Release/Files.html
   # https://zsh.sourceforge.io/Intro/intro_3.html
 
-  clear && main_customization #main_services
+  clear && main_services
 
 }
 
 main_services() {
 
-  sudo systemctl enable ly.service
+  #sudo systemctl enable ly.service
   sudo systemctl enable spotifyd.service
 
-  main_customization
+  clear && main_customization
 
 }
 

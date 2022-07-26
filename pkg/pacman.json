@@ -36,7 +36,7 @@
   },
 
   {
-    "dependency0": "pip install pywlroots",
+    "pip-install": "pywlroots",
     "dependency1": "pywlroots",
     "dependency2": "python-xkbcommon",
     "dependency3": "python-pywayland",
