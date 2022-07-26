@@ -877,6 +877,16 @@ archinstall() (
 
     reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
 
+    clear && arch_keyring
+
+  }
+
+  arch_keyring() {
+
+    echo "Pacman: Updating Arch Linux keyring..."
+
+    pacman -Sy archlinux-keyring
+
     clear && packages
 
   }
@@ -929,8 +939,7 @@ chroot() {
 
   #umount -l /mnt
 
-  clear
-  exit 1
+  clear && exit 1
 
 }
 

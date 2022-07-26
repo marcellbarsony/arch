@@ -4,8 +4,7 @@ sysadmin() (
 
   setkeymap() {
 
-    echo "Set keymap [${keymap}]..."
-    sleep 1
+    echo "Set keymap [${keymap}]..." && sleep 1
 
     loadkeys ${keymap} &>/dev/null
     localectl set-keymap --no-convert ${keymap} &>/dev/null # Systemd reads from /etc/vconsole.conf
@@ -16,8 +15,7 @@ sysadmin() (
 
   root_passphrase() {
 
-    echo "Set root password..."
-    sleep 1
+    echo "Set root password..." && sleep 1
 
     echo "root:${root_password}" | chpasswd 2>&1
     local exitcode=$?
@@ -33,8 +31,7 @@ sysadmin() (
 
   user_create() {
 
-    echo "Add user [${username}]..."
-    sleep 1
+    echo "Add user [${username}]..." && sleep 1
 
     useradd -m ${username}
 
@@ -44,8 +41,7 @@ sysadmin() (
 
   user_passphrase() {
 
-    echo "Set ${username}'s password..."
-    sleep 1
+    echo "Set ${username}'s password..." && sleep 1
 
     error=$(echo "${username}:${user_password}" | chpasswd 2>&1)
     local exitcode=$?
@@ -61,8 +57,7 @@ sysadmin() (
 
   user_group() {
 
-    echo "Add ${username} to groups..."
-    sleep 1
+    echo "Add ${username} to groups..." && sleep 1
 
     usermod -aG wheel,audio,video,optical,storage ${username} 2>&1
 
@@ -288,7 +283,6 @@ packages() {
   clear && services
 
 }
-
 
 services() (
 
