@@ -18,6 +18,7 @@
     "pkg_txteditor": "neovim",
     "pkg_python1": "python",
     "pkg_python2": "python-pip",
+    "pkg_python3": "python-pywal",
     "pkg_qtile1": "qtile",
     "pkg_qtile2": "wlroots",
     "pkg_rust": "rust",
@@ -29,8 +30,9 @@
     "pkg_unclutter": "unclutter",
     "pkg_xdg_dirs": "xdg-user-dirs",
     "pkg_zsh1": "zsh",
-    "pkg_zsh2": "zsh-completions",
-    "pkg_zsh3": "zsh-syntax-highlighting"
+    "pkg_zsh2": "zsh-autosuggestions",
+    "pkg_zsh3": "zsh-completions",
+    "pkg_zsh4": "zsh-syntax-highlighting"
   },
 
   {
