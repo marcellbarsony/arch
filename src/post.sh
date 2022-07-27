@@ -478,7 +478,7 @@ main_github() {
       ;;
     esac
 
-    main_dotfiles
+    main_repositories
 
   }
 
@@ -497,9 +497,9 @@ main_github() {
 
 }
 
-main_dotfiles() (
+main_repositories() (
 
-  dotfiles_fetch() {
+  dotfiles() {
 
     echo "Dotfiles: fetching..."
 
@@ -513,23 +513,31 @@ main_dotfiles() (
 
     mv /tmp/rbw ${HOME}/.config && mv /tmp/gh ${HOME}/.config
 
-    dotfiles_copy
-
-  }
-
-  dotfiles_copy() {
-
     echo "Dotfiles: copying..."
 
     sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
-
     sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
+
+    clear && scripts_fetch
+
+  }
+
+  scripts() {
+
+    echo "Scripts: fetching..."
+
+    local folder=${HOME}/.local/git/scripts
+
+    git clone git@github.com:${gh_username}/scripts.git ${folder}
+    cd ${folder}
+    git remote set-url origin git@github.com:${gh_username}/scripts.git
+    cd ${HOME}
 
     clear && main_install
 
   }
 
-  clear && dotfiles_fetch
+  clear && dotfiles
 
 )
 
