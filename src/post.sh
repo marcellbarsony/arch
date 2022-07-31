@@ -518,7 +518,7 @@ main_repositories() (
     sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
     sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
 
-    clear && scripts_fetch
+    clear && scripts
 
   }
 
@@ -681,6 +681,18 @@ main_customization() (
     echo "ly"
     # Configuration
     # /etc/ly/config.ini
+
+    clear && customize_pacman
+
+  }
+
+  customize_pacman() {
+
+    # Marking archlinux-keyring as explicitly installed
+    sudo pacman -D --asexplicit archlinux-keyring
+
+    # Remove orphans amd their configuration files
+    sudo pacman -Qtdq | pacman -Rns -
 
     clear && pipewire
 
