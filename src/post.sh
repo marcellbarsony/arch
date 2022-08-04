@@ -672,7 +672,22 @@ main_customization() (
     # Log
     #~/.local/share/qtile/qtile.log
 
-   customize_ly
+   customize_neovim
+
+  }
+
+  customize_neovim(){
+
+    plugins_start=$HOME/.config/nvim/pack/plugins/start
+    plugins_opt=$HOME/.config/nvim/pack/plugins/opt
+
+    # LSP config
+    gh repo clone neovim/nvim-lspconfig ${plugins_start}
+
+    # Tree
+    gh repo clone kyazdani42/nvim-tree.lua ${plugins_start}
+
+    customize_ly
 
   }
 
