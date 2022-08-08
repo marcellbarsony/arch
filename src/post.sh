@@ -678,14 +678,26 @@ main_customization() (
 
   customize_neovim(){
 
-    plugins_start=$HOME/.config/nvim/pack/plugins/start
-    plugins_opt=$HOME/.config/nvim/pack/plugins/opt
+    plugins_start=$HOME/.local/share/nvim/site/pack/default/start
+    plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
+
+    # Autocomplete
+    gh repo clone hrsh7th/nvim-cmp ${plugins_start}
+    gh repo clone hrsh7th/cmp-buffer ${plugins_start}
+    gh repo clone hrsh7th/cmp-nvim-lsp ${plugins_start}
+    gh repo clone hrsh7th/cmp-path ${plugins_start}
+
+    # Fold
 
     # LSP config
     gh repo clone neovim/nvim-lspconfig ${plugins_start}
 
+  # Tabs
+
     # Tree
     gh repo clone kyazdani42/nvim-tree.lua ${plugins_start}
+
+    # Status line
 
     customize_ly
 
