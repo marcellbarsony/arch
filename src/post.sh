@@ -672,48 +672,74 @@ main_customization() (
     # Log
     #~/.local/share/qtile/qtile.log
 
-   customize_neovim
+   clear && neovim_setup
 
   }
 
-  customize_neovim(){
+  neovim_setup(){
 
-    plugins_start=$HOME/.local/share/nvim/site/pack/default/start
-    plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
+    local plugins_start=$HOME/.local/share/nvim/site/pack/default/start
+    local plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
+    local clone='gh repo clone'
 
     # Autocomplete
-    gh repo clone hrsh7th/nvim-cmp ${plugins_start}
-    gh repo clone hrsh7th/cmp-buffer ${plugins_start}
-    gh repo clone hrsh7th/cmp-nvim-lsp ${plugins_start}
-    gh repo clone hrsh7th/cmp-path ${plugins_start}
+      # coq_nvim
+        #${clone} ms-jpq/coq_nvim ${plugins_start}
+      # nvim-cmp
+        ${clone} hrsh7th/nvim-cmp ${plugins_start}
+        ${clone} hrsh7th/cmp-buffer ${plugins_start}
+        ${clone} hrsh7th/cmp-cmdline ${plugins_start}
+        ${clone} hrsh7th/cmp-path ${plugins_start}
+        ${clone} hrsh7th/cmp-git ${plugins_start}
 
     # Fold
 
+    # Fuzzy
+      # cmp-rg
+        #${clone} lukas-reineke/cmp-rg ${plugins_start}
+
     # LSP config
-    gh repo clone neovim/nvim-lspconfig ${plugins_start}
+      ${clone} neovim/nvim-lspconfig ${plugins_start}
+      ${clone} hrsh7th/cmp-nvim-lsp ${plugins_start}
 
-  # Tabs
+    # Python plugin support
+      pip3 install pynvim
 
-    # Tree
-    gh repo clone kyazdani42/nvim-tree.lua ${plugins_start}
+    # Shell
+      #${clone} tamago324/cmp-zsh ${plugins_start}
+
+    # Snippets
+      # ultisnips
+        ${clone} SirVer/ultisnips ${plugins_start}
+        ${clone} quangnguyen30192/cmp-nvim-ultisnips ${plugins_start}
+        ${clone} honza/vim-snippets ${plugins_start}
+        ${clone} onsails/lspkind.nvim ${plugins_start} # Snippet icons
+      # vim-vsnip
+        # https://github.com/hrsh7th/cmp-vsnip
 
     # Status line
 
-    customize_ly
+    # Tabs
+
+    # Tree
+      ${clone} kyazdani42/nvim-tree.lua ${plugins_start}
+
+
+    clear && ly_setup
 
   }
 
-  customize_ly() {
+  ly_setup() {
 
     echo "ly"
     # Configuration
     # /etc/ly/config.ini
 
-    clear && customize_pacman
+    clear && pacman_setup
 
   }
 
-  customize_pacman() {
+  pacman_setup() {
 
     # Marking archlinux-keyring as explicitly installed
     sudo pacman -D --asexplicit archlinux-keyring
