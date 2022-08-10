@@ -682,28 +682,39 @@ main_customization() (
     local plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
     local clone='gh repo clone'
 
-    # Autocomplete
-      # coq_nvim
-        #${clone} ms-jpq/coq_nvim ${plugins_start}
-      # nvim-cmp
+    # Python
+      # Plugin support
+        pip3 install pynvim
+      # Autocomplete (coq.nvim)
+        ${clone} ms-jpq/coq_nvim ${plugins_start}
+      # File explorer
+        ${clone} md-jpq/chadtree ${plugins_start}
+      # LSP config
+        ${clone} neovim/nvim-lspconfig ${plugins_start}
+        #${clone} williamboman/nvim-lsp-installer ${plugins_start}
+
+    # Lua
+      # Autocomplete (nvim-cmp)
         ${clone} hrsh7th/nvim-cmp ${plugins_start}
         ${clone} hrsh7th/cmp-buffer ${plugins_start}
         ${clone} hrsh7th/cmp-cmdline ${plugins_start}
-        ${clone} hrsh7th/cmp-path ${plugins_start}
         ${clone} hrsh7th/cmp-git ${plugins_start}
+        ${clone} hrsh7th/cmp-nvim-lsp ${plugins_start}
+        ${clone} hrsh7th/cmp-path ${plugins_start}
+      # File explorer
+        ${clone} kyazdani42/nvim-tree.lua ${plugins_start}
+        #${clone} nvim-neo-tree/neo-tree.nvim ${plugins_start}
+      # Git
+        ${clone} lewis6991/gitsigns.nvim ${plugins_start}
+      # LSP config
+        ${clone} neovim/nvim-lspconfig ${plugins_start}
+        #${clone} williamboman/nvim-lsp-installer ${plugins_start}
 
     # Fold
 
     # Fuzzy
       # cmp-rg
         #${clone} lukas-reineke/cmp-rg ${plugins_start}
-
-    # LSP config
-      ${clone} neovim/nvim-lspconfig ${plugins_start}
-      ${clone} hrsh7th/cmp-nvim-lsp ${plugins_start}
-
-    # Python plugin support
-      pip3 install pynvim
 
     # Shell
       #${clone} tamago324/cmp-zsh ${plugins_start}
@@ -720,10 +731,6 @@ main_customization() (
     # Status line
 
     # Tabs
-
-    # Tree
-      ${clone} kyazdani42/nvim-tree.lua ${plugins_start}
-
 
     clear && ly_setup
 
