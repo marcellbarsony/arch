@@ -682,6 +682,11 @@ main_customization() (
     local plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
     local clone='gh repo clone'
 
+    for repo in list
+    do
+      gh repo clone ${repo} ${plugins_start}
+    done
+
     # Python
       # Plugin support
         pip3 install pynvim
