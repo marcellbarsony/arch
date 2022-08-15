@@ -672,7 +672,7 @@ main_customization() (
     # Log
     #~/.local/share/qtile/qtile.log
 
-   clear && neovim_setup
+    clear && neovim_setup
 
   }
 
@@ -680,32 +680,29 @@ main_customization() (
 
     local plugins_start=$HOME/.local/share/nvim/site/pack/default/start
     local plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
-    local clone='gh repo clone'
 
-    for repo in list
-    do
-      gh repo clone ${repo} ${plugins_start}
-    done
-
+    declare -a plugins(
+      "ms-jpq/coq_nvim"
+      ""
     # Python
       # Plugin support
         pip3 install pynvim
       # Autocomplete (coq.nvim)
-        ${clone} ms-jpq/coq_nvim ${plugins_start}
+        ms-jpq/coq_nvim ${plugins_start}
       # File explorer
-        ${clone} md-jpq/chadtree ${plugins_start}
+        md-jpq/chadtree ${plugins_start}
       # LSP config
         ${clone} neovim/nvim-lspconfig ${plugins_start}
         #${clone} williamboman/nvim-lsp-installer ${plugins_start}
 
     # Lua
       # Autocomplete (nvim-cmp)
-        ${clone} hrsh7th/nvim-cmp ${plugins_start}
-        ${clone} hrsh7th/cmp-buffer ${plugins_start}
-        ${clone} hrsh7th/cmp-cmdline ${plugins_start}
-        ${clone} hrsh7th/cmp-git ${plugins_start}
-        ${clone} hrsh7th/cmp-nvim-lsp ${plugins_start}
-        ${clone} hrsh7th/cmp-path ${plugins_start}
+        hrsh7th/nvim-cmp
+        hrsh7th/cmp-buffer
+        hrsh7th/cmp-cmdline
+        hrsh7th/cmp-git
+        hrsh7th/cmp-nvim-lsp
+        hrsh7th/cmp-path
       # File explorer
         ${clone} kyazdani42/nvim-tree.lua ${plugins_start}
         #${clone} nvim-neo-tree/neo-tree.nvim ${plugins_start}
@@ -726,16 +723,24 @@ main_customization() (
 
     # Snippets
       # ultisnips
-        ${clone} SirVer/ultisnips ${plugins_start}
-        ${clone} quangnguyen30192/cmp-nvim-ultisnips ${plugins_start}
-        ${clone} honza/vim-snippets ${plugins_start}
-        ${clone} onsails/lspkind.nvim ${plugins_start} # Snippet icons
+        SirVer/ultisnips ${plugins_start}
+        quangnguyen30192/cmp-nvim-ultisnips ${plugins_start}
+        honza/vim-snippets ${plugins_start}
+        onsails/lspkind.nvim ${plugins_start} # Snippet icons
       # vim-vsnip
         # https://github.com/hrsh7th/cmp-vsnip
 
     # Status line
 
     # Tabs
+
+
+    )
+
+    for repo in "{plugins[@]}"; do
+      gh repo clone ${repo} ${plugins_start}
+    done
+
 
     clear && ly_setup
 
