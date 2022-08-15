@@ -753,7 +753,7 @@ main_customization() (
 
   pacman_setup() {
 
-    # Marking archlinux-keyring as explicitly installed
+    # Explicitly installed: archlinux-keyring
     sudo pacman -D --asexplicit archlinux-keyring
 
     # Remove orphans amd their configuration files
