@@ -682,65 +682,47 @@ main_customization() (
     local plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
 
     declare -a plugins(
-      "ms-jpq/coq_nvim"
-      ""
-    # Python
-      # Plugin support
-        pip3 install pynvim
-      # Autocomplete (coq.nvim)
-        ms-jpq/coq_nvim ${plugins_start}
+      # Autocomplete
+        "hrsh7th/nvim-cmp"
+        "hrsh7th/cmp-buffer"
+        "hrsh7th/cmp-cmdline"
+        "hrsh7th/cmp-git"
+        "hrsh7th/cmp-nvim-lsp"
+        "hrsh7th/cmp-path"
+        #"ms-jpq/coq_nvim"
       # File explorer
-        md-jpq/chadtree ${plugins_start}
-      # LSP config
-        ${clone} neovim/nvim-lspconfig ${plugins_start}
-        #${clone} williamboman/nvim-lsp-installer ${plugins_start}
-
-    # Lua
-      # Autocomplete (nvim-cmp)
-        hrsh7th/nvim-cmp
-        hrsh7th/cmp-buffer
-        hrsh7th/cmp-cmdline
-        hrsh7th/cmp-git
-        hrsh7th/cmp-nvim-lsp
-        hrsh7th/cmp-path
-      # File explorer
-        ${clone} kyazdani42/nvim-tree.lua ${plugins_start}
-        #${clone} nvim-neo-tree/neo-tree.nvim ${plugins_start}
+        "kyazdani42/nvim-tree.lua"
+        #"md-jpq/chadtree"
+        #"nvim-neo-tree/neo-tree.nvim"
       # Git
-        ${clone} lewis6991/gitsigns.nvim ${plugins_start}
+        "lewis6991/gitsigns.nvim"
       # LSP config
-        ${clone} neovim/nvim-lspconfig ${plugins_start}
-        #${clone} williamboman/nvim-lsp-installer ${plugins_start}
-
-    # Fold
-
-    # Fuzzy
-      # cmp-rg
-        #${clone} lukas-reineke/cmp-rg ${plugins_start}
-
-    # Shell
-      #${clone} tamago324/cmp-zsh ${plugins_start}
-
-    # Snippets
-      # ultisnips
-        SirVer/ultisnips ${plugins_start}
-        quangnguyen30192/cmp-nvim-ultisnips ${plugins_start}
-        honza/vim-snippets ${plugins_start}
-        onsails/lspkind.nvim ${plugins_start} # Snippet icons
-      # vim-vsnip
-        # https://github.com/hrsh7th/cmp-vsnip
-
-    # Status line
-
-    # Tabs
-
-
+        "neovim/nvim-lspconfig"
+        #"williamboman/nvim-lsp-installer"
+      # Fold
+      # Fuzzy
+        #"lukas-reineke/cmp-rg"
+      # Shell
+        #"tamago324/cmp-zsh"
+      # Snippets
+        # ultisnips
+        "SirVer/ultisnips"
+        "quangnguyen30192/cmp-nvim-ultisnips"
+        "honza/vim-snippets"
+        "onsails/lspkind.nvim"
+        # vim-vsnip
+        #"hrsh7th/cmp-vsnip"
+      # Status line
+      # Tabs
+        "akinsho/bufferline.nvim"
     )
 
     for repo in "{plugins[@]}"; do
       gh repo clone ${repo} ${plugins_start}
     done
 
+    # Python plugin support
+    pip3 install pynvim
 
     clear && ly_setup
 

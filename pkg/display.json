@@ -6,6 +6,7 @@
     "pkg_xorg3": "xorg-xwayland",
     "pkg_xorg4": "xwallpaper",
     "pkg_xorg5": "autorandr",
+    "pkg_xorg6": "picom",
     "pkg_wayland1": "wayland",
     "pkg_wayland2": "wayland-protocols",
     "pkg_wayland3": "xorg-xwayland",
