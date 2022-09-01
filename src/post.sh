@@ -533,6 +533,21 @@ main_repositories() (
     git remote set-url origin git@github.com:${gh_username}/scripts.git
     cd ${HOME}
 
+    clear && notes
+
+  }
+
+  notes() {
+
+    echo "Notes: fetching..."
+
+    local folder=${HOME}/.local/git/notes
+
+    git clone git@github.com:${gh_username}/notes.git ${folder}
+    cd ${folder}
+    git remote set-url origin git@github.com:${gh_username}/notes.git
+    cd ${HOME}
+
     clear && main_install
 
   }
@@ -694,14 +709,16 @@ main_customization() (
         "kyazdani42/nvim-tree.lua"
         #"md-jpq/chadtree"
         #"nvim-neo-tree/neo-tree.nvim"
+      # Fold
+      # Fuzzy
+        #"lukas-reineke/cmp-rg"
       # Git
         "lewis6991/gitsigns.nvim"
       # LSP config
         "neovim/nvim-lspconfig"
         #"williamboman/nvim-lsp-installer"
-      # Fold
-      # Fuzzy
-        #"lukas-reineke/cmp-rg"
+        "jose-elias-alvarez/null-ls.nvim"
+        "nvim-lua/plenary.nvim"
       # Shell
         #"tamago324/cmp-zsh"
       # Snippets
@@ -725,6 +742,13 @@ main_customization() (
     pip3 install pynvim
 
     clear && ly_setup
+
+  }
+
+  python_setup() {
+
+    # Virtualenv
+    pip3 install virtualenv
 
   }
 
