@@ -518,37 +518,23 @@ main_repositories() (
     sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
     sudo cp ${HOME}/.config/_system/pacman/pacman.conf /etc/
 
-    clear && scripts
+    clear && repos
 
   }
 
-  scripts() {
+  repos() {
 
-    echo "Scripts: fetching..."
+      echo "Feching repositories..."
 
-    local folder=${HOME}/.local/git/scripts
+    repos=['arch', 'blog', 'notes', '', 'scripts'] 
 
-    git clone git@github.com:${gh_username}/scripts.git ${folder}
-    cd ${folder}
-    git remote set-url origin git@github.com:${gh_username}/scripts.git
-    cd ${HOME}
-
-    clear && notes
-
-  }
-
-  notes() {
-
-    echo "Notes: fetching..."
-
-    local folder=${HOME}/.local/git/notes
-
-    git clone git@github.com:${gh_username}/notes.git ${folder}
-    cd ${folder}
-    git remote set-url origin git@github.com:${gh_username}/notes.git
-    cd ${HOME}
-
-    clear && main_install
+    for repo in repos; do
+        local folder=${HOME}/.local/git/${repo}
+        git clone git@github.com:${gh_username}/${repo}.git ${folder}
+        cd ${folder}
+        git remote set-url origin git@github.com:${gh_username}/${repo}.git
+        cd ${HOME}
+    done
 
   }
 
