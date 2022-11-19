@@ -32,8 +32,8 @@ main_setup() (
       error_log=${script_dir}/src/error.log
 
       # Configs
-      dialogrc=${script_dir}/cfg/dialogrc
-      pacmanconf=${script_dir}/cfg/pacman.conf
+      dialogrc=${script_dir}/src/cfg/dialogrc
+      pacmanconf=${script_dir}src/cfg/pacman.conf
 
       colors
 
@@ -893,15 +893,17 @@ archinstall() (
 
   packages() {
 
-    pacstrap -C ~/arch/cfg/pacman.conf /mnt linux-hardened linux-hardened-headers linux-firmware base base-devel grub efibootmgr dialog vim
+    pacmancfg="~/arch/src/cfg/pacman.conf"
+
+    pacstrap -C ${pacmancfg} /mnt linux-hardened linux-hardened-headers linux-firmware base base-devel grub efibootmgr dialog vim
 
     if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
       case ${dmi} in
       "VirtualBox")
-        pacstrap -C ~/arch/cfg/pacman.conf /mnt virtualbox-guest-utils
+        pacstrap -C ${pacmancfg} /mnt virtualbox-guest-utils
         ;;
       "VMware Virtual Platform")
-        pacstrap -C ~/arch/cfg/pacman.conf /mnt open-vm-tools
+        pacstrap -C ${pacmancfg} /mnt open-vm-tools
         ;;
       esac
     fi
@@ -926,7 +928,7 @@ chroot() {
 
   cp -f ${dialogrc} /mnt/etc/dialogrc
   cp -f ${pacmanconf} /mnt/etc/pacman.conf
-  cp -f /root/arch/src/chroot.sh /mnt
+  cp -f /root/arch/src/chroot/chroot.sh /mnt
   chmod +x /mnt/chroot.sh
 
   arch-chroot /mnt ./chroot.sh

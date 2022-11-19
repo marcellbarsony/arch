@@ -124,12 +124,12 @@ main_setup() (
     error_log=${script_dir}/src/error.log
 
     # Configs
-    dialogrc=${HOME}/.local/git/arch/cfg/dialogrc
-    pacmanconf=${script_dir}/cfg/pacman.conf
-    #package_data=${script_dir}/cfg/packages.json
+    dialogrc=${HOME}/.local/git/arch/src/cfg/dialogrc
+    pacmanconf=${script_dir}/src/cfg/pacman.conf
+    #package_data=${script_dir}/src/cfg/packages.json
 
     # Temporary
-    TEMPORARY_package_data=${HOME}/arch/cfg/packages.json
+    TEMPORARY_package_data=${HOME}/arch/src/cfg/packages.json
     TEMPORARY_aurhelper="paru"
 
     configs
@@ -227,7 +227,7 @@ main_dialog() (
 
 main_aur() {
 
-  aur_helper=$( grep -o '"aurhelper": "[^"]*' ${HOME}/arch/pkg/base.json | grep -o '[^"]*$' )
+  aur_helper=$( grep -o '"aurhelper": "[^"]*' ${HOME}/arch/src/pkg/base.json | grep -o '[^"]*$' )
 
   aurdir="${HOME}/.local/src/${aur_helper}"
 
@@ -546,27 +546,31 @@ main_install() (
 
   install_base() {
 
+    pkgbase="~/arch/src/pkg"
+
     # Base
-    grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/base.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    grep -o '"pkg[^"]*": "[^"]*' ${pkgbase}/base.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
     # Pacman
-    grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/pacman.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    grep -o '"pkg[^"]*": "[^"]*' ${pkgbase}/pacman.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
     # AUR
-    grep -o '"pkg[^"]*": "[^"]*' ${HOME}/arch/pkg/aur.json | grep -o '[^"]*$' | paru -S --noconfirm - && clear
+    grep -o '"pkg[^"]*": "[^"]*' ${pkgbase}/aur.json | grep -o '[^"]*$' | paru -S --noconfirm - && clear
 
     clear && install_display
 
   }
 
   install_display() {
+    
+    pkgbase="~/arch/src/pkg"
 
     case ${displayprotocol} in
     X11)
-      grep -o '"pkg_xorg[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      grep -o '"pkg_xorg[^"]*": "[^"]*' ${pkgbase}/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
       ;;
     Wayland)
-      grep -o '"pkg_wayland[^"]*": "[^"]*' ${HOME}/arch/pkg/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      grep -o '"pkg_wayland[^"]*": "[^"]*' ${pkgbase}/display.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
       ;;
     esac
 
@@ -575,13 +579,15 @@ main_install() (
   }
 
   install_audio() {
+    
+    pkgbase="~/arch/src/pkg"
 
     case ${audiobackend} in
     ALSA)
-      grep -o '"pkg_alsa[^"]*": "[^"]*' ${HOME}/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      grep -o '"pkg_alsa[^"]*": "[^"]*' ${pkgbase}/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
       ;;
     Pipewire)
-      grep -o '"pkg_pipewire[^"]*": "[^"]*' ~/arch/pkg/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+      grep -o '"pkg_pipewire[^"]*": "[^"]*' ${pkgbase}/audio.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
       ;;
     esac
 
@@ -593,8 +599,10 @@ main_install() (
 
     echo "Installing fonts..."
 
+    pkgbase="~/arch/src/pkg"
+
     # Latin
-    grep -o '"pkg_latin[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
+    grep -o '"pkg_latin[^"]*": "[^"]*' ${pkgbase}/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
     # Japanese
     #grep -o '"pkg_japanese[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
@@ -673,68 +681,7 @@ main_customization() (
     # Log
     #~/.local/share/qtile/qtile.log
 
-    clear && neovim_setup
-
-  }
-
-  neovim_setup(){
-
-    local plugins_start=$HOME/.local/share/nvim/site/pack/default/start
-    local plugins_opt=$HOME/.local/share/nvim/site/pack/default/opt
-
-    declare -a plugins(
-      # Autocomplete
-        "hrsh7th/nvim-cmp"
-        "hrsh7th/cmp-buffer"
-        "hrsh7th/cmp-cmdline"
-        "hrsh7th/cmp-git"
-        "hrsh7th/cmp-nvim-lsp"
-        "hrsh7th/cmp-path"
-        #"ms-jpq/coq_nvim"
-      # File explorer
-        "kyazdani42/nvim-tree.lua"
-        #"md-jpq/chadtree"
-        #"nvim-neo-tree/neo-tree.nvim"
-      # Fold
-      # Fuzzy
-        #"lukas-reineke/cmp-rg"
-      # Git
-        "lewis6991/gitsigns.nvim"
-      # LSP config
-        "neovim/nvim-lspconfig"
-        #"williamboman/nvim-lsp-installer"
-        "jose-elias-alvarez/null-ls.nvim"
-        "nvim-lua/plenary.nvim"
-      # Shell
-        #"tamago324/cmp-zsh"
-      # Snippets
-        # ultisnips
-        "SirVer/ultisnips"
-        "quangnguyen30192/cmp-nvim-ultisnips"
-        "honza/vim-snippets"
-        "onsails/lspkind.nvim"
-        # vim-vsnip
-        #"hrsh7th/cmp-vsnip"
-      # Status line
-      # Tabs
-        "akinsho/bufferline.nvim"
-    )
-
-    for repo in "{plugins[@]}"; do
-      gh repo clone ${repo} ${plugins_start}
-    done
-
-    # Python plugin support
-    pip3 install pynvim
-
     clear && ly_setup
-
-  }
-
-  python_setup() {
-
-    # Virtualenv
-    pip3 install virtualenv
 
   }
 
