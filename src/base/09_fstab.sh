@@ -1,21 +1,22 @@
 # Fstab
 
-echo -n "Generating fstab file ..." && sleep 1
+errorcheck() {
+  if [ "$1" == "0" ]; then
+    echo "[${GREEN}OK${RESTORE}]"
+  else
+    echo "[${RED}ERROR${RESTORE}]"
+    echo "Exit status: $1"
+    read -n 1 -p "Press any key to continue" answer
+    exit $1
+  fi
+}
 
+echo -n "[${CYAN} FSTAB ${RESTORE}] Creating directory ... "
 mkdir /mnt/etc/ &>/dev/null
-local exitcode1=$?
+errorcheck $?
 
+echo -n "[${CYAN} FSTAB ${RESTORE}] Generating fstab file ... "
 genfstab -U /mnt >>/mnt/etc/fstab
-local exitcode2=$?
-
-if [ "${exitcode1}" == "0" ] && [ "${exitcode2}" == "0" ]; then
-  echo "[${CYAN}OK${RESTORE}]" && sleep 1
-  clear
-else
-  echo "[${RED}FAILED${RESTORE}]"
-  echo "Exit code: ${exitcode1} [mkdir]"
-  echo "Exit code: ${exitcode2} [genfstab]"
-  exit 1
-fi
+errorcheck $?
 
 clear

@@ -526,7 +526,7 @@ main_repositories() (
 
       echo "Feching repositories..."
 
-    repos=['arch', 'blog', 'notes', '', 'scripts'] 
+    repos=['arch', 'blog', 'notes', '', 'scripts']
 
     for repo in repos; do
         local folder=${HOME}/.local/git/${repo}
@@ -562,7 +562,7 @@ main_install() (
   }
 
   install_display() {
-    
+
     pkgbase="~/arch/src/pkg"
 
     case ${displayprotocol} in
@@ -579,7 +579,7 @@ main_install() (
   }
 
   install_audio() {
-    
+
     pkgbase="~/arch/src/pkg"
 
     case ${audiobackend} in

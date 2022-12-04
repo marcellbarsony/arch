@@ -1,32 +1,27 @@
 # Arch install
 
-echo "Reflector: Updating Pacman mirrorlist ..."
-
+echo "[${CYAN} REFLECTOR ${RESTORE}] Updating Pacman mirrorlist ... "
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-
 reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist
 
-clear
+echo "[${CYAN} PACMAN ${RESTORE}] Updating Arch Linux keyring ... "
+until pacman -Sy --noconfirm archlinux-keyring; do
+  echo "[${RED}ERROR${RESTORE}] - Arch Keyring installation failed. Retrying in 3 seconds..."
+  sleep 3
+done
 
-echo "Pacman: Updating Arch Linux keyring ..."
+echo "[${CYAN} PACSTRAP ${RESTORE}] Installing system ... "
+until pacstrap -C ${pacmanconf} /mnt linux-hardened linux-hardened-headers linux-firmware base base-devel btrfs-progs dialog efibootmgr git github-cli grub networkmanager ntp openssh reflector snapper vim virtualbox-guest-utils; do
+  echo "[${RED}ERROR${RESTORE}] - System installation failed. Retrying in 3 seconds..."
+  sleep 3
+done
 
-pacman -Sy --noconfirm archlinux-keyring
-
-clear
-
-echo "Pacstrap: Installing system ..."
-
-pacstrap -C ${pacmanconf} /mnt linux-hardened linux-hardened-headers linux-firmware base base-devel grub efibootmgr dialog vim
-
-if [ ${dmi} == "VirtualBox" ] || [ ${dmi} == "VMware Virtual Platform" ]; then
-  case ${dmi} in
+echo "[${CYAN} PACSTRAP ${RESTORE}] Installing DMI packages ... "
+pacstrap -C ${pacmancfg} /mnt virtualbox-guest-utils
+case ${dmi} in
   "VirtualBox")
-    pacstrap -C ${pacmancfg} /mnt virtualbox-guest-utils
     ;;
   "VMware Virtual Platform")
     pacstrap -C ${pacmancfg} /mnt open-vm-tools
     ;;
-  esac
-fi
-
-clear
+esac

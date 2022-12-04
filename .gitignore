@@ -1,2 +1,5 @@
-test.sh
 .vscode/
+src/error.log
+src/arch.sh.log
+src/_test.sh
+src/test.sh

@@ -61,7 +61,7 @@ diskselect() {
 
 sgdisk_partition() {
 
-  echo "sgdisk: creating partitions..."
+  echo "[${CYAN} GPT ${RESTORE}] creating partitions (sgdisk) ... "
 
   sgdisk -o ${disk}
   local exitcode1=$?
@@ -90,7 +90,7 @@ sgdisk_partition() {
 
 diskpart_confirm() {
 
-  items=$(gdisk -l ${disk} | tail -4)
+  items=$(gdisk -l ${disk} | tail -3)
 
   if (dialog --title " Partitions " --yes-label "Confirm" --no-label "Manual" --yesno "\nConfirm partitions:\n\n${items}" 15 60); then
     dialogs || true

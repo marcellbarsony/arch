@@ -2,19 +2,19 @@
 
 root_partition() (
 
-  echo -n "Root: Formatting" && sleep 1
-  mkfs.btrfs --quiet -L system /dev/mapper/cryptroot && echo "[${CYAN}OK${RESTORE}]"
+  echo "[${CYAN} ROOT ${RESTORE}] Formatting ... "
+  mkfs.btrfs --quiet -L system /dev/mapper/cryptroot
 
-  echo -n "Root: Mounting" && sleep 1
-  mount /dev/mapper/cryptroot /mnt && echo "[${CYAN}OK${RESTORE}]"
+  echo -n "[${CYAN} ROOT ${RESTORE}] Mounting ... "
+  mount /dev/mapper/cryptroot /mnt && echo "[${GREEN}OK${RESTORE}]"
 
-  clear && btrfs_filesystem
+  sleep 2 && btrfs_filesystem
 
 )
 
 btrfs_filesystem() (
 
-  echo "\nBTRFS: Creating subvolumes" && sleep 1
+  echo "[${CYAN} BTRFS ${RESTORE}] Creating subvolumes ... "
   btrfs subvolume create /mnt/@
   btrfs subvolume create /mnt/@home
   btrfs subvolume create /mnt/@var
@@ -23,7 +23,7 @@ btrfs_filesystem() (
   umount -R /mnt
   #btrfs subvolume list .
 
-  echo "\nBTRFS: Mounting subvolumes" && sleep 1
+  echo "[${CYAN} BTRFS ${RESTORE}] Mounting subvolumes ... "
   mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt
   # Optional:ssd
   # dmesg | grep "BTRFS"
@@ -35,20 +35,19 @@ btrfs_filesystem() (
 
   #df -hT
 
-  clear && efi_partition
+  efi_partition
 
 )
 
 efi_partition() (
 
-  echo "EFI: Formatting (F32)" && sleep 1
+  echo "[${CYAN} EFI ${RESTORE}] Formatting (F32) ... "
   mkfs.fat -F32 ${efidevice}
 
-  echo "EFI: Mounting" && sleep 1
-  efimountdir="/mnt/boot" #/mnt/efi
-  mount ${efidevice} ${efimountdir}
+  echo -n "[${CYAN} EFI ${RESTORE}] Mounting ... "
+  mount ${efidevice} /mnt/boot && echo "[${GREEN}OK${RESTORE}]" #/mnt/efi
 
-  clear
+  sleep 5 && clear
 
 )
 

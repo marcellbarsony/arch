@@ -35,13 +35,13 @@ WHITE=$(echo -en '\033[01;37m')
 #echo ${RED}RED${GREEN}GREEN${YELLOW}YELLOW${BLUE}BLUE${PURPLE}PURPLE${CYAN}CYAN${WHITE}WHITE${RESTORE}
 
 # Script
-info_logs="Log files.................... "
-info_network="Network connection........... "
-info_bootmode="Boot mode.................... "
-info_dmidata="DMI data..................... "
-info_systemclock="System clock................. "
-info_keymap="Keymap....................... "
-info_configs="Configs...................... "
-info_dependencies="Dependencies................. "
+info_logs="Log files ................... "
+info_network="Network connection .......... "
+info_bootmode="Boot mode ................... "
+info_dmidata="DMI data .................... "
+info_systemclock="System clock ................ "
+info_keymap="Keymap ...................... "
+info_configs="Configs ..................... "
+info_dependencies="Dependencies ................ "
 
 echo "[${CYAN}OK${RESTORE}]"

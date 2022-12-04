@@ -22,7 +22,7 @@ network() {
 
   if [ "$?" != "0" ]; then
     echo "[${RED}ERROR${RESTORE}]"
-    echo "Please connect to a network and try again."
+    echo "Please check network connection."
     echo "Exit status $?"
   fi
 
@@ -111,20 +111,17 @@ configs() {
 
 dependencies() {
 
-  echo -n ${info_dependencies} && sleep 1
-  pacman -Q dialog &>/dev/null
-
-  if [ "$?" != "0" ]; then
-    pacman -Sy --noconfirm dialog &>/dev/null
-    if [ "$?" != "0" ]; then
+  echo -n ${info_dependencies}
+  until pacman -Q dialog &>/dev/null; do
+    until pacman -Sy --noconfirm dialog &>/dev/null; do
       echo "[${RED}ERROR${RESTORE}]"
-      echo "Cannot install dependencies"
-      echo "Try `pacman -Sy archlinux-keyring` or reboot"
+      echo "Cannot install Dialog"
+      echo "Run \`${WHITE}pacman -Sy archlinux-keyring${RESTORE}\` or \`${WHITE}reboot now${RESTORE}\`"
       exit 1
-    fi
-  fi
+    done
+  done
 
-  echo "[${CYAN}OK${RESTORE}]"
+  echo "[${CYAN}OK${RESTORE}]" && sleep 1
 
 }
 
