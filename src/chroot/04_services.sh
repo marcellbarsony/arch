@@ -16,17 +16,20 @@ declare -a services=(
   "sshd.service"
   "NetworkManager"
   "fstrim.timer"
+  "vboxservice.service"
 )
 
 for service in "${services[@]}"; do
-  echo "[${CYAN} SERVICES ${RESTORE}] Enable [${WHITE}${service}${RESTORE}] ... "
   systemctl enable ${service}
+  if [ $? == "0" ]; then
+    echo "[${CYAN} SERVICES ${RESTORE}] Enable [${WHITE}${service}${RESTORE}] ... [${GREEN}OK${RESTORE}]"
+  else
+    echo "[${CYAN} SERVICES ${RESTORE}] Enable [${WHITE}${service}${RESTORE}] ... [${RED}FAILED${RESTORE}]"
 done
 
 echo "[${CYAN} SERVICES ${RESTORE}] Enable [${WHITE}DMI${RESTORE}] ... "
 case ${dmi} in
   "VirtualBox")
-    systemctl enable vboxservice.service
     modprobe -a vboxguest vboxsf vboxvideo
     VBoxClient-all
     ;;

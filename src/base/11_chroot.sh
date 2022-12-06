@@ -13,37 +13,55 @@ errorcheck() {
 
 }
 
-echo -n "[${CYAN} VARIABLES ${RESTORE}] Exporting variables ... "
-export keymap
-export nodename
-export username
-export user_password
-export root_password
-export grubpw
-export dmi
-export RESTORE
-export RED
-export GREEN
-export YELLOW
-export BLUE
-export MAGENTA
-export PURPLE
-export CYAN
-export LIGHTGRAY
-export LRED
-export LGREEN
-export LYELLOW
-export LBLUE
-export LMAGENTA
-export LPURPLE
-export LCYAN
-export WHITE
+declare -a variables=(
+  "keymap"
+  "nodename"
+  "username"
+  "user_password"
+  "root_password"
+  "grubpw"
+  "dmi"
+  "RESTORE"
+  "RED"
+  "GREEN"
+  "YELLOW"
+  "BLUE"
+  "MAGENTA"
+  "PURPLE"
+  "CYAN"
+  "LIGHTGRAY"
+  "LRED"
+  "LGREEN"
+  "LYELLOW"
+  "LBLUE"
+  "LMAGENTA"
+  "LPURPLE"
+  "LCYAN"
+  "WHITE"
+)
+
+for variable in "${variables[@]}"; do
+  echo -n "[${CYAN} VARIABLES ${RESTORE}] Exporting ${variable} ... "
+  export ${variable}
+  errocheck $?
+done
+
+echo -n "[${CYAN} SCRIPT ${RESTORE}] Copying script files ... "
+cp -fr ${script_dir}/src/chroot/ /mnt/temporary
 errorcheck $?
 
-echo -n "[${CYAN} CONFIGS ${RESTORE}] Copying configs ... "
-cp -fr ${script_dir}/src/chroot/ /mnt/temporary
+echo -n "[${CYAN} SCRIPT ${RESTORE}] Chmod on chroot.sh ... "
+chmod +x /mnt/temporary/chroot.sh
+errorcheck $?
+
+echo -n "[${CYAN} CONFIGS ${RESTORE}] dialogrc ... "
 cp -f ${dialogrc} /mnt/etc/dialogrc
+chown ${username} /mnt/etc/dialogrc
+errorcheck $?
+
+echo -n "[${CYAN} CONFIGS ${RESTORE}] pacman.conf ... "
 cp -f ${pacmanconf} /mnt/etc/pacman.conf
+chown ${username} /mnt/etc/pacman.conf
 errorcheck $?
 
 echo -n "[${CYAN} CHMOD ${RESTORE}] Chmod ... "

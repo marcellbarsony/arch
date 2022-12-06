@@ -28,7 +28,7 @@ error=$(echo "${username}:${user_password}" | chpasswd 2>&1)
 errorcheck "$?"
 
 echo -n "[${CYAN} GROUPS ${RESTORE}] Add user to groups ... "
-usermod -aG wheel,audio,video,optical,storage ${username} 2>&1
+usermod -aG wheel,audio,video,optical,storage,vboxsf ${username} 2>&1
 errorcheck "$?"
 
 echo -n "[${CYAN} HOSTS ${RESTORE}] Set hostname [${nodename}]"
