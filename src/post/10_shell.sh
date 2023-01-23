@@ -11,17 +11,16 @@ fi
 sudo cp -f ${HOME}/.config/zsh/global/zshenv /etc/zsh/zshenv
 sudo cp -f ${HOME}/.config/zsh/global/zprofile /etc/zsh/zprofile
 
-# Zsh-Autocomplete
+# zsh autocomplete
 git clone --depth 1 https://github.com/marlonrichert/zsh-autocomplete.git ${HOME}/.local/src/zsh-autocomplete/
 
-# Zsh-Completions
-git clone https://github.com/zsh-users/zsh-completions.git ${HOME}/.local/src/zsh-completions/
+# zsh completions
+git clone --depth 1 https://github.com/zsh-users/zsh-completions.git ${HOME}/.local/src/zsh-completions/
 
-# Zsh-Autosuggestions
-git clone https://github.com/zsh-users/zsh-autosuggestions ${HOME}/.local/src/zsh-autosuggestions/
+# zsh autosuggestions
+git clone --depth 1 https://github.com/zsh-users/zsh-autosuggestions ${HOME}/.local/src/zsh-autosuggestions/
 
-# Notes
-# https://zsh.sourceforge.io/Doc/Release/Files.html
-# https://zsh.sourceforge.io/Intro/intro_3.html
+# zsh prompt
+git clone --depth 1 https://github.com/spaceship-prompt/spaceship-prompt ${HOME}/.local/src/spaceship/
 
-clear && main_services
+clear

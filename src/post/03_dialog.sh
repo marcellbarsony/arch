@@ -18,7 +18,7 @@ fi
 
 github_pubkey() {
 
-  gh_pubkeyname=$(dialog --cancel-label "Exit" --inputbox "GitHub SSH Key" 8 45 'Arch Linux' 3>&1 1>&2 2>&3)
+  gh_pubkeyname=$(dialog --cancel-label "Exit" --inputbox "GitHub SSH Key" 8 45 'ArchLinux' 3>&1 1>&2 2>&3)
 
   if [ "$?" != "0" ]; then
     exit ${?}

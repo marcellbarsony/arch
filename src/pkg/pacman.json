@@ -24,7 +24,7 @@
     "pkg_rust": "rust",
     "pkg_sysmonitor1": "bpytop",
     "pkg_sysmonitor2": "conky",
-    "pkg_terminal": "alacritty",
+    "pkg_terminal": "kitty",
     "pkg_terminal_progs_1": "cmatrix",
     "pkg_terminal_progs_2": "neofetch",
     "pkg_unclutter": "unclutter",

@@ -53,6 +53,9 @@ gh_test () {
   0)
     gh_known_hosts
     ;;
+  1)
+    gh_known_hosts
+    ;;
   *)
     echo "An error has occurred - ${?}"
     exit ${?}

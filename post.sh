@@ -8,12 +8,19 @@ source ${script_dir}/${srcdir}/02_setup.sh
 source ${script_dir}/${srcdir}/03_dialog.sh
 source ${script_dir}/${srcdir}/04_aur.sh
 source ${script_dir}/${srcdir}/05_bitwarden.sh
+echo "SSH" && sleep 5
 source ${script_dir}/${srcdir}/06_ssh.sh
+echo "GIT" && sleep 5
 source ${script_dir}/${srcdir}/07_git.sh
+echo "REPOSITORIES" && sleep 5
 source ${script_dir}/${srcdir}/08_repositories.sh
+echo "INSTALL" && sleep 5
 source ${script_dir}/${srcdir}/09_install.sh
+echo "SHELL" && sleep 5
 source ${script_dir}/${srcdir}/10_shell.sh
+echo "SERVICES" && sleep 5
 source ${script_dir}/${srcdir}/11_services.sh
+echo "CUSTOMIZATION" && sleep 5
 source ${script_dir}/${srcdir}/12_customization.sh
 
 while (("$#")); do

@@ -32,7 +32,7 @@ pacman_setup() {
   # Explicitly installed: archlinux-keyring
   sudo pacman -D --asexplicit archlinux-keyring
 
-  # Remove orphans amd their configuration files
+  # Remove orphans and their configuration files
   sudo pacman -Qtdq | pacman -Rns -
 
   clear && pipewire
@@ -88,7 +88,7 @@ xdg_dirs() {
 
 font_support() {
 
-  # Japanese font support
+  # Japanese
   sudo sed -i '/#ja_JP.UTF-8 UTF-8/s/^#//g' /etc/locale.gen
   sudo echo "LANG=ja_JP.UTF-8" >>/etc/locale.conf
 
@@ -100,7 +100,7 @@ wallpaper() {
 
   mkdir ${HOME}/Downloads
 
-  # Fetch & unzip wallpapers
+  # Fetch & unzip
   curl -L -o ${HOME}/Downloads/wallpapers.zip "https://www.dropbox.com/sh/eo65dcs7buprzea/AABSnhAm1sswyiukCDW9Urp9a?dl=1"
   unzip ${HOME}/Downloads/wallpapers.zip -d ${HOME}/Pictures/Wallpapers/ -x /
 

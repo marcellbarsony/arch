@@ -64,9 +64,7 @@ install_fonts() {
   # Japanese
   #grep -o '"pkg_japanese[^"]*": "[^"]*' ${HOME}/arch/pkg/fonts.json | grep -o '[^"]*$' | sudo pacman -S --needed --noconfirm - && clear
 
-
-
-  clear && main_shell
+  clear
 
 }
 

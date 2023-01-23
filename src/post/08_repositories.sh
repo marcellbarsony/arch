@@ -22,7 +22,7 @@ dotfiles() {
   echo "Dotfiles: copying..."
   sudo cp ${HOME}/.config/systemd/logind.conf /etc/systemd/
 
-  clear && repos
+  sleep 5 && clear && repos
 
 }
 
@@ -43,6 +43,8 @@ repos() {
     cd -
 
   done
+
+  sleep 5 && clear
 
 }
 
