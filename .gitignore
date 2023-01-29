@@ -1,4 +1,5 @@
 .vscode/
+_old
 src/error.log
 src/arch.sh.log
 src/_test.sh
