@@ -1,6 +1,3 @@
-.vscode/
-_old
-src/error.log
-src/arch.sh.log
-src/_test.sh
-src/test.sh
+__pycache__/
+debugpy/
+venv/
