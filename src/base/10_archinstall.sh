@@ -11,12 +11,9 @@ until pacman -Sy --noconfirm archlinux-keyring; do
 done
 
 echo "[${CYAN} PACSTRAP ${RESTORE}] Installing system ... "
-until pacstrap -C ${pacmanconf} /mnt linux-hardened linux-hardened-headers linux-firmware base base-devel btrfs-progs dialog efibootmgr git github-cli grub networkmanager ntp openssh reflector snapper vim virtualbox-guest-utils; do
-  echo "[${RED}ERROR${RESTORE}] - System installation failed. Retrying in 3 seconds..."
-  sleep 3
-done
+pacstrap -C ${pacmanconf} /mnt linux-hardened linux-hardened-headers linux-firmware base base-devel btrfs-progs dialog efibootmgr git github-cli grub networkmanager ntp openssh reflector snapper vim virtualbox-guest-utils
 
-echo "[${CYAN} PACSTRAP ${RESTORE}] Installing DMI packages ... "
+echo "[${CYAN} PACSTRAP ${RESTORE}] Installing DMI packages ... " # TODO: Fix
 pacstrap -C ${pacmancfg} /mnt virtualbox-guest-utils
 case ${dmi} in
   "VirtualBox")

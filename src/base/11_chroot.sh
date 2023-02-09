@@ -9,8 +9,6 @@ errorcheck() {
     echo "Exit status: $1"
   fi
 
-  sleep 3
-
 }
 
 declare -a variables=(
@@ -43,7 +41,7 @@ declare -a variables=(
 for variable in "${variables[@]}"; do
   echo -n "[${CYAN} VARIABLES ${RESTORE}] Exporting ${variable} ... "
   export ${variable}
-  errocheck $?
+  errorcheck $?
 done
 
 echo -n "[${CYAN} SCRIPT ${RESTORE}] Copying script files ... "

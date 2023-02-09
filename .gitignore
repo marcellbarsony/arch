@@ -1,4 +1,7 @@
 .vscode/
+Archinstall
+base/
+venv/
 src/error.log
 src/arch.sh.log
 src/_test.sh
