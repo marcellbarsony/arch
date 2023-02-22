@@ -45,6 +45,7 @@ class Initialize():
         else:
             print('[-] DMI')
             exit()
+        return cmd.stdout
 
     def sys_clock(self):
         cmd = subprocess.run(
@@ -100,20 +101,18 @@ class Initialize():
             print('[-] Arch keyring update')
 
     def dependencies(self):
-        # TODO: Dependencies (pip, libraries)
+        # TODO: Install dependencies (pip, libraries)
         print('[TODO]: Check dependencies')
         pass
 
-
-def setup():
-    i = Initialize()
-    i.network()
-    i.boot_mode()
-    i.dmi_data()
-    i.sys_clock()
-    i.loadkeys()
-    i.keymap()
-    i.pacman()
-    i.mirrors()
-    i.keyring()
-    i.dependencies()
+c = Initialize()
+c.network()
+c.boot_mode()
+dmidata = c.dmi_data()
+c.sys_clock()
+c.loadkeys()
+c.keymap()
+# c.pacman()
+# c.mirrors()
+# c.keyring()
+# c.dependencies()

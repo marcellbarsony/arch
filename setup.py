@@ -1,16 +1,31 @@
 #!/usr/bin/env python3
 """
 Author  : Name Surname <mail@domain.com>
-Date    : 2023-01
+Date    : 2023-02
 """
+
+
 import argparse
-from base import s01_init as one
-from base import s02_menu as two
+import importlib
+
+
+modules = [
+    's01_init',
+    's02_config',
+    's03_disk',
+    's04_crypt',
+    's05_btrfs',
+    's06_fstab',
+    's07_install'
+    ]
 
 
 def main():
-    one.setup()
-    two.setup()
+    for module in modules:
+        importlib.import_module(f'base.{module}')
+        # imported_module = importlib.import_module(f'base.{module}')
+        # func = getattr(imported_module, 'setup')
+        # func()
 
 
 if __name__ == '__main__':
@@ -24,3 +39,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     main()
+
