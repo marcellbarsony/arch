@@ -21,9 +21,9 @@ class Btrfs():
         cmd = f'mount {rootdir} /mnt'
         try:
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-            print('[+] BTRFS: Mount cryptroot to /mnt')
+            print('[+] BTRFS: Mount cryptroot >> /mnt')
         except subprocess.CalledProcessError as err:
-            print('[-] BTRFS: Mount cryptroot to /mnt', err)
+            print('[-] BTRFS: Mount cryptroot >> /mnt', err)
             sys.exit(1)
 
     @staticmethod
@@ -53,9 +53,9 @@ class Btrfs():
         cmd = f'mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ {rootdir} /mnt'
         try:
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-            print(f'[+] BTRFS: mount @/ >> /mnt')
+            print(f'[+] BTRFS: Mount @/ >> /mnt')
         except subprocess.CalledProcessError as err:
-            print(f'[-] BTRFS: mount @/ >> /mnt', err)
+            print(f'[-] BTRFS: Mount @/ >> /mnt', err)
             sys.exit(1)
 
     @staticmethod
@@ -65,9 +65,9 @@ class Btrfs():
             path = '/mnt/' + subvolume
             if not os.path.exists(path):
                 os.makedirs(path)
-                print(f'[+] BTRFS: Directory created {path}')
+                print(f'[+] BTRFS: Create directory {path}')
             else:
-                print(f'[-] BTRFS: Directory created {path}')
+                print(f'[-] BTRFS: Create directory {path}')
                 sys.exit(1)
 
     @staticmethod

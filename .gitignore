@@ -1,4 +1,5 @@
 __pycache__/
-Archinstall/
+install/__pycache__/
+install/src/__pycache__/
 debugpy/
 venv/

@@ -45,18 +45,61 @@ class Grub():
     @staticmethod
     def install(secureboot, efi_directory):
         if secureboot == True:
-            cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory} --modulkes="tpm" --disable-shim-lock'
+            cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory} --modules="tpm" --disable-shim-lock'
         else:
             cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}'
         try:
             subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-            print(f'[+] GRUB install')
+            print(f'[+] GRUB install <')
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB install', err)
             sys.exit(1)
 
     @staticmethod
+    def secure_boot():
+        # https://www.reddit.com/r/archlinux/comments/10pq74e/my_easy_method_for_setting_up_secure_boot_with/
+        # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
+        # Secured-core PCs only
+        # Set Secure Boot mode to setup mode in UEFI settings
+
+        # sudo pacman -S sbctl
+
+        # Verify setup mode:
+        # sudo sbctl status
+
+        # Create custom Secure Boot keys:
+        # sudo sbctl create-keys
+
+        # Enroll custom keys:
+        # sudo sbctl enroll-keys -m
+
+        # Verify enrolled keys:
+        # sudo sbctl status
+
+        # Check which files need to be signed for Secure Boot to work:
+        # sudo sbctl verify
+
+        # Sign unsigned files:
+        # sudo sbctl -s /path/to/file
+        # sudo sbctl -s /efi/EFI/GRUB/grubx64.efi
+
+        # Make immutable files mutable, then resign files again:
+        # sudo chattr -i /sys/firmware/efi/efivars/<filename>
+
+        # Check which files need to be signed for Secure Boot to work:
+        # sudo sbctl verify
+
+        # Enable Secure Boot in UEFI settings
+        # Reboot
+
+        # Verify Secure Boot
+        # sbctl status
+
+        pass
+
+    @staticmethod
     def password(grub_password):
+        print('[TODO] GRUB password')
         # TODO
         # grubpass=$(echo -e "${grubpw}\n${grubpw}" | grub-mkpasswd-pbkdf2 | cut -d " " -f7 | tr -d '\n')
         # echo "cat << EOF" >>/etc/grub.d/00_header

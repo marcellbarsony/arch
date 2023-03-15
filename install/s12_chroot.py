@@ -39,7 +39,7 @@ class Chroot():
     def chroot():
         cmd = 'arch-chroot /mnt ./temporary/main.py'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True)
             print(f'[+] CHROOT')
         except subprocess.CalledProcessError as err:
             print(f'[-] CHROOT', err)
