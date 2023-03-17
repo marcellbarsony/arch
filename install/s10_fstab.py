@@ -21,7 +21,7 @@ class Fstab():
     def genfstab():
         cmd = 'genfstab -U /mnt >> /mnt/etc/fstab'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] FSTAB: Genfstab')
         except subprocess.CalledProcessError as err:
             print('[-] FSTAB: Genfstab', err)

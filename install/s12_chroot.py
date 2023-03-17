@@ -9,17 +9,7 @@ class Chroot():
     """Change root to system"""
 
     @staticmethod
-    def copy_pacconf():
-        # TODO
-        # pacman.conf
-        # src=""
-        # dst=""
-        # cp -f ${pacmanconf} /mnt/etc/pacman.conf
-        # chown ${username} /mnt/etc/pacman.conf
-        pass
-
-    @staticmethod
-    def copy_script():
+    def copy_sources():
         cfg_src = '/media/sf_arch/config.ini'
         cfg_dst = '/mnt/config.ini'
         script_src = '/media/sf_arch/src/'
@@ -39,7 +29,7 @@ class Chroot():
     def chroot():
         cmd = 'arch-chroot /mnt ./temporary/main.py'
         try:
-            subprocess.run(cmd, shell=True)
+            subprocess.run(cmd, shell=True, check=True)
             print(f'[+] CHROOT')
         except subprocess.CalledProcessError as err:
             print(f'[-] CHROOT', err)

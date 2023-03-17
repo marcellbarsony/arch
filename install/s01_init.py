@@ -21,7 +21,7 @@ class Initialize():
     def dmi_data():
         cmd = 'dmidecode -s system-product-name'
         try:
-            out = subprocess.run(cmd, shell=True, capture_output=True)
+            out = subprocess.run(cmd, shell=True, check=True, capture_output=True)
             if 'VirtualBox' in str(out.stdout):
                 print('[+] DMI <VirtualBox>')
                 return 'virtualbox'
@@ -36,7 +36,7 @@ class Initialize():
     def sys_clock():
         cmd = 'timedatectl set-ntp true --no-ask-password'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] System clock')
         except subprocess.CalledProcessError as err:
             print('[-] System clock', {err})
@@ -46,7 +46,7 @@ class Initialize():
     def loadkeys(keys):
         cmd = f'loadkeys {keys}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] Loadkeys <{keys}>')
         except subprocess.CalledProcessError as err:
             print(f'[-] loadkeys <{keys}>', {err})
@@ -56,7 +56,7 @@ class Initialize():
     def keymaps(keymap):
         cmd = f'localectl set-keymap --no-convert {keymap}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] Keymaps <{keymap}>')
         except subprocess.CalledProcessError as err:
             print(f'[-] Keymaps <{keymap}>', {err})

@@ -10,7 +10,7 @@ class Btrfs():
     def mkfs(rootdir):
         cmd = f'mkfs.btrfs --quiet -L System {rootdir}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] BTRFS: Make filesystem')
         except subprocess.CalledProcessError as err:
             print('[-] BTRFS: Make filesystem', err)
@@ -20,7 +20,7 @@ class Btrfs():
     def mountfs(rootdir):
         cmd = f'mount {rootdir} /mnt'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] BTRFS: Mount cryptroot >> /mnt')
         except subprocess.CalledProcessError as err:
             print('[-] BTRFS: Mount cryptroot >> /mnt', err)
@@ -32,7 +32,7 @@ class Btrfs():
         for subvolume in subvolumes:
             cmd = f'btrfs subvolume create {subvolume}'
             try:
-                subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+                subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
                 print(f'[+] BTRFS: Create subvolume {subvolume}')
             except subprocess.CalledProcessError as err:
                 print(f'[-] BTRFS: Create subvolume {subvolume}', err)
@@ -42,7 +42,7 @@ class Btrfs():
     def unmount():
         cmd = 'umount -R /mnt'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] Unmount')
         except subprocess.CalledProcessError as err:
             print(f'[-] Unmount', err)
@@ -52,7 +52,7 @@ class Btrfs():
     def mount_root(rootdir):
         cmd = f'mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ {rootdir} /mnt'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] BTRFS: Mount @/ >> /mnt')
         except subprocess.CalledProcessError as err:
             print(f'[-] BTRFS: Mount @/ >> /mnt', err)
@@ -76,7 +76,7 @@ class Btrfs():
         for subvolume in subvolumes:
             cmd = f'mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@{subvolume} {rootdir} /mnt/{subvolume}'
             try:
-                subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+                subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
                 print(f'[+] BTRFS: Mount @{subvolume} >> /mnt/{subvolume}')
             except subprocess.CalledProcessError as err:
                 print(f'[-] BTRFS: Mount @{subvolume} >> /mnt/{subvolume}', err)

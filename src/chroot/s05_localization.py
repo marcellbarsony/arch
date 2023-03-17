@@ -43,7 +43,7 @@ class Locale():
     def locale_gen():
         cmd ='locale-gen'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] Locale-gen')
         except subprocess.CalledProcessError as err:
             print(f'[-] Locale-gen', err)

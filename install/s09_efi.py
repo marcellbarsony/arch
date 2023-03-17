@@ -20,7 +20,7 @@ class Efi():
     def format(efidevice):
         cmd = f'mkfs.fat -F32 {efidevice}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] EFI: Format {efidevice} to F32')
         except subprocess.CalledProcessError as err:
             print(f'[-] EFI: Format {efidevice} to F32', err)
@@ -30,7 +30,7 @@ class Efi():
     def mount(efidir, efidevice):
         cmd = f'mount {efidevice} {efidir}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] EFI: Mount {efidevice} to {efidir}')
         except subprocess.CalledProcessError as err:
             print(f'[-] EFI: Mount {efidevice} to {efidir}', err)

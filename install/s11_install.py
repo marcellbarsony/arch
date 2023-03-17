@@ -3,28 +3,6 @@ import subprocess
 import sys
 
 
-class Mirrorlist():
-
-    """Update & back-up mirrolist"""
-
-    @staticmethod
-    def backup():
-        src='/etc/pacman.d/mirrorlist'
-        dst='/etc/pacman.d/mirrorlist.bak'
-        shutil.copy2(src, dst)
-
-    @staticmethod
-    def update():
-        file = '/etc/pacman.d/mirrorlist'
-        cmd = f'reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save {file}'
-        try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-            print(f'[+] PACMAN: System install')
-        except subprocess.CalledProcessError as err:
-            print(f'[-] PACMAN: System install', err)
-            sys.exit(1)
-
-
 class Install():
 
     """Pacstrap system packages"""
@@ -34,21 +12,21 @@ class Install():
         # Pacstrap doesn't work properly until pacman-init.service in the live system is done
         cmd = f'systemctl --no-pager status -n0 pacman-init.service'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] PACSTRAP: pacman-init.service')
         except subprocess.CalledProcessError as err:
-            print(f'[+] PACSTRAP: pacman-init.service', err)
+            print(f'[-] PACSTRAP: pacman-init.service', err)
             sys.exit(1)
 
         # while True:
         #     cmd = 'systemctl show pacman-init.service | grep SubState=exited'
         #     try:
-        #         subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+        #         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         #         print(f'[+] PACSTRAP: pacman-init.service')
         #         break
         #     except subprocess.CalledProcessError as err:
         #         cmd = f'systemctl --no-pager status -n0 pacman-init.service'
-        #         subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+        #         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         #         print(f'[-] PACSTRAP: pacman-init.service', err)
 
     @staticmethod

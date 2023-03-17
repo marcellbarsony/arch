@@ -22,8 +22,9 @@ from install.s11_install import *
 from install.s12_chroot import *
 
 
-def main():
+class Main():
 
+    @staticmethod
     def Init():
         Initialize.boot_mode()
         global dmidata
@@ -32,7 +33,8 @@ def main():
         Initialize.loadkeys(keys)
         Initialize.keymaps(keymap)
 
-    def NetConf():
+    @staticmethod
+    def NetworkConfiguration():
         while True:
             if dmidata != 'virtualbox' and 'vmware':
                 Network.wifi_activate(network_toggle)
@@ -41,15 +43,17 @@ def main():
             if status == True:
                 break
 
-    def PacConf():
+    @staticmethod
+    def PackageManager():
         Pacman.config()
-        Pacman.mirrors()
         Pacman.keyring()
 
+    @staticmethod
     def Configuration():
         Config.main()
 
-    def Filesystem():
+    @staticmethod
+    def FileSystem():
         WipeDisk.filesystem(disk)
         WipeDisk.partition_data(disk)
         WipeDisk.gpt_data(disk)
@@ -57,10 +61,12 @@ def main():
         Partitions.create_efi(disk, efisize)
         Partitions.create_system(disk)
 
+    @staticmethod
     def Encryption():
         CryptSetup.encrypt(rootdevice, cryptpassword)
         CryptSetup.open(rootdevice, cryptpassword)
 
+    @staticmethod
     def Btreefs():
         Btrfs.mkfs(rootdir)
         Btrfs.mountfs(rootdir)
@@ -70,40 +76,28 @@ def main():
         Btrfs.mkdir()
         Btrfs.mount_subvolumes(rootdir)
 
-    def Efipart():
+    @staticmethod
+    def EfiPartition():
         Efi.mkdir(efidir)
         Efi.format(efidevice)
         Efi.mount(efidir, efidevice)
 
+    @staticmethod
     def FsTable():
         Fstab.mkdir()
         Fstab.genfstab()
 
+    @staticmethod
     def Pacstrap():
-        Mirrorlist.backup()
-        Mirrorlist.update()
         Install.bug()
         Install.install(pacmanconf)
         Install.install_dmi(pacmanconf)
 
+    @staticmethod
     def ArchChroot():
-        Chroot.copy_pacconf()
-        Chroot.copy_script()
+        Chroot.copy_sources()
         Chroot.chroot()
         Chroot.clear()
-
-
-    Init()
-    NetConf()
-    PacConf()
-    Configuration()
-    Filesystem()
-    Encryption()
-    Btreefs()
-    Efipart()
-    FsTable()
-    Pacstrap()
-    ArchChroot()
 
 
 if __name__ == '__main__':
@@ -153,4 +147,14 @@ if __name__ == '__main__':
     # User
     user = getpass.getuser()
 
-    main()
+    Main.Init()
+    Main.NetworkConfiguration()
+    Main.PackageManager()
+    Main.Configuration()
+    Main.FileSystem()
+    Main.Encryption()
+    Main.Btreefs()
+    Main.EfiPartition()
+    Main.FsTable()
+    Main.Pacstrap()
+    Main.ArchChroot()

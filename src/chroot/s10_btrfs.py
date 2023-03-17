@@ -10,7 +10,7 @@ class Btrfs():
     def snapper():
         cmd = 'snapper --no-dbus -c home create-config /home'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] BTRFS Snapper')
         except subprocess.CalledProcessError as err:
             print(f'[-] BTRFS Snapper', err)

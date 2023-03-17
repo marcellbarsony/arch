@@ -20,63 +20,62 @@ from chroot.s10_btrfs import *
 from chroot.s11_services import *
 
 
-def main():
+class Main():
 
+    @staticmethod
     def Keys():
         Keymaps.loadkeys(keys)
         Keymaps.keymap(keys)
 
+    @staticmethod
     def Accounts():
         Root.password(root_pw)
         User.add(user)
         User.password(user, user_pw)
         User.group(user)
 
+    @staticmethod
     def Hostname():
         Host.set_hostname(hostname)
         Host.hosts(hostname)
 
+    @staticmethod
     def Sec():
         Security.sudoers()
         Security.login_delay(logindelay)
 
+    @staticmethod
     def Loc():
         Locale.locale()
         Locale.locale_conf()
         Locale.locale_gen()
 
+    @staticmethod
     def Bug():
         Bugfix.watchdog_error()
 
+    @staticmethod
     def Initram():
         Initramfs.initramfs()
 
+    @staticmethod
     def Mkinitcp():
         Mkinitcpio.mkinitcpio()
 
+    @staticmethod
     def Bootloader():
         Grub.config(resolution)
         Grub.install(secureboot, efi_directory)
         Grub.password(grub_password)
         Grub.mkconfig()
 
+    @staticmethod
     def Filesystem():
         Btrfs.snapper()
 
+    @staticmethod
     def Services():
         Service.enable()
-
-    Keys()
-    Accounts()
-    Hostname()
-    Sec()
-    Loc()
-    Bug()
-    Initram()
-    Mkinitcp()
-    Bootloader()
-    Filesystem()
-    Services()
 
 
 if __name__ == '__main__':
@@ -112,4 +111,14 @@ if __name__ == '__main__':
     # Security
     logindelay = config.get('security', 'logindelay')
 
-    main()
+    Main.Keys()
+    Main.Accounts()
+    Main.Hostname()
+    Main.Sec()
+    Main.Loc()
+    Main.Bug()
+    Main.Initram()
+    Main.Mkinitcp()
+    Main.Bootloader()
+    Main.Filesystem()
+    Main.Services()

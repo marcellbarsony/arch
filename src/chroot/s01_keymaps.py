@@ -10,7 +10,7 @@ class Keymaps():
     def loadkeys(keymap):
         cmd = f'sudo loadkeys {keymap}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] Loadkeys {keymap}')
         except subprocess.CalledProcessError as err:
             print(f'[-] Loadkeys {keymap}', err)

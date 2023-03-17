@@ -6,7 +6,7 @@ import sys
 
 class Pacman():
 
-    """Initialize Arch base installer"""
+    """Initialize Pacman config"""
 
     @staticmethod
     def config():
@@ -21,16 +21,10 @@ class Pacman():
             sys.exit(1)
 
     @staticmethod
-    def mirrors():
-        # TODO: Pacman mirrors
-        print('[TODO] Check Pacman mirrors')
-        pass
-
-    @staticmethod
     def keyring():
         cmd = 'sudo pacman -Sy --noconfirm archlinux-keyring'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] Arch keyring update')
         except subprocess.CalledProcessError as err:
             print('[-] Arch keyring update', err)

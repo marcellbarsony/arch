@@ -10,7 +10,7 @@ class Root():
     def password(root_pw):
         cmd = f'chpasswd 2>&1'
         try:
-            subprocess.run(cmd, shell=True, input=f'root:{root_pw}'.encode())
+            subprocess.run(cmd, shell=True, check=True, input=f'root:{root_pw}'.encode())
             print('[+] Root password')
         except subprocess.CalledProcessError as err:
             print('[+] Root password', err)
@@ -23,7 +23,7 @@ class User():
     def add(user):
         cmd = f'useradd -m {user}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] User add {user}')
         except subprocess.CalledProcessError as err:
             print(f'[+] User add {user}', err)
@@ -43,7 +43,7 @@ class User():
     def group(user):
         cmd = f'usermod -aG wheel,audio,video,optical,storage,vboxsf {user}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] User group')
         except subprocess.CalledProcessError as err:
             print(f'[-] User group', err)

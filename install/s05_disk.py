@@ -9,7 +9,7 @@ class WipeDisk():
     def filesystem(disk):
         cmd = f'wipefs -af {disk}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] FILESYSTEM: Wipe')
         except subprocess.CalledProcessError as err:
             print('[-] FILESYSTEM: Wipe', err)
@@ -19,7 +19,7 @@ class WipeDisk():
     def partition_data(disk):
         cmd = f'sgdisk -o {disk}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] FILESYSTEM: Wipe partition data')
         except subprocess.CalledProcessError as err:
             print('[-] FILESYSTEM: Wipe partition data', err)
@@ -29,7 +29,7 @@ class WipeDisk():
     def gpt_data(disk):
         cmd = f'sgdisk --zap-all --clear {disk}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] FILESYSTEM: Wipe GPT data')
         except subprocess.CalledProcessError as err:
             print('[-] FILESYSTEM: Wipe GPT data', err)
@@ -39,7 +39,7 @@ class WipeDisk():
     def partprobe(disk):
         cmd = f'partprobe {disk}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] FILESYSTEM: Partprobe')
         except subprocess.CalledProcessError as err:
             print('[-] FILESYSTEM: Partprobe', err)

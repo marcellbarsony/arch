@@ -9,7 +9,7 @@ class CryptSetup():
     def encrypt(rootdevice, cryptpassword):
         cmd = f'cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat {rootdevice}'
         try:
-            subprocess.run(cmd, shell=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
             print(f'[+] CRYPTSETUP: {rootdevice}')
         except subprocess.CalledProcessError as err:
             print(f'[-] CRYPTSETUP: {rootdevice}', err)
@@ -19,7 +19,7 @@ class CryptSetup():
     def open(rootdevice, cryptpassword):
         cmd = f'cryptsetup open --type luks2 {rootdevice} cryptroot'
         try:
-            subprocess.run(cmd, shell=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
             print(f'[+] CRYPTSETUP: Open {rootdevice}')
         except subprocess.CalledProcessError as err:
             print(f'[-] CRYPTSETUP: Open {rootdevice}', err)

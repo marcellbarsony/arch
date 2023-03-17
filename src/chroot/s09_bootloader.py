@@ -12,7 +12,7 @@ class Grub():
         # Root partition UUID
         cmd = 'blkid'
         try:
-            out = subprocess.run(cmd, stdout=subprocess.PIPE)
+            out = subprocess.run(cmd, shell=True, check=True, stdout=subprocess.PIPE)
             print(f'[+] GRUB: Root partition UUID')
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB: Root partition UUID', err)
@@ -49,7 +49,7 @@ class Grub():
         else:
             cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] GRUB install <')
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB install', err)
@@ -112,7 +112,7 @@ class Grub():
     def mkconfig():
         cmd = f'grub-mkconfig -o /boot/grub/grub.cfg'
         try:
-            subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] GRUB config')
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB config', err)

@@ -18,7 +18,7 @@ class Service():
         for service in services:
             cmd = f'systemctl enable {service}'
             try:
-                subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+                subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
                 print(f'[+] SERVICE enable {service}')
             except subprocess.CalledProcessError as err:
                 print(f'[-] SERVICE enable {service}', err)
