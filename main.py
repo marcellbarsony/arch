@@ -29,6 +29,7 @@ class Main():
         Initialize.boot_mode()
         global dmidata
         dmidata = Initialize.dmi_data()
+        Initialize.timezone()
         Initialize.sys_clock()
         Initialize.loadkeys(keys)
         Initialize.keymaps(keymap)
@@ -46,7 +47,7 @@ class Main():
     @staticmethod
     def PackageManager():
         Pacman.config()
-        Pacman.keyring()
+        Pacman.bug()
 
     @staticmethod
     def Configuration():
@@ -90,8 +91,8 @@ class Main():
     @staticmethod
     def Pacstrap():
         Install.bug()
-        Install.install(pacmanconf)
-        Install.install_dmi(pacmanconf)
+        Install.install()
+        Install.install_dmi(dmidata)
 
     @staticmethod
     def ArchChroot():
@@ -140,9 +141,6 @@ if __name__ == '__main__':
     network_toggle = config.get('network', 'wifi')
     network_key = config.get('network', 'wifi_key')
     network_ssid = config.get('network', 'wifi_ssid')
-
-    # Pacman
-    pacmanconf = config.get('pacman', 'pacmanconf')
 
     # User
     user = getpass.getuser()

@@ -33,13 +33,23 @@ class Initialize():
             sys.exit(1)
 
     @staticmethod
+    def timezone():
+        cmd = 'timedatectl set-timezone Europe/Amsterdam'
+        try:
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print('[+] Timezone')
+        except subprocess.CalledProcessError as err:
+            print('[-] Timezone', {err})
+            sys.exit(1)
+
+    @staticmethod
     def sys_clock():
         cmd = 'timedatectl set-ntp true --no-ask-password'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] System clock')
+            print('[+] Set NTP')
         except subprocess.CalledProcessError as err:
-            print('[-] System clock', {err})
+            print('[-] Set NTP', {err})
             sys.exit(1)
 
     @staticmethod

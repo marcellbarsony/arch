@@ -8,16 +8,17 @@ Date    : 2023-02
 import argparse
 import configparser
 from chroot.s01_keymaps import *
-from chroot.s02_account import *
-from chroot.s03_host import *
-from chroot.s04_security import *
-from chroot.s05_localization import *
-from chroot.s06_bugfix import *
-from chroot.s07_initramfs import *
-from chroot.s08_mkinitcpio import *
-from chroot.s09_bootloader import *
-from chroot.s10_btrfs import *
-from chroot.s11_services import *
+from chroot.s02_pacman import *
+from chroot.s03_account import *
+from chroot.s04_host import *
+from chroot.s05_security import *
+from chroot.s06_localization import *
+from chroot.s07_bugfix import *
+from chroot.s08_initramfs import *
+from chroot.s09_mkinitcpio import *
+from chroot.s10_bootloader import *
+from chroot.s11_btrfs import *
+from chroot.s12_services import *
 
 
 class Main():
@@ -26,6 +27,12 @@ class Main():
     def Keys():
         Keymaps.loadkeys(keys)
         Keymaps.keymap(keys)
+
+    @staticmethod
+    def PackageManager():
+        Mirrorlist.backup()
+        Mirrorlist.update()
+        Pacman.config()
 
     @staticmethod
     def Accounts():
@@ -66,12 +73,12 @@ class Main():
     def Bootloader():
         Grub.config(resolution)
         Grub.install(secureboot, efi_directory)
-        Grub.password(grub_password)
+        Grub.password(grub_password, user)
         Grub.mkconfig()
 
     @staticmethod
     def Filesystem():
-        Btrfs.snapper()
+        Snapper.config()
 
     @staticmethod
     def Services():
@@ -112,6 +119,7 @@ if __name__ == '__main__':
     logindelay = config.get('security', 'logindelay')
 
     Main.Keys()
+    Main.PackageManager()
     Main.Accounts()
     Main.Hostname()
     Main.Sec()

@@ -18,12 +18,16 @@ class Mirrorlist():
         file = '/etc/pacman.d/mirrorlist'
         cmd = f'reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save {file}'
         try:
-            print('[/] Updating Pacman mirrorlist...')
+            print('[/] PACMAN: Updating Pacman mirrorlist...')
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] PACMAN: System install')
+            print(f'[+] PACMAN: Mirrorlist update')
         except subprocess.CalledProcessError as err:
-            print(f'[-] PACMAN: System install', err)
+            print(f'[-] PACMAN: Mirorlist update', err)
             sys.exit(1)
+
+class Pacman():
+
+    """Pacman configuration"""
 
     @staticmethod
     def config():
@@ -31,20 +35,18 @@ class Mirrorlist():
         try:
             with open(config, 'r') as file:
                 lines = file.readlines()
-            print(f'[+] Read {config}')
         except Exception as err:
-            print(f'[-] Read {config}', err)
+            print(f'[-] PACMAN: Read {config}', err)
             sys.exit(1)
 
-        lines.insert(36, f'ParallelDownloads=5\n')
-        lines[37] = f'ILoveCandy\n'
-        lines[38] = f'Color\n'
+        lines[32] = f'Color\n'
+        lines[33] = f'ILoveCandy\n'
+        lines[36] = f'ParallelDownloads=5\n'
 
         try:
             with open(config, 'w') as file:
                 file.writelines(lines)
-            print(f'[+] Write {config}')
+            print(f'[+] PACMAN: Write {config}')
         except Exception as err:
-            print(f'[-] Write {config}', err)
+            print(f'[-] PACMAN: Write {config}', err)
             sys.exit(1)
-
