@@ -17,7 +17,6 @@ class Locale():
             sys.exit(1)
 
         lines[170] = "en_US.UTF-8 UTF-8\n"
-
         try:
             with open(locale_gen, 'w') as file:
                 file.writelines(lines)

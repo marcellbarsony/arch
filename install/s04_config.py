@@ -1,6 +1,6 @@
 class Config():
 
-    """Docstring for Menu"""
+    """Docstring for Config"""
 
     @staticmethod
     def main():

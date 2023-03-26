@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Author  : Name Surname <mail@domain.com>
+Author  : FName SName <mail@domain.com>
 Date    : 2023-03
 """
 
@@ -26,6 +26,7 @@ class Main():
 
     @staticmethod
     def Init():
+        Initialize.set_font(font)
         Initialize.boot_mode()
         global dmidata
         dmidata = Initialize.dmi_data()
@@ -38,8 +39,7 @@ class Main():
     def NetworkConfiguration():
         while True:
             if dmidata != 'virtualbox' and 'vmware':
-                Network.wifi_activate(network_toggle)
-                Network.wifi_connect(network_ssid, network_key)
+                Network.wifi_connect(network_toggle, network_ssid, network_key)
             status = Network.check(network_ip, network_port)
             if status == True:
                 break
@@ -55,10 +55,8 @@ class Main():
 
     @staticmethod
     def FileSystem():
-        WipeDisk.filesystem(disk)
-        WipeDisk.partition_data(disk)
-        WipeDisk.gpt_data(disk)
-        WipeDisk.partprobe(disk)
+        Disk.wipe(disk)
+        Disk.partprobe(disk)
         Partitions.create_efi(disk, efisize)
         Partitions.create_system(disk)
 
@@ -121,7 +119,7 @@ if __name__ == '__main__':
     efidevice = config.get('drive', 'efidevice')
     rootdevice = config.get('drive', 'rootdevice')
 
-    # Efi
+    # EFI
     efisize = config.get('efi', 'efisize')
 
     # Encryption
@@ -132,6 +130,7 @@ if __name__ == '__main__':
     efidir = config.get('btrfs', 'efidir')
 
     # Keys
+    font = config.get('keyset', 'font')
     keys = config.get('keyset', 'keys')
     keymap = config.get('keyset', 'keymap')
 

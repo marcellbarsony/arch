@@ -8,24 +8,17 @@ class Network():
     """Network settings"""
 
     @staticmethod
-    def wifi_activate(status):
-        cmd = f'sudo nmcli radio wifi {status}'
-        try:
-            subprocess.run(cmd, shell=True, check=True)
-            print('[+] Wi-Fi activate')
-        except subprocess.CalledProcessError as err:
-            print('[-]', repr(err))
-            sys.exit(1)
+    def wifi_connect(status, ssid, password):
+        cmd_list = [f'sudo nmcli radio wifi {status}',
+                    f'nmcli device wifi connect {ssid} password {password}']
 
-    @staticmethod
-    def wifi_connect(ssid, password):
-        cmd = f'nmcli device wifi connect {ssid} password {password}'
-        try:
-            subprocess.run(cmd, shell=True, check=True)
-            print('[+] Wi-Fi connect')
-        except subprocess.CalledProcessError as err:
-            print('[-]', repr(err))
-            pass
+        for cmd in cmd_list:
+            try:
+                subprocess.run(cmd, shell=True, check=True)
+                print('[+] Wi-Fi Connection')
+            except subprocess.CalledProcessError as err:
+                print('[-]', repr(err))
+                sys.exit(1)
 
     @staticmethod
     def check(ip, port):

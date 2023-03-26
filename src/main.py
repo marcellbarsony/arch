@@ -50,6 +50,7 @@ class Main():
     def Sec():
         Security.sudoers()
         Security.login_delay(logindelay)
+        Security.automatic_logout()
 
     @staticmethod
     def Loc():

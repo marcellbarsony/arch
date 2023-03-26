@@ -28,19 +28,20 @@ class Grub():
         try:
             with open(grub_cfg, 'r') as file:
                 lines = file.readlines()
-            print(f'[+] Read {grub_cfg}')
         except Exception as err:
             print(f'[-] Read {grub_cfg}', err)
             sys.exit(1)
+
         # Configuration
-        lines[3] = 'GRUB_TIMEOUT=0\n'
+        lines[3] = 'GRUB_TIMEOUT=5\n'
         # Btrfs & Encryption
-        lines[5] = f'GRUB_CMDLINE_LINUX_DEFAULT=" cryptdevice=UUID={uuid}:cryptroot:allow-discards root=/dev/mapper/cryptroot video={resolution}"\n'
+        lines[5] = f'GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID={uuid}:cryptroot:allow-discards root=/dev/mapper/cryptroot video={resolution}"\n'
         lines[9] = f'GRUB_PRELOAD_MODULES="part_gpt part_msdos luks2"\n'
         lines[12] = f'GRUB_ENABLE_CRYPTODISK=y\n'
         # Colors
         lines[41] = f'GRUB_COLOR_NORMAL="light-blue/black"\n'
         lines[42] = f'GRUB_COLOR_HIGHLIGHT="white/blue"\n'
+
         try:
             with open(grub_cfg, 'w') as file:
                 file.writelines(lines)
@@ -57,7 +58,7 @@ class Grub():
             cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] GRUB install <')
+            print(f'[+] GRUB install')
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB install', err)
             sys.exit(1)
@@ -106,31 +107,21 @@ class Grub():
 
     @staticmethod
     def password(grub_password, user):
+        # https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu
         pbkdf2_hash = ''
         cmd = f'grub-mkpasswd-pbkdf2'
-        #cmd_stdin = f'{grub_password}\n{grub_password}'
-        cmd_stdin = f'user\nuser'
+        sin = f'{grub_password}\n{grub_password}'
         try:
-            out = subprocess.run(cmd, shell=True, check=True, input=cmd_stdin.encode(), stdout=subprocess.PIPE)
+            out = subprocess.run(cmd, shell=True, check=True, input=sin.encode(), stdout=subprocess.PIPE)
             pbkdf2_hash = out.stdout.decode('utf-8')[67:].strip()
             print(f'[+] GRUB password')
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB password', err)
-            sys.exit(1)
 
-        file = '/etc/grub.d/40_custom'
-        content = f'\nset superusers="{user}"\npassword_pbkdf2 {user} {pbkdf2_hash}'
-
-        try:
-            with open(file, 'a') as f:
-                f.write(content)
-            print('[+] GRUB hash write')
-        except Exception as err:
-            print('[-] GRUB hash write', err)
-            sys.exit(1)
-
-        mode = 0o400
-        os.chmod(file, mode)
+        file = '/etc/grub.d/00_header'
+        content = f'\ncat << EOF\nset superusers="{user}"\npassword_pbkdf2 {user} {pbkdf2_hash}\nEOF'
+        with open(file, 'a') as f:
+            f.write(content)
 
     @staticmethod
     def mkconfig():
@@ -141,4 +132,3 @@ class Grub():
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB config', err)
             sys.exit(1)
-

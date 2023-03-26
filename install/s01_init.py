@@ -8,6 +8,17 @@ class Initialize():
     """Initialize Arch base installer"""
 
     @staticmethod
+    def set_font(font):
+        # cmd = f'setfont {font}'
+        # try:
+        #     subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        #     print(f'[+] Set font <{font}>')
+        # except subprocess.CalledProcessError as err:
+        #     print(f'[-] Set font <{font}>', {err})
+        #     sys.exit(1)
+        pass
+
+    @staticmethod
     def boot_mode():
         path = '/sys/firmware/efi/efivars/'
         result = os.path.exists(path)

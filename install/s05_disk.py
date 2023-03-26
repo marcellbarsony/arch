@@ -1,39 +1,22 @@
 import subprocess
 import sys
 
-class WipeDisk():
+class Disk():
 
-    """Docstring for WipeDisk"""
-
-    @staticmethod
-    def filesystem(disk):
-        cmd = f'wipefs -af {disk}'
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] FILESYSTEM: Wipe')
-        except subprocess.CalledProcessError as err:
-            print('[-] FILESYSTEM: Wipe', err)
-            sys.exit(1)
+    """Docstring for Disk"""
 
     @staticmethod
-    def partition_data(disk):
-        cmd = f'sgdisk -o {disk}'
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] FILESYSTEM: Wipe partition data')
-        except subprocess.CalledProcessError as err:
-            print('[-] FILESYSTEM: Wipe partition data', err)
-            sys.exit(1)
-
-    @staticmethod
-    def gpt_data(disk):
-        cmd = f'sgdisk --zap-all --clear {disk}'
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] FILESYSTEM: Wipe GPT data')
-        except subprocess.CalledProcessError as err:
-            print('[-] FILESYSTEM: Wipe GPT data', err)
-            sys.exit(1)
+    def wipe(disk):
+        cmd_list = [f'sgdisk -o {disk}', # Filesystem
+                    f'wipefs -af {disk}', # Partition data
+                    f'sgdisk --zap-all --clear {disk}'] # GPT data
+        for cmd in cmd_list:
+            try:
+                subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+                print('[+] FILESYSTEM: Wipe')
+            except subprocess.CalledProcessError as err:
+                print('[-] FILESYSTEM: ', err)
+                sys.exit(1)
 
     @staticmethod
     def partprobe(disk):
