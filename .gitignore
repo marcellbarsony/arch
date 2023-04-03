@@ -1,1 +1,3 @@
-install/__pycache__/
+__pycache__/
+debugpy/
+venv/

@@ -7,31 +7,32 @@ class Efi():
 
     """Docstring for Efi partition"""
 
-    @staticmethod
-    def mkdir(efidir):
-        if not os.path.exists(efidir):
-            os.makedirs(efidir)
-            print(f'[+] EFI: Make directory {efidir}')
+    def __init__(self, efidir, efidevice):
+        self.efidir = efidir
+        self.efidevice = efidevice
+
+    def mkdir(self):
+        if not os.path.exists(self.efidir):
+            os.makedirs(self.efidir)
+            print(f'[+] EFI: Make directory {self.efidir}')
         else:
-            print(f'[-] EFI: Make directory {efidir}')
+            print(f'[-] EFI: Make directory {self.efidir}')
             sys.exit(1)
 
-    @staticmethod
-    def format(efidevice):
-        cmd = f'mkfs.fat -F32 {efidevice}'
+    def format(self):
+        cmd = f'mkfs.fat -F32 {self.efidevice}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] EFI: Format {efidevice} to F32')
+            print(f'[+] EFI: Format {self.efidevice} to F32')
         except subprocess.CalledProcessError as err:
-            print(f'[-] EFI: Format {efidevice} to F32', err)
+            print(f'[-] EFI: Format {self.efidevice} to F32', err)
             sys.exit(1)
 
-    @staticmethod
-    def mount(efidir, efidevice):
-        cmd = f'mount {efidevice} {efidir}'
+    def mount(self):
+        cmd = f'mount {self.efidevice} {self.efidir}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] EFI: Mount {efidevice} to {efidir}')
+            print(f'[+] EFI: Mount {self.efidevice} to {self.efidir}')
         except subprocess.CalledProcessError as err:
-            print(f'[-] EFI: Mount {efidevice} to {efidir}', err)
+            print(f'[-] EFI: Mount {self.efidevice} to {self.efidir}', err)
             sys.exit(1)

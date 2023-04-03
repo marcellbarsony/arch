@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author  : FName SName <mail@domain.com>
-Date    : 2023-03
+Date    : 2023-04
 """
 
 
@@ -77,9 +77,10 @@ class Main():
 
     @staticmethod
     def EfiPartition():
-        Efi.mkdir(efidir)
-        Efi.format(efidevice)
-        Efi.mount(efidir, efidevice)
+        efi = Efi(efidir, efidevice)
+        efi.mkdir()
+        efi.format()
+        efi.mount()
 
     @staticmethod
     def FsTable():
