@@ -45,6 +45,9 @@ class Install():
             cmd += 'open-vm-tools'
         else:
             print('[TODO]: PACSTRAP DMI packages')
+            # https://wiki.archlinux.org/title/Microcode
+            # amd-ucode
+            # intel-ucode
             pass
         try:
             subprocess.run(cmd, shell=True, check=True)

@@ -16,7 +16,8 @@ class Locale():
             print(f'[-] Read {locale_gen}', err)
             sys.exit(1)
 
-        lines[170] = "en_US.UTF-8 UTF-8\n"
+        lines[170] = 'en_US.UTF-8 UTF-8\n'
+        lines[295] = 'ja_JP.UTF-8 UTF-8\n'
         try:
             with open(locale_gen, 'w') as file:
                 file.writelines(lines)
@@ -27,11 +28,12 @@ class Locale():
 
     @staticmethod
     def localeConf():
-        value = "LANG=en_US.UTF-8"
+        value = ['LANG=en_US.UTF-8', 'LANG=ja_JP.UTF-8']
         locale_conf = '/etc/locale.conf'
         try:
-            with open(locale_conf, 'w') as file:
-                file.write(value)
+            with open(locale_conf, 'a') as file:
+                for line in value:
+                    file.write(line + '\n')
             print(f'[+] Set {locale_conf}')
         except Exception as err:
             print(f'[-] Set {locale_conf}', err)

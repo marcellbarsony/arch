@@ -7,6 +7,7 @@ Date    : 2023-04
 
 import argparse
 import configparser
+
 from chroot import Keymaps
 from chroot import Mirrorlist
 from chroot import Pacman
@@ -20,6 +21,7 @@ from chroot import Initramfs
 from chroot import Mkinitcpio
 from chroot import Grub
 from chroot import Snapper
+#from chroot import SecureShell
 from chroot import Service
 
 
@@ -32,14 +34,14 @@ class Main():
         key.keymap()
 
     @staticmethod
-    def PackageManager():
+    def packageManager():
         ml = Mirrorlist()
         ml.backup()
         ml.update()
         Pacman.config()
 
     @staticmethod
-    def Accounts():
+    def accounts():
         Root.password(root_pw)
         usr = User(user)
         usr.add()
@@ -47,16 +49,16 @@ class Main():
         usr.group()
 
     @staticmethod
-    def Hosts():
+    def hostSetup():
         host = Host(hostname)
         host.setHostname()
         host.hosts()
 
     @staticmethod
-    def Sec():
+    def security():
         Security.sudoers()
         Security.loginDelay(logindelay)
-        Security.automatic_logout()
+        Security.automaticLogout()
 
     @staticmethod
     def Loc():
@@ -65,30 +67,36 @@ class Main():
         Locale.localeGen()
 
     @staticmethod
-    def Bug():
+    def bug():
         Bugfix.watchdogError()
 
     @staticmethod
-    def Initram():
+    def initram():
         Initramfs.initramfs()
 
     @staticmethod
-    def Mkinitcp():
+    def mkinit():
         Mkinitcpio.mkinitcpio()
 
     @staticmethod
-    def Bootloader():
+    def bootloader():
         Grub.config(resolution)
         Grub.install(secureboot, efi_directory)
         Grub.password(grub_password, user)
         Grub.mkconfig()
 
     @staticmethod
-    def Filesystem():
+    def filesystem():
         Snapper.config()
 
+    #@staticmethod
+    #def secureShell():
+    #    ssh = SecureShell(user)
+    #    ssh.agentService()
+    #    ssh.agentSetup()
+
     @staticmethod
-    def Services():
+    def services():
         Service.enable()
 
 
@@ -105,7 +113,7 @@ if __name__ == '__main__':
 
     # Config
     config = configparser.ConfigParser()
-    config.read('/config.ini')
+    config.read('/config.ini') # TODO: check dir location
 
     # Grub
     efi_directory = config.get('grub', 'efi_directory')
@@ -126,14 +134,15 @@ if __name__ == '__main__':
     logindelay = config.get('security', 'logindelay')
 
     Main.Keys()
-    Main.PackageManager()
-    Main.Accounts()
-    Main.Hosts()
-    Main.Sec()
+    Main.packageManager()
+    Main.accounts()
+    Main.hostSetup()
+    Main.security()
     Main.Loc()
-    Main.Bug()
-    Main.Initram()
-    Main.Mkinitcp()
-    Main.Bootloader()
-    Main.Filesystem()
-    Main.Services()
+    Main.bug()
+    Main.initram()
+    Main.mkinit()
+    Main.bootloader()
+    Main.filesystem()
+    #Main.secureShell()
+    Main.services()

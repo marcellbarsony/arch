@@ -1,10 +1,13 @@
+import os
 import subprocess
 import sys
 
 
 class Pacman():
 
-    """Initialize Pacman config"""
+    """
+    Initialize Pacman config
+    """
 
     @staticmethod
     def config():
@@ -28,10 +31,23 @@ class Pacman():
             print(f'[-] PACMAN: Write {config}', err)
             sys.exit(1)
 
+
+class Keyring():
+
+    """
+    Initialize keyring config
+    https://wiki.archlinux.org/title/Pacman/
+    """
+
     @staticmethod
-    def bug():
-        cmd_list = ['pacman -Sy --noconfirm archlinux-keyring',
+    def init():
+        #path = '/etc/pacman.d/gnupg'
+        #os.rmdir(path)
+
+        cmd_list = ['pacman -Sy --noconfrim archlinux-keyring',
                     'pacman-key --init',
+                    #'pacman-key --refresh-keys',
+                    # gpg --refresh-keys,
                     'pacman-key --populate']
         for cmd in cmd_list:
             try:

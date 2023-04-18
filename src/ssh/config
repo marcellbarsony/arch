@@ -1,0 +1,3 @@
+Host *
+    AddkeysToAgent yes
+    IdentityFile ~/.ssh/id_ed25519

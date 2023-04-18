@@ -8,9 +8,11 @@ Date    : 2023-04
 import argparse
 import configparser
 import getpass
+
 from install import Init
 from install import Network
 from install import Pacman
+from install import Keyring
 from install import Config
 from install import Disk
 from install import Partitions
@@ -34,7 +36,7 @@ class Main():
         Init.keymaps(keymap)
 
     @staticmethod
-    def NetworkConfiguration():
+    def network_configuration():
         dmidata = Init.dmiData()
         while True:
             if dmidata != 'virtualbox' and 'vmware':
@@ -44,9 +46,9 @@ class Main():
                 break
 
     @staticmethod
-    def PackageManager():
+    def package_manager():
         Pacman.config()
-        Pacman.bug()
+        Keyring.init()
 
     @staticmethod
     def Configuration():
@@ -79,25 +81,25 @@ class Main():
         fs.mountSubvolumes()
 
     @staticmethod
-    def EfiPartition():
+    def efi_partition():
         efi = Efi(efidir, efidevice)
         efi.mkdir()
         efi.format()
         efi.mount()
 
     @staticmethod
-    def FsTable():
+    def fs_table():
         Fstab.mkdir()
         Fstab.genfstab()
 
     @staticmethod
-    def Pacstrap():
+    def pacstrap():
         Install.bug()
         Install.install()
         Install.installDmi()
 
     @staticmethod
-    def ArchChroot():
+    def arch_chroot():
         Chroot.copySources()
         Chroot.chroot()
         Chroot.clear()
@@ -149,13 +151,13 @@ if __name__ == '__main__':
     user = getpass.getuser()
 
     Main.Initialize()
-    Main.NetworkConfiguration()
-    Main.PackageManager()
+    Main.network_configuration()
+    Main.package_manager()
     Main.Configuration()
     Main.FileSystem()
     Main.Encryption()
     Main.Btreefs()
-    Main.EfiPartition()
-    Main.FsTable()
-    Main.Pacstrap()
-    Main.ArchChroot()
+    Main.efi_partition()
+    Main.fs_table()
+    Main.pacstrap()
+    Main.arch_chroot()

@@ -10,9 +10,9 @@ class Chroot():
 
     @staticmethod
     def copySources():
-        cfg_src = '/media/sf_arch/config.ini'
-        cfg_dst = '/mnt/config.ini'
-        script_src = '/media/sf_arch/src/'
+        cfg_src = '/media/sf_arch/config.ini' # TODO: relative directory
+        cfg_dst = '/mnt/config.ini' # TODO: check dst & remove file
+        script_src = '/media/sf_arch/src/' # TODO: relative directory
         script_dst = '/mnt/temporary'
         try:
             shutil.copytree(script_src, script_dst)

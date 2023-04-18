@@ -7,7 +7,7 @@ class Config():
         pass
 
     # TODO
-    # def disk_select(self):
+    # def diskSelect(self):
     #     disk = subprocess.run(['lsblk', '-p', '-n', '-l', '-o', 'NAME,SIZE', '-e', '7,11'],
     #                                   stdout=subprocess.PIPE)
     #     print(disk.stdout.decode('utf-8'))

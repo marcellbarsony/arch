@@ -45,7 +45,7 @@ class Security():
                 sys.exit(1)
 
     @staticmethod
-    def automatic_logout():
+    def automaticLogout():
         print('[TODO]: automatic_logout')
         # file = '/etc/profile.d/shell-timeout.sh'
         # cmd = 'TMOUT="$(( 60*10 ))"; [ -z "DISPLAY" ] && export TMOUT; case $( /usr/bin/tty ) in /dev/tty[0-9]*) export TMOUT;; esac'

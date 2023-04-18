@@ -5,7 +5,10 @@ import sys
 
 class Mirrorlist():
 
-    """Update & back-up mirrolist"""
+    """
+    Update & back-up mirrolist
+    https://wiki.archlinux.org/title/Reflector
+    """
 
     def __init__(self):
         self.mirrorlist = '/etc/pacman.d/mirrorlist'
@@ -17,16 +20,19 @@ class Mirrorlist():
     def update(self):
         cmd = f'reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save {self.mirrorlist}'
         try:
-            print('[/] PACMAN: Updating Pacman mirrorlist...')
+            print('REFLECTOR: Updating Pacman mirrorlist...')
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] PACMAN: Mirrorlist update')
+            print(f'[+] REFLECTOR: Mirrorlist update')
         except subprocess.CalledProcessError as err:
-            print(f'[-] PACMAN: Mirorlist update', err)
+            print(f'[-] REFLECTOR: Mirorlist update', err)
             sys.exit(1)
 
 class Pacman():
 
-    """Pacman configuration"""
+    """
+    Pacman configuration
+    https://wiki.archlinux.org/title/Pacman
+    """
 
     @staticmethod
     def config():
@@ -40,6 +46,7 @@ class Pacman():
 
         lines[32] = f'Color\n'
         lines[33] = f'ILoveCandy\n'
+        #lines[35] = f'VerbosePkgLists\n'
         lines[36] = f'ParallelDownloads=5\n'
 
         try:
