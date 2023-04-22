@@ -14,7 +14,7 @@ class Mirrorlist():
         self.mirrorlist = '/etc/pacman.d/mirrorlist'
 
     def backup(self):
-        dst='/etc/pacman.d/mirrorlist.bak'
+        dst = '/etc/pacman.d/mirrorlist.bak'
         shutil.copy2(self.mirrorlist, dst)
 
     def update(self):

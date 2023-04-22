@@ -44,7 +44,7 @@ class Keyring():
         #path = '/etc/pacman.d/gnupg'
         #os.rmdir(path)
 
-        cmd_list = ['pacman -Sy --noconfrim archlinux-keyring',
+        cmd_list = ['pacman -Sy --noconfirm archlinux-keyring',
                     'pacman-key --init',
                     #'pacman-key --refresh-keys',
                     # gpg --refresh-keys,

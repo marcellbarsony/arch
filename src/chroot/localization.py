@@ -28,12 +28,11 @@ class Locale():
 
     @staticmethod
     def localeConf():
-        value = ['LANG=en_US.UTF-8', 'LANG=ja_JP.UTF-8']
+        locale = 'LANG=en_US.UTF-8'
         locale_conf = '/etc/locale.conf'
         try:
             with open(locale_conf, 'a') as file:
-                for line in value:
-                    file.write(line + '\n')
+                file.write(f'{locale}\n')
             print(f'[+] Set {locale_conf}')
         except Exception as err:
             print(f'[-] Set {locale_conf}', err)

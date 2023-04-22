@@ -8,15 +8,17 @@ class Chroot():
 
     """Change root to system"""
 
-    @staticmethod
-    def copySources():
-        cfg_src = '/media/sf_arch/config.ini' # TODO: relative directory
-        cfg_dst = '/mnt/config.ini' # TODO: check dst & remove file
-        script_src = '/media/sf_arch/src/' # TODO: relative directory
-        script_dst = '/mnt/temporary'
+    def __init__(self, current_dir: str):
+        self.current_dir = current_dir
+        self.cfg_src = f'{self.current_dir}/config.ini'
+        self.scr_src = f'{self.current_dir}/src/'
+        self.cfg_dst = '/mnt/config.ini'
+        self.scr_dst = '/mnt/temporary'
+
+    def copySources(self):
         try:
-            shutil.copytree(script_src, script_dst)
-            shutil.copy(cfg_src, cfg_dst)
+            shutil.copytree(self.scr_src, self.scr_dst)
+            shutil.copy(self.cfg_src, self.cfg_dst)
             os.chmod('/mnt/temporary/main.py', 0o755)
             print('[+] CHROOT: Copy script')
         except FileExistsError as err:
@@ -35,7 +37,6 @@ class Chroot():
             print(f'[-] CHROOT', err)
             sys.exit(1)
 
-    @staticmethod
-    def clear():
-        shutil.rmtree('/mnt/temporary')
-        os.remove('/mnt/config.ini')
+    def clear(self):
+        shutil.rmtree(self.scr_dst)
+        os.remove(self.cfg_dst)

@@ -21,7 +21,7 @@ from chroot import Initramfs
 from chroot import Mkinitcpio
 from chroot import Grub
 from chroot import Snapper
-#from chroot import SecureShell
+from chroot import SecureShell
 from chroot import Service
 
 
@@ -34,7 +34,7 @@ class Main():
         key.keymap()
 
     @staticmethod
-    def packageManager():
+    def package_manager():
         ml = Mirrorlist()
         ml.backup()
         ml.update()
@@ -49,7 +49,7 @@ class Main():
         usr.group()
 
     @staticmethod
-    def hostSetup():
+    def host_setup():
         host = Host(hostname)
         host.setHostname()
         host.hosts()
@@ -89,11 +89,13 @@ class Main():
     def filesystem():
         Snapper.config()
 
-    #@staticmethod
-    #def secureShell():
-    #    ssh = SecureShell(user)
-    #    ssh.agentService()
-    #    ssh.agentSetup()
+    @staticmethod
+    def secure_shell():
+        ssh = SecureShell(user)
+        ssh.agent_service()
+        ssh.agent_config()
+        ssh.bashrc()
+        ssh.ownership()
 
     @staticmethod
     def services():
@@ -134,9 +136,9 @@ if __name__ == '__main__':
     logindelay = config.get('security', 'logindelay')
 
     Main.Keys()
-    Main.packageManager()
+    Main.package_manager()
     Main.accounts()
-    Main.hostSetup()
+    Main.host_setup()
     Main.security()
     Main.Loc()
     Main.bug()
@@ -144,5 +146,5 @@ if __name__ == '__main__':
     Main.mkinit()
     Main.bootloader()
     Main.filesystem()
-    #Main.secureShell()
+    Main.secure_shell()
     Main.services()

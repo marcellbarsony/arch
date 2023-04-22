@@ -8,20 +8,21 @@ Date    : 2023-04
 import argparse
 import configparser
 import getpass
+import os
 
-from install import Init
-from install import Network
-from install import Pacman
-from install import Keyring
-from install import Config
-from install import Disk
-from install import Partitions
-from install import CryptSetup
-from install import Btrfs
-from install import Efi
-from install import Fstab
-from install import Install
-from install import Chroot
+from src.install import Init
+from src.install import Network
+from src.install import Pacman
+from src.install import Keyring
+from src.install import Config
+from src.install import Disk
+from src.install import Partitions
+from src.install import CryptSetup
+from src.install import Btrfs
+from src.install import Efi
+from src.install import Fstab
+from src.install import Install
+from src.install import Chroot
 
 
 class Main():
@@ -100,9 +101,10 @@ class Main():
 
     @staticmethod
     def arch_chroot():
-        Chroot.copySources()
-        Chroot.chroot()
-        Chroot.clear()
+        chrt = Chroot(current_dir)
+        chrt.copySources()
+        chrt.chroot()
+        chrt.clear()
 
 
 if __name__ == '__main__':
@@ -149,6 +151,9 @@ if __name__ == '__main__':
 
     # User
     user = getpass.getuser()
+
+    # Directory
+    current_dir = os.getcwd()
 
     Main.Initialize()
     Main.network_configuration()
