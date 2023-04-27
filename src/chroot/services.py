@@ -12,7 +12,6 @@ class Service():
                 'systemctl enable NetworkManager.service',
                 'systemctl enable ntpd.service',
                 'systemctl enable reflector.service',
-                #'systemctl --user enable ssh-agent.service',
                 'systemctl enable vboxservice.service']
         for cmd in cmds:
             try:

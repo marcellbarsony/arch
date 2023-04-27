@@ -21,8 +21,8 @@ from chroot import Initramfs
 from chroot import Mkinitcpio
 from chroot import Grub
 from chroot import Snapper
-from chroot import SecureShell
 from chroot import Service
+from chroot import Finzalize
 
 
 class Main():
@@ -90,16 +90,12 @@ class Main():
         Snapper.config()
 
     @staticmethod
-    def secure_shell():
-        ssh = SecureShell(user)
-        ssh.agent_service()
-        ssh.agent_config()
-        ssh.bashrc()
-        ssh.ownership()
-
-    @staticmethod
     def services():
         Service.enable()
+
+    @staticmethod
+    def finalize():
+        Finzalize.ownership(user)
 
 
 if __name__ == '__main__':
@@ -146,5 +142,5 @@ if __name__ == '__main__':
     Main.mkinit()
     Main.bootloader()
     Main.filesystem()
-    Main.secure_shell()
     Main.services()
+    Main.finalize()

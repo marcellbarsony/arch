@@ -32,9 +32,9 @@ class Chroot():
         cmd = 'arch-chroot /mnt ./temporary/main.py'
         try:
             subprocess.run(cmd, shell=True, check=True)
-            print(f'[+] CHROOT')
+            print(f'[+] Installation successful')
         except subprocess.CalledProcessError as err:
-            print(f'[-] CHROOT', err)
+            print(f'[-] Chroot', err)
             sys.exit(1)
 
     def clear(self):
