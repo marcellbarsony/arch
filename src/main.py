@@ -21,8 +21,9 @@ from chroot import Initramfs
 from chroot import Mkinitcpio
 from chroot import Grub
 from chroot import Snapper
+from chroot import SecureShell
 from chroot import Service
-from chroot import Finzalize
+from chroot import Finalize
 
 
 class Main():
@@ -56,15 +57,17 @@ class Main():
 
     @staticmethod
     def security():
-        Security.sudoers()
-        Security.loginDelay(logindelay)
-        Security.automaticLogout()
+        sec = Security()
+        sec.sudoers()
+        sec.loginDelay(logindelay)
+        sec.automaticLogout()
 
     @staticmethod
     def Loc():
-        Locale.locale()
-        Locale.localeConf()
-        Locale.localeGen()
+        loc = Locale()
+        loc.locale()
+        loc.localeConf()
+        loc.localeGen()
 
     @staticmethod
     def bug():
@@ -90,12 +93,16 @@ class Main():
         Snapper.config()
 
     @staticmethod
+    def secureshell():
+        SecureShell.bashrc(user)
+
+    @staticmethod
     def services():
         Service.enable()
 
     @staticmethod
     def finalize():
-        Finzalize.ownership(user)
+        Finalize.ownership(user)
 
 
 if __name__ == '__main__':
@@ -142,5 +149,6 @@ if __name__ == '__main__':
     Main.mkinit()
     Main.bootloader()
     Main.filesystem()
+    Main.secureshell()
     Main.services()
     Main.finalize()

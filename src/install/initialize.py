@@ -8,8 +8,8 @@ class Init():
     """Initialize Arch base installer"""
 
     @staticmethod
-    def setFont(font):
-        print(font)
+    def set_font(font):
+        print('TODO', font)
         # cmd = f'setfont {font}'
         # try:
         #     subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -20,7 +20,7 @@ class Init():
         pass
 
     @staticmethod
-    def bootMode():
+    def boot_mode():
         path = '/sys/firmware/efi/efivars/'
         if os.path.exists(path):
             print('[+] Boot mode <UEFI>')
@@ -29,7 +29,7 @@ class Init():
             sys.exit(1)
 
     @staticmethod
-    def dmiData():
+    def dmi_data():
         cmd = 'dmidecode -s system-product-name'
         try:
             out = subprocess.run(cmd, shell=True, check=True, capture_output=True)
@@ -54,7 +54,7 @@ class Init():
             sys.exit(1)
 
     @staticmethod
-    def sysClock():
+    def sys_clock():
         cmd = 'timedatectl set-ntp true --no-ask-password'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

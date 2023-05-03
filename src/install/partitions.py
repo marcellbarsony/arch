@@ -9,7 +9,7 @@ class Partitions():
     def __init__(self, disk: str):
         self.disk = disk
 
-    def createEfi(self, efisize):
+    def efi(self, efisize):
         cmd = f'sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {self.disk}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -18,7 +18,7 @@ class Partitions():
             print('[-] PARTITION: Create EFI', err)
             sys.exit(1)
 
-    def createSystem(self):
+    def system(self):
         system = 'cryptsystem'
         cmd = f'sgdisk -n 0:0:0 -t 0:8e00 -c 0:{system} {self.disk}'
         try:

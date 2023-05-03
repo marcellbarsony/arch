@@ -1,8 +1,8 @@
-import grp
 import os
+import grp
 import pwd
 
-class Finzalize():
+class Finalize():
 
     """Finalize setup"""
 

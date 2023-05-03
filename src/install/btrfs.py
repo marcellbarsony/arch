@@ -29,7 +29,7 @@ class Btrfs():
             sys.exit(1)
 
     @staticmethod
-    def subvolumes():
+    def mksubvols():
         subvolumes = ['/mnt/@', '/mnt/@home', '/mnt/@var', '/mnt/@snapshots']
         for subvolume in subvolumes:
             cmd = f'btrfs subvolume create {subvolume}'
@@ -50,7 +50,7 @@ class Btrfs():
             print(f'[-] Unmount', err)
             sys.exit(1)
 
-    def mountRoot(self):
+    def mount_root(self):
         cmd = f'mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ {self.rootdir} /mnt'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -69,7 +69,7 @@ class Btrfs():
                 print(f'[-] BTRFS: Create directory {path}')
                 sys.exit(1)
 
-    def mountSubvolumes(self):
+    def mount_subvolumes(self):
         for subvolume in self.volumes:
             cmd = f'mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@{subvolume} {self.rootdir} /mnt/{subvolume}'
             try:

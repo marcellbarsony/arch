@@ -26,7 +26,7 @@ class Install():
         pkg_git = 'git github-cli'
         pkg_grub = 'grub grub-btrfs efibootmgr'
         pkg_network = 'networkmanager ntp'
-        pkg_etc = 'neovim openssh python python-pip reflector'
+        pkg_etc = 'neovim openssh python python-pip reflector dmidecode'
         cmd = f'pacstrap -K /mnt {pkg_linux} {pkg_base} {pkg_git} {pkg_grub} {pkg_network} {pkg_btrfs} {pkg_etc}'
         try:
             subprocess.run(cmd, shell=True, check=True)
@@ -36,19 +36,20 @@ class Install():
             sys.exit(1)
 
     @staticmethod
-    def installDmi():
-        dmi = Init.dmiData()
-        cmd = 'pacstrap -K /mnt '
+    def install_dmi():
+        dmi = Init.dmi_data()
+        pkg = ''
         if dmi == 'virtualbox':
-            cmd += 'virtualbox-guest-utils'
+            pkg = 'virtualbox-guest-utils'
         if dmi == 'vmware':
-            cmd += 'open-vm-tools'
+            pkg = 'open-vm-tools'
         else:
             print('[TODO]: PACSTRAP DMI packages')
             # https://wiki.archlinux.org/title/Microcode
             # amd-ucode
             # intel-ucode
             pass
+        cmd = f'pacstrap -K /mnt {pkg}'
         try:
             subprocess.run(cmd, shell=True, check=True)
             print(f'[+] PACSTRAP: DMI packages <{dmi}>')
