@@ -1,0 +1,7 @@
+dkms
+xorg-server
+xorg-xinit
+xorg-xwayland
+xwallpaper
+autorandr
+picom

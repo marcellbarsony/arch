@@ -1,0 +1,4 @@
+sof-firmware
+alsa
+alsa-firmware
+alsa-utils

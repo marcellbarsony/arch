@@ -1,0 +1,15 @@
+zsh
+qtile
+kitty
+alacritty
+dkms
+xorg-server
+xorg-xinit
+xorg-xwayland
+xwallpaper
+autorandr
+picom
+unclutter
+adobe-source-code-pro-fonts
+starship
+xdg-user-dirs

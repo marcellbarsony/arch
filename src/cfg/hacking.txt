@@ -1,0 +1,5 @@
+gnu-netcat
+net-tools
+nmap
+wireshark-cli
+wireshark-qt

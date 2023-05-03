@@ -1,0 +1,13 @@
+man-db
+texinfo
+tldr
+dunst
+neovim
+bpytop
+conky
+htop
+cmatrix
+kitty
+neofetch
+unclutter
+xdg-user-dirs
