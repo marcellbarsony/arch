@@ -1,5 +1,0 @@
-wayland
-wayland-protocols
-xorg-xwayland
-xorg-xlsclients
-xdg-desktop-portal-wlr

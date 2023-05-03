@@ -1,3 +1,0 @@
-intel-ucode
-xf86-video-intel
-xf86-video-vmware

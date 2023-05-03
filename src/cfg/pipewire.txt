@@ -1,7 +1,0 @@
-sof-firmware
-pipewire
-pipewire-alsa
-pipewire-jack
-pipewire-pulse
-pavucontrol
-wireplumber

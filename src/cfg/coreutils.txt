@@ -1,6 +1,0 @@
-zip
-unzip
-bat
-exa
-lsd
-zoxide
