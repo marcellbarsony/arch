@@ -19,10 +19,10 @@ class Disk():
         for cmd in cmd_list:
             try:
                 subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-                print('[+] FILESYSTEM: Wipe')
             except subprocess.CalledProcessError as err:
                 print('[-] FILESYSTEM: ', err)
                 sys.exit(1)
+        print('[+] FILESYSTEM: Wipe')
 
     def partprobe(self):
         cmd = f'partprobe {self.device}'

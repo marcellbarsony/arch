@@ -13,6 +13,8 @@ class DMI():
             return 'vbox'
         if 'VMware Virtual Platform' in str(out.stdout):
             return 'vmware'
+        if 'Intel(R) Corporation' in str(out.stdout):
+            return 'intel'
         else:
             return 'pm'
 
