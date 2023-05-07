@@ -1,15 +1,18 @@
 import subprocess
 import sys
+from .dmi import DMI
 
 
 class Partitions():
 
     """Docstring for Partitions"""
 
-    def __init__(self, disk: str):
+    def __init__(self):
+        dmi = DMI()
+        disk, _, _ = dmi.disk()
         self.disk = disk
 
-    def efi(self, efisize):
+    def efi(self, efisize: str):
         cmd = f'sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {self.disk}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

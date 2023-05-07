@@ -40,9 +40,6 @@ class Keyring():
 
     @staticmethod
     def init():
-        #path = '/etc/pacman.d/gnupg'
-        #os.rmdir(path)
-
         cmd_list = ['pacman -Sy --noconfirm archlinux-keyring',
                     'pacman-key --init',
                     #'pacman-key --refresh-keys',

@@ -1,6 +1,5 @@
 import subprocess
-import sys
-from .initialize import Init
+from .dmi import DMI
 
 
 class Install():
@@ -19,41 +18,30 @@ class Install():
             pass
 
     @staticmethod
-    def install():
-        pkg_linux = 'linux-hardened linux-hardened-headers linux-firmware'
-        pkg_base = 'base base-devel'
-        pkg_btrfs = 'btrfs-progs snapper'
-        pkg_git = 'git github-cli'
-        pkg_grub = 'grub grub-btrfs efibootmgr'
-        pkg_network = 'networkmanager ntp'
-        pkg_etc = 'neovim openssh python python-pip reflector dmidecode'
-        cmd = f'pacstrap -K /mnt {pkg_linux} {pkg_base} {pkg_git} {pkg_grub} {pkg_network} {pkg_btrfs} {pkg_etc}'
+    def get_packages():
+        packages = ''
+        with open('_packages.ini', 'r') as file:
+            for line in file:
+                if not line.startswith('[') and not line.startswith('#') and line.strip() != '':
+                    packages += f'{line.rstrip()} '
+        return packages
+
+    @staticmethod
+    def get_packages_dmi(packages: str):
+        dmi = DMI.check()
+        if dmi == 'vbox':
+            packages += 'virtualbox-guest-utils'
+        if dmi == 'vmware':
+            packages += 'open-vm-tools'
+        if dmi == 'pm':
+            packages += 'intel-ucode' # amd-ucode
+        return packages
+
+    @staticmethod
+    def install(packages: str):
+        cmd = f'pacstrap -K /mnt {packages}'
         try:
-            subprocess.run(cmd, shell=True, check=True)
+            subprocess.run(cmd.rstrip(), shell=True, check=True)
             print(f'[+] PACSTRAP install')
         except subprocess.CalledProcessError as err:
             print(f'[-] PACSTRAP install', err)
-            sys.exit(1)
-
-    @staticmethod
-    def install_dmi():
-        dmi = Init.dmi_data()
-        pkg = ''
-        if dmi == 'virtualbox':
-            pkg = 'virtualbox-guest-utils'
-        if dmi == 'vmware':
-            pkg = 'open-vm-tools'
-        else:
-            print('[TODO]: PACSTRAP DMI packages')
-            # https://wiki.archlinux.org/title/Microcode
-            # amd-ucode
-            # intel-ucode
-            pass
-        cmd = f'pacstrap -K /mnt {pkg}'
-        try:
-            subprocess.run(cmd, shell=True, check=True)
-            print(f'[+] PACSTRAP: DMI packages <{dmi}>')
-        except subprocess.CalledProcessError as err:
-            print(f'[-] PACSTRAP: DMI packages <{dmi}>', err)
-            sys.exit(1)
-        pass

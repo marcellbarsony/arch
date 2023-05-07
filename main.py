@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author  : FName SName <mail@domain.com>
-Date    : 2023-04
+Date    : 2023-05
 """
 
 
@@ -10,11 +10,10 @@ import configparser
 import getpass
 import os
 
-from src.install import Init
-from src.install import Network
+from src.install import Check
+from src.install import Initialize
 from src.install import Pacman
 from src.install import Keyring
-from src.install import Config
 from src.install import Disk
 from src.install import Partitions
 from src.install import CryptSetup
@@ -28,87 +27,79 @@ from src.install import Chroot
 class Main():
 
     @staticmethod
-    def Initialize():
-        init = Init()
-        init.set_font(font)
-        init.boot_mode()
-        init.timezone()
-        init.sys_clock()
-        init.loadkeys(keys)
-        init.keymaps(keymap)
+    def check():
+        c = Check()
+        c.boot_mode()
+        c.network(network_ip, network_port)
 
     @staticmethod
-    def network_configuration():
-        dmidata = Init.dmi_data()
-        while True:
-            if dmidata != 'virtualbox' and 'vmware':
-                Network.wifiConnect(network_toggle, network_ssid, network_key)
-            status = Network.check(network_ip, network_port)
-            if status == True:
-                break
+    def init():
+        i = Initialize()
+        i.time_zone()
+        i.sys_time()
+        i.loadkeys(keys)
+        i.keymaps(keymap)
 
     @staticmethod
     def package_manager():
-        Pacman.config()
-        Keyring.init()
+        p = Pacman()
+        p.config()
+        k = Keyring()
+        k.init()
 
     @staticmethod
-    def Configuration():
-        c = Config()
-        c.main()
-
-    @staticmethod
-    def FileSystem():
-        d = Disk(disk)
+    def file_system():
+        d = Disk()
         d.wipe()
         d.partprobe()
-        p = Partitions(disk)
+        p = Partitions()
         p.efi(efisize)
         p.system()
 
     @staticmethod
-    def Encryption():
-        c = CryptSetup(rootdevice, cryptpassword)
+    def encryption():
+        c = CryptSetup(cryptpassword)
         c.encrypt()
         c.open()
 
     @staticmethod
-    def Btreefs():
-        fs = Btrfs(rootdir)
-        fs.mkfs()
-        fs.mountfs()
-        fs.mksubvols()
-        fs.unmount()
-        fs.mount_root()
-        fs.mkdir()
-        fs.mount_subvolumes()
+    def btrfs():
+        b = Btrfs(rootdir)
+        b.mkfs()
+        b.mountfs()
+        b.mksubvols()
+        b.unmount()
+        b.mount_root()
+        b.mkdir()
+        b.mount_subvolumes()
 
     @staticmethod
     def efi_partition():
-        efi = Efi(efidir, efidevice)
-        efi.mkdir()
-        efi.format()
-        efi.mount()
+        e = Efi(efidir)
+        e.mkdir()
+        e.format()
+        e.mount()
 
     @staticmethod
-    def fs_table():
-        fstab = Fstab()
-        fstab.mkdir()
-        fstab.genfstab()
+    def fstab():
+        f = Fstab()
+        f.mkdir()
+        f.genfstab()
 
     @staticmethod
     def pacstrap():
-        pac = Install()
-        pac.bug()
-        pac.install()
-        pac.install_dmi()
+        p = Install()
+        p.bug()
+        packages = p.get_packages()
+        packages = p.get_packages_dmi(packages)
+        p.install(packages)
 
     @staticmethod
     def arch_chroot():
-        chrt = Chroot(current_dir)
-        chrt.copySources()
-        chrt.chroot()
-        chrt.clear()
+        c = Chroot(current_dir)
+        c.copy_sources()
+        c.chroot()
+        c.clear()
 
 
 if __name__ == '__main__':
@@ -124,12 +115,7 @@ if __name__ == '__main__':
 
     # Config
     config = configparser.ConfigParser()
-    config.read('config.ini')
-
-    # Disk
-    disk = config.get('drive', 'disk')
-    efidevice = config.get('drive', 'efidevice')
-    rootdevice = config.get('drive', 'rootdevice')
+    config.read('_config.ini')
 
     # EFI
     efisize = config.get('efi', 'efisize')
@@ -149,9 +135,6 @@ if __name__ == '__main__':
     # Network
     network_ip = config.get('network', 'ip')
     network_port = config.get('network', 'port')
-    network_toggle = config.get('network', 'wifi')
-    network_key = config.get('network', 'wifi_key')
-    network_ssid = config.get('network', 'wifi_ssid')
 
     # User
     user = getpass.getuser()
@@ -159,14 +142,14 @@ if __name__ == '__main__':
     # Directory
     current_dir = os.getcwd()
 
-    Main.Initialize()
-    Main.network_configuration()
-    Main.package_manager()
-    Main.Configuration()
-    Main.FileSystem()
-    Main.Encryption()
-    Main.Btreefs()
-    Main.efi_partition()
-    Main.fs_table()
-    Main.pacstrap()
-    Main.arch_chroot()
+    m = Main()
+    m.check()
+    m.init()
+    m.package_manager()
+    m.file_system()
+    m.encryption()
+    m.btrfs()
+    m.efi_partition()
+    m.fstab()
+    m.pacstrap()
+    m.arch_chroot()

@@ -26,7 +26,7 @@ class Security():
             sys.exit(1)
 
     @staticmethod
-    def loginDelay(logindelay: str):
+    def login_delay(logindelay: str):
         system_login = '/etc/pam.d/system-login'
         try:
             with open(system_login, 'r') as file:
@@ -45,7 +45,7 @@ class Security():
                 sys.exit(1)
 
     @staticmethod
-    def automaticLogout():
+    def automatic_logout():
         print('[TODO]: automatic_logout')
         # file = '/etc/profile.d/shell-timeout.sh'
         # cmd = 'TMOUT="$(( 60*10 ))"; [ -z "DISPLAY" ] && export TMOUT; case $( /usr/bin/tty ) in /dev/tty[0-9]*) export TMOUT;; esac'

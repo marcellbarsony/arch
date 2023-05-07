@@ -29,80 +29,90 @@ from chroot import Finalize
 class Main():
 
     @staticmethod
-    def Keys():
-        key = Keymaps(keys)
-        key.loadkeys()
-        key.keymap()
+    def set_keys():
+        k = Keymaps(keys)
+        k.loadkeys()
+        k.keymap()
 
     @staticmethod
     def package_manager():
-        ml = Mirrorlist()
-        ml.backup()
-        ml.update()
-        Pacman.config()
+        m = Mirrorlist()
+        m.backup()
+        m.update()
+        p = Pacman()
+        p.config()
 
     @staticmethod
     def accounts():
-        Root.password(root_pw)
-        usr = User(user)
-        usr.add()
-        usr.password(user_pw)
-        usr.group()
+        r = Root()
+        r.password(root_pw)
+        u = User(user)
+        u.add()
+        u.password(user_pw)
+        u.group()
 
     @staticmethod
-    def host_setup():
-        host = Host(hostname)
-        host.setHostname()
-        host.hosts()
+    def host():
+        h = Host(hostname)
+        h.set_hostname()
+        h.hosts()
 
     @staticmethod
     def security():
-        sec = Security()
-        sec.sudoers()
-        sec.loginDelay(logindelay)
-        sec.automaticLogout()
+        s = Security()
+        s.sudoers()
+        s.login_delay(logindelay)
+        s.automatic_logout()
 
     @staticmethod
-    def Loc():
-        loc = Locale()
-        loc.locale()
-        loc.localeConf()
-        loc.localeGen()
+    def set_locale():
+        l = Locale()
+        l.locale()
+        l.locale_conf()
+        l.locale_gen()
 
     @staticmethod
     def bug():
-        Bugfix.watchdogError()
+        b = Bugfix()
+        b.watchdog()
 
     @staticmethod
     def initram():
-        Initramfs.initramfs()
+        i = Initramfs()
+        i.initramfs()
 
     @staticmethod
     def mkinit():
-        Mkinitcpio.mkinitcpio()
+        m = Mkinitcpio()
+        m.mkinitcpio()
 
     @staticmethod
     def bootloader():
-        Grub.config(resolution)
-        Grub.install(secureboot, efi_directory)
-        Grub.password(grub_password, user)
-        Grub.mkconfig()
+        g = Grub()
+        g.config(resolution)
+        g.install(secureboot, efi_directory)
+        g.password(grub_password, user)
+        g.mkconfig()
 
     @staticmethod
     def filesystem():
-        Snapper.config()
+        s = Snapper()
+        s.config()
 
     @staticmethod
-    def secureshell():
-        SecureShell.bashrc(user)
+    def secure_shell():
+        s = SecureShell()
+        s.bashrc(user)
 
     @staticmethod
     def services():
-        Service.enable()
+        s = Service()
+        s.enable()
 
     @staticmethod
     def finalize():
-        Finalize.ownership(user)
+        f = Finalize()
+        f.ownership(user)
 
 
 if __name__ == '__main__':
@@ -138,17 +148,18 @@ if __name__ == '__main__':
     # Security
     logindelay = config.get('security', 'logindelay')
 
-    Main.Keys()
-    Main.package_manager()
-    Main.accounts()
-    Main.host_setup()
-    Main.security()
-    Main.Loc()
-    Main.bug()
-    Main.initram()
-    Main.mkinit()
-    Main.bootloader()
-    Main.filesystem()
-    Main.secureshell()
-    Main.services()
-    Main.finalize()
+    m = Main()
+    m.set_keys()
+    m.package_manager()
+    m.accounts()
+    m.host()
+    m.security()
+    m.set_locale()
+    m.bug()
+    m.initram()
+    m.mkinit()
+    m.bootloader()
+    m.filesystem()
+    m.secure_shell()
+    m.services()
+    m.finalize()

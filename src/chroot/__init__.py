@@ -7,7 +7,7 @@ from .localization import *
 from .bugfix import *
 from .initramfs import *
 from .mkinitcpio import *
-from .bootloader import *
+from .grub import *
 from .btrfs import *
 from .ssh import *
 from .services import *

@@ -15,7 +15,7 @@ class Chroot():
         self.cfg_dst = '/mnt/config.ini'
         self.scr_dst = '/mnt/temporary'
 
-    def copySources(self):
+    def copy_sources(self):
         try:
             shutil.copytree(self.scr_src, self.scr_dst)
             shutil.copy(self.cfg_src, self.cfg_dst)

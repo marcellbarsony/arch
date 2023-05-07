@@ -9,7 +9,7 @@ class Host():
     def __init__(self, hostname: str):
         self.hostname = hostname
 
-    def setHostname(self):
+    def set_hostname(self):
         conf = '/etc/hostname'
         try:
             with open(conf, 'w') as file:

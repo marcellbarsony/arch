@@ -6,7 +6,7 @@ class Bugfix():
     """Docstring for Bugfix"""
 
     @staticmethod
-    def watchdogError():
+    def watchdog():
         system_conf = '/etc/systemd/system.conf'
         try:
             with open(system_conf, 'r') as file:

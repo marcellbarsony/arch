@@ -1,5 +1,6 @@
 import subprocess
 import sys
+from .dmi import DMI
 
 
 class Root():
@@ -43,10 +44,14 @@ class User():
             sys.exit(1)
 
     def group(self):
-        cmd = f'usermod -aG wheel,audio,video,optical,storage,vboxsf {self.user}'
+        groups = 'wheel,audio,video,optical,storage'
+        if DMI.check() == 'vbox':
+            groups += ',vboxsf'
+        cmd = f'usermod -aG {groups} {self.user}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] User group')
         except subprocess.CalledProcessError as err:
             print(f'[-] User group', err)
             sys.exit(1)
+

@@ -27,7 +27,7 @@ class Locale():
             sys.exit(1)
 
     @staticmethod
-    def localeConf():
+    def locale_conf():
         locale = 'LANG=en_US.UTF-8'
         locale_conf = '/etc/locale.conf'
         try:
@@ -39,7 +39,7 @@ class Locale():
             sys.exit(1)
 
     @staticmethod
-    def localeGen():
+    def locale_gen():
         cmd ='locale-gen'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
