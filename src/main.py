@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """
 Author  : Name Surname <mail@domain.com>
-Date    : 2023-04
+Date    : 2023-05
 """
 
 
-import argparse
 import configparser
 
 from chroot import Keymaps
@@ -116,19 +115,10 @@ class Main():
 
 
 if __name__ == '__main__':
-    """ Initialize argparse """
-
-    parser = argparse.ArgumentParser(
-                        prog='python3 chroot.py',
-                        description='Arch base system [chroot]',
-                        epilog='TODO'  # TODO
-                        )
-
-    args = parser.parse_args()
 
     # Config
     config = configparser.ConfigParser()
-    config.read('/config.ini') # TODO: check dir location
+    config.read('/_config.ini') # TODO: check dir location
 
     # Grub
     efi_directory = config.get('grub', 'efi_directory')
