@@ -40,7 +40,8 @@ class Keyring():
 
     @staticmethod
     def init():
-        cmd_list = ['pacman -Sy --noconfirm archlinux-keyring',
+        cmd_list = ['pacman -Sy',
+                    'pacman -Sy --noconfirm archlinux-keyring',
                     'pacman-key --init',
                     #'pacman-key --refresh-keys',
                     # gpg --refresh-keys,
