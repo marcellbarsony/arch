@@ -1,6 +1,7 @@
 import re
 import sys
 import subprocess
+from .dmi import DMI
 
 
 class Grub():
@@ -8,21 +9,21 @@ class Grub():
     """Docstring for GRUB"""
 
     @staticmethod
+    def get_uuid():
+        _, _, device_root = DMI().disk()
+        out = subprocess.check_output(['blkid']).decode('utf-8')
+        for line in out.splitlines():
+            if line.startswith(device_root):
+                match = re.search(r'UUID="([\w-]+)"', line)
+                if match:
+                    uuid = match.group(1)
+                    return uuid
+                else:
+                    pass
+
+    @staticmethod
     def config(resolution: str):
-        # Root partition UUID
-        cmd = 'blkid'
-        try:
-            out = subprocess.run(cmd, shell=True, check=True, stdout=subprocess.PIPE)
-            print(f'[+] GRUB: Root partition UUID')
-        except subprocess.CalledProcessError as err:
-            print(f'[-] GRUB: Root partition UUID', err)
-            sys.exit(1)
-
-        regex = r'"([^"]*)"'
-        matches = re.findall(regex, out.stdout.decode('utf-8'))
-        uuid = matches[12]
-
-        # /etc/default/grub
+        uuid = Grub().get_uuid()
         grub_cfg = '/etc/default/grub'
         try:
             with open(grub_cfg, 'r') as file:
@@ -39,8 +40,7 @@ class Grub():
         lines[12] = f'GRUB_ENABLE_CRYPTODISK=y\n'
         # Colors
         lines[41] = f'GRUB_COLOR_NORMAL="light-blue/black"\n'
-        lines[42] = f'GRUB_COLOR_HIGHLIGHT="white/blue"\n'
-
+        lines[42] = f'GRUB_COLOR_HIGHLIGHT="light-cyan/blue"\n'
         try:
             with open(grub_cfg, 'w') as file:
                 file.writelines(lines)
@@ -51,7 +51,7 @@ class Grub():
 
     @staticmethod
     def install(secureboot: str, efi_directory: str):
-        if secureboot == True:
+        if secureboot:
             cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory} --modules="tpm" --disable-shim-lock'
         else:
             cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}'
@@ -60,6 +60,33 @@ class Grub():
             print(f'[+] GRUB install')
         except subprocess.CalledProcessError as err:
             print(f'[-] GRUB install', err)
+            sys.exit(1)
+
+    @staticmethod
+    def password(grub_password: str, user: str):
+        pbkdf2_hash = ''
+        cmd = f'grub-mkpasswd-pbkdf2'
+        sin = f'{grub_password}\n{grub_password}'
+        try:
+            out = subprocess.run(cmd, shell=True, check=True, input=sin.encode(), stdout=subprocess.PIPE)
+            pbkdf2_hash = out.stdout.decode('utf-8')[67:].strip()
+            print(f'[+] GRUB password')
+        except subprocess.CalledProcessError as err:
+            print(f'[-] GRUB password', err)
+
+        file = '/etc/grub.d/00_header'
+        content = f'\ncat << EOF\nset superusers="{user}"\npassword_pbkdf2 {user} {pbkdf2_hash}\nEOF'
+        with open(file, 'a') as f:
+            f.write(content)
+
+    @staticmethod
+    def mkconfig():
+        cmd = f'grub-mkconfig -o /boot/grub/grub.cfg'
+        try:
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print(f'[+] GRUB config')
+        except subprocess.CalledProcessError as err:
+            print(f'[-] GRUB config', err)
             sys.exit(1)
 
     @staticmethod
@@ -101,33 +128,4 @@ class Grub():
 
         # Verify Secure Boot
         # sbctl status
-
         pass
-
-    @staticmethod
-    def password(grub_password, user):
-        # https://wiki.archlinux.org/title/GRUB/Tips_and_tricks#Password_protection_of_GRUB_menu
-        pbkdf2_hash = ''
-        cmd = f'grub-mkpasswd-pbkdf2'
-        sin = f'{grub_password}\n{grub_password}'
-        try:
-            out = subprocess.run(cmd, shell=True, check=True, input=sin.encode(), stdout=subprocess.PIPE)
-            pbkdf2_hash = out.stdout.decode('utf-8')[67:].strip()
-            print(f'[+] GRUB password')
-        except subprocess.CalledProcessError as err:
-            print(f'[-] GRUB password', err)
-
-        file = '/etc/grub.d/00_header'
-        content = f'\ncat << EOF\nset superusers="{user}"\npassword_pbkdf2 {user} {pbkdf2_hash}\nEOF'
-        with open(file, 'a') as f:
-            f.write(content)
-
-    @staticmethod
-    def mkconfig():
-        cmd = f'grub-mkconfig -o /boot/grub/grub.cfg'
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] GRUB config')
-        except subprocess.CalledProcessError as err:
-            print(f'[-] GRUB config', err)
-            sys.exit(1)

@@ -1,0 +1,7 @@
+**/__pycache__/
+**/test.py
+__pycache__/
+debugpy/
+venv/
+
+
