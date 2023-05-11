@@ -3,12 +3,27 @@ import sys
 from .dmi import DMI
 
 
-class Service():
+class Systemd():
 
-    """Docstring for Services"""
+    """Docstring for Systemd"""
 
     @staticmethod
-    def enable():
+    def acpi_events():
+        file = '/etc/systemd/logind.conf'
+        with open(file, 'r') as f:
+            lines = f.readlines()
+        lines[27] = 'HandleLidSwitch=ignore'
+        lines[28] = 'HandleLidSwitchExternalPower=ignore'
+        lines[29] = 'HandleLidSwitchDocked=ignore'
+        try:
+            with open(file, 'w') as f:
+                 f.writelines(lines)
+            print(f'[+] ACPI events')
+        except Exception as err:
+            print(f'[-] ACPI events', err)
+
+    @staticmethod
+    def services():
         cmds = ['systemctl enable fstrim.timer',
                 'systemctl enable NetworkManager.service',
                 'systemctl enable ntpd.service',

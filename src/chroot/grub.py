@@ -31,7 +31,6 @@ class Grub():
         except Exception as err:
             print(f'[-] Read {grub_cfg}', err)
             sys.exit(1)
-
         # Configuration
         lines[3] = 'GRUB_TIMEOUT=5\n'
         # Btrfs & Encryption

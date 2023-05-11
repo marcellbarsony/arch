@@ -21,7 +21,7 @@ from chroot import Mkinitcpio
 from chroot import Grub
 from chroot import Snapper
 from chroot import SecureShell
-from chroot import Service
+from chroot import Systemd
 from chroot import Finalize
 
 
@@ -94,6 +94,12 @@ class Main():
         g.mkconfig()
 
     @staticmethod
+    def systemd():
+        s = Systemd()
+        s.acpi_events() # TODO
+        s.services()
+
+    @staticmethod
     def filesystem():
         s = Snapper()
         s.config()
@@ -102,11 +108,6 @@ class Main():
     def secure_shell():
         s = SecureShell()
         s.bashrc(user)
-
-    @staticmethod
-    def services():
-        s = Service()
-        s.enable()
 
     @staticmethod
     def finalize():
@@ -149,7 +150,7 @@ if __name__ == '__main__':
     m.initram()
     m.mkinit()
     m.bootloader()
+    m.systemd()
     m.filesystem()
     m.secure_shell()
-    m.services()
     m.finalize()

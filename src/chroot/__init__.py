@@ -10,5 +10,5 @@ from .mkinitcpio import *
 from .grub import *
 from .btrfs import *
 from .ssh import *
-from .services import *
+from .systemd import *
 from .finalize import *
