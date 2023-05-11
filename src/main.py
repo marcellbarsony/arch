@@ -96,7 +96,7 @@ class Main():
     @staticmethod
     def systemd():
         s = Systemd()
-        s.acpi_events() # TODO
+        s.logind()
         s.services()
 
     @staticmethod

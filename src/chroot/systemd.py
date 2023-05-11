@@ -8,13 +8,14 @@ class Systemd():
     """Docstring for Systemd"""
 
     @staticmethod
-    def acpi_events():
+    def logind():
         file = '/etc/systemd/logind.conf'
         with open(file, 'r') as f:
             lines = f.readlines()
-        lines[27] = 'HandleLidSwitch=ignore'
-        lines[28] = 'HandleLidSwitchExternalPower=ignore'
-        lines[29] = 'HandleLidSwitchDocked=ignore'
+        # ACPI events
+        lines[27] = 'HandleLidSwitch=ignore\n'
+        lines[28] = 'HandleLidSwitchExternalPower=ignore\n'
+        lines[29] = 'HandleLidSwitchDocked=ignore\n'
         try:
             with open(file, 'w') as f:
                  f.writelines(lines)
