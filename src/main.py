@@ -34,14 +34,6 @@ class Main():
         k.keymap()
 
     @staticmethod
-    def package_manager():
-        m = Mirrorlist()
-        m.backup()
-        m.update()
-        p = Pacman()
-        p.config()
-
-    @staticmethod
     def accounts():
         r = Root()
         r.password(root_pw)
@@ -110,9 +102,18 @@ class Main():
         s.bashrc(user)
 
     @staticmethod
+    def package_manager():
+        m = Mirrorlist()
+        m.backup()
+        m.update()
+        p = Pacman()
+        p.config()
+
+    @staticmethod
     def finalize():
-        f = Finalize()
-        f.ownership(user)
+        f = Finalize(user)
+        f.ownership()
+        f.remove_dirs()
 
 
 if __name__ == '__main__':
@@ -141,7 +142,6 @@ if __name__ == '__main__':
 
     m = Main()
     m.set_keys()
-    m.package_manager()
     m.accounts()
     m.host()
     m.security()
@@ -153,4 +153,5 @@ if __name__ == '__main__':
     m.systemd()
     m.filesystem()
     m.secure_shell()
+    m.package_manager()
     m.finalize()

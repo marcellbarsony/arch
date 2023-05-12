@@ -38,8 +38,8 @@ class Grub():
         lines[9] = f'GRUB_PRELOAD_MODULES="part_gpt part_msdos luks2"\n'
         lines[12] = f'GRUB_ENABLE_CRYPTODISK=y\n'
         # Colors
-        lines[41] = f'GRUB_COLOR_NORMAL="light-blue/black"\n'
-        lines[42] = f'GRUB_COLOR_HIGHLIGHT="light-cyan/blue"\n'
+        lines[41] = f'GRUB_COLOR_NORMAL="white/black"\n'
+        lines[42] = f'GRUB_COLOR_HIGHLIGHT="white/black"\n'
         try:
             with open(grub_cfg, 'w') as file:
                 file.writelines(lines)

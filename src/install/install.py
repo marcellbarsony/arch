@@ -1,3 +1,4 @@
+import os
 import subprocess
 from .dmi import DMI
 
@@ -39,6 +40,7 @@ class Install():
 
     @staticmethod
     def install(packages: str):
+        os.system('clear')
         cmd = f'pacstrap -K /mnt {packages}'
         try:
             subprocess.run(cmd.rstrip(), shell=True, check=True)

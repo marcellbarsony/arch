@@ -41,13 +41,6 @@ class Main():
         i.keymaps(keymap)
 
     @staticmethod
-    def package_manager():
-        p = Pacman()
-        p.config()
-        k = Keyring()
-        k.init()
-
-    @staticmethod
     def file_system():
         d = Disk()
         d.wipe()
@@ -85,6 +78,13 @@ class Main():
         f = Fstab()
         f.mkdir()
         f.genfstab()
+
+    @staticmethod
+    def package_manager():
+        p = Pacman()
+        p.config()
+        k = Keyring()
+        k.init()
 
     @staticmethod
     def pacstrap():
@@ -145,11 +145,11 @@ if __name__ == '__main__':
     m = Main()
     m.check()
     m.init()
-    m.package_manager()
     m.file_system()
     m.encryption()
     m.btrfs()
     m.efi_partition()
     m.fstab()
+    m.package_manager()
     m.pacstrap()
     m.arch_chroot()

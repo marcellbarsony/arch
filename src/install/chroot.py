@@ -29,6 +29,7 @@ class Chroot():
 
     @staticmethod
     def chroot():
+        os.system('clear')
         cmd = 'arch-chroot /mnt ./temporary/main.py'
         try:
             subprocess.run(cmd, shell=True, check=True)
