@@ -4,7 +4,6 @@ Author  : FName SName <mail@domain.com>
 Date    : 2023-05
 """
 
-
 import argparse
 import configparser
 import getpass
