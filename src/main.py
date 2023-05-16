@@ -7,22 +7,22 @@ Date    : 2023-05
 
 import configparser
 
+from chroot import Bugfix
+from chroot import Finalize
+from chroot import Grub
+from chroot import Host
+from chroot import Initramfs
 from chroot import Keymaps
+from chroot import Locale
 from chroot import Mirrorlist
+from chroot import Mkinitcpio
 from chroot import Pacman
 from chroot import Root
-from chroot import User
-from chroot import Host
-from chroot import Security
-from chroot import Locale
-from chroot import Bugfix
-from chroot import Initramfs
-from chroot import Mkinitcpio
-from chroot import Grub
-from chroot import Snapper
 from chroot import SecureShell
+from chroot import Security
+from chroot import Snapper
 from chroot import Systemd
-from chroot import Finalize
+from chroot import User
 
 
 class Main():

@@ -9,18 +9,18 @@ import configparser
 import getpass
 import os
 
-from src.install import Check
-from src.install import Initialize
-from src.install import Pacman
-from src.install import Keyring
-from src.install import Disk
-from src.install import Partitions
-from src.install import CryptSetup
 from src.install import Btrfs
+from src.install import Check
+from src.install import Chroot
+from src.install import CryptSetup
+from src.install import Disk
 from src.install import Efi
 from src.install import Fstab
+from src.install import Initialize
 from src.install import Install
-from src.install import Chroot
+from src.install import Keyring
+from src.install import Pacman
+from src.install import Partitions
 
 
 class Main():
