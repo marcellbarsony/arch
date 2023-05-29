@@ -31,8 +31,9 @@ class Grub():
         except Exception as err:
             print(f'[-] Read {grub_cfg}', err)
             sys.exit(1)
-        # Configuration
-        lines[3] = 'GRUB_TIMEOUT=5\n'
+
+        # Hidden menu
+        lines[3] = 'GRUB_TIMEOUT=0\n'
         # Btrfs & Encryption
         lines[5] = f'GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID={uuid}:cryptroot:allow-discards root=/dev/mapper/cryptroot video={resolution}"\n'
         lines[9] = f'GRUB_PRELOAD_MODULES="part_gpt part_msdos luks2"\n'
@@ -40,6 +41,7 @@ class Grub():
         # Colors
         lines[41] = f'GRUB_COLOR_NORMAL="white/black"\n'
         lines[42] = f'GRUB_COLOR_HIGHLIGHT="white/black"\n'
+
         try:
             with open(grub_cfg, 'w') as file:
                 file.writelines(lines)
