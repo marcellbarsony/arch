@@ -18,8 +18,6 @@ class Grub():
                 if match:
                     uuid = match.group(1)
                     return uuid
-                else:
-                    pass
 
     @staticmethod
     def config(resolution: str):
@@ -35,7 +33,7 @@ class Grub():
         # Hidden menu
         lines[3] = 'GRUB_TIMEOUT=0\n'
         # Btrfs & Encryption
-        lines[5] = f'GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID={uuid}:cryptroot:allow-discards root=/dev/mapper/cryptroot video={resolution}"\n'
+        lines[5] = f'GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID={uuid}:cryptroot:allow-discards root=/dev/mapper/cryptroot"\n' # video={resolution}
         lines[9] = f'GRUB_PRELOAD_MODULES="part_gpt part_msdos luks2"\n'
         lines[12] = f'GRUB_ENABLE_CRYPTODISK=y\n'
         # Colors
