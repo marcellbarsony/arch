@@ -4,6 +4,7 @@ Author  : FName SName <mail@domain.com>
 Date    : 2023-05
 """
 
+
 import argparse
 import configparser
 import getpass
@@ -89,9 +90,9 @@ class Main():
     def pacstrap():
         p = Install()
         p.bug()
-        packages = p.get_packages()
-        packages = p.get_packages_dmi(packages)
-        p.install(packages)
+        pkgs = p.get_packages()
+        pkgs = p.get_packages_dmi(pkgs)
+        p.install(pkgs)
 
     @staticmethod
     def arch_chroot():

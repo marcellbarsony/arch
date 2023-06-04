@@ -54,4 +54,3 @@ class User():
         except subprocess.CalledProcessError as err:
             print(f'[-] User group', err)
             sys.exit(1)
-

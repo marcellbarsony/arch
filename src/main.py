@@ -80,7 +80,6 @@ class Main():
     @staticmethod
     def bootloader():
         g = Grub()
-        g.config(resolution)
         g.install(secureboot, efi_directory)
         g.password(grub_password, user)
         g.mkconfig()
@@ -124,7 +123,6 @@ if __name__ == '__main__':
 
     # Grub
     efi_directory = config.get('grub', 'efi_directory')
-    resolution = config.get('grub', 'resolution')
     secureboot = config.get('grub', 'secureboot')
     grub_password = config.get('grub', 'password')
 
