@@ -22,7 +22,6 @@ from src.install import Initialize
 from src.install import Install
 from src.install import Keyring
 from src.install import Pacman
-from src.install import Partitions
 
 
 class Main():
@@ -45,9 +44,9 @@ class Main():
     def file_system():
         d = Disk()
         d.wipe()
-        d.partprobe()
         d.create_efi(efisize)
         d.create_system()
+        d.partprobe()
 
     @staticmethod
     def encryption():
@@ -67,7 +66,7 @@ class Main():
         b.mount_subvolumes()
 
     @staticmethod
-    def efi_partition():
+    def efi():
         e = Efi(efidir)
         e.mkdir()
         e.format()
@@ -151,7 +150,7 @@ if __name__ == '__main__':
     m.file_system()
     m.encryption()
     m.btrfs()
-    m.efi_partition()
+    m.efi()
     m.fstab()
     m.pacman()
     m.pacstrap()

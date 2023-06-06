@@ -2,7 +2,6 @@ from .check import *
 from .initialize import *
 from .pacman import *
 from .disk import *
-from .partitions import *
 from .encrypt import *
 from .btrfs import *
 from .efi import *

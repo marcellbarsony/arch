@@ -24,22 +24,13 @@ class Disk():
                 sys.exit(1)
         print('[+] FILESYSTEM: Wipe')
 
-    def partprobe(self):
-        cmd = f'partprobe {self.disk}'
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] FILESYSTEM: Partprobe')
-        except subprocess.CalledProcessError as err:
-            print('[-] FILESYSTEM: Partprobe', err)
-            sys.exit(1)
-
     def create_efi(self, efisize: str):
         cmd = f'sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {self.disk}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] PARTITION: Create EFI')
+            print('[+] FILESYSTEM: Create EFI')
         except subprocess.CalledProcessError as err:
-            print('[-] PARTITION: Create EFI', err)
+            print('[-] FILESYSTEM: Create EFI', err)
             sys.exit(1)
 
     def create_system(self):
@@ -47,7 +38,16 @@ class Disk():
         cmd = f'sgdisk -n 0:0:0 -t 0:8e00 -c 0:{system} {self.disk}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] PARTITION: Create {system}')
+            print(f'[+] FILESYSTEM: Create {system}')
         except subprocess.CalledProcessError as err:
-            print(f'[-] PARTITION: Create {system}', err)
+            print(f'[-] FILESYSTEM: Create {system}', err)
+            sys.exit(1)
+
+    def partprobe(self):
+        cmd = f'partprobe {self.disk}'
+        try:
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print('[+] FILESYSTEM: Partprobe')
+        except subprocess.CalledProcessError as err:
+            print('[-] FILESYSTEM: Partprobe', err)
             sys.exit(1)
