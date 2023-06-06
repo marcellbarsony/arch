@@ -46,9 +46,8 @@ class Main():
         d = Disk()
         d.wipe()
         d.partprobe()
-        p = Partitions()
-        p.efi(efisize)
-        p.system()
+        d.create_efi(efisize)
+        d.create_system()
 
     @staticmethod
     def encryption():

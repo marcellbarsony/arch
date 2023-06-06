@@ -9,13 +9,13 @@ class Disk():
 
     def __init__(self):
         dmi = DMI()
-        device, _, _ = dmi.disk()
-        self.device = device
+        disk, _, _ = dmi.disk()
+        self.disk = disk
 
     def wipe(self):
-        cmd_list = [f'sgdisk -o {self.device}', # Filesystem
-                    f'wipefs -af {self.device}', # Partition data
-                    f'sgdisk --zap-all --clear {self.device}'] # GPT data
+        cmd_list = [f'sgdisk --zap-all --clear {self.disk}', # GUID table
+                    f'wipefs -af {self.disk}', # Filesystem signature
+                    f'sgdisk -o {self.disk}'] # New GUID table
         for cmd in cmd_list:
             try:
                 subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -25,10 +25,29 @@ class Disk():
         print('[+] FILESYSTEM: Wipe')
 
     def partprobe(self):
-        cmd = f'partprobe {self.device}'
+        cmd = f'partprobe {self.disk}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print('[+] FILESYSTEM: Partprobe')
         except subprocess.CalledProcessError as err:
             print('[-] FILESYSTEM: Partprobe', err)
+            sys.exit(1)
+
+    def create_efi(self, efisize: str):
+        cmd = f'sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {self.disk}'
+        try:
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print('[+] PARTITION: Create EFI')
+        except subprocess.CalledProcessError as err:
+            print('[-] PARTITION: Create EFI', err)
+            sys.exit(1)
+
+    def create_system(self):
+        system = 'cryptsystem'
+        cmd = f'sgdisk -n 0:0:0 -t 0:8e00 -c 0:{system} {self.disk}'
+        try:
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print(f'[+] PARTITION: Create {system}')
+        except subprocess.CalledProcessError as err:
+            print(f'[-] PARTITION: Create {system}', err)
             sys.exit(1)

@@ -7,6 +7,10 @@ class Partitions():
 
     """Docstring for Partitions"""
 
+    ######################################################################
+    ### MIGHT BE REMOVED IF TEST SUCCEEDS
+    ######################################################################
+
     def __init__(self):
         dmi = DMI()
         disk, _, _ = dmi.disk()
@@ -30,3 +34,4 @@ class Partitions():
         except subprocess.CalledProcessError as err:
             print(f'[-] PARTITION: Create {system}', err)
             sys.exit(1)
+###########################################################################3
