@@ -10,6 +10,7 @@ import configparser
 import getpass
 import os
 
+
 from src.install import Btrfs
 from src.install import Check
 from src.install import Chroot
@@ -80,7 +81,7 @@ class Main():
         f.genfstab()
 
     @staticmethod
-    def package_manager():
+    def pacman():
         p = Pacman()
         p.config()
         k = Keyring()
@@ -103,6 +104,7 @@ class Main():
 
 
 if __name__ == '__main__':
+
     """ Initialize argparse """
 
     parser = argparse.ArgumentParser(
@@ -112,6 +114,8 @@ if __name__ == '__main__':
                         )
 
     args = parser.parse_args()
+
+    """ Initialize variables """
 
     # Config
     config = configparser.ConfigParser()
@@ -150,6 +154,6 @@ if __name__ == '__main__':
     m.btrfs()
     m.efi_partition()
     m.fstab()
-    m.package_manager()
+    m.pacman()
     m.pacstrap()
     m.arch_chroot()

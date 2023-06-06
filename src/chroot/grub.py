@@ -20,7 +20,7 @@ class Grub():
                     return uuid
 
     @staticmethod
-    def config():
+    def setup():
         uuid = Grub().get_uuid()
         grub_cfg = '/etc/default/grub'
         try:

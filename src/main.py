@@ -80,6 +80,7 @@ class Main():
     @staticmethod
     def bootloader():
         g = Grub()
+        g.setup()
         g.install(secureboot, efi_directory)
         g.password(grub_password, user)
         g.mkconfig()
