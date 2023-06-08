@@ -4,7 +4,10 @@ import sys
 
 class Mkinitcpio():
 
-    """Docstring for Mkinitcpio"""
+    """
+    Docstring for Mkinitcpio
+    https://wiki.archlinux.org/mkinitcpio
+    """
 
     @staticmethod
     def mkinitcpio():

@@ -34,8 +34,10 @@ class Install():
             packages += 'virtualbox-guest-utils'
         if dmi == 'vmware':
             packages += 'open-vm-tools'
-        if dmi == 'pm':
-            packages += 'intel-ucode' # amd-ucode
+        if dmi == 'intel':
+            packages += 'intel-ucode xf86-video-intel'
+        if dmi == 'AMD':
+            packages += 'amd-ucode xf86-video-amdgpu'
         return packages
 
     @staticmethod
