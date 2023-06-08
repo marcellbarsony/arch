@@ -1,4 +1,5 @@
 import sys
+import subprocess
 
 
 class Initramfs():
@@ -17,14 +18,14 @@ class Initramfs():
             for line in lines:
                 if line.startswith('vendor_id'):
                     _, kms = line.split(':')
-                    return kms.strip()
+                    kms = kms.strip()
 
-        if "AMD" in kms:
+        if "AuthenticAMD" in kms:
             return 'amdgpu'
         if "GenuineIntel" in kms:
             return 'i915'
         else:
-            return ''
+            return 'vboxvideo'
 
     @staticmethod
     def initramfs():
@@ -46,4 +47,14 @@ class Initramfs():
             print(f'[+] Mkinitcpio.conf {conf}')
         except Exception as err:
             print(f'[-] Mkinitcpio.conf {conf}', err)
+            sys.exit(1)
+
+    @staticmethod
+    def mkinitcpio():
+        cmd = 'mkinitcpio -p linux-hardened'
+        try:
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print(f'[+] Mkinitcpio: linux-hardened')
+        except subprocess.CalledProcessError as err:
+            print(f'[-] Mkinitcpio: linux-hardened', err)
             sys.exit(1)

@@ -6,7 +6,6 @@ from .security import *
 from .localization import *
 from .bugfix import *
 from .initramfs import *
-from .mkinitcpio import *
 from .grub import *
 from .btrfs import *
 from .ssh import *

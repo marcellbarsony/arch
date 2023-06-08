@@ -15,7 +15,6 @@ from chroot import Initramfs
 from chroot import Keymaps
 from chroot import Locale
 from chroot import Mirrorlist
-from chroot import Mkinitcpio
 from chroot import Pacman
 from chroot import Root
 from chroot import SecureShell
@@ -68,14 +67,10 @@ class Main():
         b.watchdog()
 
     @staticmethod
-    def initram():
+    def initramdisk():
         i = Initramfs()
         i.initramfs()
-
-    @staticmethod
-    def mkinit():
-        m = Mkinitcpio()
-        m.mkinitcpio()
+        i.mkinitcpio()
 
     @staticmethod
     def bootloader():
@@ -146,8 +141,7 @@ if __name__ == '__main__':
     m.security()
     m.set_locale()
     m.bug()
-    m.initram()
-    m.mkinit()
+    m.initramdisk()
     m.bootloader()
     m.systemd()
     m.filesystem()

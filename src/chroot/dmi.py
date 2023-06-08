@@ -22,7 +22,7 @@ class DMI():
     def disk() -> tuple[str, str, str]:
         # lsblk -p -n -l -o NAME,SIZE -e 7,11
         dmi = DMI.check()
-        if dmi == 'pm':
+        if dmi == 'intel' or dmi == 'pm':
             device = '/dev/nvme0n1'
             device_efi = '/dev/nvme0n1p1'
             device_root = '/dev/nvme0n1p2'
