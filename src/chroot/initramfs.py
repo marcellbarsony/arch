@@ -44,9 +44,9 @@ class Initramfs():
         try:
             with open(conf, 'w') as file:
                 file.writelines(lines)
-            print(f'[+] Initramfs: mkinitcpio.conf {conf}')
+            print(f'[+] Mkinitcpio.conf {conf}')
         except Exception as err:
-            print(f'[-] Initramfs: mkinitcpio.conf {conf}', err)
+            print(f'[-] Mkinitcpio.conf {conf}', err)
             sys.exit(1)
 
     @staticmethod
@@ -54,7 +54,7 @@ class Initramfs():
         cmd = 'mkinitcpio -p linux-hardened'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] Initramfs: mkinitcpio: linux-hardened')
+            print(f'[+] Mkinitcpio: linux-hardened')
         except subprocess.CalledProcessError as err:
-            print(f'[-] Initramfs: mkinitcpio: linux-hardened', err)
+            print(f'[-] Mkinitcpio: linux-hardened', err)
             sys.exit(1)
