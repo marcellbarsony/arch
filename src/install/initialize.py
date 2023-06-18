@@ -4,9 +4,7 @@ import sys
 
 class Initialize():
 
-    """
-    Initialize Arch base installer
-    """
+    """Initialize Arch base installer"""
 
     @staticmethod
     def time_zone():

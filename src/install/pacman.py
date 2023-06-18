@@ -4,9 +4,7 @@ import sys
 
 class Pacman():
 
-    """
-    Initialize Pacman config
-    """
+    """Initialize Pacman config"""
 
     @staticmethod
     def config():

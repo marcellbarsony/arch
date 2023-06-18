@@ -6,7 +6,7 @@ import sys
 
 class Chroot():
 
-    """Change root to system"""
+    """Change root into new system"""
 
     def __init__(self, current_dir: str):
         self.current_dir = current_dir

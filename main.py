@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Author  : FName SName <mail@domain.com>
+Author  : Marcell Barsony <barsonymarcell@gmail.com>
 Date    : 2023-05
+Desc    : Arch linux base installer
 """
 
 
@@ -9,7 +10,6 @@ import argparse
 import configparser
 import getpass
 import os
-
 
 from src.install import Btrfs
 from src.install import Check

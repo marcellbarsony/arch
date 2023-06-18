@@ -5,9 +5,7 @@ import sys
 
 class Check():
 
-    """
-    Check install requirements
-    """
+    """Check install requirements"""
 
     @staticmethod
     def boot_mode():
