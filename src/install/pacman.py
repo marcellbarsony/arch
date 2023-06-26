@@ -19,6 +19,7 @@ class Pacman():
         lines.insert(36, f'ParallelDownloads=5\n')
         lines[37] = f'ILoveCandy\n'
         lines[38] = f'Color\n'
+        lines[38] = f'Color\n'
 
         try:
             with open(config, 'w') as file:

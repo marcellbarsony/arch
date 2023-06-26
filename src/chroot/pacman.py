@@ -46,7 +46,7 @@ class Pacman():
 
         lines[32] = f'Color\n'
         lines[33] = f'ILoveCandy\n'
-        #lines[35] = f'VerbosePkgLists\n'
+        lines[35] = f'VerbosePkgLists\n'
         lines[36] = f'ParallelDownloads=5\n'
 
         try:
