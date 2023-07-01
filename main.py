@@ -101,42 +101,42 @@ class Main():
         c.clear()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     """ Initialize argparse """
 
     parser = argparse.ArgumentParser(
-                        prog='python3 setup.py',
-                        description='Arch base system',
-                        epilog='TODO'  # TODO
+                        prog="python3 setup.py",
+                        description="Arch base system",
+                        epilog="TODO"  # TODO
                         )
 
     args = parser.parse_args()
 
-    """ Initialize variables """
+    """Initialize variables"""
 
     # Config
     config = configparser.ConfigParser()
-    config.read('_config.ini')
+    config.read("_config.ini")
 
     # EFI
-    efisize = config.get('efi', 'efisize')
+    efisize = config.get("efi", "efisize")
 
     # Encryption
-    cryptpassword = config.get('encryption', 'cryptpassword')
+    cryptpassword = config.get("encryption", "cryptpassword")
 
     # Filesystem (BTRFS)
-    rootdir = config.get('btrfs', 'rootdir')
-    efidir = config.get('btrfs', 'efidir')
+    rootdir = config.get("btrfs", "rootdir")
+    efidir = config.get("btrfs", "efidir")
 
     # Keys
-    font = config.get('keyset', 'font')
-    keys = config.get('keyset', 'keys')
-    keymap = config.get('keyset', 'keymap')
+    font = config.get("keyset", "font")
+    keys = config.get("keyset", "keys")
+    keymap = config.get("keyset", "keymap")
 
     # Network
-    network_ip = config.get('network', 'ip')
-    network_port = config.get('network', 'port')
+    network_ip = config.get("network", "ip")
+    network_port = config.get("network", "port")
 
     # User
     user = getpass.getuser()
