@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Author  : Marcell Barsony <barsonymarcell@gmail.com>
-Date    : 2023-05
+Author  : Marcell Barsony <marcellbarsony@protonmail.com>
+Date    : 2023-03
 Desc    : Arch linux base installer
 """
 

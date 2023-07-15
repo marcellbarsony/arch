@@ -9,20 +9,20 @@ class Fstab():
 
     @staticmethod
     def mkdir():
-        dir = '/mnt/etc'
+        dir = "/mnt/etc"
         try:
             os.mkdir(dir)
-            print(f'[+] FSTAB: Create directory')
+            print(f"[+] FSTAB: Create directory")
         except Exception as err:
-            print(f'[+] FSTAB: Create directory', err)
+            print(f"[+] FSTAB: Create directory", err)
             sys.exit(1)
 
     @staticmethod
     def genfstab():
-        cmd = 'genfstab -U /mnt >> /mnt/etc/fstab'
+        cmd = "genfstab -U /mnt >> /mnt/etc/fstab"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] FSTAB: Genfstab')
+            print("[+] FSTAB: Genfstab")
         except subprocess.CalledProcessError as err:
-            print('[-] FSTAB: Genfstab', err)
+            print("[-] FSTAB: Genfstab", err)
             sys.exit(1)

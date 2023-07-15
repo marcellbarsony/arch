@@ -40,7 +40,7 @@ class Locale():
 
     @staticmethod
     def locale_gen():
-        cmd ='locale-gen'
+        cmd = 'locale-gen'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f'[+] Locale-gen')

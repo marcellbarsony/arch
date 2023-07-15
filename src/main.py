@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Author  : Name Surname <mail@domain.com>
-Date    : 2023-05
+Author  : Marcell Barsony <marcellbarsony@protonmail.com>
+Date    : 2023-03
 """
 
 

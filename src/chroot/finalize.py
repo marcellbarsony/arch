@@ -3,6 +3,7 @@ import grp
 import pwd
 import shutil
 
+
 class Finalize():
 
     """Finalize setup"""
@@ -10,7 +11,7 @@ class Finalize():
         self.user = user
 
     def ownership(self):
-        target = f'/home/{self.user}/'
+        target = f"/home/{self.user}/"
         uid = pwd.getpwnam(self.user).pw_uid # Owner
         gid = grp.getgrnam(self.user).gr_gid # Group
         for dirpath, dirnames, filenames in os.walk(target):
@@ -22,8 +23,8 @@ class Finalize():
                 os.chown(file_path, uid, gid)
 
     def remove_dirs(self):
-        home_dir = f'/home/{self.user}'
-        dirs = ['.config', 'Desktop', 'Documents', 'Music', 'Public', 'Templates', 'Videos']
+        home_dir = f"/home/{self.user}"
+        dirs = [".config", "Desktop", "Documents", "Music", "Public", "Templates", "Videos"]
         for dir in dirs:
             path = os.path.join(home_dir, dir)
             if os.path.exists(path):

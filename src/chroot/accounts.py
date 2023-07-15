@@ -9,12 +9,12 @@ class Root():
 
     @staticmethod
     def password(root_pw: str):
-        cmd = f'chpasswd'
+        cmd = f"chpasswd"
         try:
-            subprocess.run(cmd, shell=True, check=True, input=f'root:{root_pw}'.encode())
-            print('[+] Root password')
+            subprocess.run(cmd, shell=True, check=True, input=f"root:{root_pw}".encode())
+            print("[+] Root password")
         except subprocess.CalledProcessError as err:
-            print('[+] Root password', err)
+            print("[+] Root password", err)
             sys.exit(1)
 
 
@@ -26,31 +26,31 @@ class User():
         self.user = user
 
     def add(self):
-        cmd = f'useradd -m {self.user}'
+        cmd = f"useradd -m {self.user}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] User add {self.user}')
+            print(f"[+] User add {self.user}")
         except subprocess.CalledProcessError as err:
-            print(f'[+] User add {self.user}', err)
+            print(f"[+] User add {self.user}", err)
             sys.exit(1)
 
     def password(self, user_pw: str):
-        cmd = f'chpasswd'
+        cmd = f"chpasswd"
         try:
-            subprocess.run(cmd, input=f'{self.user}:{user_pw}'.encode())
-            print(f'[+] User password [{self.user}]')
+            subprocess.run(cmd, input=f"{self.user}:{user_pw}".encode())
+            print(f"[+] User password [{self.user}]")
         except subprocess.CalledProcessError as err:
-            print(f'[-] User password [{self.user}]', err)
+            print(f"[-] User password [{self.user}]", err)
             sys.exit(1)
 
     def group(self):
-        groups = 'wheel,audio,video,optical,storage'
-        if DMI.check() == 'vbox':
-            groups += ',vboxsf'
-        cmd = f'usermod -aG {groups} {self.user}'
+        groups = "wheel,audio,video,optical,storage"
+        if DMI.check() == "vbox":
+            groups += ",vboxsf"
+        cmd = f"usermod -aG {groups} {self.user}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] User group')
+            print(f"[+] User group")
         except subprocess.CalledProcessError as err:
-            print(f'[-] User group', err)
+            print(f"[-] User group", err)
             sys.exit(1)

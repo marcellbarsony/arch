@@ -8,10 +8,11 @@ class Initialize():
 
     @staticmethod
     def time_zone():
-        cmd = 'timedatectl set-timezone Europe/Amsterdam' # TODO: softcode
+        timezone = "Europe/Amsterdam"
+        cmd = f'timedatectl set-timezone {timezone}'
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print('[+] Timezone')
+            print(f'[+] Timezone {timezone}')
         except subprocess.CalledProcessError as err:
             print('[-] Timezone', {err})
             sys.exit(1)
