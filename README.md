@@ -1,10 +1,10 @@
-**Arch Linux installation script**
+**The Chad Stack installation script**
 
-## Feature list
+## The Chad Stack
 
 - UEFI
 - GRUB2 (password locked)
-- dm-crypt
+- dm-crypt (luks2)
 - Linux-hardened
 - Btrfs (w/Snapper)
 - SSH service

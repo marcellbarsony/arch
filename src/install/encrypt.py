@@ -14,7 +14,10 @@ class CryptSetup():
         self.cryptpassword = cryptpassword
 
     def encrypt(self):
-        cmd = f'cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 256 --pbkdf pbkdf2 --batch-mode luksFormat {self.device_root}'
+
+        """https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Encryption_options_for_LUKS_mode"""
+
+        cmd = f'cryptsetup --type luks2 --cipher aes-xts-plain64 --hash sha512 --key-size 512 --pbkdf pbkdf2 --batch-mode luksFormat {self.device_root}'
         try:
             subprocess.run(cmd, shell=True, check=True, input=self.cryptpassword.encode(), stdout=subprocess.DEVNULL)
             print(f'[+] CRYPTSETUP: {self.device_root}')
