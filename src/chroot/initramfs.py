@@ -12,49 +12,49 @@ class Initramfs():
 
     @staticmethod
     def kernel_mode_setting() -> str:
-        kms = ''
-        with open('/proc/cpuinfo') as file:
+        kms = ""
+        with open("/proc/cpuinfo") as file:
             lines = file.readlines()
             for line in lines:
-                if line.startswith('vendor_id'):
-                    _, kms = line.split(':')
+                if line.startswith("vendor_id"):
+                    _, kms = line.split(":")
                     kms = kms.strip()
 
         if "AuthenticAMD" in kms:
-            return 'amdgpu'
+            return "amdgpu"
         if "GenuineIntel" in kms:
-            return 'i915'
+            return "i915"
         else:
-            return 'vboxvideo'
+            return "vboxvideo"
 
     @staticmethod
     def initramfs():
         kms = Initramfs.kernel_mode_setting()
-        conf = '/etc/mkinitcpio.conf'
+        conf = "/etc/mkinitcpio.conf"
         try:
-            with open(conf, 'r') as file:
+            with open(conf, "r") as file:
                 lines = file.readlines()
         except Exception as err:
-            print(f'[-] Read {conf}', err)
+            print(f"[-] Read {conf}", err)
             sys.exit(1)
 
-        lines[6] = f'MODULES=(btrfs {kms})\n'
-        lines[51] = 'HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt btrfs filesystems fsck)\n'
+        lines[6] = f"MODULES=(btrfs {kms})\n"
+        lines[51] = "HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt btrfs filesystems fsck)\n"
 
         try:
-            with open(conf, 'w') as file:
+            with open(conf, "w") as file:
                 file.writelines(lines)
-            print(f'[+] Mkinitcpio.conf {conf}')
+            print(f"[+] Mkinitcpio.conf {conf}")
         except Exception as err:
-            print(f'[-] Mkinitcpio.conf {conf}', err)
+            print(f"[-] Mkinitcpio.conf {conf}", err)
             sys.exit(1)
 
     @staticmethod
     def mkinitcpio():
-        cmd = 'mkinitcpio -p linux-hardened'
+        cmd = "mkinitcpio -p linux-hardened"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f'[+] Mkinitcpio: linux-hardened')
+            print(f"[+] Mkinitcpio: linux-hardened")
         except subprocess.CalledProcessError as err:
-            print(f'[-] Mkinitcpio: linux-hardened', err)
+            print(f"[-] Mkinitcpio: linux-hardened", err)
             sys.exit(1)

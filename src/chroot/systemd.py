@@ -9,39 +9,41 @@ class Systemd():
 
     @staticmethod
     def logind():
-        file = '/etc/systemd/logind.conf'
-        with open(file, 'r') as f:
+        file = "/etc/systemd/logind.conf"
+        with open(file, "r") as f:
             lines = f.readlines()
         # ACPI events
-        lines[27] = 'HandleLidSwitch=ignore\n'
-        lines[28] = 'HandleLidSwitchExternalPower=ignore\n'
-        lines[29] = 'HandleLidSwitchDocked=ignore\n'
+        lines[27] = "HandleLidSwitch=ignore\n"
+        lines[28] = "HandleLidSwitchExternalPower=ignore\n"
+        lines[29] = "HandleLidSwitchDocked=ignore\n"
         try:
-            with open(file, 'w') as f:
+            with open(file, "w") as f:
                  f.writelines(lines)
-            print(f'[+] ACPI events')
+            print(f"[+] ACPI events")
         except Exception as err:
-            print(f'[-] ACPI events', err)
+            print(f"[-] ACPI events", err)
 
     @staticmethod
     def services():
-        cmds = ['systemctl enable fstrim.timer',
-                'systemctl enable NetworkManager.service',
-                'systemctl enable nftables.service'
-                'systemctl enable ntpd.service',
-                'systemctl enable reflector.service']
+        cmds = [
+            "systemctl enable fstrim.timer",
+            "systemctl enable NetworkManager.service",
+            "systemctl enable nftables.service"
+            "systemctl enable ntpd.service",
+            "systemctl enable reflector.service"
+        ]
         for cmd in cmds:
             try:
                 subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                print('[+]', cmd)
+                print("[+]", cmd)
             except subprocess.CalledProcessError as err:
-                print('[-]', err)
+                print("[-]", err)
 
-        if DMI.check() == 'vbox':
-            cmd = 'systemctl enable vboxservice.service'
+        if DMI.check() == "vbox":
+            cmd = "systemctl enable vboxservice.service"
             try:
                 subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-                print(f'[+] User group [DMI]')
+                print(f"[+] User group [DMI]")
             except subprocess.CalledProcessError as err:
-                print(f'[-] User group [DMI]', err)
+                print(f"[-] User group [DMI]", err)
                 sys.exit(1)

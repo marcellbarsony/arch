@@ -3,7 +3,7 @@ import shutil
 
 class SecureShell():
 
-    """Secure Shell setup"""
+    """SSH setup"""
 
     @staticmethod
     def bashrc(user: str):

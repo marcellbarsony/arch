@@ -26,6 +26,18 @@ from src.install import Pacman
 
 class Main():
 
+    def run(self):
+        self.check()
+        self.init()
+        self.file_system()
+        self.encryption()
+        self.btrfs()
+        self.efi()
+        self.fstab()
+        self.pacman()
+        self.pacstrap()
+        self.arch_chroot()
+
     @staticmethod
     def check():
         c = Check()
@@ -106,52 +118,35 @@ if __name__ == "__main__":
     """ Initialize argparse """
 
     parser = argparse.ArgumentParser(
-                        prog="python3 setup.py",
-                        description="Arch base system",
-                        epilog="TODO"  # TODO
-                        )
+                                prog="python3 setup.py",
+                                description="Arch base system",
+                                epilog="TODO"
+                                )
 
     args = parser.parse_args()
 
-    """Initialize variables"""
-
-    # Config
     config = configparser.ConfigParser()
     config.read("_config.ini")
 
-    # EFI
+    """ Initialize variables """
+
     efisize = config.get("efi", "efisize")
 
-    # Encryption
     cryptpassword = config.get("encryption", "cryptpassword")
 
-    # Filesystem (BTRFS)
     rootdir = config.get("btrfs", "rootdir")
     efidir = config.get("btrfs", "efidir")
 
-    # Keys
     font = config.get("keyset", "font")
     keys = config.get("keyset", "keys")
     keymap = config.get("keyset", "keymap")
 
-    # Network
     network_ip = config.get("network", "ip")
     network_port = config.get("network", "port")
 
-    # User
     user = getpass.getuser()
 
-    # Directory
     current_dir = os.getcwd()
 
     m = Main()
-    m.check()
-    m.init()
-    m.file_system()
-    m.encryption()
-    m.btrfs()
-    m.efi()
-    m.fstab()
-    m.pacman()
-    m.pacstrap()
-    m.arch_chroot()
+    m.run()

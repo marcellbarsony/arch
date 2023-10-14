@@ -7,6 +7,7 @@ import shutil
 class Finalize():
 
     """Finalize setup"""
+
     def __init__(self, user: str):
         self.user = user
 
@@ -24,7 +25,15 @@ class Finalize():
 
     def remove_dirs(self):
         home_dir = f"/home/{self.user}"
-        dirs = [".config", "Desktop", "Documents", "Music", "Public", "Templates", "Videos"]
+        dirs = [
+            ".config",
+            "Desktop",
+            "Documents",
+            "Music",
+            "Public",
+            "Templates",
+            "Videos"
+        ]
         for dir in dirs:
             path = os.path.join(home_dir, dir)
             if os.path.exists(path):
