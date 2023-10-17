@@ -31,7 +31,12 @@ class Pacman():
 
     @staticmethod
     def mirrorlist():
-        cmd = f"reflector --latest 25 --protocol https --connection-timeout 5 --sort rate --save /etc/pacman.d/mirrorlist"
+        cmd = f"reflector \
+        --latest 25 \
+        --protocol https \
+        --connection-timeout 5 \
+        --sort rate \
+        --save /etc/pacman.d/mirrorlist"
         try:
             print("[INFO] PACMAN: Updating mirrorlist...")
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

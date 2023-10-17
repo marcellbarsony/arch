@@ -2,7 +2,7 @@
 """
 Author  : Marcell Barsony <marcellbarsony@protonmail.com>
 Date    : 2023-03
-Desc    : Arch linux base installer
+Desc    : Arch Linux base installer
 """
 
 
