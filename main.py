@@ -94,6 +94,7 @@ class Main():
     def pacman():
         p = Pacman()
         p.config()
+        p.mirrorlist()
         k = Keyring()
         k.init()
 
