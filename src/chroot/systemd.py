@@ -28,7 +28,7 @@ class Systemd():
         cmds = [
             "systemctl enable fstrim.timer",
             "systemctl enable NetworkManager.service",
-            "systemctl enable nftables.service"
+            "systemctl enable nftables.service",
             "systemctl enable ntpd.service",
             "systemctl enable reflector.service"
         ]

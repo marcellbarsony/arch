@@ -12,9 +12,9 @@ class Fstab():
         dir = "/mnt/etc"
         try:
             os.mkdir(dir)
-            print(f"[+] FSTAB: Create directory")
+            print("[+] FSTAB: Mkdir")
         except Exception as err:
-            print(f"[+] FSTAB: Create directory", err)
+            print("[+] FSTAB: Mkdir", err)
             sys.exit(1)
 
     @staticmethod

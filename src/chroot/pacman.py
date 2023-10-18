@@ -20,7 +20,7 @@ class Mirrorlist():
     def update(self):
         cmd = f"reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save {self.mirrorlist}"
         try:
-            print("[INFO] REFLECTOR: Updating Pacman mirrorlist...")
+            print("[I] REFLECTOR: Updating Pacman mirrorlist...")
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f"[+] REFLECTOR: Mirrorlist update")
         except subprocess.CalledProcessError as err:

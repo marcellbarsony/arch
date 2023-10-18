@@ -70,9 +70,9 @@ class Btrfs():
             path = "/mnt/" + subvolume
             if not os.path.exists(path):
                 os.makedirs(path)
-                print(f"[+] BTRFS: Create directory {path}")
+                print(f"[+] BTRFS: mkdir {path}")
             else:
-                print(f"[-] BTRFS: Create directory {path}")
+                print(f"[-] BTRFS: mkdir {path}")
                 sys.exit(1)
 
     def mount_subvolumes(self):
