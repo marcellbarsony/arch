@@ -33,7 +33,7 @@ class Main():
         k.keymap()
 
     @staticmethod
-    def accounts():
+    def user_mgmt():
         r = Root()
         r.password(root_pw)
         u = User(user)
@@ -65,6 +65,7 @@ class Main():
     def bug():
         b = Bugfix()
         b.watchdog()
+        b.pc_speaker()
 
     @staticmethod
     def initramdisk():
@@ -136,7 +137,7 @@ if __name__ == '__main__':
 
     m = Main()
     m.set_keys()
-    m.accounts()
+    m.user_mgmt()
     m.host()
     m.security()
     m.set_locale()

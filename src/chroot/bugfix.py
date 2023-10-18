@@ -22,3 +22,19 @@ class Bugfix():
         except Exception as err:
             print(f"[-] Write {system_conf}", err)
             sys.exit(1)
+
+    @staticmethod
+    def pc_speaker():
+
+        """https://wiki.archlinux.org/title/PC_speaker#Globally"""
+
+        file = "/etc/modprobe.d/nobeep.conf"
+        conf = "blacklist pcspkr\nblacklist snd_pcsp"
+        try:
+            with open(file, "w") as f:
+                f.write(conf)
+            print("[+] Disable PC speaker")
+        except IOError as err:
+            print(f"[-] Disable PC speaker {err}")
+            pass
+

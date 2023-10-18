@@ -4,7 +4,10 @@ import textwrap
 
 class Host():
 
-    """Docstring for Host"""
+    """
+    Docstring for network network configuration
+    https://wiki.archlinux.org/title/Network_configuration
+    """
 
     def __init__(self, hostname: str):
         self.hostname = hostname

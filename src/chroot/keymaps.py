@@ -4,7 +4,10 @@ import sys
 
 class Keymaps():
 
-    """Docstring for Setup"""
+    """
+    Docstring for Keymaps
+    https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration
+    """
 
     def __init__(self, keys: str):
         self.keys = keys

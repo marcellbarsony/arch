@@ -20,7 +20,10 @@ class Root():
 
 class User():
 
-    """Docstring for user setup"""
+    """
+    Docstring for user setup
+    https://wiki.archlinux.org/title/users_and_groups
+    """
 
     def __init__(self, user: str):
         self.user = user
@@ -35,7 +38,7 @@ class User():
             sys.exit(1)
 
     def password(self, user_pw: str):
-        cmd = f"chpasswd"
+        cmd = "chpasswd"
         try:
             subprocess.run(cmd, input=f"{self.user}:{user_pw}".encode())
             print(f"[+] User password [{self.user}]")
