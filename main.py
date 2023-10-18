@@ -2,7 +2,7 @@
 """
 Author  : Marcell Barsony <marcellbarsony@protonmail.com>
 Date    : 2023-03
-Desc    : Arch linux base installer
+Desc    : Arch Linux base installer
 """
 
 
@@ -94,6 +94,7 @@ class Main():
     def pacman():
         p = Pacman()
         p.config()
+        p.mirrorlist()
         k = Keyring()
         k.init()
 

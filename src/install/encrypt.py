@@ -20,15 +20,15 @@ class CryptSetup():
         https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Encryption_options_for_LUKS_mode
         """
 
-        cmd = f"cryptsetup \\
-        --batch-mode luksFormat \\
-        --cipher aes-xts-plain64 \\
-        --hash sha512 \\
-        --iter-time 5000 \\
-        --key-size 512 \\
-        --pbkdf pbkdf2 \\
-        --type luks2 \\
-        --use-random \\
+        cmd = f"cryptsetup \
+        --batch-mode luksFormat \
+        --cipher aes-xts-plain64 \
+        --hash sha512 \
+        --iter-time 5000 \
+        --key-size 512 \
+        --pbkdf pbkdf2 \
+        --type luks2 \
+        --use-random \
         {self.device_root}"
         try:
             subprocess.run(cmd, shell=True, check=True, input=self.cryptpassword.encode(), stdout=subprocess.DEVNULL)
