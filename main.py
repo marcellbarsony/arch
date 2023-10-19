@@ -116,37 +116,29 @@ class Main():
 
 if __name__ == "__main__":
 
-    """ Initialize argparse """
-
+    # Argparse
     parser = argparse.ArgumentParser(
                                 prog="python3 setup.py",
                                 description="Arch base system",
                                 epilog="TODO"
                                 )
-
     args = parser.parse_args()
 
+    # Config
     config = configparser.ConfigParser()
     config.read("_config.ini")
 
-    """ Initialize variables """
-
+    # Variable initialization
     efisize = config.get("efi", "efisize")
-
     cryptpassword = config.get("encryption", "cryptpassword")
-
     rootdir = config.get("btrfs", "rootdir")
     efidir = config.get("btrfs", "efidir")
-
     font = config.get("keyset", "font")
     keys = config.get("keyset", "keys")
     keymap = config.get("keyset", "keymap")
-
     network_ip = config.get("network", "ip")
     network_port = config.get("network", "port")
-
     user = getpass.getuser()
-
     current_dir = os.getcwd()
 
     m = Main()

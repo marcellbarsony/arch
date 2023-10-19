@@ -30,6 +30,7 @@ class Finalize():
             "Desktop",
             "Documents",
             "Music",
+            "Pictures",
             "Public",
             "Templates",
             "Videos"

@@ -16,7 +16,7 @@ class CryptSetup():
     def encrypt(self):
 
         """
-        Device encryption options
+        Device encryption
         https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Encryption_options_for_LUKS_mode
         """
 

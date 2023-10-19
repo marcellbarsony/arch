@@ -37,4 +37,3 @@ class Bugfix():
         except IOError as err:
             print(f"[-] Disable PC speaker {err}")
             pass
-
