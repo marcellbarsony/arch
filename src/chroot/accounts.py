@@ -9,7 +9,7 @@ class Root():
 
     @staticmethod
     def password(root_pw: str):
-        cmd = f"chpasswd"
+        cmd = f"chpasswd --crypt-method SHA512"
         try:
             subprocess.run(cmd, shell=True, check=True, input=f"root:{root_pw}".encode())
             print("[+] Root password")
@@ -38,7 +38,7 @@ class User():
             sys.exit(1)
 
     def password(self, user_pw: str):
-        cmd = "chpasswd"
+        cmd = "chpasswd --crypt-method SHA512"
         try:
             subprocess.run(cmd, input=f"{self.user}:{user_pw}".encode())
             print(f"[+] User password [{self.user}]")
