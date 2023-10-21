@@ -129,10 +129,10 @@ if __name__ == "__main__":
     config.read("config.ini")
 
     # Variable initialization
-    efisize = config.get("efi", "efisize")
-    cryptpassword = config.get("encryption", "cryptpassword")
-    rootdir = config.get("btrfs", "rootdir")
-    efidir = config.get("btrfs", "efidir")
+    efisize = config.get("disk", "efisize")
+    cryptpassword = config.get("auth", "cryptpassword")
+    rootdir = config.get("disk", "rootdir")
+    efidir = config.get("disk", "efidir")
     font = config.get("keyset", "font")
     keys = config.get("keyset", "keys")
     keymap = config.get("keyset", "keymap")

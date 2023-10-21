@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Author  : Marcell Barsony <marcellbarsony@protonmail.com>
-Date    : 2023-03
+Date    : March 2023
 """
 
 
@@ -112,28 +112,28 @@ class Main():
         f.remove_dirs()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     # Config
     config = configparser.ConfigParser()
-    config.read('/config.ini') # TODO: check dir location
+    config.read("/config.ini") # TODO: check dir location
 
     # Grub
-    efi_directory = config.get('grub', 'efi_directory')
-    secureboot = config.get('grub', 'secureboot')
-    grub_password = config.get('grub', 'password')
+    efi_directory = config.get("grub", "efi_directory")
+    secureboot = config.get("grub", "secureboot")
+    grub_password = config.get("grub", "password")
 
     # Keys
-    keys = config.get('keyset', 'keys')
+    keys = config.get("keyset", "keys")
 
     # User
-    hostname = config.get('user', 'hostname')
-    root_pw = config.get('user', 'root_pw')
-    user = config.get('user', 'user')
-    user_pw = config.get('user', 'user_pw')
+    hostname = config.get("network", "hostname")
+    root_pw = config.get("auth", "root_pw")
+    user = config.get("auth", "user")
+    user_pw = config.get("auth", "user_pw")
 
     # Security
-    logindelay = config.get('security', 'logindelay')
+    logindelay = config.get("security", "logindelay")
 
     m = Main()
     m.set_keys()
