@@ -130,7 +130,7 @@ if __name__ == "__main__":
 
     # Variable initialization
     efisize = config.get("disk", "efisize")
-    cryptpassword = config.get("auth", "cryptpassword")
+    cryptpassword = config.get("auth", "crypt")
     rootdir = config.get("disk", "rootdir")
     efidir = config.get("disk", "efidir")
     font = config.get("keyset", "font")

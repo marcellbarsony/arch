@@ -121,7 +121,7 @@ if __name__ == "__main__":
     # Grub
     efi_directory = config.get("grub", "efi_directory")
     secureboot = config.get("grub", "secureboot")
-    grub_password = config.get("grub", "password")
+    grub_password = config.get("auth", "grub")
 
     # Keys
     keys = config.get("keyset", "keys")

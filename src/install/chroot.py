@@ -10,9 +10,9 @@ class Chroot():
 
     def __init__(self, current_dir: str):
         self.current_dir = current_dir
-        self.cfg_src = f"{self.current_dir}/_config.ini"
+        self.cfg_src = f"{self.current_dir}/config.ini"
         self.scr_src = f"{self.current_dir}/src/"
-        self.cfg_dst = "/mnt/_config.ini"
+        self.cfg_dst = "/mnt/config.ini"
         self.scr_dst = "/mnt/temporary"
 
     def copy_sources(self):
