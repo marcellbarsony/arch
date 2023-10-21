@@ -40,7 +40,7 @@ class User():
     def password(self, user_pw: str):
         cmd = "chpasswd --crypt-method SHA512"
         try:
-            subprocess.run(cmd, input=f"{self.user}:{user_pw}".encode())
+            subprocess.run(cmd, shell=True, check=True, input=f"{self.user}:{user_pw}".encode())
             print(f"[+] User password [{self.user}]")
         except subprocess.CalledProcessError as err:
             print(f"[-] User password [{self.user}]", err)
