@@ -48,7 +48,7 @@ class Main():
     def init():
         i = Initialize()
         i.time_zone()
-        i.sys_time()
+        #i.sys_time()
         i.loadkeys(keys)
         i.keymaps(keymap)
 
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
     # Config
     config = configparser.ConfigParser()
-    config.read("_config.ini")
+    config.read("config.ini")
 
     # Variable initialization
     efisize = config.get("efi", "efisize")

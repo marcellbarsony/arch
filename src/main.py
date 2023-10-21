@@ -116,7 +116,7 @@ if __name__ == '__main__':
 
     # Config
     config = configparser.ConfigParser()
-    config.read('/_config.ini') # TODO: check dir location
+    config.read('/config.ini') # TODO: check dir location
 
     # Grub
     efi_directory = config.get('grub', 'efi_directory')
