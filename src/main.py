@@ -11,6 +11,7 @@ from chroot import Bugfix
 from chroot import Finalize
 from chroot import Grub
 from chroot import Host
+from chroot import DomainNameSystem
 from chroot import Initramfs
 from chroot import Keymaps
 from chroot import Locale
@@ -42,10 +43,13 @@ class Main():
         u.group()
 
     @staticmethod
-    def host():
+    def network():
         h = Host(hostname)
         h.set_hostname()
         h.hosts()
+        d = DomainNameSystem()
+        d.networkmanager()
+        d.resolv()
 
     @staticmethod
     def security():
@@ -111,7 +115,6 @@ class Main():
         f.ownership()
         f.remove_dirs()
 
-
 if __name__ == "__main__":
 
     # Config
@@ -139,6 +142,7 @@ if __name__ == "__main__":
     m.set_keys()
     m.user_mgmt()
     m.host()
+    m.dns()
     m.security()
     m.set_locale()
     m.bug()
