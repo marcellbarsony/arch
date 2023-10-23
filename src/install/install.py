@@ -21,7 +21,7 @@ class Install():
     @staticmethod
     def get_packages():
         packages = ""
-        with open("_packages.ini", "r") as file:
+        with open("packages.ini", "r") as file:
             for line in file:
                 if not line.startswith("[") and not line.startswith("#") and line.strip() != "":
                     packages += f"{line.rstrip()} "

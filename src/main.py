@@ -34,13 +34,11 @@ class Main():
         k.keymap()
 
     @staticmethod
-    def user_mgmt():
-        r = Root()
-        r.password(root_pw)
-        u = User(user)
-        u.add()
-        u.password(user_pw)
-        u.group()
+    def set_locale():
+        l = Locale()
+        l.locale()
+        l.locale_conf()
+        l.locale_gen()
 
     @staticmethod
     def network():
@@ -52,24 +50,20 @@ class Main():
         d.resolv()
 
     @staticmethod
+    def user_mgmt():
+        r = Root()
+        r.password(root_pw)
+        u = User(user)
+        u.add()
+        u.password(user_pw)
+        u.group()
+
+    @staticmethod
     def security():
         s = Security()
         s.sudoers()
         s.login_delay(logindelay)
         s.automatic_logout()
-
-    @staticmethod
-    def set_locale():
-        l = Locale()
-        l.locale()
-        l.locale_conf()
-        l.locale_gen()
-
-    @staticmethod
-    def bug():
-        b = Bugfix()
-        b.watchdog()
-        b.pc_speaker()
 
     @staticmethod
     def initramdisk():
@@ -90,6 +84,8 @@ class Main():
         s = Systemd()
         s.logind()
         s.services()
+        s.watchdog()
+        s.pc_speaker()
 
     @staticmethod
     def filesystem():
@@ -97,12 +93,12 @@ class Main():
         s.config()
 
     @staticmethod
-    def secure_shell():
+    def ssh():
         s = SecureShell()
         s.bashrc(user)
 
     @staticmethod
-    def package_manager():
+    def pacman():
         m = Mirrorlist()
         m.backup()
         m.update()
@@ -140,16 +136,14 @@ if __name__ == "__main__":
 
     m = Main()
     m.set_keys()
-    m.user_mgmt()
-    m.host()
-    m.dns()
-    m.security()
     m.set_locale()
-    m.bug()
+    m.network()
+    m.user_mgmt()
+    m.security()
     m.initramdisk()
     m.bootloader()
     m.systemd()
     m.filesystem()
-    m.secure_shell()
-    m.package_manager()
+    m.ssh()
+    m.pacman()
     m.finalize()

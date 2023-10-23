@@ -4,7 +4,10 @@ import sys
 
 class Locale():
 
-    """Docstring for Locale"""
+    """
+    Docstring for Locale
+    https://wiki.archlinux.org/title/locale
+    """
 
     @staticmethod
     def locale():

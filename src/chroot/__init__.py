@@ -4,7 +4,6 @@ from .accounts import *
 from .network import *
 from .security import *
 from .localization import *
-from .bugfix import *
 from .initramfs import *
 from .grub import *
 from .btrfs import *
