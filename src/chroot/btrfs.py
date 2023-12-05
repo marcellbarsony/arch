@@ -20,7 +20,7 @@ class Snapper():
         cmd = "snapper --no-dbus -c home create-config /home"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] BTRFS Snapper")
+            print("[+] BTRFS Snapper")
         except subprocess.CalledProcessError as err:
-            print(f"[-] BTRFS Snapper", err)
+            print("[-] BTRFS Snapper", err)
             sys.exit(1)

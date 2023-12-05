@@ -48,7 +48,6 @@ class Main():
     def init():
         i = Initialize()
         i.time_zone()
-        #i.sys_time()
         i.loadkeys(keys)
         i.keymaps(keymap)
 
@@ -118,17 +117,17 @@ if __name__ == "__main__":
 
     # Argparse
     parser = argparse.ArgumentParser(
-                                prog="python3 setup.py",
-                                description="Arch base system",
-                                epilog="TODO"
-                                )
+        prog="python3 setup.py",
+        description="Arch base system",
+        epilog="TODO"
+    )
     args = parser.parse_args()
 
     # Config
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    # Variable initialization
+    # Config variables
     efisize = config.get("disk", "efisize")
     cryptpassword = config.get("auth", "crypt")
     rootdir = config.get("disk", "rootdir")

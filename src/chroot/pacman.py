@@ -18,13 +18,18 @@ class Mirrorlist():
         shutil.copy2(self.mirrorlist, dst)
 
     def update(self):
-        cmd = f"reflector --latest 20 --protocol https --connection-timeout 5 --sort rate --save {self.mirrorlist}"
+        cmd = f"sudo reflector \
+        --latest 25 \
+        --protocol https \
+        --connection-timeout 5 \
+        --sort rate \
+        --save {self.mirrorlist}"
         try:
             print("[I] REFLECTOR: Updating Pacman mirrorlist...")
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] REFLECTOR: Mirrorlist update")
+            print("[+] REFLECTOR: Mirrorlist update")
         except subprocess.CalledProcessError as err:
-            print(f"[-] REFLECTOR: Mirorlist update", err)
+            print("[-] REFLECTOR: Mirorlist update", err)
             sys.exit(1)
 
 class Pacman():

@@ -77,5 +77,5 @@ class Systemd():
                 f.write(conf)
             print("[+] Disable PC speaker")
         except IOError as err:
-            print(f"[-] Disable PC speaker {err}")
+            print("[-] Disable PC speaker", err)
             sys.exit(1)

@@ -53,7 +53,7 @@ class User():
         cmd = f"usermod -aG {groups} {self.user}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] User group")
+            print("[+] User group")
         except subprocess.CalledProcessError as err:
-            print(f"[-] User group", err)
+            print("[-] User group", err)
             sys.exit(1)

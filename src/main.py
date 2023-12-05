@@ -7,7 +7,6 @@ Date    : March 2023
 
 import configparser
 
-from chroot import Bugfix
 from chroot import Finalize
 from chroot import Grub
 from chroot import Host
@@ -47,7 +46,7 @@ class Main():
         h.hosts()
         d = DomainNameSystem()
         d.networkmanager()
-        d.resolv()
+        d.resolvconf()
 
     @staticmethod
     def user_mgmt():
@@ -117,22 +116,15 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read("/config.ini") # TODO: check dir location
 
-    # Grub
     efi_directory = config.get("grub", "efi_directory")
-    secureboot = config.get("grub", "secureboot")
     grub_password = config.get("auth", "grub")
-
-    # Keys
-    keys = config.get("keyset", "keys")
-
-    # User
     hostname = config.get("network", "hostname")
+    keys = config.get("keyset", "keys")
+    logindelay = config.get("security", "logindelay")
     root_pw = config.get("auth", "root_pw")
+    secureboot = config.get("grub", "secureboot")
     user = config.get("auth", "user")
     user_pw = config.get("auth", "user_pw")
-
-    # Security
-    logindelay = config.get("security", "logindelay")
 
     m = Main()
     m.set_keys()

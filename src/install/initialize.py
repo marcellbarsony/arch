@@ -18,16 +18,6 @@ class Initialize():
             sys.exit(1)
 
     @staticmethod
-    def sys_time():
-        cmd = "timedatectl set-ntp true --no-ask-password"
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print("[+] Set NTP")
-        except subprocess.CalledProcessError as err:
-            print("[-] Set NTP", {err})
-            sys.exit(1)
-
-    @staticmethod
     def loadkeys(keys: str):
         cmd = f"loadkeys {keys}"
         try:

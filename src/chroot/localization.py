@@ -48,5 +48,5 @@ class Locale():
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print("[+] Locale-gen")
         except subprocess.CalledProcessError as err:
-            print(f"[-] Locale-gen", err)
+            print("[-] Locale-gen", err)
             sys.exit(1)

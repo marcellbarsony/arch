@@ -12,6 +12,9 @@ class Initramfs():
 
     @staticmethod
     def kernel_mode_setting() -> str:
+        """
+        2.1 Early KMS start
+        """
         kms = ""
         with open("/proc/cpuinfo") as file:
             lines = file.readlines()
@@ -54,7 +57,7 @@ class Initramfs():
         cmd = "mkinitcpio -p linux-hardened"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] Mkinitcpio: linux-hardened")
+            print("[+] Mkinitcpio: linux-hardened")
         except subprocess.CalledProcessError as err:
-            print(f"[-] Mkinitcpio: linux-hardened", err)
+            print("[-] Mkinitcpio: linux-hardened", err)
             sys.exit(1)

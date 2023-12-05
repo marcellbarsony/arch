@@ -30,8 +30,9 @@ class Grub():
             print(f"[-] Read {grub_cfg}", err)
             sys.exit(1)
 
-        # Hidden menu
+        # Timeout
         lines[3] = "GRUB_TIMEOUT=0\n"
+        lines[16] = "GRUB_TIMEOUT_STYLE=countdown"
         # Btrfs & Encryption
         lines[5] = f'GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID={uuid}:cryptroot:allow-discards root=/dev/mapper/cryptroot"\n'
         lines[9] = f'GRUB_PRELOAD_MODULES="part_gpt part_msdos luks2"\n'
@@ -56,9 +57,9 @@ class Grub():
             cmd = f"grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] GRUB install")
+            print("[+] GRUB install")
         except subprocess.CalledProcessError as err:
-            print(f"[-] GRUB install", err)
+            print("[-] GRUB install", err)
             sys.exit(1)
 
     @staticmethod
@@ -83,9 +84,9 @@ class Grub():
         cmd = f"grub-mkconfig -o /boot/grub/grub.cfg"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] GRUB config")
+            print("[+] GRUB config")
         except subprocess.CalledProcessError as err:
-            print(f"[-] GRUB config", err)
+            print("[-] GRUB config", err)
             sys.exit(1)
 
     @staticmethod

@@ -17,9 +17,9 @@ class Host():
         try:
             with open(conf, "w") as file:
                 file.write(self.hostname)
-            print(f"[+] /etc/hostname [{self.hostname}]")
+            print("[+] /etc/hostname")
         except Exception as err:
-            print(f"[-] /etc/hostname [{self.hostname}]", err)
+            print("[-] /etc/hostname", err)
             sys.exit(1)
 
     def hosts(self):
@@ -51,17 +51,22 @@ class DomainNameSystem():
     def networkmanager():
         """https://wiki.archlinux.org/title/NetworkManager#Unmanaged_/etc/resolv.conf"""
         conf = "/etc/NetworkManager/conf.d/dns.conf"
-        content = "[main]\ndns=none"
+        content = textwrap.dedent(
+            """\
+            [main]
+            dns=none
+            """
+        )
         try:
             with open(conf, "w") as f:
                 f.write(content)
-            print("[+] NetworkManager conf")
+            print("[+] NetworkManager dns conf")
         except Exception as err:
-            print(f"[-] NetworkManager conf", err)
+            print("[-] NetworkManager dns conf", err)
             sys.exit(1)
 
     @staticmethod
-    def resolv():
+    def resolvconf():
         """https://wiki.archlinux.org/title/Domain_name_resolution#Overwriting_of_/etc/resolv.conf"""
         conf = "/etc/resolv.conf"
         content = textwrap.dedent(
