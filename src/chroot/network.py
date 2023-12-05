@@ -56,7 +56,7 @@ class DomainNameSystem():
             [main]
             dns=none
             """
-        )
+            )
         try:
             with open(conf, "w") as f:
                 f.write(content)
@@ -83,7 +83,7 @@ class DomainNameSystem():
             # nameserver 2620:fe::fe
             # nameserver 2620:fe::9
             """
-        )
+            )
         try:
             with open(conf, "w") as file:
                 file.write(content)

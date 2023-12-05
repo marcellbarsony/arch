@@ -9,7 +9,7 @@ class Install():
 
     @staticmethod
     def bug():
-        # Pacstrap doesn't work properly until pacman-init.service in the live system is done
+        """Pacstrap doesn't work properly until pacman-init.service in the live system is done"""
         cmd = f"systemctl --no-pager status -n0 pacman-init.service"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

@@ -17,7 +17,7 @@ class Disk():
             f"sgdisk --zap-all --clear {self.disk}", # GUID table
             f"wipefs -af {self.disk}", # Filesystem signature
             f"sgdisk -o {self.disk}" # New GUID table
-        ]
+            ]
         for cmd in cmd_list:
             try:
                 subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

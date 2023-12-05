@@ -34,7 +34,7 @@ class Finalize():
             "Public",
             "Templates",
             "Videos"
-        ]
+            ]
         for dir in dirs:
             path = os.path.join(home_dir, dir)
             if os.path.exists(path):

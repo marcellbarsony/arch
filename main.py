@@ -120,7 +120,7 @@ if __name__ == "__main__":
         prog="python3 setup.py",
         description="Arch base system",
         epilog="TODO"
-    )
+        )
     args = parser.parse_args()
 
     # Config
