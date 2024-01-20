@@ -1,3 +1,4 @@
+import logging
 import subprocess
 
 
@@ -9,6 +10,7 @@ class DMI():
     def check() -> str:
         cmd = "sudo dmidecode -s system-product-name"
         out = subprocess.run(cmd, shell=True, check=True, capture_output=True)
+        logging.info(cmd)
         if "VirtualBox" in str(out.stdout):
             return "vbox"
         if "VMware Virtual Platform" in str(out.stdout):
@@ -22,6 +24,7 @@ class DMI():
     def disk() -> tuple[str, str, str]:
         # lsblk -p -n -l -o NAME,SIZE -e 7,11
         dmi = DMI.check()
+        logging.info(dmi)
         if dmi == "pm":
             device = "/dev/nvme0n1"
             device_efi = "/dev/nvme0n1p1"

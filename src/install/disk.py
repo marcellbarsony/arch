@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import sys
 from .dmi import DMI
@@ -21,7 +22,9 @@ class Disk():
         for cmd in cmd_list:
             try:
                 subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+                logging.info(cmd)
             except subprocess.CalledProcessError as err:
+                logging.error(f"{cmd}: {err}")
                 print("[-] FILESYSTEM: ", err)
                 sys.exit(1)
         print("[+] FILESYSTEM: Wipe")
@@ -30,8 +33,10 @@ class Disk():
         cmd = f"sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {self.disk}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            logging.info(cmd)
             print("[+] FILESYSTEM: Create EFI")
         except subprocess.CalledProcessError as err:
+            logging.error(f"{cmd}: {err}")
             print("[-] FILESYSTEM: Create EFI", err)
             sys.exit(1)
 
@@ -40,8 +45,10 @@ class Disk():
         cmd = f"sgdisk -n 0:0:0 -t 0:8e00 -c 0:{system} {self.disk}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            logging.info(cmd)
             print(f"[+] FILESYSTEM: Create {system}")
         except subprocess.CalledProcessError as err:
+            logging.error(f"{cmd}: {err}")
             print(f"[-] FILESYSTEM: Create {system}", err)
             sys.exit(1)
 
@@ -49,7 +56,9 @@ class Disk():
         cmd = f"partprobe {self.disk}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            logging.info(cmd)
             print("[+] FILESYSTEM: Partprobe")
         except subprocess.CalledProcessError as err:
+            logging.error(f"{cmd}: {err}")
             print("[-] FILESYSTEM: Partprobe", err)
             sys.exit(1)

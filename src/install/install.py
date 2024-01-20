@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 from .dmi import DMI
@@ -13,6 +14,7 @@ class Install():
         cmd = f"systemctl --no-pager status -n0 pacman-init.service"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            logging.info(cmd)
             print(f"[+] PACSTRAP: pacman-init.service")
         except subprocess.CalledProcessError as err:
             print(f"[-] PACSTRAP: pacman-init.service", err)
@@ -25,6 +27,7 @@ class Install():
             for line in file:
                 if not line.startswith("[") and not line.startswith("#") and line.strip() != "":
                     packages += f"{line.rstrip()} "
+        logging.info(packages)
         return packages
 
     @staticmethod
@@ -46,6 +49,8 @@ class Install():
         cmd = f"pacstrap -K /mnt {packages}"
         try:
             subprocess.run(cmd.rstrip(), shell=True, check=True)
+            logging.info(cmd)
             print(f"[+] PACSTRAP install")
         except subprocess.CalledProcessError as err:
+            logging.error(f"{cmd}: {err}")
             print(f"[-] PACSTRAP install", err)

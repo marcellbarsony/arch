@@ -9,6 +9,7 @@ Desc    : Arch Linux base installer
 import argparse
 import configparser
 import getpass
+import logging
 import os
 
 from src.install import Btrfs
@@ -28,15 +29,15 @@ class Main():
 
     def run(self):
         self.check()
-        self.init()
-        self.file_system()
-        self.encryption()
-        self.btrfs()
-        self.efi()
-        self.fstab()
-        self.pacman()
-        self.pacstrap()
-        self.arch_chroot()
+        # self.init()
+        # self.file_system()
+        # self.encryption()
+        # self.btrfs()
+        # self.efi()
+        # self.fstab()
+        # self.pacman()
+        # self.pacstrap()
+        # self.arch_chroot()
 
     @staticmethod
     def check():
@@ -115,7 +116,7 @@ class Main():
 
 if __name__ == "__main__":
 
-    # Argparse
+    """ Initialize Argparse """
     parser = argparse.ArgumentParser(
         prog="python3 setup.py",
         description="Arch base system",
@@ -123,11 +124,14 @@ if __name__ == "__main__":
         )
     args = parser.parse_args()
 
-    # Config
+    """ Initialize Logging """
+    logging.basicConfig(level=logging.INFO, filename="logs.log", filemode="w",
+                        format="%(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s")
+
+    """ Initialize Global variables """
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    # Config variables
     efisize = config.get("disk", "efisize")
     cryptpassword = config.get("auth", "crypt")
     rootdir = config.get("disk", "rootdir")
@@ -140,5 +144,6 @@ if __name__ == "__main__":
     user = getpass.getuser()
     current_dir = os.getcwd()
 
+    """ Run script """
     m = Main()
     m.run()

@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import sys
 
@@ -12,7 +13,9 @@ class Pacman():
         try:
             with open(config, "r") as file:
                 lines = file.readlines()
+                logging.info(config)
         except Exception as err:
+            logging.error(f"{config}: {err}")
             print(f"[-] Read {config}", err)
             sys.exit(1)
 
@@ -23,8 +26,10 @@ class Pacman():
         try:
             with open(config, "w") as file:
                 file.writelines(lines)
+            logging.info(config)
             print(f"[+] PACMAN: Write {config}")
         except Exception as err:
+            logging.error(f"{config}: {err}")
             print(f"[-] PACMAN: Write {config}", err)
             sys.exit(1)
 
@@ -39,8 +44,10 @@ class Pacman():
         try:
             print("[I] PACMAN: Updating mirrorlist...")
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            logging.info(cmd)
             print("[+] PACMAN: Mirrorlist")
         except subprocess.CalledProcessError as err:
+            logging.error(f"{cmd}: {err}")
             print(f"[-] PACMAN: Mirrorlist {err}")
             sys.exit(1)
 
@@ -65,7 +72,9 @@ class Keyring():
         for cmd in cmds:
             try:
                 subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+                logging.info(cmd)
                 print("[+] PACMAN: Arch keyring update")
             except subprocess.CalledProcessError as err:
+                logging.error(f"{cmd}: {err}")
                 print("[-] PACMAN: Arch keyring update", err)
                 pass

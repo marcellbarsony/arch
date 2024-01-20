@@ -13,13 +13,14 @@ class Keymaps():
         self.keys = keys
 
     def loadkeys(self):
-        cmd = f"sudo loadkeys {self.keys}"
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] Loadkeys {self.keys}")
-        except subprocess.CalledProcessError as err:
-            print(f"[-] Loadkeys {self.keys}", err)
-            sys.exit(1)
+        # cmd = f"sudo loadkeys {self.keys}"
+        # try:
+        #     subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        #     print(f"[+] Loadkeys {self.keys}")
+        # except subprocess.CalledProcessError as err:
+        #     print(f"[-] Loadkeys {self.keys}", err)
+        #     sys.exit(1)
+        print("something")
 
     def keymap(self):
         conf = "/etc/vconsole.conf"

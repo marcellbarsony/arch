@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import sys
 from .dmi import DMI
@@ -32,8 +33,10 @@ class CryptSetup():
         {self.device_root}"
         try:
             subprocess.run(cmd, shell=True, check=True, input=self.cryptpassword.encode(), stdout=subprocess.DEVNULL)
+            logging.info(cmd)
             print(f"[+] CRYPTSETUP: {self.device_root}")
         except subprocess.CalledProcessError as err:
+            logging.error(f"{cmd}: {err}")
             print(f"[-] CRYPTSETUP: {self.device_root}", err)
             sys.exit(1)
 
@@ -41,7 +44,9 @@ class CryptSetup():
         cmd = f"cryptsetup open --type luks2 {self.device_root} cryptroot"
         try:
             subprocess.run(cmd, shell=True, check=True, input=self.cryptpassword.encode(), stdout=subprocess.DEVNULL)
+            logging.info(cmd)
             print(f"[+] CRYPTSETUP: Open {self.device_root}")
         except subprocess.CalledProcessError as err:
+            logging.error(f"{cmd}: {err}")
             print(f"[-] CRYPTSETUP: Open {self.device_root}", err)
             sys.exit(1)
