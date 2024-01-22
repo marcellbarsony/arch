@@ -6,6 +6,7 @@ Date    : March 2023
 
 
 import configparser
+import logging
 
 from chroot import Finalize
 from chroot import Grub
@@ -25,6 +26,21 @@ from chroot import User
 
 
 class Main():
+
+    @staticmethod
+    def run():
+        m.set_keys()
+        m.set_locale()
+        m.network()
+        m.user_mgmt()
+        m.security()
+        m.initramdisk()
+        m.bootloader()
+        m.systemd()
+        m.filesystem()
+        m.ssh()
+        m.pacman()
+        m.finalize()
 
     @staticmethod
     def set_keys():
@@ -112,7 +128,7 @@ class Main():
 
 if __name__ == "__main__":
 
-    # Config
+    """ Initialize Global variables """
     config = configparser.ConfigParser()
     config.read("/config.ini") # TODO: check dir location
 
@@ -126,16 +142,12 @@ if __name__ == "__main__":
     user = config.get("auth", "user")
     user_pw = config.get("auth", "user_pw")
 
+    """ Initialize logging """
+    logging.basicConfig(
+        level=logging.INFO, filename="logs.log", filemode="w",
+        format="%(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s"
+    )
+
+    """ Run script """
     m = Main()
-    m.set_keys()
-    m.set_locale()
-    m.network()
-    m.user_mgmt()
-    m.security()
-    m.initramdisk()
-    m.bootloader()
-    m.systemd()
-    m.filesystem()
-    m.ssh()
-    m.pacman()
-    m.finalize()
+    m.run()

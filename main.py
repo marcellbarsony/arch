@@ -125,8 +125,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     """ Initialize Logging """
-    logging.basicConfig(level=logging.INFO, filename="logs.log", filemode="w",
-                        format="%(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s")
+    logging.basicConfig(
+        level=logging.INFO, filename="logs.log", filemode="w",
+        format="%(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s"
+    )
 
     """ Initialize Global variables """
     config = configparser.ConfigParser()
