@@ -47,7 +47,7 @@ class User():
             sys.exit(1)
 
     def group(self):
-        groups = "wheel,audio,video,optical,storage"
+        groups = "wheel,audio,video,optical,storage,vboxusers"
         if DMI.check() == "vbox":
             groups += ",vboxsf"
         cmd = f"usermod -aG {groups} {self.user}"
