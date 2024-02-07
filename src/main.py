@@ -5,6 +5,7 @@ Date    : March 2023
 """
 
 
+# {{{
 import configparser
 import logging
 
@@ -23,10 +24,12 @@ from chroot import Security
 from chroot import Snapper
 from chroot import Systemd
 from chroot import User
+# }}}
 
 
 class Main():
 
+    # {{{ Run
     @staticmethod
     def run():
         m.set_keys()
@@ -41,20 +44,26 @@ class Main():
         m.ssh()
         m.pacman()
         m.finalize()
+    # }}}
 
+    # {{{ Keys
     @staticmethod
     def set_keys():
         k = Keymaps(keys)
         k.loadkeys()
-        k.keymap()
+        k.keymaps()
+    # }}}
 
+    # {{{ Locale
     @staticmethod
     def set_locale():
         l = Locale()
         l.locale()
         l.locale_conf()
         l.locale_gen()
+    # }}}
 
+    # {{{ Network
     @staticmethod
     def network():
         h = Host(hostname)
@@ -63,7 +72,9 @@ class Main():
         d = DomainNameSystem()
         d.networkmanager()
         d.resolvconf()
+    # }}}
 
+    # {{{ User management
     @staticmethod
     def user_mgmt():
         r = Root()
@@ -72,20 +83,26 @@ class Main():
         u.add()
         u.password(user_pw)
         u.group()
+    # }}}
 
+    # {{{ Security
     @staticmethod
     def security():
         s = Security()
         s.sudoers()
         s.login_delay(logindelay)
         s.automatic_logout()
+    # }}}
 
+    # {{{ Initramfs (mkinitcpio)
     @staticmethod
     def initramdisk():
         i = Initramfs()
         i.initramfs()
         i.mkinitcpio()
+    # }}}
 
+    # {{{ GRUB
     @staticmethod
     def bootloader():
         g = Grub()
@@ -93,7 +110,9 @@ class Main():
         g.install(secureboot, efi_directory)
         g.password(grub_password, user)
         g.mkconfig()
+    # }}}
 
+    # {{{ Systemd
     @staticmethod
     def systemd():
         s = Systemd()
@@ -101,17 +120,23 @@ class Main():
         s.services()
         s.watchdog()
         s.pc_speaker()
+    # }}}
 
+    # {{{ Filesystem
     @staticmethod
     def filesystem():
         s = Snapper()
         s.config()
+    # }}}
 
+    # {{{ SSH
     @staticmethod
     def ssh():
         s = SecureShell()
         s.bashrc(user)
+    # }}}
 
+    # {{{ Pacman
     @staticmethod
     def pacman():
         m = Mirrorlist()
@@ -119,16 +144,19 @@ class Main():
         m.update()
         p = Pacman()
         p.config()
+    # }}}
 
+    # {{{ Finalize
     @staticmethod
     def finalize():
         f = Finalize(user)
         f.ownership()
         f.remove_dirs()
+    # }}}
 
 if __name__ == "__main__":
 
-    """ Initialize Global variables """
+    # {{{ """ Initialize Global variables """
     config = configparser.ConfigParser()
     config.read("/config.ini") # TODO: check dir location
 
@@ -141,13 +169,16 @@ if __name__ == "__main__":
     secureboot = config.get("grub", "secureboot")
     user = config.get("auth", "user")
     user_pw = config.get("auth", "user_pw")
+    # }}}
 
-    """ Initialize logging """
+    # {{{ """ Initialize logging """
     logging.basicConfig(
         level=logging.INFO, filename="logs.log", filemode="w",
         format="%(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s"
     )
+    # }}}
 
-    """ Run script """
+    # {{{ """ Run script """
     m = Main()
     m.run()
+    # }}}

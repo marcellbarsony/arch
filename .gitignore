@@ -5,4 +5,4 @@ debugpy/
 venv/
 .venv/
 *.log
-
+*.spl

@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import textwrap
 
 
 class Keymaps():
@@ -20,15 +21,27 @@ class Keymaps():
         # except subprocess.CalledProcessError as err:
         #     print(f"[-] Loadkeys {self.keys}", err)
         #     sys.exit(1)
-        print("something")
+        print("TODO: loadkeys")
 
-    def keymap(self):
-        conf = "/etc/vconsole.conf"
-        content = f"KEYMAP={self.keys}"
+    @staticmethod
+    def keymaps():
+        conf = "/etc/X11/xorg.conf.d/00-keyboard.conf"
+        content = textwrap.dedent( """\
+            # Written by systemd-localed(8), read by systemd-localed and Xorg. It's
+            # probably wise not to edit this file manually. Use localectl(1) to
+            # update this file.
+            Section "InputClass"
+                    Identifier "system-keyboard"
+                    MatchIsKeyboard "on"
+                    Option "XkbLayout" "us"
+                    Option "XkbVariant" "colemak_dh"
+                    Option "XkbOptions" "caps:capslock"
+            EndSection
+        """ )
         try:
-            # TODO check
-            with open(conf, "r") as file:
-                print(f"[+] {conf} already exists")
-        except FileNotFoundError:
             with open(conf, "w") as file:
                 file.write(content)
+            print("[+] /etc/resolv.conf")
+        except Exception as err:
+            print("[-] /etc/resolv.conf", err)
+            sys.exit(1)

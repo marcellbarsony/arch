@@ -6,6 +6,7 @@ Desc    : Arch Linux base installer
 """
 
 
+# {{{ Imports
 import argparse
 import configparser
 import getpass
@@ -23,10 +24,12 @@ from src.install import Initialize
 from src.install import Install
 from src.install import Keyring
 from src.install import Pacman
+# }}}
 
 
 class Main():
 
+    # {{{ Run
     def run(self):
         self.check()
         # self.init()
@@ -38,20 +41,26 @@ class Main():
         # self.pacman()
         # self.pacstrap()
         # self.arch_chroot()
+    # }}}
 
+    # {{{ Check
     @staticmethod
     def check():
         c = Check()
         c.boot_mode()
         c.network(network_ip, network_port)
+    # }}}
 
+    # {{{ Init
     @staticmethod
     def init():
         i = Initialize()
         i.time_zone()
         i.loadkeys(keys)
         i.keymaps(keymap)
+    # }}}
 
+    # {{{ File
     @staticmethod
     def file_system():
         d = Disk()
@@ -59,13 +68,17 @@ class Main():
         d.create_efi(efisize)
         d.create_system()
         d.partprobe()
+    # }}}
 
+    # {{{ Encryption
     @staticmethod
     def encryption():
         c = CryptSetup(cryptpassword)
         c.encrypt()
         c.open()
+    # }}}
 
+    # {{{ Btrfs
     @staticmethod
     def btrfs():
         b = Btrfs(rootdir)
@@ -76,20 +89,26 @@ class Main():
         b.mount_root()
         b.mkdir()
         b.mount_subvolumes()
+    # }}}
 
+    # {{{ EFI
     @staticmethod
     def efi():
         e = Efi(efidir)
         e.mkdir()
         e.format()
         e.mount()
+    # }}}
 
+    # {{{ Fstab
     @staticmethod
     def fstab():
         f = Fstab()
         f.mkdir()
         f.genfstab()
+    # }}}
 
+    # {{{ Pacman
     @staticmethod
     def pacman():
         p = Pacman()
@@ -97,7 +116,9 @@ class Main():
         p.mirrorlist()
         k = Keyring()
         k.init()
+    # }}}
 
+    # {{{ Pacstrap
     @staticmethod
     def pacstrap():
         p = Install()
@@ -105,32 +126,37 @@ class Main():
         pkgs = p.get_packages()
         pkgs = p.get_packages_dmi(pkgs)
         p.install(pkgs)
+    # }}}
 
+    # {{{ Chroot
     @staticmethod
     def arch_chroot():
         c = Chroot(current_dir)
         c.copy_sources()
         c.chroot()
         c.clear()
+    # }}}
 
 
 if __name__ == "__main__":
 
-    """ Initialize Argparse """
+    # {{{ """ Initialize Argparse """
     parser = argparse.ArgumentParser(
         prog="python3 setup.py",
         description="Arch base system",
         epilog="TODO"
         )
     args = parser.parse_args()
+    # }}}
 
-    """ Initialize Logging """
+    # {{{ """ Initialize Logging """
     logging.basicConfig(
         level=logging.INFO, filename="logs.log", filemode="w",
         format="%(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s"
     )
+    # }}}
 
-    """ Initialize Global variables """
+    # {{{ """ Initialize Global variables """
     config = configparser.ConfigParser()
     config.read("config.ini")
 
@@ -145,7 +171,9 @@ if __name__ == "__main__":
     network_port = config.get("network", "port")
     user = getpass.getuser()
     current_dir = os.getcwd()
+    # }}}
 
-    """ Run script """
+    # {{{ """ Run script """
     m = Main()
     m.run()
+    # }}}
