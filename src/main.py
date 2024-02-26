@@ -40,7 +40,7 @@ class Main():
         m.initramdisk()
         m.bootloader()
         m.systemd()
-        m.filesystem()
+        m.btrfs()
         m.ssh()
         m.pacman()
         m.finalize()
@@ -50,7 +50,6 @@ class Main():
     @staticmethod
     def set_keys():
         k = Keymaps(keys)
-        k.loadkeys()
         k.keymaps()
     # }}}
 
@@ -122,11 +121,13 @@ class Main():
         s.pc_speaker()
     # }}}
 
-    # {{{ Filesystem
+    # {{{ Btrfs
     @staticmethod
-    def filesystem():
+    def btrfs():
         s = Snapper()
-        s.config()
+        s.config_init()
+        s.config_set()
+        s.systemd_services()
     # }}}
 
     # {{{ SSH
@@ -150,7 +151,7 @@ class Main():
     @staticmethod
     def finalize():
         f = Finalize(user)
-        f.ownership()
+        f.change_ownership()
         f.remove_dirs()
     # }}}
 

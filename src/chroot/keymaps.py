@@ -13,16 +13,6 @@ class Keymaps():
     def __init__(self, keys: str):
         self.keys = keys
 
-    def loadkeys(self):
-        # cmd = f"sudo loadkeys {self.keys}"
-        # try:
-        #     subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        #     print(f"[+] Loadkeys {self.keys}")
-        # except subprocess.CalledProcessError as err:
-        #     print(f"[-] Loadkeys {self.keys}", err)
-        #     sys.exit(1)
-        print("TODO: loadkeys")
-
     @staticmethod
     def keymaps():
         conf = "/etc/X11/xorg.conf.d/00-keyboard.conf"
@@ -41,7 +31,7 @@ class Keymaps():
         try:
             with open(conf, "w") as file:
                 file.write(content)
-            print("[+] /etc/resolv.conf")
+            print("[+] Keyboard configuration")
         except Exception as err:
-            print("[-] /etc/resolv.conf", err)
+            print("[-] Keyboard configuration", err)
             sys.exit(1)

@@ -10,7 +10,11 @@ class Install():
 
     @staticmethod
     def bug():
-        """Pacstrap doesn't work properly until pacman-init.service in the live system is done"""
+        """
+        Fixing Pacstrap error: Keyring is not writable
+        Pacstrap doesn't work properly until pacman-init.service in the live system is done
+        https://bbs.archlinux.org/viewtopic.php?pid=2081392#p2081392
+        """
         cmd = f"systemctl --no-pager status -n0 pacman-init.service"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

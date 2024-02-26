@@ -37,7 +37,7 @@ class Security():
             with open(system_login, "r") as file:
                 lines = file.readlines()
         except Exception as err:
-                print(f"[+] Read {system_login}", err)
+                print(f"[-] Read {system_login}", err)
                 sys.exit(1)
 
         lines.insert(5, f"auth optional pam_faildelay.so delay={logindelay}")

@@ -42,7 +42,7 @@ class Pacman():
         --sort rate \
         --save /etc/pacman.d/mirrorlist"
         try:
-            print("[I] PACMAN: Updating mirrorlist...")
+            print("[i] PACMAN: Updating mirrorlist...")
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             logging.info(cmd)
             print("[+] PACMAN: Mirrorlist")
@@ -65,8 +65,8 @@ class Keyring():
             "pacman -Sy",
             "pacman -Sy --noconfirm archlinux-keyring",
             "pacman-key --init",
-            #"pacman-key --refresh-keys",
-            #"gpg --refresh-keys",
+            # "pacman-key --refresh-keys",
+            # "gpg --refresh-keys",
             "pacman-key --populate"
             ]
         for cmd in cmds:

@@ -14,7 +14,7 @@ class Root():
             subprocess.run(cmd, shell=True, check=True, input=f"root:{root_pw}".encode())
             print("[+] Root password")
         except subprocess.CalledProcessError as err:
-            print("[+] Root password", err)
+            print("[-] Root password", err)
             sys.exit(1)
 
 
@@ -34,7 +34,7 @@ class User():
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(f"[+] User add {self.user}")
         except subprocess.CalledProcessError as err:
-            print(f"[+] User add {self.user}", err)
+            print(f"[-] User add {self.user}", err)
             sys.exit(1)
 
     def password(self, user_pw: str):

@@ -6,7 +6,10 @@ import subprocess
 
 class Fstab():
 
-    """Docstring for Fstab"""
+    """
+    Docstring for Fstab
+    https://wiki.archlinux.org/title/Fstab
+    """
 
     @staticmethod
     def mkdir():

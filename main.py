@@ -32,15 +32,15 @@ class Main():
     # {{{ Run
     def run(self):
         self.check()
-        # self.init()
-        # self.file_system()
-        # self.encryption()
-        # self.btrfs()
-        # self.efi()
-        # self.fstab()
-        # self.pacman()
-        # self.pacstrap()
-        # self.arch_chroot()
+        self.init()
+        self.file_system()
+        self.encryption()
+        self.btrfs()
+        self.efi()
+        self.fstab()
+        self.pacman()
+        self.pacstrap()
+        self.arch_chroot()
     # }}}
 
     # {{{ Check
@@ -78,7 +78,7 @@ class Main():
         c.open()
     # }}}
 
-    # {{{ Btrfs
+    # {{{ BTRFS
     @staticmethod
     def btrfs():
         b = Btrfs(rootdir)

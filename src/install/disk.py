@@ -41,15 +41,14 @@ class Disk():
             sys.exit(1)
 
     def create_system(self):
-        system = "cryptsystem"
-        cmd = f"sgdisk -n 0:0:0 -t 0:8e00 -c 0:{system} {self.disk}"
+        cmd = f"sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem {self.disk}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             logging.info(cmd)
-            print(f"[+] FILESYSTEM: Create {system}")
+            print(f"[+] FILESYSTEM: Create cryptsystem")
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}: {err}")
-            print(f"[-] FILESYSTEM: Create {system}", err)
+            print(f"[-] FILESYSTEM: Create cryptsystem", err)
             sys.exit(1)
 
     def partprobe(self):

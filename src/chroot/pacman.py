@@ -25,7 +25,7 @@ class Mirrorlist():
         --sort rate \
         --save {self.mirrorlist}"
         try:
-            print("[I] REFLECTOR: Updating Pacman mirrorlist...")
+            print("[i] REFLECTOR: Updating Pacman mirrorlist...")
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print("[+] REFLECTOR: Mirrorlist update")
         except subprocess.CalledProcessError as err:

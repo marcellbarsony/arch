@@ -29,7 +29,7 @@ class Systemd():
             "systemctl enable fstrim.timer",
             "systemctl enable NetworkManager.service",
             "systemctl enable nftables.service",
-           #"systemctl enable ntpd.service",
+            # "systemctl enable ntpd.service",
             "systemctl enable ntpdate.service",
             "systemctl enable reflector.service"
         ]
