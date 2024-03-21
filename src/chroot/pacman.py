@@ -49,10 +49,12 @@ class Pacman():
             print(f"[-] PACMAN: Read {config}", err)
             sys.exit(1)
 
-        lines[32] = f"Color\n"
-        lines[33] = f"ILoveCandy\n"
-        lines[35] = f"VerbosePkgLists\n"
-        lines[36] = f"ParallelDownloads=5\n"
+        lines[32] = "Color\n"
+        lines[33] = "ILoveCandy\n"
+        lines[35] = "VerbosePkgLists\n"
+        lines[36] = "ParallelDownloads=5\n"
+        lines[89] = "[multilib]\n"
+        lines[90] = "Include = /etc/pacman.d/mirrorlist\n"
         try:
             with open(config, "w") as file:
                 file.writelines(lines)
