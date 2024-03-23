@@ -26,6 +26,7 @@ class Systemd():
     @staticmethod
     def services():
         cmds = [
+            "systemctl enable earlyoom",
             "systemctl enable fstrim.timer",
             "systemctl enable NetworkManager.service",
             "systemctl enable nftables.service",
