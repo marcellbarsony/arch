@@ -60,7 +60,7 @@ class Main():
         i.keymaps(keymap)
     # }}}
 
-    # {{{ File
+    # {{{ Filesystem
     @staticmethod
     def file_system():
         d = Disk()
