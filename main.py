@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Author  : Marcell Barsony <marcellbarsony@protonmail.com>
+Author  : Marcell Barsony
 Date    : 2023 January
 Desc    : Arch Linux base installer
 """
@@ -14,128 +14,96 @@ import logging
 import os
 
 from src.install import Btrfs
-from src.install import Check
+from src.install import check
 from src.install import Chroot
 from src.install import CryptSetup
 from src.install import Disk
 from src.install import Efi
-from src.install import Fstab
-from src.install import Initialize
+from src.install import fstab
+from src.install import initialize
 from src.install import Install
-from src.install import Keyring
-from src.install import Pacman
+from src.install import pacman
 # }}}
 
 
-class Main():
+# {{{ Check
+def run_check():
+    check.boot_mode()
+    check.network(network_ip, network_port)
+# }}}
 
-    # {{{ Run
-    def run(self):
-        self.check()
-        self.init()
-        self.file_system()
-        self.encryption()
-        self.btrfs()
-        self.efi()
-        self.fstab()
-        self.pacman()
-        self.pacstrap()
-        self.arch_chroot()
-    # }}}
+# {{{ Init
+def init():
+    initialize.time_zone()
+    initialize.loadkeys(keys)
+    initialize.keymaps(keymap)
+# }}}
 
-    # {{{ Check
-    @staticmethod
-    def check():
-        c = Check()
-        c.boot_mode()
-        c.network(network_ip, network_port)
-    # }}}
+# {{{ Filesystem
+def file_system():
+    d = Disk()
+    d.wipe()
+    d.create_efi(efisize)
+    d.create_system()
+    d.partprobe()
+# }}}
 
-    # {{{ Init
-    @staticmethod
-    def init():
-        i = Initialize()
-        i.time_zone()
-        i.loadkeys(keys)
-        i.keymaps(keymap)
-    # }}}
+# {{{ Encryption
+def encryption():
+    c = CryptSetup(cryptpassword)
+    c.encrypt()
+    c.open()
+# }}}
 
-    # {{{ Filesystem
-    @staticmethod
-    def file_system():
-        d = Disk()
-        d.wipe()
-        d.create_efi(efisize)
-        d.create_system()
-        d.partprobe()
-    # }}}
+# {{{ BTRFS
+def btrfs():
+    b = Btrfs(rootdir)
+    b.mkfs()
+    b.mountfs()
+    b.mksubvols()
+    b.unmount()
+    b.mount_root()
+    b.mkdir()
+    b.mount_subvolumes()
+# }}}
 
-    # {{{ Encryption
-    @staticmethod
-    def encryption():
-        c = CryptSetup(cryptpassword)
-        c.encrypt()
-        c.open()
-    # }}}
+# {{{ EFI
+def efi():
+    e = Efi(efidir)
+    e.mkdir()
+    e.format()
+    e.mount()
+# }}}
 
-    # {{{ BTRFS
-    @staticmethod
-    def btrfs():
-        b = Btrfs(rootdir)
-        b.mkfs()
-        b.mountfs()
-        b.mksubvols()
-        b.unmount()
-        b.mount_root()
-        b.mkdir()
-        b.mount_subvolumes()
-    # }}}
+# {{{ Fstab
+def gen_fstab():
+    fstab.mkdir()
+    fstab.genfstab()
+# }}}
 
-    # {{{ EFI
-    @staticmethod
-    def efi():
-        e = Efi(efidir)
-        e.mkdir()
-        e.format()
-        e.mount()
-    # }}}
+# {{{ Pacman
+def set_pacman():
+    pacman.config()
+    pacman.mirrorlist()
+    pacman.keyring_init()
+# }}}
 
-    # {{{ Fstab
-    @staticmethod
-    def fstab():
-        f = Fstab()
-        f.mkdir()
-        f.genfstab()
-    # }}}
+# {{{ Pacstrap
+def pacstrap():
+    p = Install()
+    p.bug()
+    pkgs = p.get_packages()
+    pkgs = p.get_packages_dmi(pkgs)
+    p.install(pkgs)
+# }}}
 
-    # {{{ Pacman
-    @staticmethod
-    def pacman():
-        p = Pacman()
-        p.config()
-        p.mirrorlist()
-        k = Keyring()
-        k.init()
-    # }}}
-
-    # {{{ Pacstrap
-    @staticmethod
-    def pacstrap():
-        p = Install()
-        p.bug()
-        pkgs = p.get_packages()
-        pkgs = p.get_packages_dmi(pkgs)
-        p.install(pkgs)
-    # }}}
-
-    # {{{ Chroot
-    @staticmethod
-    def arch_chroot():
-        c = Chroot(current_dir)
-        c.copy_sources()
-        c.chroot()
-        c.clear()
-    # }}}
+# {{{ Chroot
+def arch_chroot():
+    c = Chroot(current_dir)
+    c.copy_sources()
+    c.chroot()
+    c.clear()
+# }}}
 
 
 if __name__ == "__main__":
@@ -169,11 +137,20 @@ if __name__ == "__main__":
     keymap = config.get("keyset", "keymap")
     network_ip = config.get("network", "ip")
     network_port = config.get("network", "port")
+
     user = getpass.getuser()
     current_dir = os.getcwd()
     # }}}
 
-    # {{{ """ Run script """
-    m = Main()
-    m.run()
+    # {{{ """ Run """
+    run_check()
+    init()
+    file_system()
+    encryption()
+    btrfs()
+    efi()
+    gen_fstab()
+    set_pacman()
+    pacstrap()
+    arch_chroot()
     # }}}

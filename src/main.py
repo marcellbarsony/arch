@@ -9,151 +9,106 @@ Date    : March 2023
 import configparser
 import logging
 
-from chroot import Finalize
-from chroot import Grub
-from chroot import Host
-from chroot import DomainNameSystem
-from chroot import Initramfs
-from chroot import Keymaps
-from chroot import Locale
-from chroot import Mirrorlist
-from chroot import Pacman
-from chroot import Root
-from chroot import SecureShell
-from chroot import Security
-from chroot import Snapper
-from chroot import Systemd
-from chroot import User
+from chroot import snapper
+from chroot import dns
+from chroot import finalize
+from chroot import grub
+from chroot import host
+from chroot import initramfs
+from chroot import keymaps
+from chroot import locale
+from chroot import mirrorlist
+from chroot import pacman
+from chroot import ssh
+from chroot import security
+from chroot import systemd
+from chroot import users
 # }}}
 
 
-class Main():
+# {{{ Keys
+def set_keys():
+    keymaps.keymaps()
+# }}}
 
-    # {{{ Run
-    @staticmethod
-    def run():
-        m.set_keys()
-        m.set_locale()
-        m.network()
-        m.user_mgmt()
-        m.security()
-        m.initramdisk()
-        m.bootloader()
-        m.systemd()
-        m.btrfs()
-        m.ssh()
-        m.pacman()
-        m.finalize()
-    # }}}
+# {{{ Locale
+def set_locale():
+    locale.locale()
+    locale.conf()
+    locale.gen()
+# }}}
 
-    # {{{ Keys
-    @staticmethod
-    def set_keys():
-        k = Keymaps(keys)
-        k.keymaps()
-    # }}}
+# {{{ Network
+def set_hosts():
+    host.hostname(hostname)
+    host.hosts(hostname)
 
-    # {{{ Locale
-    @staticmethod
-    def set_locale():
-        l = Locale()
-        l.locale()
-        l.locale_conf()
-        l.locale_gen()
-    # }}}
+def set_dns():
+    dns.networkmanager()
+    dns.resolvconf()
+# }}}
 
-    # {{{ Network
-    @staticmethod
-    def network():
-        h = Host(hostname)
-        h.set_hostname()
-        h.hosts()
-        d = DomainNameSystem()
-        d.networkmanager()
-        d.resolvconf()
-    # }}}
+# {{{ Users
+def set_users():
+    users.root_password(root_pw)
+    users.user_add(user)
+    users.user_password(user, user_pw)
+    users.user_group(user)
+# }}}
 
-    # {{{ User management
-    @staticmethod
-    def user_mgmt():
-        r = Root()
-        r.password(root_pw)
-        u = User(user)
-        u.add()
-        u.password(user_pw)
-        u.group()
-    # }}}
+# {{{ Security
+def set_security():
+    security.sudoers()
+    security.login_delay(logindelay)
+    security.automatic_logout()
+# }}}
 
-    # {{{ Security
-    @staticmethod
-    def security():
-        s = Security()
-        s.sudoers()
-        s.login_delay(logindelay)
-        s.automatic_logout()
-    # }}}
+# {{{ Initramfs (mkinitcpio)
+def set_initramfs():
+    initramfs.mkinitcpio()
+    initramfs.initramfs()
+# }}}
 
-    # {{{ Initramfs (mkinitcpio)
-    @staticmethod
-    def initramdisk():
-        i = Initramfs()
-        i.initramfs()
-        i.mkinitcpio()
-    # }}}
+# {{{ GRUB
+def set_bootloader():
+    grub.setup()
+    grub.install(secureboot, efi_directory)
+    grub.password(grub_password, user)
+    grub.mkconfig()
+# }}}
 
-    # {{{ GRUB
-    @staticmethod
-    def bootloader():
-        g = Grub()
-        g.setup()
-        g.install(secureboot, efi_directory)
-        g.password(grub_password, user)
-        g.mkconfig()
-    # }}}
+# {{{ Systemd
+def set_systemd():
+    systemd.logind()
+    systemd.services()
+    systemd.watchdog()
+    systemd.pc_speaker()
+# }}}
 
-    # {{{ Systemd
-    @staticmethod
-    def systemd():
-        s = Systemd()
-        s.logind()
-        s.services()
-        s.watchdog()
-        s.pc_speaker()
-    # }}}
+# {{{ Btrfs
+def set_btrfs():
+    snapper.config_init()
+    snapper.config_set()
+    snapper.systemd_services()
+# }}}
 
-    # {{{ Btrfs
-    @staticmethod
-    def btrfs():
-        s = Snapper()
-        s.config_init()
-        s.config_set()
-        s.systemd_services()
-    # }}}
+# {{{ SSH
+def set_ssh():
+    ssh.bashrc(user)
+# }}}
 
-    # {{{ SSH
-    @staticmethod
-    def ssh():
-        s = SecureShell()
-        s.bashrc(user)
-    # }}}
+# {{{ Pacman
+def set_pacman():
+    mirrorlist.backup()
+    mirrorlist.update()
+    pacman.config()
+# }}}
 
-    # {{{ Pacman
-    @staticmethod
-    def pacman():
-        m = Mirrorlist()
-        m.backup()
-        m.update()
-        p = Pacman()
-        p.config()
-    # }}}
-
-    # {{{ Finalize
-    @staticmethod
-    def finalize():
-        f = Finalize(user)
-        f.change_ownership()
-        f.remove_dirs()
-    # }}}
+# {{{ Finalize
+def set_finalize():
+    finalize.change_ownership(user)
+    finalize.remove_xdg_dirs(user)
+# }}}
 
 if __name__ == "__main__":
 
@@ -180,6 +135,16 @@ if __name__ == "__main__":
     # }}}
 
     # {{{ """ Run script """
-    m = Main()
-    m.run()
+    set_keys()
+    set_locale()
+    set_hosts()
+    set_users()
+    set_security()
+    set_initramfs()
+    set_bootloader()
+    set_systemd()
+    set_btrfs()
+    set_ssh()
+    set_pacman()
+    set_finalize()
     # }}}
