@@ -25,12 +25,6 @@ from chroot import systemd
 from chroot import users
 # }}}
 
-
-# {{{ Keys
-def set_keys():
-    keymaps.keymaps()
-# }}}
-
 # {{{ Locale
 def set_locale():
     locale.locale()
@@ -51,6 +45,7 @@ def set_dns():
 # {{{ Users
 def set_users():
     users.root_password(root_pw)
+
     users.user_add(user)
     users.user_password(user, user_pw)
     users.user_group(user)
@@ -104,6 +99,12 @@ def set_pacman():
     pacman.config()
 # }}}
 
+# {{{ X11: Keymaps
+def x11_keys():
+    keymaps.x11_keymaps()
+# }}}
+
+
 # {{{ Finalize
 def set_finalize():
     finalize.change_ownership(user)
@@ -135,7 +136,6 @@ if __name__ == "__main__":
     # }}}
 
     # {{{ """ Run script """
-    set_keys()
     set_locale()
     set_hosts()
     set_users()
@@ -146,5 +146,6 @@ if __name__ == "__main__":
     set_btrfs()
     set_ssh()
     set_pacman()
+    x11_keys()
     set_finalize()
     # }}}

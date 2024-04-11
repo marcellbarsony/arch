@@ -1,6 +1,6 @@
 import subprocess
 import sys
-from .dmi import DMI
+import dmi
 
 
 """Docstring for root user setup"""
@@ -40,7 +40,7 @@ def user_password(user: str, user_pw: str):
 
 def user_group(user: str):
     groups = "wheel,audio,video,optical,storage,vboxusers"
-    if DMI.check() == "vbox":
+    if dmi.check() == "vbox":
         groups += ",vboxsf"
     cmd = f"usermod -aG {groups} {user}"
     try:

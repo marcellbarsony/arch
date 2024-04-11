@@ -1,13 +1,13 @@
 import re
 import sys
 import subprocess
-from .dmi import DMI
+import dmi
 
 
 """Docstring for GRUB"""
 
 def get_uuid():
-    _, _, device_root = DMI().disk()
+    _, _, device_root = dmi.disk()
     out = subprocess.check_output(["blkid"]).decode("utf-8")
     for line in out.splitlines():
         if line.startswith(device_root):

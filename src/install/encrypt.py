@@ -1,7 +1,7 @@
 import logging
 import subprocess
 import sys
-from .dmi import DMI
+import dmi
 
 
 class CryptSetup():
@@ -9,7 +9,6 @@ class CryptSetup():
     """Docstring for Encryption"""
 
     def __init__(self, cryptpassword: str):
-        dmi = DMI()
         _, _, device_root = dmi.disk()
         self.device_root = device_root
         self.cryptpassword = cryptpassword

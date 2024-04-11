@@ -2,9 +2,9 @@ import sys
 import textwrap
 
 
-def keymaps():
+def x11_keymaps():
     """
-    Docstring for Keymaps
+    Docstring for X11 Keymaps
     https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration
     """
     conf = "/etc/X11/xorg.conf.d/00-keyboard.conf"
@@ -23,7 +23,7 @@ def keymaps():
     try:
         with open(conf, "w") as file:
             file.write(content)
-        print("[+] Keyboard configuration")
+        print("[+] X11: Keyboard configuration")
     except Exception as err:
-        print("[-] Keyboard configuration", err)
+        print("[-] X11: Keyboard configuration", err)
         sys.exit(1)

@@ -1,7 +1,8 @@
 import logging
 import subprocess
 import sys
-from .dmi import DMI
+import dmi
+
 
 
 class Disk():
@@ -9,7 +10,6 @@ class Disk():
     """Docstring for Disk"""
 
     def __init__(self):
-        dmi = DMI()
         disk, _, _ = dmi.disk()
         self.disk = disk
 

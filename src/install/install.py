@@ -1,8 +1,7 @@
 import logging
 import os
 import subprocess
-from .dmi import DMI
-
+import dmi
 
 class Install():
 
@@ -36,14 +35,14 @@ class Install():
 
     @staticmethod
     def get_packages_dmi(packages: str):
-        dmi = DMI.check()
-        if dmi == "vbox":
+        out = dmi.check()
+        if out == "vbox":
             packages += "virtualbox-guest-utils"
-        if dmi == "vmware":
+        if out == "vmware":
             packages += "open-vm-tools"
-        if dmi == "intel":
+        if out == "intel":
             packages += "intel-ucode xf86-video-intel"
-        if dmi == "AMD":
+        if out == "AMD":
             packages += "amd-ucode xf86-video-amdgpu"
         return packages
 
