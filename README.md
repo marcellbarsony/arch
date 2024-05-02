@@ -35,4 +35,3 @@ Launch the script
 ```
 ./main.py
 ```
-
