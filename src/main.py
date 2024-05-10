@@ -11,6 +11,7 @@ import logging
 
 from chroot import snapper
 from chroot import dns
+from chroot import dmi
 from chroot import finalize
 from chroot import grub
 from chroot import host
@@ -75,7 +76,8 @@ def set_bootloader():
 # {{{ Systemd
 def set_systemd():
     systemd.logind()
-    systemd.services()
+    dmi_res = dmi.check()
+    systemd.services(dmi_res)
     systemd.watchdog()
     systemd.pc_speaker()
 # }}}

@@ -13,16 +13,17 @@ import getpass
 import logging
 import os
 
-from src.install import Btrfs
 from src.install import check
-from src.install import Chroot
-from src.install import CryptSetup
-from src.install import Disk
-from src.install import Efi
-from src.install import fstab
 from src.install import initialize
-from src.install import Install
+from src.install import dmi
+from src.install import disk
+from src.install import encrypt
+from src.install import btrfs
+from src.install import efi
+from src.install import fstab
 from src.install import pacman
+from src.install import install
+from src.install import chroot
 # }}}
 
 
@@ -41,38 +42,38 @@ def init():
 
 # {{{ Filesystem
 def file_system():
-    d = Disk()
-    d.wipe()
-    d.create_efi(efisize)
-    d.create_system()
-    d.partprobe()
+    device, _, _ = dmi.disk()
+    disk.wipe(device)
+    disk.create_efi(device, efisize)
+    disk.create_system(device)
+    disk.partprobe(device)
 # }}}
 
 # {{{ Encryption
 def encryption():
-    c = CryptSetup(cryptpassword)
-    c.encrypt()
-    c.open()
+    _, _, device_root = dmi.disk()
+    encrypt.encrypt(device_root, cryptpassword)
+    encrypt.open(device_root, cryptpassword)
 # }}}
 
 # {{{ BTRFS
-def btrfs():
-    b = Btrfs(rootdir)
-    b.mkfs()
-    b.mountfs()
-    b.mksubvols()
-    b.unmount()
-    b.mount_root()
-    b.mkdir()
-    b.mount_subvolumes()
+def init_btrfs():
+    subvolumes = ["home", "var", "snapshots"]
+    btrfs.mkfs(rootdir)
+    btrfs.mountfs(rootdir)
+    btrfs.mksubvols()
+    btrfs.unmount()
+    btrfs.mount_root(rootdir)
+    btrfs.mkdir(subvolumes)
+    btrfs.mount_subvolumes(subvolumes, rootdir)
 # }}}
 
 # {{{ EFI
-def efi():
-    e = Efi(efidir)
-    e.mkdir()
-    e.format()
-    e.mount()
+def init_efi():
+    _, device_efi, _ = dmi.disk()
+    efi.mkdir(efidir)
+    efi.format(device_efi)
+    efi.mount(device_efi, efidir)
 # }}}
 
 # {{{ Fstab
@@ -90,19 +91,21 @@ def set_pacman():
 
 # {{{ Pacstrap
 def pacstrap():
-    p = Install()
-    p.bug()
-    pkgs = p.get_packages()
-    pkgs = p.get_packages_dmi(pkgs)
-    p.install(pkgs)
+    install.bug()
+    pkgs = install.get_packages()
+    pkgs = install.get_packages_dmi(pkgs, dmi.check())
+    install.install(pkgs)
 # }}}
 
 # {{{ Chroot
 def arch_chroot():
-    c = Chroot(current_dir)
-    c.copy_sources()
-    c.chroot()
-    c.clear()
+    cfg_src = f"{current_dir}/config.ini"
+    scr_src = f"{current_dir}/src/"
+    cfg_dst = "/mnt/config.ini"
+    scr_dst = "/mnt/temporary"
+    chroot.copy_sources(scr_src, scr_dst, cfg_src, cfg_dst)
+    chroot.chroot()
+    chroot.clear(scr_dst, cfg_dst)
 # }}}
 
 
@@ -120,7 +123,7 @@ if __name__ == "__main__":
     # {{{ """ Initialize Logging """
     logging.basicConfig(
         level=logging.INFO, filename="logs.log", filemode="w",
-        format="%(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s"
+        format=":: %(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s"
     )
     # }}}
 
@@ -147,8 +150,8 @@ if __name__ == "__main__":
     init()
     file_system()
     encryption()
-    btrfs()
-    efi()
+    init_btrfs()
+    init_efi()
     gen_fstab()
     set_pacman()
     pacstrap()

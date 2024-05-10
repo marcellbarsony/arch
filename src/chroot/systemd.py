@@ -1,6 +1,5 @@
 import subprocess
 import sys
-from .dmi import DMI
 
 
 """Docstring for Systemd"""
@@ -20,7 +19,7 @@ def logind():
     except Exception as err:
         print("[-] ACPI events", err)
 
-def services():
+def services(dmi: str):
     cmds = [
         "systemctl enable earlyoom",
         "systemctl enable fstrim.timer",
@@ -37,7 +36,7 @@ def services():
         except subprocess.CalledProcessError as err:
             print("[-]", err)
 
-    if DMI.check() == "vbox":
+    if dmi == "vbox":
         cmd = "systemctl enable vboxservice.service"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

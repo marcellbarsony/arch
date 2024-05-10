@@ -49,7 +49,7 @@ def mirrorlist():
 
 
 """
-Initialize keyring config
+Initialize Keyring config
 https://wiki.archlinux.org/title/Pacman/
 """
 
