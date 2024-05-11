@@ -1,7 +1,6 @@
 import logging
 import os
 import subprocess
-import dmi
 
 """Pacstrap system packages"""
 
