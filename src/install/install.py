@@ -1,6 +1,7 @@
 import logging
 import os
 import subprocess
+import sys
 
 """Pacstrap system packages"""
 
@@ -49,3 +50,4 @@ def install(packages: str):
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}: {err}")
         print(f"[-] PACSTRAP install", err)
+        sys.exit(1)
