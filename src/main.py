@@ -57,7 +57,6 @@ def set_users():
 def set_security():
     security.sudoers()
     security.login_delay(logindelay)
-    security.automatic_logout()
 # }}}
 
 # {{{ Initramfs (mkinitcpio)
