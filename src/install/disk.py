@@ -10,7 +10,7 @@ def wipe(disk: str):
         f"sgdisk --zap-all --clear {disk}", # GUID table
         f"wipefs -af {disk}", # Filesystem signature
         f"sgdisk -o {disk}" # New GUID table
-        ]
+    ]
     for cmd in cmd_list:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

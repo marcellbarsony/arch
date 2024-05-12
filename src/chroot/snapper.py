@@ -25,7 +25,7 @@ def config_set():
         "TIMELINE_LIMIT_WEEKLY=1",
         "TIMELINE_LIMIT_MONTHLY=0",
         "TIMELINE_LIMIT_YEARLY=0",
-        ]
+    ]
     for cfg in cfgs:
         cmd = f"snapper -c home set-config {cfg}"
         try:
@@ -40,7 +40,7 @@ def systemd_services():
     cmds = [
         "systemctl enable snapper-timeline.timer",
         "systemctl enable snapper-cleanup.timer"
-        ]
+    ]
     for cmd in cmds:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

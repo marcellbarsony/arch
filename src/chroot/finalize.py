@@ -28,7 +28,7 @@ def remove_xdg_dirs(user: str):
         "Public",
         "Templates",
         "Videos"
-        ]
+    ]
     for dir in dirs:
         path = os.path.join(home_dir, dir)
         if os.path.exists(path):

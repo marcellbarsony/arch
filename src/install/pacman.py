@@ -61,7 +61,7 @@ def keyring_init():
         # "pacman-key --refresh-keys",
         # "gpg --refresh-keys",
         "pacman-key --populate"
-        ]
+    ]
     for cmd in cmds:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
