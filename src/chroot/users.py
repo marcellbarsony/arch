@@ -8,9 +8,9 @@ def root_password(root_pw: str):
     cmd = f"chpasswd --crypt-method SHA512"
     try:
         subprocess.run(cmd, shell=True, check=True, input=f"root:{root_pw}".encode())
-        print(":: [+] Root password")
+        print(":: [+] ROOT: chpasswd")
     except subprocess.CalledProcessError as err:
-        print(":: [-] Root password", err)
+        print(":: [-] ROOT: chpasswd", err)
         sys.exit(1)
 
 
@@ -23,18 +23,18 @@ def user_add(user: str):
     cmd = f"useradd -m {user}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(f":: [+] User add {user}")
+        print(f":: [+] USER: useradd [{user}]")
     except subprocess.CalledProcessError as err:
-        print(f":: [-] User add {user}", err)
+        print(f":: [-] USER: useradd [{user}]", err)
         sys.exit(1)
 
 def user_password(user: str, user_pw: str):
     cmd = "chpasswd --crypt-method SHA512"
     try:
         subprocess.run(cmd, shell=True, check=True, input=f"{user}:{user_pw}".encode())
-        print(f":: [+] User password [{user}]")
+        print(f":: [+] USER: chpasswd [{user}]")
     except subprocess.CalledProcessError as err:
-        print(f":: [-] User password [{user}]", err)
+        print(f":: [-] USER: chpasswd [{user}]", err)
         sys.exit(1)
 
 def user_group(user: str, dmi: str):
@@ -44,7 +44,7 @@ def user_group(user: str, dmi: str):
     cmd = f"usermod -aG {groups} {user}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] User group")
+        print(":: [+] USER: usermod")
     except subprocess.CalledProcessError as err:
-        print(":: [-] User group", err)
+        print(":: [-] USER: usermod", err)
         sys.exit(1)

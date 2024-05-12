@@ -71,7 +71,7 @@ def set_bootloader():
     uuid = grub.get_uuid(device_root)
     grub.setup(uuid)
     grub.install(secureboot, efi_directory)
-    grub.password(grub_password, user)
+    # grub.password(grub_password, user)
     grub.mkconfig()
 # }}}
 
