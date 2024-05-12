@@ -48,10 +48,11 @@ def initramfs():
         sys.exit(1)
 
 def mkinitcpio():
-    cmd = "mkinitcpio -p linux-hardened"
+    # cmd = "mkinitcpio -p linux-hardened"
+    cmd = "mkinitcpio -p linux"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] Mkinitcpio: linux-hardened")
+        print(":: [+] MKINITCPIO: linux")
     except subprocess.CalledProcessError as err:
-        print(":: [-] Mkinitcpio: linux-hardened", err)
+        print(":: [-] MKINITCPIO: linux", err)
         sys.exit(1)

@@ -15,11 +15,11 @@ def backup():
 
 def update():
     cmd = f"sudo reflector \
-    --latest 25 \
-    --protocol https \
-    --connection-timeout 5 \
-    --sort rate \
-    --save /etc/pacman.d/mirrorlist"
+        --latest 25 \
+        --protocol https \
+        --connection-timeout 5 \
+        --sort rate \
+        --save /etc/pacman.d/mirrorlist"
     try:
         print(":: [i] REFLECTOR: Updating Pacman mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

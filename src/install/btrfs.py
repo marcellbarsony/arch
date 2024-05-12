@@ -34,7 +34,7 @@ def mksubvols():
         "/mnt/@home",
         "/mnt/@var",
         "/mnt/@snapshots"
-        ]
+    ]
     for subvolume in subvolumes:
         cmd = f"btrfs subvolume create {subvolume}"
         try:
