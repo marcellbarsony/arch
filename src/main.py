@@ -87,7 +87,7 @@ def set_systemd():
 # {{{ Btrfs
 def set_btrfs():
     snapper.config_init()
-    snapper.config_set()
+    # snapper.config_set()
     snapper.systemd_services()
 # }}}
 
