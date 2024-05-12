@@ -13,15 +13,15 @@ def encrypt(device_root: str, cryptpassword: str):
     """
 
     cmd = f"cryptsetup \
-    --batch-mode luksFormat \
-    --cipher aes-xts-plain64 \
-    --hash sha512 \
-    --iter-time 5000 \
-    --key-size 512 \
-    --pbkdf pbkdf2 \
-    --type luks2 \
-    --use-random \
-    {device_root}"
+        --batch-mode luksFormat \
+        --cipher aes-xts-plain64 \
+        --hash sha512 \
+        --iter-time 5000 \
+        --key-size 512 \
+        --pbkdf pbkdf2 \
+        --type luks2 \
+        --use-random \
+        {device_root}"
     try:
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
         logging.info(cmd)

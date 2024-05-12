@@ -38,7 +38,7 @@ def mirrorlist():
     --sort rate \
     --save /etc/pacman.d/mirrorlist"
     try:
-        print("[i] PACMAN: Updating mirrorlist...")
+        print(":: [i] PACMAN: Updating mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         logging.info(cmd)
         print(":: [+] PACMAN: Mirrorlist")
