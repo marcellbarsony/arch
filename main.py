@@ -83,7 +83,7 @@ def gen_fstab():
 # }}}
 
 # {{{ Pacman
-def set_pacman():
+def packages():
     pacman.config()
     pacman.mirrorlist()
     pacman.keyring_init()
@@ -153,7 +153,7 @@ if __name__ == "__main__":
     init_btrfs()
     init_efi()
     gen_fstab()
-    set_pacman()
+    packages()
     pacstrap()
     arch_chroot()
     # }}}

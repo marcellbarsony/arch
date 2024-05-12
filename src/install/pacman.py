@@ -24,10 +24,10 @@ def config():
         with open(config, "w") as file:
             file.writelines(lines)
         logging.info(config)
-        print(f"[+] PACMAN: Write {config}")
+        print(f":: [+] PACMAN: Write {config}")
     except Exception as err:
         logging.error(f"{config}: {err}")
-        print(f"[-] PACMAN: Write {config}", err)
+        print(f":: [-] PACMAN: Write {config}", err)
         sys.exit(1)
 
 def mirrorlist():
@@ -41,10 +41,10 @@ def mirrorlist():
         print("[i] PACMAN: Updating mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         logging.info(cmd)
-        print("[+] PACMAN: Mirrorlist")
+        print(":: [+] PACMAN: Mirrorlist")
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}: {err}")
-        print(f"[-] PACMAN: Mirrorlist {err}")
+        print(f":: [-] PACMAN: Mirrorlist {err}")
         sys.exit(1)
 
 
@@ -66,8 +66,8 @@ def keyring_init():
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             logging.info(cmd)
-            print("[+] PACMAN: Arch keyring update")
+            print(":: [+] PACMAN: Arch keyring update")
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}: {err}")
-            print("[-] PACMAN: Arch keyring update", err)
+            print(":: [-] PACMAN: Arch keyring update", err)
             pass

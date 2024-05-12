@@ -17,9 +17,9 @@ def networkmanager():
     try:
         with open(conf, "w") as f:
             f.write(content)
-        print("[+] NetworkManager DNS conf")
+        print(":: [+] NetworkManager DNS conf")
     except Exception as err:
-        print("[-] NetworkManager DNS conf", err)
+        print(":: [-] NetworkManager DNS conf", err)
         sys.exit(1)
 
 def resolvconf():
@@ -41,7 +41,7 @@ def resolvconf():
     try:
         with open(conf, "w") as file:
             file.write(content)
-        print("[+] /etc/resolv.conf")
+        print(":: [+] /etc/resolv.conf")
     except Exception as err:
-        print("[-] /etc/resolv.conf", err)
+        print(":: [-] /etc/resolv.conf", err)
         sys.exit(1)

@@ -19,7 +19,7 @@ def wipe(disk: str):
             logging.error(f"{cmd}: {err}")
             print(":: [-] FILESYSTEM: ", err)
             sys.exit(1)
-    print("[+] FILESYSTEM: Wipe")
+    print(":: [+] FILESYSTEM: Wipe")
 
 def create_efi(device: str, efisize: str):
     cmd = f"sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {device}"

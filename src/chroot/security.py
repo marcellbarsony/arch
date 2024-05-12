@@ -12,7 +12,7 @@ def sudoers():
         with open(sudoers, "r") as file:
             lines = file.readlines()
     except Exception as err:
-        print("[-] SUDOERS: Read", err)
+        print(":: [-] SUDOERS: Read", err)
         sys.exit(1)
 
     lines.insert(73, "Defaults:%wheel insults\n")
@@ -21,9 +21,9 @@ def sudoers():
     try:
         with open(sudoers, "w") as file:
             file.writelines(lines)
-        print("[+] SUDOERS: Write")
+        print(":: [+] SUDOERS: Write")
     except Exception as err:
-        print("[-] SUDOERS: Write", err)
+        print(":: [-] SUDOERS: Write", err)
         sys.exit(1)
 
 def login_delay(logindelay: str):
@@ -33,16 +33,16 @@ def login_delay(logindelay: str):
         with open(system_login, "r") as file:
             lines = file.readlines()
     except Exception as err:
-            print(f"[-] Read {system_login}", err)
+            print(f":: [-] Read {system_login}", err)
             sys.exit(1)
 
     lines.insert(5, f"auth optional pam_faildelay.so delay={logindelay}")
     try:
         with open(system_login, "w") as file:
             file.writelines(lines)
-            print(f"[+] Write {system_login}")
+            print(f":: [+] Write {system_login}")
     except Exception as err:
-            print(f"[-] Write {system_login}")
+            print(f":: [-] Write {system_login}")
             sys.exit(1)
 
 def automatic_logout():

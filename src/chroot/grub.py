@@ -1,13 +1,11 @@
 import re
 import sys
 import subprocess
-import dmi
 
 
 """Docstring for GRUB"""
 
-def get_uuid():
-    _, _, device_root = dmi.disk()
+def get_uuid(device_root: str):
     out = subprocess.check_output(["blkid"]).decode("utf-8")
     for line in out.splitlines():
         if line.startswith(device_root):
@@ -16,14 +14,13 @@ def get_uuid():
                 uuid = match.group(1)
                 return uuid
 
-def setup():
-    uuid = get_uuid()
+def setup(uuid):
     grub_cfg = "/etc/default/grub"
     try:
         with open(grub_cfg, "r") as file:
             lines = file.readlines()
     except Exception as err:
-        print(f"[-] Read {grub_cfg}", err)
+        print(f":: [-] Read {grub_cfg}", err)
         sys.exit(1)
 
     # Timeout
@@ -40,9 +37,9 @@ def setup():
     try:
         with open(grub_cfg, "w") as file:
             file.writelines(lines)
-        print(f"[+] Write {grub_cfg}")
+        print(f":: [+] Write {grub_cfg}")
     except Exception as err:
-        print(f"[-] Write {grub_cfg}", err)
+        print(f":: [-] Write {grub_cfg}", err)
         sys.exit(1)
 
 def install(secureboot: str, efi_directory: str):
@@ -52,9 +49,9 @@ def install(secureboot: str, efi_directory: str):
         cmd = f"grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print("[+] GRUB install")
+        print(":: [+] GRUB install")
     except subprocess.CalledProcessError as err:
-        print("[-] GRUB install", err)
+        print(":: [-] GRUB install", err)
         sys.exit(1)
 
 def password(grub_password: str, user: str):
@@ -64,9 +61,9 @@ def password(grub_password: str, user: str):
     try:
         out = subprocess.run(cmd, shell=True, check=True, input=sin.encode(), stdout=subprocess.PIPE)
         pbkdf2_hash = out.stdout.decode("utf-8")[67:].strip()
-        print(f"[+] GRUB password")
+        print(":: [+] GRUB password")
     except subprocess.CalledProcessError as err:
-        print(f"[-] GRUB password", err)
+        print(":: [-] GRUB password", err)
 
     file = "/etc/grub.d/00_header"
     content = f'\ncat << EOF\nset superusers="{user}"\npassword_pbkdf2 {user} {pbkdf2_hash}\nEOF'
@@ -77,9 +74,9 @@ def mkconfig():
     cmd = f"grub-mkconfig -o /boot/grub/grub.cfg"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print("[+] GRUB config")
+        print(":: [+] GRUB config")
     except subprocess.CalledProcessError as err:
-        print("[-] GRUB config", err)
+        print(":: [-] GRUB config", err)
         sys.exit(1)
 
 def secure_boot():

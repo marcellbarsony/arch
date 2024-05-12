@@ -12,9 +12,9 @@ def hostname(hostname: str):
     try:
         with open(conf, "w") as file:
             file.write(hostname)
-        print("[+] /etc/hostname")
+        print(":: [+] /etc/hostname")
     except Exception as err:
-        print("[-] /etc/hostname", err)
+        print(":: [-] /etc/hostname", err)
         sys.exit(1)
 
 def hosts(hostname: str):
@@ -29,7 +29,7 @@ def hosts(hostname: str):
     try:
         with open(conf, "w") as file:
             file.write(content)
-        print("[+] /etc/hosts")
+        print(":: [+] /etc/hosts")
     except Exception as err:
-        print("[+] /etc/hosts", err)
+        print(":: [+] /etc/hosts", err)
         sys.exit(1)

@@ -23,7 +23,7 @@ def x11_keymaps():
     try:
         with open(conf, "w") as file:
             file.write(content)
-        print("[+] X11: Keyboard configuration")
+        print(":: [+] X11: Keyboard configuration")
     except Exception as err:
-        print("[-] X11: Keyboard configuration", err)
+        print(":: [-] X11: Keyboard configuration", err)
         sys.exit(1)

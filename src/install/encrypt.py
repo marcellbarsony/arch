@@ -25,10 +25,10 @@ def encrypt(device_root: str, cryptpassword: str):
     try:
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
         logging.info(cmd)
-        print(f"[+] CRYPTSETUP: {device_root}")
+        print(f":: [+] CRYPTSETUP: {device_root}")
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}: {err}")
-        print(f"[-] CRYPTSETUP: {device_root}", err)
+        print(f":: [-] CRYPTSETUP: {device_root}", err)
         sys.exit(1)
 
 def open(device_root: str, cryptpassword: str):
@@ -36,8 +36,8 @@ def open(device_root: str, cryptpassword: str):
     try:
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
         logging.info(cmd)
-        print(f"[+] CRYPTSETUP: Open {device_root}")
+        print(f":: [+] CRYPTSETUP: Open {device_root}")
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}: {err}")
-        print(f"[-] CRYPTSETUP: Open {device_root}", err)
+        print(f":: [-] CRYPTSETUP: Open {device_root}", err)
         sys.exit(1)

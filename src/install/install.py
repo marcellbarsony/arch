@@ -15,9 +15,9 @@ def bug():
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         logging.info(cmd)
-        print(f"[+] PACSTRAP: pacman-init.service")
+        print(":: [+] PACSTRAP: pacman-init.service")
     except subprocess.CalledProcessError as err:
-        print(f"[-] PACSTRAP: pacman-init.service", err)
+        print(":: [-] PACSTRAP: pacman-init.service", err)
         pass
 
 def get_packages():
@@ -46,8 +46,8 @@ def install(packages: str):
     try:
         subprocess.run(cmd.rstrip(), shell=True, check=True)
         logging.info(cmd)
-        print(f"[+] PACSTRAP install")
+        print(":: [+] PACSTRAP install")
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}: {err}")
-        print(f"[-] PACSTRAP install", err)
+        print(":: [-] PACSTRAP install", err)
         sys.exit(1)

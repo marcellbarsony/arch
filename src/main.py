@@ -47,9 +47,10 @@ def set_dns():
 def set_users():
     users.root_password(root_pw)
 
+    dmi_res = dmi.check()
     users.user_add(user)
     users.user_password(user, user_pw)
-    users.user_group(user)
+    users.user_group(user, dmi_res)
 # }}}
 
 # {{{ Security
@@ -67,7 +68,9 @@ def set_initramfs():
 
 # {{{ GRUB
 def set_bootloader():
-    grub.setup()
+    _, _, device_root = dmi.disk()
+    uuid = grub.get_uuid(device_root)
+    grub.setup(uuid)
     grub.install(secureboot, efi_directory)
     grub.password(grub_password, user)
     grub.mkconfig()

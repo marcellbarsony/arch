@@ -34,7 +34,7 @@ def initramfs():
         with open(conf, "r") as file:
             lines = file.readlines()
     except Exception as err:
-        print(f"[-] Read {conf}", err)
+        print(f":: [-] Read {conf}", err)
         sys.exit(1)
 
     lines[6] = f"MODULES=(btrfs {kms})\n"
@@ -42,16 +42,16 @@ def initramfs():
     try:
         with open(conf, "w") as file:
             file.writelines(lines)
-        print(f"[+] Mkinitcpio.conf {conf}")
+        print(f":: [+] Mkinitcpio.conf {conf}")
     except Exception as err:
-        print(f"[-] Mkinitcpio.conf {conf}", err)
+        print(f":: [-] Mkinitcpio.conf {conf}", err)
         sys.exit(1)
 
 def mkinitcpio():
     cmd = "mkinitcpio -p linux-hardened"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print("[+] Mkinitcpio: linux-hardened")
+        print(":: [+] Mkinitcpio: linux-hardened")
     except subprocess.CalledProcessError as err:
-        print("[-] Mkinitcpio: linux-hardened", err)
+        print(":: [-] Mkinitcpio: linux-hardened", err)
         sys.exit(1)

@@ -24,7 +24,7 @@ def config():
     try:
         with open(config, "w") as file:
             file.writelines(lines)
-        print(f"[+] PACMAN: Write {config}")
+        print(f":: [+] PACMAN: Write {config}")
     except Exception as err:
-        print(f"[-] PACMAN: Write {config}", err)
+        print(f":: [-] PACMAN: Write {config}", err)
         sys.exit(1)

@@ -15,9 +15,9 @@ def logind():
     try:
         with open(file, "w") as f:
              f.writelines(lines)
-        print("[+] ACPI events")
+        print(":: [+] ACPI events")
     except Exception as err:
-        print("[-] ACPI events", err)
+        print(":: [-] ACPI events", err)
 
 def services(dmi: str):
     cmds = [
@@ -32,17 +32,17 @@ def services(dmi: str):
     for cmd in cmds:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            print("[+]", cmd)
+            print(":: [+]", cmd)
         except subprocess.CalledProcessError as err:
-            print("[-]", err)
+            print(":: [-]", err)
 
     if dmi == "vbox":
         cmd = "systemctl enable vboxservice.service"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(f"[+] User group [DMI]")
+            print(f":: [+] User group [DMI]")
         except subprocess.CalledProcessError as err:
-            print(f"[-] User group [DMI]", err)
+            print(f":: [-] User group [DMI]", err)
             sys.exit(1)
 
 def watchdog():
@@ -51,15 +51,15 @@ def watchdog():
         with open(system_conf, "r") as file:
             lines = file.readlines()
     except Exception as err:
-        print(f"[-] Read {system_conf}", err)
+        print(f":: [-] Read {system_conf}", err)
         sys.exit(1)
     lines[34] = "RebootWatchdogSec=0\n"
     try:
         with open(system_conf, "w") as file:
             file.writelines(lines)
-        print(f"[+] Write {system_conf}")
+        print(f":: [+] Write {system_conf}")
     except Exception as err:
-        print(f"[-] Write {system_conf}", err)
+        print(f":: [-] Write {system_conf}", err)
         sys.exit(1)
 
 def pc_speaker():
@@ -69,7 +69,7 @@ def pc_speaker():
     try:
         with open(file, "w") as f:
             f.write(conf)
-        print("[+] Disable PC speaker")
+        print(":: [+] Disable PC speaker")
     except IOError as err:
-        print("[-] Disable PC speaker", err)
+        print(":: [-] Disable PC speaker", err)
         sys.exit(1)
