@@ -54,7 +54,7 @@ def unmount():
         print(":: [+] Umount")
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}: {err}")
-        print(f":: [-] Umount", err)
+        print(":: [-] Umount", err)
         sys.exit(1)
 
 def mount_root(rootdir: str):

@@ -12,9 +12,9 @@ def config_init():
     cmd = "snapper --no-dbus -c home create-config /home"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] BTRFS Snapper config init")
+        print(":: [+] BTRFS: Snapper config init")
     except subprocess.CalledProcessError as err:
-        print(":: [-] BTRFS Snapper config init", err)
+        print(":: [-] BTRFS: Snapper config init", err)
         sys.exit(1)
 
 def config_set():
@@ -30,9 +30,9 @@ def config_set():
         cmd = f"snapper -c home set-config {cfg}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(":: [+] BTRFS Snapper config set")
+            print(":: [+] BTRFS: Snapper config set")
         except subprocess.CalledProcessError as err:
-            print(":: [-] BTRFS Snapper config set", err)
+            print(":: [-] BTRFS: Snapper config set", err)
             sys.exit(1)
 
 def systemd_services():
@@ -44,7 +44,7 @@ def systemd_services():
     for cmd in cmds:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(":: [+] BTRFS Snapper service")
+            print(":: [+] BTRFS: Snapper service")
         except subprocess.CalledProcessError as err:
-            print(":: [-] BTRFS Snapper service", err)
+            print(":: [-] BTRFS: Snapper service", err)
             sys.exit(1)

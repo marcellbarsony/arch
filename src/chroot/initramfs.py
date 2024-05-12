@@ -42,17 +42,17 @@ def initramfs():
     try:
         with open(conf, "w") as file:
             file.writelines(lines)
-        print(f":: [+] Mkinitcpio.conf {conf}")
+        print(f":: [+] INITRAMFS: {conf}")
     except Exception as err:
-        print(f":: [-] Mkinitcpio.conf {conf}", err)
+        print(f":: [-] INITRAMFS: {conf}", err)
         sys.exit(1)
 
 def mkinitcpio():
-    # cmd = "mkinitcpio -p linux-hardened"
     cmd = "mkinitcpio -p linux"
+    # cmd = "mkinitcpio -p linux-hardened"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] MKINITCPIO: linux")
+        print(":: [+] INITRAMFS: mkinitcpio")
     except subprocess.CalledProcessError as err:
-        print(":: [-] MKINITCPIO: linux", err)
+        print(":: [-] INITRAMFS: mkinitcpio", err)
         sys.exit(1)
