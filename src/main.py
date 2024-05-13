@@ -26,7 +26,6 @@ from chroot import systemd
 from chroot import users
 # }}}
 
-
 # {{{ Locale
 def set_locale():
     locale.locale()
@@ -57,7 +56,7 @@ def set_users():
 # {{{ Security
 def set_security():
     security.sudoers()
-    security.login_delay(logindelay)
+    # security.login_delay(logindelay)
 # }}}
 
 # {{{ Initramfs (mkinitcpio)
@@ -109,6 +108,7 @@ def x11_keys():
     keymaps.x11_keymaps()
 # }}}
 
+
 # {{{ Finalize
 def set_finalize():
     finalize.change_ownership(user)
@@ -141,16 +141,16 @@ if __name__ == "__main__":
 
     # {{{ """ Run script """
     set_locale()
-    # set_hosts()
-    # set_dns()
+    set_hosts()
+    set_dns()
     set_users()
     set_security()
     set_initramfs()
     set_bootloader()
-    # set_systemd()
-    # set_btrfs()
-    # set_ssh()
-    # set_pacman()
-    # x11_keys()
-    # set_finalize()
+    set_systemd()
+    set_btrfs()
+    set_ssh()
+    set_pacman()
+    x11_keys()
+    set_finalize()
     # }}}

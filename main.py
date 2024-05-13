@@ -146,8 +146,8 @@ if __name__ == "__main__":
     # }}}
 
     # {{{ """ Run """
-    # run_check()
-    # init()
+    run_check()
+    init()
     file_system()
     encryption()
     init_btrfs()
