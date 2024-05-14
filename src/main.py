@@ -114,6 +114,7 @@ def set_finalize():
     finalize.remove_xdg_dirs(user)
 # }}}
 
+
 if __name__ == "__main__":
 
     # {{{ """ Initialize Global variables """

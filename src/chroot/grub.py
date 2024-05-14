@@ -47,10 +47,8 @@ def setup(uuid):
         sys.exit(1)
 
 def install(secureboot: str, efi_directory: str):
-    if secureboot:
-        cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory} --modules="tpm" --disable-shim-lock'
-    else:
-        cmd = f"grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"
+    cmd = f"grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"
+    # cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory} --modules="tpm" --disable-shim-lock'
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] GRUB install")
