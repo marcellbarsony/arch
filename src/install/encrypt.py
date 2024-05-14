@@ -6,12 +6,10 @@ import sys
 """Docstring for Encryption"""
 
 def encrypt(device_root: str, cryptpassword: str):
-
     """
     Device encryption
     https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Encryption_options_for_LUKS_mode
     """
-
     cmd = f"cryptsetup \
         --batch-mode luksFormat \
         --cipher aes-xts-plain64 \
@@ -27,7 +25,7 @@ def encrypt(device_root: str, cryptpassword: str):
         logging.info(cmd)
         print(f":: [+] CRYPTSETUP: {device_root}")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(f":: [-] CRYPTSETUP: {device_root}", err)
         sys.exit(1)
 
@@ -38,6 +36,6 @@ def open(device_root: str, cryptpassword: str):
         logging.info(cmd)
         print(f":: [+] CRYPTSETUP: Open {device_root}")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(f":: [-] CRYPTSETUP: Open {device_root}", err)
         sys.exit(1)

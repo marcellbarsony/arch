@@ -5,6 +5,7 @@ import sys
 
 
 def boot_mode():
+    os.system("clear")
     path = "/sys/firmware/efi/efivars/"
     if os.path.exists(path):
         print(":: [+] Boot mode <UEFI>")

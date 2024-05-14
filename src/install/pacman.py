@@ -12,7 +12,7 @@ def config():
             lines = file.readlines()
             logging.info(config)
     except Exception as err:
-        logging.error(f"{config}: {err}")
+        logging.error(f"{config}\n{err}")
         print(f"[-] Read {config}", err)
         sys.exit(1)
 
@@ -26,7 +26,7 @@ def config():
         logging.info(config)
         print(f":: [+] PACMAN: Write {config}")
     except Exception as err:
-        logging.error(f"{config}: {err}")
+        logging.error(f"{config}\n{err}")
         print(f":: [-] PACMAN: Write {config}", err)
         sys.exit(1)
 
@@ -43,7 +43,7 @@ def mirrorlist():
         logging.info(cmd)
         print(":: [+] PACMAN: Mirrorlist")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(f":: [-] PACMAN: Mirrorlist {err}")
         sys.exit(1)
 
@@ -68,6 +68,6 @@ def keyring_init():
             logging.info(cmd)
             print(":: [+] PACMAN: Arch keyring update")
         except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}: {err}")
+            logging.error(f"{cmd}\n{err}")
             print(":: [-] PACMAN: Arch keyring update", err)
             pass

@@ -1,3 +1,4 @@
+import logging
 import re
 import sys
 import subprocess
@@ -12,6 +13,7 @@ def get_uuid(device_root: str):
             match = re.search(r'UUID="([\w-]+)"', line)
             if match:
                 uuid = match.group(1)
+                logging.info(uuid)
                 return uuid
 
 def setup(uuid):
@@ -21,6 +23,7 @@ def setup(uuid):
             lines = file.readlines()
     except Exception as err:
         print(f":: [-] Read {grub_cfg}", err)
+        logging.error(f"{grub_cfg}\n{err}")
         sys.exit(1)
 
     # Timeout
@@ -33,13 +36,14 @@ def setup(uuid):
     # Colors
     lines[41] = f'GRUB_COLOR_NORMAL="white/black"\n'
     lines[42] = f'GRUB_COLOR_HIGHLIGHT="white/black"\n'
-
     try:
         with open(grub_cfg, "w") as file:
             file.writelines(lines)
         print(f":: [+] Write {grub_cfg}")
+        logging.info(grub_cfg)
     except Exception as err:
         print(f":: [-] Write {grub_cfg}", err)
+        logging.error(f"{grub_cfg}\n{err}")
         sys.exit(1)
 
 def install(secureboot: str, efi_directory: str):
@@ -50,8 +54,10 @@ def install(secureboot: str, efi_directory: str):
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] GRUB install")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] GRUB install", err)
+        logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
 def password(grub_password: str, user: str):
@@ -62,26 +68,31 @@ def password(grub_password: str, user: str):
         out = subprocess.run(cmd, shell=True, check=True, input=sin.encode(), stdout=subprocess.PIPE)
         pbkdf2_hash = out.stdout.decode("utf-8")[67:].strip()
         print(":: [+] GRUB password")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] GRUB password", err)
+        logging.error(f"{cmd}\n{err}")
 
     file = "/etc/grub.d/00_header"
     content = f'\ncat << EOF\nset superusers="{user}"\npassword_pbkdf2 {user} {pbkdf2_hash}\nEOF'
     with open(file, "a") as f:
         f.write(content)
+    logging.info(f"{file}\n{content}")
 
 def mkconfig():
     cmd = f"grub-mkconfig -o /boot/grub/grub.cfg"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] GRUB config")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] GRUB config", err)
+        logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
 def secure_boot():
-    # https://www.reddit.com/r/archlinux/comments/10pq74e/my_easy_method_for_setting_up_secure_boot_with/
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot
+    # https://www.reddit.com/r/archlinux/comments/10pq74e/my_easy_method_for_setting_up_secure_boot_with/
 
     # sudo pacman -S sbctl
 

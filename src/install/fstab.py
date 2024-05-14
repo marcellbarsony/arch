@@ -16,7 +16,7 @@ def mkdir():
         logging.info(dir)
         print(":: [+] FSTAB: Mkdir")
     except Exception as err:
-        logging.error(f"{dir}: {err}")
+        logging.error(f"{dir}\n{err}")
         print(":: [+] FSTAB: Mkdir", err)
         sys.exit(1)
 
@@ -27,6 +27,6 @@ def genfstab():
         logging.info(cmd)
         print(":: [+] FSTAB: Genfstab")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(":: [-] FSTAB: Genfstab", err)
         sys.exit(1)

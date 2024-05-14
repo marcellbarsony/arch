@@ -1,4 +1,4 @@
-import sys
+import logging
 import textwrap
 
 
@@ -24,6 +24,7 @@ def x11_keymaps():
         with open(conf, "w") as file:
             file.write(content)
         print(":: [+] X11: Keyboard configuration")
+        logging.info(conf)
     except Exception as err:
         print(":: [-] X11: Keyboard configuration", err)
-        sys.exit(1)
+        logging.error(f"{conf}\n{err}")

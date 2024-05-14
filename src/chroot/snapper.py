@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import sys
 
@@ -8,13 +9,14 @@ https://wiki.archlinux.org/title/snapper
 """
 
 def config_init():
-    """https://wiki.archlinux.org/title/snapper#Creating_a_new_configuration"""
     cmd = "snapper --no-dbus -c home create-config /home"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] BTRFS: Snapper config init")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] BTRFS: Snapper config init", err)
+        logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
 def config_set():
@@ -31,12 +33,13 @@ def config_set():
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(":: [+] BTRFS: Snapper config set")
+            logging.info(cmd)
         except subprocess.CalledProcessError as err:
             print(":: [-] BTRFS: Snapper config set", err)
+            logging.error(f"{cmd}\n{err}")
             sys.exit(1)
 
 def systemd_services():
-    """https://wiki.archlinux.org/title/snapper#Enable/disable"""
     cmds = [
         "systemctl enable snapper-timeline.timer",
         "systemctl enable snapper-cleanup.timer"
@@ -45,6 +48,8 @@ def systemd_services():
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             print(":: [+] BTRFS: Snapper service")
+            logging.info(cmd)
         except subprocess.CalledProcessError as err:
             print(":: [-] BTRFS: Snapper service", err)
+            logging.error(f"{cmd}\n{err}")
             sys.exit(1)

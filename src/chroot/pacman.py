@@ -1,3 +1,4 @@
+import logging
 import sys
 
 
@@ -13,6 +14,7 @@ def config():
             lines = file.readlines()
     except Exception as err:
         print(f"[-] PACMAN: Read {config}", err)
+        logging.error(f"{config}\n{err}")
         sys.exit(1)
 
     lines[32] = "Color\n"
@@ -25,6 +27,8 @@ def config():
         with open(config, "w") as file:
             file.writelines(lines)
         print(f":: [+] PACMAN: Write {config}")
+        logging.info(config)
     except Exception as err:
         print(f":: [-] PACMAN: Write {config}", err)
+        logging.error(f"{config}\n{err}")
         sys.exit(1)

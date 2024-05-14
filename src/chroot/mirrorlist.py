@@ -1,3 +1,4 @@
+import logging
 import shutil
 import subprocess
 import sys
@@ -12,6 +13,7 @@ def backup():
     src = "/etc/pacman.d/mirrorlist"
     dst = "/etc/pacman.d/mirrorlist.bak"
     shutil.copy2(src, dst)
+    logging.info(f"Copy {src} >> {dst}")
 
 def update():
     cmd = f"sudo reflector \
@@ -24,6 +26,7 @@ def update():
         print(":: [i] REFLECTOR: Updating Pacman mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] REFLECTOR: Mirrorlist update")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] REFLECTOR: Mirorlist update", err)
-        sys.exit(1)
+        logging.error(f"{cmd}\n{err}")

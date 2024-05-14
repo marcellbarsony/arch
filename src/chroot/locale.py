@@ -1,3 +1,4 @@
+import logging
 import subprocess
 import sys
 
@@ -14,6 +15,7 @@ def locale():
             lines = file.readlines()
     except Exception as err:
         print(f":: [-] Read {locale_gen}", err)
+        logging.info(f"Reading {locale_gen}")
         sys.exit(1)
 
     lines[170] = "en_US.UTF-8 UTF-8\n"
@@ -22,8 +24,10 @@ def locale():
         with open(locale_gen, "w") as file:
             file.writelines(lines)
         print(f":: [+] Set {locale_gen}")
+        logging.info(f"Setting {locale_gen}")
     except Exception as err:
         print(f":: [-] Set {locale_gen}", err)
+        logging.error(f"Setting {locale_gen}: {err}")
         sys.exit(1)
 
 def conf():
@@ -33,8 +37,10 @@ def conf():
         with open(locale_conf, "a") as file:
             file.write(f"{locale}\n")
         print(f":: [+] Set {locale_conf}")
+        logging.info(f"Setting {locale_conf}")
     except Exception as err:
         print(f":: [-] Set {locale_conf}", err)
+        logging.error(f"Setting {locale_conf}: {err}")
         sys.exit(1)
 
 def gen():
@@ -42,6 +48,8 @@ def gen():
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] Locale-gen")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] Locale-gen", err)
+        logging.error(f"{cmd}\n{err}")
         sys.exit(1)

@@ -1,3 +1,4 @@
+import logging
 import sys
 import subprocess
 
@@ -9,9 +10,6 @@ https://wiki.archlinux.org/Kernel_mode_setting
 """
 
 def kernel_mode_setting() -> str:
-    """
-    TODO: 2.1 Early KMS start
-    """
     kms = ""
     with open("/proc/cpuinfo") as file:
         lines = file.readlines()
@@ -21,10 +19,13 @@ def kernel_mode_setting() -> str:
                 kms = kms.strip()
 
     if "AuthenticAMD" in kms:
+        logging.info("AuthenticAMD (amdgpu)")
         return "amdgpu"
     if "GenuineIntel" in kms:
+        logging.info("GenuineIntel (i915)")
         return "i915"
     else:
+        logging.info("VirtualBox (vboxvideo)")
         return "vboxvideo"
 
 def initramfs():
@@ -34,7 +35,8 @@ def initramfs():
         with open(conf, "r") as file:
             lines = file.readlines()
     except Exception as err:
-        print(f":: [-] Read {conf}", err)
+        print(f":: [-] Reading {conf}", err)
+        logging.error(f"Reading {conf}\n{err}")
         sys.exit(1)
 
     lines[6] = f"MODULES=(btrfs {kms})\n"
@@ -43,16 +45,19 @@ def initramfs():
         with open(conf, "w") as file:
             file.writelines(lines)
         print(f":: [+] INITRAMFS: {conf}")
+        logging.info(f"{conf}")
     except Exception as err:
         print(f":: [-] INITRAMFS: {conf}", err)
+        logging.error(f"{conf}\n{err}")
         sys.exit(1)
 
 def mkinitcpio():
     cmd = "mkinitcpio -p linux"
-    # cmd = "mkinitcpio -p linux-hardened"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] INITRAMFS: mkinitcpio")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] INITRAMFS: mkinitcpio", err)
+        logging.error(f"{cmd}\n{err}")
         sys.exit(1)

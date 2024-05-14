@@ -32,7 +32,7 @@ def chroot():
         logging.info(cmd)
         print(":: [+] Installation successful")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(":: [-] Chroot", err)
         sys.exit(1)
 

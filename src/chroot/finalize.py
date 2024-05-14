@@ -1,3 +1,4 @@
+import logging
 import os
 import grp
 import pwd
@@ -33,3 +34,4 @@ def remove_xdg_dirs(user: str):
         path = os.path.join(home_dir, dir)
         if os.path.exists(path):
             shutil.rmtree(path)
+            logging.info(f"rmdir {path}")

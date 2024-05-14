@@ -23,7 +23,7 @@ def format(device_efi: str):
         logging.info(cmd)
         print(f":: [+] EFI: Format {device_efi} (F32)")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(f":: [-] EFI: Format {device_efi} (F32)", err)
         sys.exit(1)
 
@@ -34,6 +34,6 @@ def mount(device_efi: str, efidir: str):
         logging.info(cmd)
         print(f":: [+] EFI: Mount {device_efi} >> {efidir}")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(f":: [-] EFI: Mount {device_efi} >> {efidir}", err)
         sys.exit(1)

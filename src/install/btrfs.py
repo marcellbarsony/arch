@@ -13,7 +13,7 @@ def mkfs(rootdir: str):
         logging.info(cmd)
         print(":: [+] BTRFS: Make filesystem")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(":: [-] BTRFS: Make filesystem", err)
         sys.exit(1)
 
@@ -24,7 +24,7 @@ def mountfs(rootdir: str):
         logging.info(cmd)
         print(":: [+] BTRFS: Mount cryptroot >> /mnt")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(":: [-] BTRFS: Mount cryptroot >> /mnt", err)
         sys.exit(1)
 
@@ -42,7 +42,7 @@ def mksubvols():
             logging.info(cmd)
             print(f":: [+] BTRFS: Create subvolume {subvolume}")
         except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}: {err}")
+            logging.error(f"{cmd}\n{err}")
             print(f":: [-] BTRFS: Create subvolume {subvolume}", err)
             sys.exit(1)
 
@@ -53,7 +53,7 @@ def unmount():
         logging.info(cmd)
         print(":: [+] Umount")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(":: [-] Umount", err)
         sys.exit(1)
 
@@ -64,7 +64,7 @@ def mount_root(rootdir: str):
         logging.info(cmd)
         print(":: [+] BTRFS: Mount @/ >> /mnt")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(":: [-] BTRFS: Mount @/ >> /mnt", err)
         sys.exit(1)
 
@@ -88,6 +88,6 @@ def mount_subvolumes(subvolumes, rootdir: str):
             logging.info(cmd)
             print(f":: [+] BTRFS: Mount @{subvolume} >> /mnt/{subvolume}")
         except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}: {err}")
+            logging.error(f"{cmd}\n{err}")
             print(f":: [-] BTRFS: Mount @{subvolume} >> /mnt/{subvolume}", err)
             sys.exit(1)

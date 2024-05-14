@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # {{{ """ Initialize Logging """
     logging.basicConfig(
         level=logging.INFO, filename="logs.log", filemode="w",
-        format=":: %(levelname)-7s :: %(module)s - %(funcName)s - %(lineno)d :: %(message)s"
+        format=":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
 
@@ -147,13 +147,13 @@ if __name__ == "__main__":
 
     # {{{ """ Run """
     run_check()
-    init()
-    file_system()
-    encryption()
-    init_btrfs()
-    init_efi()
-    gen_fstab()
-    packages()
-    pacstrap()
-    arch_chroot()
+    # init()
+    # file_system()
+    # encryption()
+    # init_btrfs()
+    # init_efi()
+    # gen_fstab()
+    # packages()
+    # pacstrap()
+    # arch_chroot()
     # }}}

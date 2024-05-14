@@ -11,7 +11,7 @@ def time_zone():
         logging.info(cmd)
         print(f":: [+] Timezone {timezone}")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(":: [-] Timezone", {err})
         sys.exit(1)
 
@@ -22,7 +22,7 @@ def loadkeys(keys: str):
         logging.info(cmd)
         print(f":: [+] Loadkeys <{keys}>")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(f":: [-] loadkeys <{keys}>", {err})
         sys.exit(1)
 
@@ -33,6 +33,6 @@ def keymaps(keymap: str):
         logging.info(cmd)
         print(f":: [+] Keymaps <{keymap}>")
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}: {err}")
+        logging.error(f"{cmd}\n{err}")
         print(f":: [-] Keymaps <{keymap}>", {err})
         sys.exit(1)
