@@ -14,7 +14,7 @@ def locale():
         with open(locale_gen, "r") as file:
             lines = file.readlines()
     except Exception as err:
-        print(f":: [-] Read {locale_gen}", err)
+        print(f":: [-] Reading {locale_gen}", err)
         logging.info(f"Reading {locale_gen}")
         sys.exit(1)
 
@@ -24,10 +24,10 @@ def locale():
         with open(locale_gen, "w") as file:
             file.writelines(lines)
         print(f":: [+] Set {locale_gen}")
-        logging.info(f"Setting {locale_gen}")
+        logging.info(locale_gen)
     except Exception as err:
         print(f":: [-] Set {locale_gen}", err)
-        logging.error(f"Setting {locale_gen}: {err}")
+        logging.error(f"{locale_gen}: {err}")
         sys.exit(1)
 
 def conf():
@@ -37,10 +37,10 @@ def conf():
         with open(locale_conf, "a") as file:
             file.write(f"{locale}\n")
         print(f":: [+] Set {locale_conf}")
-        logging.info(f"Setting {locale_conf}")
+        logging.info(locale_conf)
     except Exception as err:
         print(f":: [-] Set {locale_conf}", err)
-        logging.error(f"Setting {locale_conf}: {err}")
+        logging.error(f"{locale_conf}\n{err}")
         sys.exit(1)
 
 def gen():

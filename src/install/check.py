@@ -8,10 +8,10 @@ def boot_mode():
     os.system("clear")
     path = "/sys/firmware/efi/efivars/"
     if os.path.exists(path):
-        print(":: [+] Boot mode <UEFI>")
+        print(":: [+] Boot mode: UEFI")
         logging.info("UEFI")
     else:
-        print(":: [-] Boot mode <BIOS>")
+        print(":: [-] Boot mode: BIOS")
         logging.error("BIOS")
         sys.exit(1)
 

@@ -24,10 +24,10 @@ def sudoers():
         with open(sudoers, "w") as file:
             file.writelines(lines)
         print(":: [+] SUDOERS: Write")
-        logging.info(f"Writing {sudoers}")
+        logging.info(sudoers)
     except Exception as err:
         print(":: [-] SUDOERS: Write", err)
-        logging.error(f"Writing {sudoers}\n{err}")
+        logging.error(f"{sudoers}\n{err}")
         sys.exit(1)
 
 def login_delay(logindelay: str):
@@ -46,8 +46,8 @@ def login_delay(logindelay: str):
         with open(system_login, "w") as file:
             file.writelines(lines)
             print(f":: [+] Writing {system_login}")
-            logging.info(f"Writing {system_login}")
+            logging.info(system_login)
     except Exception as err:
             print(f":: [-] Writing {system_login}")
-            logging.error(f"Writing {system_login}\n{err}")
+            logging.error(f"{system_login}\n{err}")
             sys.exit(1)
