@@ -37,10 +37,6 @@ def set_locale():
 def set_hosts():
     host.hostname(hostname)
     host.hosts(hostname)
-
-def set_dns():
-    dns.networkmanager()
-    dns.resolvconf()
 # }}}
 
 # {{{ Users
@@ -143,7 +139,6 @@ if __name__ == "__main__":
     # {{{ """ Run script """
     set_locale()
     set_hosts()
-    set_dns()
     set_users()
     set_security()
     set_initramfs()
