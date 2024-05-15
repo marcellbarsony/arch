@@ -10,7 +10,6 @@ import configparser
 import logging
 
 from chroot import snapper
-from chroot import dns
 from chroot import dmi
 from chroot import finalize
 from chroot import grub
