@@ -40,7 +40,7 @@ def initramfs():
         sys.exit(1)
 
     lines[6] = f"MODULES=(btrfs {kms})\n"
-    lines[54] = "HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt btrfs filesystems fsck)\n"
+    lines[53] = "HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt btrfs filesystems fsck)\n"
     try:
         with open(conf, "w") as file:
             file.writelines(lines)

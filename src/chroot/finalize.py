@@ -1,7 +1,9 @@
+import logging
 import os
 import grp
 import pwd
 import shutil
+import subprocess
 
 
 def change_ownership(user: str):
@@ -33,3 +35,12 @@ def remove_xdg_dirs(user: str):
         path = os.path.join(home_dir, dir)
         if os.path.exists(path):
             shutil.rmtree(path)
+
+def clone(user: str):
+    dir = f"/home/{user}/arch-post"
+    cmd = f"git clone https://github.com/marcellbarsony/arch-post {dir}"
+    try:
+        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        logging.info(cmd)
+    except subprocess.CalledProcessError as err:
+        logging.error(f"{cmd}\n{err}")

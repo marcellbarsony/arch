@@ -112,6 +112,7 @@ def x11_keys():
 def set_finalize():
     finalize.change_ownership(user)
     finalize.remove_xdg_dirs(user)
+    finalize.clone(user)
 # }}}
 
 

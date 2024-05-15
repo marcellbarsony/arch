@@ -11,10 +11,12 @@ https://wiki.archlinux.org/title/Domain_name_resolution
 def networkmanager():
     """https://wiki.archlinux.org/title/NetworkManager#Unmanaged_/etc/resolv.conf"""
     conf = "/etc/NetworkManager/conf.d/dns.conf"
-    content = textwrap.dedent( """\
+    content = textwrap.dedent(
+        """\
         [main]
         dns=none
-    """ )
+        """
+    )
     try:
         with open(conf, "w") as f:
             f.write(content)
