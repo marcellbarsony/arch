@@ -28,7 +28,8 @@ def networkmanager():
 def resolvconf():
     """https://wiki.archlinux.org/title/Domain_name_resolution#Overwriting_of_/etc/resolv.conf"""
     conf = "/etc/resolv.conf"
-    content = textwrap.dedent( """\
+    content = textwrap.dedent(
+        f"""\
         # Cloudflare
         nameserver 1.1.1.1
         nameserver 1.0.0.1
@@ -40,7 +41,8 @@ def resolvconf():
         # nameserver 149.112.112.112
         # nameserver 2620:fe::fe
         # nameserver 2620:fe::9
-    """ )
+        """
+    )
     try:
         with open(conf, "w") as file:
             file.write(content)
