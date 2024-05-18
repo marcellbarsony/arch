@@ -12,8 +12,8 @@ def config():
             lines = file.readlines()
             logging.info(config)
     except Exception as err:
+        print(f":: [-] Read {config} :: ", err)
         logging.error(f"{config}\n{err}")
-        print(f"[-] Read {config}", err)
         sys.exit(1)
 
     lines.insert(36, f"ParallelDownloads=5\n")
@@ -23,28 +23,28 @@ def config():
     try:
         with open(config, "w") as file:
             file.writelines(lines)
+        print(":: [+] PACMAN :: Write ", config)
         logging.info(config)
-        print(f":: [+] PACMAN: Write {config}")
     except Exception as err:
+        print(":: [-] PACMAN :: Write ", err)
         logging.error(f"{config}\n{err}")
-        print(f":: [-] PACMAN: Write {config}", err)
         sys.exit(1)
 
 def mirrorlist():
     cmd = f"reflector \
-    --latest 25 \
-    --protocol https \
-    --connection-timeout 5 \
-    --sort rate \
-    --save /etc/pacman.d/mirrorlist"
+        --latest 25 \
+        --protocol https \
+        --connection-timeout 5 \
+        --sort rate \
+        --save /etc/pacman.d/mirrorlist"
     try:
-        print(":: [i] PACMAN: Updating mirrorlist...")
+        print(":: [i] PACMAN :: Updating mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        print(":: [+] PACMAN :: Mirrorlist")
         logging.info(cmd)
-        print(":: [+] PACMAN: Mirrorlist")
     except subprocess.CalledProcessError as err:
+        print(":: [-] PACMAN :: Mirrorlist :: ", err)
         logging.error(f"{cmd}\n{err}")
-        print(f":: [-] PACMAN: Mirrorlist {err}")
         sys.exit(1)
 
 
@@ -65,9 +65,9 @@ def keyring_init():
     for cmd in cmds:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print(":: [+] PACMAN :: ", cmd)
             logging.info(cmd)
-            print(":: [+] PACMAN: Arch keyring update")
         except subprocess.CalledProcessError as err:
+            print(":: [-] PACMAN :: Keyring :: ", err)
             logging.error(f"{cmd}\n{err}")
-            print(":: [-] PACMAN: Arch keyring update", err)
             pass

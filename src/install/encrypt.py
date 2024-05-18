@@ -22,20 +22,20 @@ def encrypt(device_root: str, cryptpassword: str):
         {device_root}"
     try:
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
+        print(":: [+] CRYPTSETUP :: Encrypt :: ", device_root)
         logging.info(cmd)
-        print(f":: [+] CRYPTSETUP: {device_root}")
     except subprocess.CalledProcessError as err:
+        print(":: [-] CRYPTSETUP :: Encrypt :: ", err)
         logging.error(f"{cmd}\n{err}")
-        print(f":: [-] CRYPTSETUP: {device_root}", err)
         sys.exit(1)
 
 def open(device_root: str, cryptpassword: str):
     cmd = f"cryptsetup open --type luks2 {device_root} cryptroot"
     try:
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
+        print(":: [+] CRYPTSETUP :: Open :: ", device_root)
         logging.info(cmd)
-        print(f":: [+] CRYPTSETUP: Open {device_root}")
     except subprocess.CalledProcessError as err:
+        print(":: [-] CRYPTSETUP :: Open :: ", err)
         logging.error(f"{cmd}\n{err}")
-        print(f":: [-] CRYPTSETUP: Open {device_root}", err)
         sys.exit(1)

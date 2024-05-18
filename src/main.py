@@ -11,6 +11,7 @@ import logging
 
 from chroot import snapper
 from chroot import dmi
+from chroot import dns
 from chroot import finalize
 from chroot import grub
 from chroot import host
@@ -19,6 +20,7 @@ from chroot import keymaps
 from chroot import locale
 from chroot import mirrorlist
 from chroot import pacman
+from chroot import post
 from chroot import ssh
 from chroot import security
 from chroot import systemd
@@ -32,7 +34,7 @@ def set_locale():
     locale.gen()
 # }}}
 
-# {{{ Network
+# {{{ Hosts
 def set_hosts():
     host.hostname(hostname)
     host.hosts(hostname)
@@ -56,8 +58,9 @@ def set_security():
 
 # {{{ Initramfs (mkinitcpio)
 def set_initramfs():
+    kms = initramfs.kernel_mode_setting()
+    initramfs.initramfs(kms)
     initramfs.mkinitcpio()
-    initramfs.initramfs()
 # }}}
 
 # {{{ GRUB
@@ -79,10 +82,16 @@ def set_systemd():
     systemd.pc_speaker()
 # }}}
 
+# {{{ DNS
+def set_dns():
+    dns.networkmanager()
+    dns.resolvconf()
+# }}}
+
 # {{{ Btrfs
 def set_btrfs():
     snapper.config_init()
-    # snapper.config_set()
+    snapper.config_set()
     snapper.systemd_services()
 # }}}
 
@@ -103,11 +112,16 @@ def x11_keys():
     keymaps.x11_keymaps()
 # }}}
 
+# {{{ Post script
+def arch_post():
+    post.clone(user)
+    post.chown(user)
+# }}}
+
 # {{{ Finalize
 def set_finalize():
     finalize.change_ownership(user)
     finalize.remove_xdg_dirs(user)
-    finalize.clone(user)
 # }}}
 
 
@@ -143,6 +157,7 @@ if __name__ == "__main__":
     set_initramfs()
     set_bootloader()
     set_systemd()
+    set_dns()
     set_btrfs()
     set_ssh()
     set_pacman()

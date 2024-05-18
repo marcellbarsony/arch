@@ -23,10 +23,10 @@ def update():
         --sort rate \
         --save /etc/pacman.d/mirrorlist"
     try:
-        print(":: [i] REFLECTOR: Updating Pacman mirrorlist...")
+        print(":: [i] REFLECTOR :: Updating Pacman mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] REFLECTOR: Mirrorlist update")
+        print(":: [+] REFLECTOR :: Mirrorlist update")
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] REFLECTOR: Mirorlist update", err)
+        print(":: [-] REFLECTOR :: Mirorlist update :: ", err)
         logging.error(f"{cmd}\n{err}")

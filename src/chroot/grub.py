@@ -17,13 +17,13 @@ def get_uuid(device_root: str):
                 return uuid
 
 def setup(uuid):
-    grub_cfg = "/etc/default/grub"
+    file = "/etc/default/grub"
     try:
-        with open(grub_cfg, "r") as file:
-            lines = file.readlines()
+        with open(file, "r") as f:
+            lines = f.readlines()
     except Exception as err:
-        print(f":: [-] Read {grub_cfg}", err)
-        logging.error(f"{grub_cfg}\n{err}")
+        print(":: [-] GRUB :: ", err)
+        logging.error(f"{file}\n{err}")
         sys.exit(1)
 
     # Timeout
@@ -37,13 +37,13 @@ def setup(uuid):
     lines[41] = f'GRUB_COLOR_NORMAL="white/black"\n'
     lines[42] = f'GRUB_COLOR_HIGHLIGHT="white/black"\n'
     try:
-        with open(grub_cfg, "w") as file:
-            file.writelines(lines)
-        print(f":: [+] Write {grub_cfg}")
-        logging.info(grub_cfg)
+        with open(file, "w") as f:
+            f.writelines(lines)
+        print(":: [+] GRUB :: Write ", file)
+        logging.info(file)
     except Exception as err:
-        print(f":: [-] Write {grub_cfg}", err)
-        logging.error(f"{grub_cfg}\n{err}")
+        print(":: [-] GRUB :: Write ", err)
+        logging.error(f"{file}\n{err}")
         sys.exit(1)
 
 def install(secureboot: str, efi_directory: str):
@@ -51,24 +51,24 @@ def install(secureboot: str, efi_directory: str):
     # cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory} --modules="tpm" --disable-shim-lock'
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] GRUB install")
+        print(":: [+] GRUB :: Install")
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] GRUB install", err)
+        print(":: [-] GRUB :: Install ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
 def password(grub_password: str, user: str):
     pbkdf2_hash = ""
     cmd = f"grub-mkpasswd-pbkdf2"
-    sin = f"{grub_password}\n{grub_password}"
+    stdin = f"{grub_password}\n{grub_password}"
     try:
-        out = subprocess.run(cmd, shell=True, check=True, input=sin.encode(), stdout=subprocess.PIPE)
+        out = subprocess.run(cmd, shell=True, check=True, input=stdin.encode(), stdout=subprocess.PIPE)
         pbkdf2_hash = out.stdout.decode("utf-8")[67:].strip()
-        print(":: [+] GRUB password")
+        print(":: [+] GRUB :: Password")
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] GRUB password", err)
+        print(":: [-] GRUB :: Password :: ", err)
         logging.error(f"{cmd}\n{err}")
 
     file = "/etc/grub.d/00_header"
@@ -81,10 +81,10 @@ def mkconfig():
     cmd = f"grub-mkconfig -o /boot/grub/grub.cfg"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] GRUB config")
+        print(":: [+] GRUB :: ", cmd)
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] GRUB config", err)
+        print(":: [-] GRUB :: ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 

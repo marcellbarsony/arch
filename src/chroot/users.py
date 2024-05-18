@@ -12,10 +12,10 @@ def root_password(root_pw: str):
     cmd = f"chpasswd --crypt-method SHA512"
     try:
         subprocess.run(cmd, shell=True, check=True, input=f"root:{root_pw}".encode())
-        print(":: [+] ROOT: chpasswd")
+        print(":: [+] ROOT :: ", cmd)
         logging.info(f"root:{root_pw} | {cmd}")
     except subprocess.CalledProcessError as err:
-        print(":: [-] ROOT: chpasswd", err)
+        print(":: [-] ROOT :: ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
@@ -29,10 +29,10 @@ def user_add(user: str):
     cmd = f"useradd -m {user}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(f":: [+] USER: useradd [{user}]")
+        print(":: [+] USER :: ", cmd)
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(f":: [-] USER: useradd [{user}]", err)
+        print(":: [-] USER :: ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
@@ -40,10 +40,10 @@ def user_password(user: str, user_pw: str):
     cmd = "chpasswd --crypt-method SHA512"
     try:
         subprocess.run(cmd, shell=True, check=True, input=f"{user}:{user_pw}".encode())
-        print(f":: [+] USER: chpasswd [{user}]")
+        print(":: [+] USER :: ", cmd)
         logging.info(f"{user}:{user_pw} | {cmd}")
     except subprocess.CalledProcessError as err:
-        print(f":: [-] USER: chpasswd [{user}]", err)
+        print(":: [-] USER :: ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
@@ -54,9 +54,9 @@ def user_group(user: str, dmi: str):
     cmd = f"usermod -aG {groups} {user}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] USER: usermod")
+        print(":: [+] USER :: ", cmd)
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] USER: usermod", err)
+        print(":: [-] USER :: ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)

@@ -35,7 +35,7 @@ def run_check():
 
 # {{{ Init
 def init():
-    initialize.time_zone()
+    initialize.time_zone(zone)
     initialize.loadkeys(keys)
     initialize.keymaps(keymap)
 # }}}
@@ -100,8 +100,8 @@ def pacstrap():
 # {{{ Chroot
 def arch_chroot():
     cfg_src = f"{current_dir}/config.ini"
-    scr_src = f"{current_dir}/src/"
     cfg_dst = "/mnt/config.ini"
+    scr_src = f"{current_dir}/src/"
     scr_dst = "/mnt/temporary"
     chroot.copy_sources(scr_src, scr_dst, cfg_src, cfg_dst)
     chroot.chroot()
@@ -140,6 +140,7 @@ if __name__ == "__main__":
     keymap = config.get("keyset", "keymap")
     network_ip = config.get("network", "ip")
     network_port = config.get("network", "port")
+    zone = config.get("timezone", "zone")
 
     user = getpass.getuser()
     current_dir = os.getcwd()
