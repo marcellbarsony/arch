@@ -5,6 +5,22 @@ import sys
 
 """Docstring for Encryption"""
 
+
+def modprobe():
+    cmds = [
+        "modprobe dm-cpryt"
+        "modprobe dm-mod"
+    ]
+    for cmd in cmds:
+        try:
+            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            print(":: [+] CRYPTSETUP :: ", cmd)
+            logging.info(cmd)
+        except subprocess.CalledProcessError as err:
+            print(":: [-] CRYPTSETUP :: ", err)
+            logging.error(f"{cmd}\n{err}")
+            pass
+
 def encrypt(device_root: str, cryptpassword: str):
     """
     Device encryption

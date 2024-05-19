@@ -20,10 +20,10 @@ def format(device_efi: str):
     cmd = f"mkfs.fat -F32 {device_efi}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(f":: [+] EFI :: Format {device_efi} [F32]")
+        print(":: [+] EFI :: ", cmd)
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(f":: [-] EFI :: Format {device_efi} [F32] :: ", err)
+        print(f":: [-] EFI :: {cmd} :: ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
@@ -34,6 +34,6 @@ def mount(device_efi: str, efidir: str):
         print(f":: [+] EFI :: Mount {device_efi} >> {efidir}")
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(f":: [-] EFI :: Mount {device_efi} >> {efidir}", err)
+        print(f":: [-] EFI :: Mount {device_efi} >> {efidir} ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)

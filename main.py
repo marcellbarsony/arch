@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-Author  : Marcell Barsony
-Date    : 2023 January
-Desc    : Arch Linux base installer
-"""
 
 
 # {{{ Imports
@@ -52,6 +47,7 @@ def file_system():
 # {{{ Encryption
 def encryption():
     _, _, device_root = dmi.disk()
+    encrypt.modprobe()
     encrypt.encrypt(device_root, cryptpassword)
     encrypt.open(device_root, cryptpassword)
 # }}}
@@ -92,9 +88,12 @@ def packages():
 # {{{ Pacstrap
 def pacstrap():
     install.bug()
-    pkgs = install.get_packages()
-    pkgs = install.get_packages_dmi(pkgs, dmi.check())
+
+    pkgs = install.get_pkgs()
     install.install(pkgs)
+
+    pkgs_dmi = install.get_pkgs_dmi(dmi.check())
+    install.install(pkgs_dmi)
 # }}}
 
 # {{{ Chroot

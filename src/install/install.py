@@ -21,7 +21,7 @@ def bug():
         logging.error(f"{cmd}\n{err}")
         pass
 
-def get_packages():
+def get_pkgs():
     packages = ""
     with open("packages.ini", "r") as file:
         for line in file:
@@ -30,15 +30,17 @@ def get_packages():
     logging.info(packages)
     return packages
 
-def get_packages_dmi(packages: str, dmi: str):
+def get_pkgs_dmi(dmi: str):
+    packages = ""
     if dmi == "vbox":
-        packages += "virtualbox-guest-utils"
+        packages = "virtualbox-guest-utils"
     if dmi == "vmware":
-        packages += "open-vm-tools"
+        packages = "open-vm-tools"
     if dmi == "intel":
-        packages += "intel-ucode xf86-video-intel"
+        packages = "intel-ucode xf86-video-intel"
     if dmi == "AMD":
-        packages += "amd-ucode xf86-video-amdgpu"
+        packages = "amd-ucode xf86-video-amdgpu"
+    logging.info(packages)
     return packages
 
 def install(packages: str):

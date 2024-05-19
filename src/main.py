@@ -1,8 +1,4 @@
 #!/usr/bin/env python3
-"""
-Author  : Marcell Barsony <marcellbarsony@protonmail.com>
-Date    : March 2023
-"""
 
 
 # {{{ Imports
@@ -26,6 +22,7 @@ from chroot import security
 from chroot import systemd
 from chroot import users
 # }}}
+
 
 # {{{ Locale
 def set_locale():

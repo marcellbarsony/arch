@@ -28,7 +28,7 @@ def create_efi(device: str, efisize: str):
         print(":: [+] FILESYSTEM :: Create EFI")
         logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] FILESYSTEM :: Create EFI ::", err)
+        print(":: [-] FILESYSTEM :: Create EFI :: ", err)
         logging.error(f"{cmd}\n{err}")
         sys.exit(1)
 
@@ -47,9 +47,9 @@ def partprobe(device: str):
     cmd = f"partprobe {device}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        logging.info(cmd)
         print(":: [+] FILESYSTEM :: Partprobe")
+        logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
         print(":: [-] FILESYSTEM :: Partprobe :: ", err)
+        logging.error(f"{cmd}\n{err}")
         sys.exit(1)
