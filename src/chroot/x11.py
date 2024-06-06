@@ -2,7 +2,7 @@ import logging
 import textwrap
 
 
-def x11_keymaps():
+def keymaps():
     """
     Docstring for X11 Keymaps
     https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration

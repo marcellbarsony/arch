@@ -5,8 +5,6 @@ import subprocess
 import sys
 
 
-"""Change root into new system"""
-
 def copy_sources(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
     try:
         shutil.copytree(scr_src, scr_dst)

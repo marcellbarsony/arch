@@ -12,7 +12,6 @@ from chroot import finalize
 from chroot import grub
 from chroot import host
 from chroot import initramfs
-from chroot import keymaps
 from chroot import locale
 from chroot import mirrorlist
 from chroot import pacman
@@ -21,6 +20,7 @@ from chroot import ssh
 from chroot import security
 from chroot import systemd
 from chroot import users
+from chroot import x11
 # }}}
 
 
@@ -104,9 +104,9 @@ def set_pacman():
     pacman.config()
 # }}}
 
-# {{{ X11: Keymaps
-def x11_keys():
-    keymaps.x11_keymaps()
+# {{{ X11
+def xorg():
+    x11.keymaps()
 # }}}
 
 # {{{ Post script
@@ -158,6 +158,6 @@ if __name__ == "__main__":
     set_btrfs()
     set_ssh()
     set_pacman()
-    x11_keys()
+    xorg()
     set_finalize()
     # }}}
