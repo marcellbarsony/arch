@@ -38,7 +38,7 @@ def init():
 # {{{ Filesystem
 def file_system():
     device, _, _ = dmi.disk()
-    disk.wipe(device)
+    disk.ipe(device)
     disk.create_efi(device, efisize)
     disk.create_system(device)
     disk.partprobe(device)

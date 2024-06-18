@@ -1,7 +1,6 @@
 import logging
 import shutil
 import subprocess
-import sys
 
 
 """
@@ -23,7 +22,7 @@ def update():
         --sort rate \
         --save /etc/pacman.d/mirrorlist"
     try:
-        print(":: [i] REFLECTOR :: Updating Pacman mirrorlist...")
+        print(":: [i] REFLECTOR :: Updating mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         print(":: [+] REFLECTOR :: Mirrorlist update")
         logging.info(cmd)
