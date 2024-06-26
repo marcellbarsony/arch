@@ -3,11 +3,12 @@
 ## The Chad Stack
 
 - UEFI
-- GRUB2 (password locked)
+- GRUB2
 - dm-crypt (luks2)
 - Linux-hardened
-- Btrfs (w/Snapper)
+- Btrfs + Snapper
 - SSH service
+- Wayland
 
 ## Installation
 
