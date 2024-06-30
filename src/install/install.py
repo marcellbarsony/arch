@@ -14,12 +14,13 @@ def bug():
     cmd = f"systemctl --no-pager status -n0 pacman-init.service"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] PACSTRAP :: pacman-init.service")
-        logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] PACSTRAP :: pacman-init.service :: ", err)
-        logging.error(f"{cmd}\n{err}")
+        logging.warn(f"{cmd}\n{err}")
+        print(":: [W] PACSTRAP :: pacman-init.service :: ", err)
         pass
+    else:
+        logging.info(cmd)
+        print(":: [+] PACSTRAP :: pacman-init.service")
 
 def get_pkgs():
     packages = ""
@@ -48,9 +49,10 @@ def install(packages: str):
     cmd = f"pacstrap -K /mnt {packages}"
     try:
         subprocess.run(cmd.rstrip(), shell=True, check=True)
-        logging.info(cmd)
-        print(":: [+] PACSTRAP :: Install")
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] PACSTRAP :: Install :: ", err)
         sys.exit(1)
+    else:
+        logging.info(cmd)
+        print(":: [+] PACSTRAP :: Install")

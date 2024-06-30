@@ -11,11 +11,12 @@ def config_init():
     cmd = "snapper --no-dbus -c home create-config /home"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] BTRFS :: ", cmd)
-        logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] BTRFS :: ", err)
         logging.error(f"{cmd}\n{err}")
+        print(":: [-] BTRFS :: ", err)
+    else:
+        logging.info(cmd)
+        print(":: [+] BTRFS :: ", cmd)
 
 def config_set():
     cfgs = [
@@ -30,11 +31,12 @@ def config_set():
         cmd = f"snapper -c home set-config {cfg}"
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(":: [+] BTRFS :: ", cfg)
-            logging.info(cmd)
         except subprocess.CalledProcessError as err:
-            print(":: [-] BTRFS :: ", err)
             logging.error(f"{cmd}\n{err}")
+            print(":: [-] BTRFS :: ", err)
+        else:
+            logging.info(cmd)
+            print(":: [+] BTRFS :: ", cfg)
 
 def systemd_services():
     cmds = [
@@ -44,8 +46,8 @@ def systemd_services():
     for cmd in cmds:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(":: [+] BTRFS :: ", cmd)
             logging.info(cmd)
+            print(":: [+] BTRFS :: ", cmd)
         except subprocess.CalledProcessError as err:
-            print(":: [-] BTRFS :: ", err)
             logging.error(f"{cmd}\n{err}")
+            print(":: [-] BTRFS :: ", err)

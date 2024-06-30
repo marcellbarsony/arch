@@ -15,6 +15,7 @@ def backup():
     logging.info(f"Copy {src} >> {dst}")
 
 def update():
+    print(":: [i] REFLECTOR :: Updating mirrorlist...")
     cmd = f"sudo reflector \
         --latest 25 \
         --protocol https \
@@ -22,10 +23,10 @@ def update():
         --sort rate \
         --save /etc/pacman.d/mirrorlist"
     try:
-        print(":: [i] REFLECTOR :: Updating mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] REFLECTOR :: Mirrorlist update")
-        logging.info(cmd)
     except subprocess.CalledProcessError as err:
         print(":: [-] REFLECTOR :: Mirorlist update :: ", err)
         logging.error(f"{cmd}\n{err}")
+    else:
+        logging.info(cmd)
+        print(":: [+] REFLECTOR :: Mirrorlist update")

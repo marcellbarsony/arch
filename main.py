@@ -9,7 +9,7 @@ import logging
 import os
 
 from src.install import check
-from src.install import initialize
+from src.install import init
 from src.install import dmi
 from src.install import disk
 from src.install import encrypt
@@ -29,16 +29,16 @@ def run_check():
 # }}}
 
 # {{{ Init
-def init():
-    initialize.time_zone(zone)
-    initialize.loadkeys(keys)
-    initialize.keymaps(keymap)
+def initialize():
+    init.time_zone(zone)
+    init.loadkeys(keys)
+    init.keymaps(keymap)
 # }}}
 
 # {{{ Filesystem
 def file_system():
     device, _, _ = dmi.disk()
-    disk.ipe(device)
+    disk.wipe(device)
     disk.create_efi(device, efisize)
     disk.create_system(device)
     disk.partprobe(device)
@@ -147,7 +147,7 @@ if __name__ == "__main__":
 
     # {{{ """ Run """
     run_check()
-    init()
+    initialize()
     file_system()
     encryption()
     init_btrfs()

@@ -15,17 +15,19 @@ def networkmanager():
         """\
         [main]
         dns=none
+        systemd-resolved=false
         """
     )
     try:
         with open(file, "w") as f:
             f.write(content)
-        print(":: [+] DNS :: ", file)
-        logging.info(file)
     except Exception as err:
-        print(":: [-] DNS :: ", err)
         logging.error(f"{file}\n{err}")
+        print(":: [-] DNS :: ", err)
         sys.exit(1)
+    else:
+        logging.info(file)
+        print(":: [+] DNS :: ", file)
 
 def resolvconf():
     file = "/etc/resolv.conf"
@@ -47,9 +49,10 @@ def resolvconf():
     try:
         with open(file, "w") as f:
             f.write(content)
-        print(":: [+] DNS :: ", file)
-        logging.info(file)
     except Exception as err:
-        print(":: [-] DNS :: ", err)
         logging.error(f"{file}\n{err}")
+        print(":: [-] DNS :: ", err)
         sys.exit(1)
+    else:
+        logging.info(file)
+        print(":: [+] DNS :: ", file)

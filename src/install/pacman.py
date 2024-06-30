@@ -10,11 +10,12 @@ def config():
     try:
         with open(config, "r") as file:
             lines = file.readlines()
-            logging.info(config)
     except Exception as err:
-        print(f":: [-] Read {config} :: ", err)
         logging.error(f"{config}\n{err}")
+        print(f":: [-] Read {config} :: ", err)
         sys.exit(1)
+    else:
+        logging.info(config)
 
     lines.insert(36, f"ParallelDownloads=5\n")
     lines[37] = f"ILoveCandy\n"
@@ -23,12 +24,13 @@ def config():
     try:
         with open(config, "w") as file:
             file.writelines(lines)
-        print(":: [+] PACMAN :: Write ", config)
-        logging.info(config)
     except Exception as err:
-        print(":: [-] PACMAN :: Write ", err)
         logging.error(f"{config}\n{err}")
+        print(":: [-] PACMAN :: Write ", err)
         sys.exit(1)
+    else:
+        logging.info(config)
+        print(":: [+] PACMAN :: Write ", config)
 
 def mirrorlist():
     cmd = f"reflector \
@@ -40,12 +42,13 @@ def mirrorlist():
     try:
         print(":: [i] PACMAN :: Updating mirrorlist...")
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-        print(":: [+] PACMAN :: Mirrorlist")
-        logging.info(cmd)
     except subprocess.CalledProcessError as err:
-        print(":: [-] PACMAN :: Mirrorlist :: ", err)
         logging.error(f"{cmd}\n{err}")
+        print(":: [-] PACMAN :: Mirrorlist :: ", err)
         sys.exit(1)
+    else:
+        logging.info(cmd)
+        print(":: [+] PACMAN :: Mirrorlist")
 
 
 """
@@ -65,9 +68,10 @@ def keyring_init():
     for cmd in cmds:
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            print(":: [+] PACMAN :: ", cmd)
-            logging.info(cmd)
         except subprocess.CalledProcessError as err:
-            print(":: [-] PACMAN :: Keyring :: ", err)
             logging.error(f"{cmd}\n{err}")
+            print(":: [-] PACMAN :: Keyring :: ", err)
             pass
+        else:
+            logging.info(cmd)
+            print(":: [+] PACMAN :: ", cmd)

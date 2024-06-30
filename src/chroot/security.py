@@ -23,12 +23,13 @@ def sudoers():
     try:
         with open(file, "w") as f:
             f.writelines(lines)
-        print(":: [+] SUDOERS :: ", file)
-        logging.info(file)
     except Exception as err:
-        print(":: [-] SUDOERS :: ", err)
         logging.error(f"{file}\n{err}")
+        print(":: [-] SUDOERS :: ", err)
         sys.exit(1)
+    else:
+        logging.info(file)
+        print(":: [+] SUDOERS :: ", file)
 
 # def login_delay(logindelay: str):
 #     """https://wiki.archlinux.org/title/security#Enforce_a_delay_after_a_failed_login_attempt"""
