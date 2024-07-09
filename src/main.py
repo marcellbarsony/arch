@@ -101,6 +101,7 @@ def set_ssh():
 def set_pacman():
     mirrorlist.backup()
     mirrorlist.update()
+    mirrorlist.systemd()
     pacman.config()
 # }}}
 

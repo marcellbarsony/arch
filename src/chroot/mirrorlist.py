@@ -1,6 +1,7 @@
 import logging
 import shutil
 import subprocess
+import textwrap
 
 
 """
@@ -30,3 +31,24 @@ def update():
     else:
         logging.info(cmd)
         print(":: [+] REFLECTOR :: Mirrorlist update")
+
+def systemd():
+    file = "/etc/xdg/reflector/reflector.conf"
+    content = textwrap.dedent( """\
+        # Reflector systemd service
+        # https://wiki.archlinux.org/title/Reflector#systemd_service
+        --save /etc/pacman.d/mirrorlist
+        --country Hungary,Germany
+        --protocol https
+        --sort rate
+        --latest 25
+    """ )
+    try:
+        with open(file, "w") as f:
+            f.write(content)
+    except Exception as err:
+        logging.error(f"{file}\n{err}")
+        print(":: [-] REFLECTOR :: ", err)
+    else:
+        logging.info(file)
+        print(":: [+] REFLECTOR :: ", file)

@@ -15,7 +15,7 @@ def copy_sources(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
         pass
     except Exception as err:
         logging.error(err)
-        print(":: [-] CHROOT :: Copy script :: ", err)
+        print(":: [-] CHROOT :: Copy sources :: ", err)
         sys.exit(1)
     else:
         logging.info(f"copytree: {scr_src} >> {scr_dst}")
@@ -37,7 +37,13 @@ def chroot():
         print(":: [+] Installation successful")
 
 def clear(scr_dst: str, cfg_dst: str):
-    shutil.rmtree(scr_dst)
-    logging.info(f"rmtree {scr_dst}")
-    os.remove(cfg_dst)
-    logging.info(f"remove {cfg_dst}")
+    try:
+        shutil.rmtree(scr_dst)
+        os.remove(cfg_dst)
+    except Exception as err:
+        logging.error(err)
+        print(":: [-] CLEAR-UP :: Copy sources :: ", err)
+        sys.exit(1)
+    else:
+        logging.info(f"rmtree {scr_dst}")
+        logging.info(f"remove {cfg_dst}")
