@@ -34,7 +34,7 @@ def mount(device_efi: str, efidir: str):
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(f":: [-] EFI :: Mount {device_efi} >> {efidir} ", err)
+        print(f":: [-] EFI :: Mount {device_efi} >> {efidir} :: ", err)
         sys.exit(1)
     else:
         logging.info(cmd)

@@ -91,7 +91,7 @@ def password(grub_password: str, user: str):
     logging.info(f"{file}\n{content}")
 
 def mkconfig():
-    cmd = f"grub-mkconfig -o /boot/grub/grub.cfg"
+    cmd = "grub-mkconfig -o /boot/grub/grub.cfg"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:

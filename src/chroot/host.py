@@ -35,7 +35,7 @@ def hosts(hostname: str):
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(f":: [-] HOST :: ", err)
+        print(":: [-] HOST :: ", err)
         sys.exit(1)
     else:
         logging.info(file)

@@ -15,7 +15,7 @@ def locale():
             lines = f.readlines()
     except Exception as err:
         logging.error(f"Reading {file}\n{err}")
-        print(f":: [-] LOCALE :: Reading {file}", err)
+        print(f":: [-] LOCALE :: Reading {file} :: ", err)
         sys.exit(1)
 
     lines[170] = "en_US.UTF-8 UTF-8\n"
