@@ -7,13 +7,13 @@ import sys
 def boot_mode():
     os.system("clear")
     path = "/sys/firmware/efi/efivars/"
-    if os.path.exists(path):
-        logging.info("UEFI")
-        print(":: [+] CHECK :: Boot mode [UEFI]")
-    else:
+    if not os.path.exists(path):
         logging.error("BIOS")
         print(":: [-] CHECK :: Boot mode [BIOS]")
         sys.exit(1)
+    else:
+        logging.info("UEFI")
+        print(":: [+] CHECK :: Boot mode [UEFI]")
 
 def network(ip: str, port: str):
     try:

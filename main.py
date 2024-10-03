@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-# {{{ Imports
+# Imports {{{
 import argparse
 import configparser
 import getpass
@@ -21,21 +21,20 @@ from src.install import install
 from src.install import chroot
 # }}}
 
-
-# {{{ Check
+# Check {{{
 def run_check():
     check.boot_mode()
     check.network(network_ip, network_port)
 # }}}
 
-# {{{ Init
+# Init {{{
 def initialize():
     init.time_zone(zone)
     init.loadkeys(keys)
     init.keymaps(keymap)
 # }}}
 
-# {{{ Filesystem
+# Filesystem {{{
 def file_system():
     device, _, _ = dmi.disk()
     disk.wipe(device)
@@ -44,7 +43,7 @@ def file_system():
     disk.partprobe(device)
 # }}}
 
-# {{{ Encryption
+# Encryption {{{
 def encryption():
     _, _, device_root = dmi.disk()
     encrypt.modprobe()
@@ -52,7 +51,7 @@ def encryption():
     encrypt.open(device_root, cryptpassword)
 # }}}
 
-# {{{ BTRFS
+# BTRFS {{{
 def init_btrfs():
     subvolumes = ["home", "var", "snapshots"]
     btrfs.mkfs(rootdir)
@@ -64,7 +63,7 @@ def init_btrfs():
     btrfs.mount_subvolumes(subvolumes, rootdir)
 # }}}
 
-# {{{ EFI
+# EFI {{{
 def init_efi():
     _, device_efi, _ = dmi.disk()
     efi.mkdir(efidir)
@@ -72,20 +71,20 @@ def init_efi():
     efi.mount(device_efi, efidir)
 # }}}
 
-# {{{ Fstab
+# Fstab {{{
 def gen_fstab():
     fstab.mkdir()
     fstab.genfstab()
 # }}}
 
-# {{{ Pacman
+# Pacman {{{
 def packages():
     pacman.config()
     pacman.mirrorlist()
     pacman.keyring_init()
 # }}}
 
-# {{{ Pacstrap
+# Pacstrap {{{
 def pacstrap():
     install.bug()
 
@@ -96,7 +95,7 @@ def pacstrap():
     install.install(pkgs_dmi)
 # }}}
 
-# {{{ Chroot
+# Chroot {{{
 def arch_chroot():
     cfg_src = f"{current_dir}/config.ini"
     cfg_dst = "/mnt/config.ini"
@@ -110,7 +109,7 @@ def arch_chroot():
 
 if __name__ == "__main__":
 
-    # {{{ """ Initialize Argparse """
+    # Initialize Argparse {{{
     parser = argparse.ArgumentParser(
         prog="python3 setup.py",
         description="Arch base system",
@@ -119,14 +118,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # }}}
 
-    # {{{ """ Initialize Logging """
+    # Initialize Logging {{{
     logging.basicConfig(
         level=logging.INFO, filename="logs.log", filemode="w",
         format=":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
 
-    # {{{ """ Initialize Global variables """
+    # Initialize Global variables {{{
     config = configparser.ConfigParser()
     config.read("config.ini")
 
@@ -145,7 +144,7 @@ if __name__ == "__main__":
     current_dir = os.getcwd()
     # }}}
 
-    # {{{ """ Run """
+    # Run {{{
     run_check()
     initialize()
     file_system()

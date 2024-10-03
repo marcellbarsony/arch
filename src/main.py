@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-# {{{ Imports
+# Imports {{{
 import configparser
 import logging
 
@@ -23,21 +23,20 @@ from chroot import users
 from chroot import x11
 # }}}
 
-
-# {{{ Locale
+# Locale {{{
 def set_locale():
     locale.locale()
     locale.conf()
     locale.gen()
 # }}}
 
-# {{{ Hosts
+# Hosts {{{
 def set_hosts():
     host.hostname(hostname)
     host.hosts(hostname)
 # }}}
 
-# {{{ Users
+# Users {{{
 def set_users():
     users.root_password(root_pw)
 
@@ -47,20 +46,20 @@ def set_users():
     users.user_group(user, dmi_res)
 # }}}
 
-# {{{ Security
+# Security {{{
 def set_security():
     security.sudoers()
     # security.login_delay(logindelay)
 # }}}
 
-# {{{ Initramfs (mkinitcpio)
+# Initramfs (mkinitcpio) {{{
 def set_initramfs():
     kms = initramfs.kernel_mode_setting()
     initramfs.initramfs(kms)
     initramfs.mkinitcpio()
 # }}}
 
-# {{{ GRUB
+# GRUB {{{
 def set_bootloader():
     _, _, device_root = dmi.disk()
     uuid = grub.get_uuid(device_root)
@@ -70,7 +69,7 @@ def set_bootloader():
     grub.mkconfig()
 # }}}
 
-# {{{ Systemd
+# Systemd {{{
 def set_systemd():
     systemd.logind()
     dmi_res = dmi.check()
@@ -79,25 +78,25 @@ def set_systemd():
     systemd.pc_speaker()
 # }}}
 
-# {{{ DNS
+# DNS {{{
 def set_dns():
     dns.networkmanager()
     dns.resolvconf()
 # }}}
 
-# {{{ Btrfs
+# Btrfs {{{
 def set_btrfs():
     snapper.config_init()
     snapper.config_set()
     snapper.systemd_services()
 # }}}
 
-# {{{ SSH
+# SSH {{{
 def set_ssh():
     ssh.bashrc(user)
 # }}}
 
-# {{{ Pacman
+# Pacman {{{
 def set_pacman():
     mirrorlist.backup()
     mirrorlist.update()
@@ -105,18 +104,18 @@ def set_pacman():
     pacman.config()
 # }}}
 
-# {{{ X11
+# X11 {{{
 def xorg():
     x11.keymaps()
 # }}}
 
-# {{{ Post script
+# Post script {{{
 def arch_post():
     post.clone(user)
     post.chown(user)
 # }}}
 
-# {{{ Finalize
+# Finalize {{{
 def set_finalize():
     finalize.change_ownership(user)
     finalize.remove_xdg_dirs(user)
@@ -125,7 +124,7 @@ def set_finalize():
 
 if __name__ == "__main__":
 
-    # {{{ """ Initialize Global variables """
+    # Initialize Global variables {{{
     config = configparser.ConfigParser()
     config.read("/config.ini") # TODO: check dir location
 
@@ -140,14 +139,14 @@ if __name__ == "__main__":
     user_pw = config.get("auth", "user_pw")
     # }}}
 
-    # {{{ """ Initialize logging """
+    # Initialize logging {{{
     logging.basicConfig(
         level=logging.INFO, filename="logs.log", filemode="w",
         format=":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
 
-    # {{{ """ Run script """
+    # Run script {{{
     set_locale()
     set_hosts()
     set_users()

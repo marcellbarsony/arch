@@ -13,7 +13,7 @@ def config():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        print("[-] PACMAN: Read ", file, err)
+        print(":: [-] PACMAN :: Read :: ", err)
         logging.error(f"{file}\n{err}")
         sys.exit(1)
 
@@ -26,9 +26,9 @@ def config():
     try:
         with open(file, "w") as f:
             f.writelines(lines)
-        print(":: [+] PACMAN: ", file)
+        print(":: [+] PACMAN :: Write :: ", file)
         logging.info(file)
     except Exception as err:
-        print(":: [-] PACMAN: ", file, err)
+        print(":: [-] PACMAN :: Write :: ", err)
         logging.error(f"{file}\n{err}")
         sys.exit(1)

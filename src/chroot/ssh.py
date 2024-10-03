@@ -2,7 +2,10 @@ import logging
 import shutil
 
 
-"""SSH setup"""
+"""
+Docstring for SSH setup
+https://wiki.archlinux.org/title/OpenSSH
+"""
 
 def bashrc(user: str):
     src = "/temporary/ssh/.bashrc"

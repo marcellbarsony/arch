@@ -15,7 +15,7 @@ def bug():
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.warn(f"{cmd}\n{err}")
+        logging.warning(f"{cmd}\n{err}")
         print(":: [W] PACSTRAP :: pacman-init.service :: ", err)
         pass
     else:

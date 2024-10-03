@@ -76,14 +76,14 @@ def mount_root(rootdir: str):
 def mkdir(subvolumes):
     for subvolume in subvolumes:
         path = "/mnt/" + subvolume
-        if not os.path.exists(path):
-            os.makedirs(path)
-            logging.info(path)
-            print(":: [+] BTRFS :: mkdir :: ", path)
-        else:
+        if os.path.exists(path):
             logging.error(path)
             print(":: [-] BTRFS :: mkdir :: ", path)
             sys.exit(1)
+        else:
+            os.makedirs(path)
+            logging.info(path)
+            print(":: [+] BTRFS :: mkdir :: ", path)
 
 def mount_subvolumes(subvolumes, rootdir: str):
     for subvolume in subvolumes:

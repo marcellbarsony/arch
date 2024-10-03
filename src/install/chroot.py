@@ -11,7 +11,7 @@ def copy_sources(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
         shutil.copy(cfg_src, cfg_dst)
         os.chmod("/mnt/temporary/main.py", 0o755)
     except FileExistsError as err:
-        logging.warn("File already exists: ", err)
+        logging.warning("File already exists: ", err)
         pass
     except Exception as err:
         logging.error(err)
