@@ -111,17 +111,17 @@ if __name__ == "__main__":
 
     # Initialize Argparse {{{
     parser = argparse.ArgumentParser(
-        prog="python3 setup.py",
-        description="Arch base system",
-        epilog="TODO"
-        )
+        prog = "python3 setup.py",
+        description = "Arch base system",
+        epilog = "TODO"
+    )
     args = parser.parse_args()
     # }}}
 
     # Initialize Logging {{{
     logging.basicConfig(
-        level=logging.INFO, filename="logs.log", filemode="w",
-        format=":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
+        level = logging.INFO, filename="logs.log", filemode="w",
+        format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
 
