@@ -33,11 +33,17 @@ def resolvconf():
     file = "/etc/resolv.conf"
     content = textwrap.dedent(
         f"""\
+        # NextDNS
+        nameserver 45.90.28.25
+        nameserver 45.90.30.25
+        nameserver 2a07:a8c0::f2:ef5e
+        nameserver 2a07:a8c1::f2:ef5e
+
         # Cloudflare
-        nameserver 1.1.1.1
-        nameserver 1.0.0.1
-        nameserver 2606:4700:4700::1111
-        nameserver 2606:4700:4700::1001
+        # nameserver 1.1.1.1
+        # nameserver 1.0.0.1
+        # nameserver 2606:4700:4700::1111
+        # nameserver 2606:4700:4700::1001
 
         # Quad9
         # nameserver 9.9.9.9
