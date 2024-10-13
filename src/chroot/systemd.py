@@ -1,6 +1,8 @@
 import logging
+import re
 import subprocess
 import sys
+import textwrap
 
 
 """
@@ -10,13 +12,24 @@ https://wiki.archlinux.org/title/systemd
 
 def logind():
     file = "/etc/systemd/logind.conf"
+    pattern_1 = re.compile(r"^#HandleLidSwitch=ignore")
+    pattern_2 = re.compile(r"^#HandleLidSwitchExternalPower=ignore")
+    pattern_3 = re.compile(r"^#HandleLidSwitchDocked=ignore")
+
     with open(file, "r") as f:
         lines = f.readlines()
 
-    # ACPI events
-    lines[27] = "HandleLidSwitch=ignore\n"
-    lines[28] = "HandleLidSwitchExternalPower=ignore\n"
-    lines[29] = "HandleLidSwitchDocked=ignore\n"
+    updated_lines = []
+    for line in lines:
+        if pattern_1.match(line):
+            updated_lines.append("HandleLidSwitch=ignore\n")
+        elif pattern_2.match(line):
+            updated_lines.append("HandleLidSwitchExternalPower=ignore\n")
+        elif pattern_3.match(line):
+            updated_lines.append("HandleLidSwitchDocked=ignore\n")
+        else:
+            updated_lines.append(line)
+
     try:
         with open(file, "w") as f:
              f.writelines(lines)
@@ -62,6 +75,8 @@ def services(dmi: str):
 def watchdog():
     """https://man.archlinux.org/man/systemd-system.conf.5.en"""
     file = "/etc/systemd/system.conf"
+    pattern_1 = re.compile(r"^#RebootWatchdogSec=0")
+
     try:
         with open(file, "r") as f:
             lines = f.readlines()
@@ -70,7 +85,13 @@ def watchdog():
         logging.error(f"{file}\n{err}")
         sys.exit(1)
 
-    lines[36] = "RebootWatchdogSec=0\n"
+    updated_lines = []
+    for line in lines:
+        if pattern_1.match(line):
+            updated_lines.append("RebootWatchdogSec=0\n")
+        else:
+            updated_lines.append(line)
+
     try:
         with open(file, "w") as f:
             f.writelines(lines)
@@ -84,12 +105,15 @@ def watchdog():
 def pc_speaker():
     """https://wiki.archlinux.org/title/PC_speaker#Globally"""
     file = "/etc/modprobe.d/nobeep.conf"
-    conf = "blacklist pcspkr\nblacklist snd_pcsp"
+    content = textwrap.dedent( """\
+        blacklist pcspkr
+        blacklist snd_pcsp"
+    """ )
     try:
         with open(file, "w") as f:
-            f.write(conf)
-    except IOError as err:
-        logging.error(f"{conf}\n{err}")
+            f.write(content)
+    except Exception as err:
+        logging.error(f"{file}\n{err}")
         print(":: [-] SYSTEMD :: ", err)
     else:
         logging.info(file)

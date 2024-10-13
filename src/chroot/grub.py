@@ -37,6 +37,7 @@ def setup(uuid):
     # Colors
     lines[41] = f'GRUB_COLOR_NORMAL="white/black"\n'
     lines[42] = f'GRUB_COLOR_HIGHLIGHT="white/black"\n'
+
     try:
         with open(file, "w") as f:
             f.writelines(lines)

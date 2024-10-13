@@ -38,6 +38,7 @@ def initramfs(kms: str):
 
     lines[6] = f"MODULES=(btrfs {kms})\n"
     lines[54] = "HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block encrypt btrfs filesystems fsck)\n"
+
     try:
         with open(file, "w") as f:
             f.writelines(lines)
