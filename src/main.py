@@ -39,17 +39,15 @@ def set_hosts():
 # Users {{{
 def set_users():
     users.root_password(root_pw)
-
-    dmi_res = dmi.check()
     users.user_add(user)
     users.user_password(user, user_pw)
-    users.user_group(user, dmi_res)
+    users.user_group(user)
 # }}}
 
 # Security {{{
 def set_security():
     security.sudoers()
-    # security.login_delay(logindelay)
+    security.login_delay()
 # }}}
 
 # Initramfs (mkinitcpio) {{{
@@ -61,7 +59,6 @@ def set_initramfs():
 
 # GRUB {{{
 def set_bootloader():
-    _, _, device_root = dmi.disk()
     uuid = grub.get_uuid(device_root)
     grub.setup(uuid)
     grub.install(secureboot, efi_directory)
@@ -105,7 +102,7 @@ def set_pacman():
 # }}}
 
 # X11 {{{
-def xorg():
+def set_xorg():
     x11.keymaps()
 # }}}
 
@@ -132,14 +129,16 @@ if __name__ == "__main__":
     grub_password = config.get("auth", "grub")
     hostname = config.get("network", "hostname")
     keys = config.get("keyset", "keys")
-    logindelay = config.get("security", "logindelay")
     root_pw = config.get("auth", "root_pw")
     secureboot = config.get("grub", "secureboot")
     user = config.get("auth", "user")
     user_pw = config.get("auth", "user_pw")
+
+    # DMI table decoder
+    device, device_efi, device_root = dmi.disk()
     # }}}
 
-    # Initialize logging {{{
+    # Initialize Logging {{{
     logging.basicConfig(
         level = logging.INFO, filename="logs.log", filemode="w",
         format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
@@ -158,6 +157,6 @@ if __name__ == "__main__":
     set_btrfs()
     set_ssh()
     set_pacman()
-    xorg()
+    set_xorg()
     set_finalize()
     # }}}

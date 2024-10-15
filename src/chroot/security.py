@@ -50,24 +50,25 @@ def sudoers():
         logging.info(file)
         print(":: [+] SUDOERS :: ", file)
 
-# def login_delay(logindelay: str):
-#     """https://wiki.archlinux.org/title/security#Enforce_a_delay_after_a_failed_login_attempt"""
-#     system_login = "/etc/pam.d/system-login"
-#     try:
-#         with open(system_login, "r") as file:
-#             lines = file.readlines()
-#     except Exception as err:
-#             print(f":: [-] Read {system_login}", err)
-#             logging.error(f"Reading {system_login}\n{err}")
-#             sys.exit(1)
-#
-#     lines.insert(5, f"auth optional pam_faildelay.so delay={logindelay}")
-#     try:
-#         with open(system_login, "w") as file:
-#             file.writelines(lines)
-#             print(f":: [+] Writing {system_login}")
-#             logging.info(system_login)
-#     except Exception as err:
-#             print(f":: [-] Writing {system_login}")
-#             logging.error(f"{system_login}\n{err}")
-#             sys.exit(1)
+def login_delay():
+    """https://wiki.archlinux.org/title/security#Enforce_a_delay_after_a_failed_login_attempt"""
+    file = "/etc/pam.d/system-login"
+    try:
+        with open(file, "r") as f:
+            lines = f.readlines()
+    except Exception as err:
+        print(f":: [-] Read {file}", err)
+        logging.error(f"Reading {file}\n{err}")
+        sys.exit(1)
+
+    lines.insert(5, f"auth optional pam_faildelay.so delay=5000000")
+    try:
+        with open(file, "w") as f:
+            f.writelines(lines)
+    except Exception as err:
+        logging.error(f"{file}\n{err}")
+        print(f":: [-] Writing {file}")
+        sys.exit(1)
+    else:
+        logging.info(file)
+        print(f":: [+] Writing {file}")

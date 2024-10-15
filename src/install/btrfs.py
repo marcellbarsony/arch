@@ -73,7 +73,7 @@ def mount_root(rootdir: str):
         logging.info(cmd)
         print(":: [+] BTRFS :: Mount @/ >> /mnt")
 
-def mkdir(subvolumes):
+def mkdir(subvolumes: list):
     for subvolume in subvolumes:
         path = "/mnt/" + subvolume
         if os.path.exists(path):
@@ -85,7 +85,7 @@ def mkdir(subvolumes):
             logging.info(path)
             print(":: [+] BTRFS :: mkdir :: ", path)
 
-def mount_subvolumes(subvolumes, rootdir: str):
+def mount_subvolumes(subvolumes: list, rootdir: str):
     for subvolume in subvolumes:
         cmd = f"mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@{subvolume} {rootdir} /mnt/{subvolume}"
         try:

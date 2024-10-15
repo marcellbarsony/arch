@@ -13,7 +13,6 @@ def locale():
     file = "/etc/locale.gen"
     pattern_1 = re.compile(r"^#en_US\.UTF-8\sUTF-8")
     pattern_2 = re.compile(r"^#ja_JP\.UTF-8\sUTF-8")
-
     try:
         with open(file, "r") as f:
             lines = f.readlines()

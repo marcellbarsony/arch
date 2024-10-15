@@ -1,4 +1,5 @@
 import logging
+import re
 import subprocess
 import sys
 
@@ -17,9 +18,19 @@ def config():
     else:
         logging.info(config)
 
-    lines.insert(36, "ParallelDownloads=5\n")
-    lines[37] = "ILoveCandy\n"
-    lines[38] = "Color\n"
+    pattern = re.compile(r"^#\sMisc\soptions")
+
+    updated_lines = []
+    insert_lines = [
+        "ParallelDownloads=5\n",
+        "ILoveCandy\n",
+        "Color\n",
+    ]
+
+    for line in lines:
+        updated_lines.append(line)
+        if pattern.match(line):
+            updated_lines.extend(insert_lines)
 
     try:
         with open(config, "w") as file:
@@ -61,8 +72,6 @@ def keyring_init():
         "pacman -Sy",
         "pacman -Sy --noconfirm archlinux-keyring",
         "pacman-key --init",
-        # "pacman-key --refresh-keys",
-        # "gpg --refresh-keys",
         "pacman-key --populate"
     ]
     for cmd in cmds:

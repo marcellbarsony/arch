@@ -21,7 +21,6 @@ def mkdir():
         logging.info(dir)
         print(":: [+] FSTAB :: Mkdir :: ", dir)
 
-
 def genfstab():
     cmd = "genfstab -U /mnt >> /mnt/etc/fstab"
     try:

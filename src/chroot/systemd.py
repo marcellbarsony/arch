@@ -75,8 +75,6 @@ def services(dmi: str):
 def watchdog():
     """https://man.archlinux.org/man/systemd-system.conf.5.en"""
     file = "/etc/systemd/system.conf"
-    pattern_1 = re.compile(r"^#RebootWatchdogSec=0")
-
     try:
         with open(file, "r") as f:
             lines = f.readlines()
@@ -84,6 +82,8 @@ def watchdog():
         print(f":: [-] SYSTEMD :: Read {file} :: ", err)
         logging.error(f"{file}\n{err}")
         sys.exit(1)
+
+    pattern_1 = re.compile(r"^#RebootWatchdogSec=0")
 
     updated_lines = []
     for line in lines:

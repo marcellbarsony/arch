@@ -1,4 +1,5 @@
 import logging
+import re
 import sys
 
 
@@ -17,18 +18,35 @@ def config():
         logging.error(f"{file}\n{err}")
         sys.exit(1)
 
-    lines[32] = "Color\n"
-    lines[33] = "ILoveCandy\n"
-    lines[35] = "VerbosePkgLists\n"
-    lines[36] = "ParallelDownloads=5\n"
-    lines[89] = "[multilib]\n"
-    lines[90] = "Include = /etc/pacman.d/mirrorlist\n"
+    pattern_1 = re.compile(r"^#\sMisc\soptions")
+    # TODO: Test pattern_2
+    pattern_2 = re.compile(r"^#\[multilib\]\n#Include\s=s\\/etc\/pacman.d\/mirrorlist")
+
+    updated_lines = []
+    insert_lines = [
+        "Color\n",
+        "ILoveCandy\n",
+        "VerbosePkgLists\n",
+        "ParallelDownloads=5\n",
+    ]
+
+    for line in lines:
+        if pattern_1.match(line):
+            updated_lines.extend(insert_lines)
+
+        # TODO: Test pattern_2
+        if pattern_2.match(line):
+            updated_lines.append("Include = /etc/pacman.d/mirrorlist\n")
+        else:
+            updated_lines.append(line)
+
     try:
         with open(file, "w") as f:
             f.writelines(lines)
-        print(":: [+] PACMAN :: Write :: ", file)
-        logging.info(file)
     except Exception as err:
         print(":: [-] PACMAN :: Write :: ", err)
         logging.error(f"{file}\n{err}")
         sys.exit(1)
+    else:
+        print(":: [+] PACMAN :: Write :: ", file)
+        logging.info(file)

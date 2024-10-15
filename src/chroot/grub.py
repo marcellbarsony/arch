@@ -17,7 +17,7 @@ def get_uuid(device_root: str):
                 logging.info(uuid)
                 return uuid
 
-def setup(uuid):
+def setup(uuid: str):
     file = "/etc/default/grub"
     try:
         with open(file, "r") as f:

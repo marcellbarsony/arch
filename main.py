@@ -36,7 +36,6 @@ def initialize():
 
 # Filesystem {{{
 def file_system():
-    device, _, _ = dmi.disk()
     disk.wipe(device)
     disk.create_efi(device, efisize)
     disk.create_system(device)
@@ -45,7 +44,6 @@ def file_system():
 
 # Encryption {{{
 def encryption():
-    _, _, device_root = dmi.disk()
     encrypt.modprobe()
     encrypt.encrypt(device_root, cryptpassword)
     encrypt.open(device_root, cryptpassword)
@@ -53,7 +51,6 @@ def encryption():
 
 # BTRFS {{{
 def init_btrfs():
-    subvolumes = ["home", "var", "snapshots"]
     btrfs.mkfs(rootdir)
     btrfs.mountfs(rootdir)
     btrfs.mksubvols()
@@ -65,7 +62,6 @@ def init_btrfs():
 
 # EFI {{{
 def init_efi():
-    _, device_efi, _ = dmi.disk()
     efi.mkdir(efidir)
     efi.format(device_efi)
     efi.mount(device_efi, efidir)
@@ -91,15 +87,15 @@ def pacstrap():
     pkgs = install.get_pkgs()
     install.install(pkgs)
 
-    pkgs_dmi = install.get_pkgs_dmi(dmi.check())
+    pkgs_dmi = install.get_pkgs_dmi(dmidecode)
     install.install(pkgs_dmi)
 # }}}
 
 # Chroot {{{
 def arch_chroot():
-    cfg_src = f"{current_dir}/config.ini"
+    cfg_src = f"{cwd}/config.ini"
     cfg_dst = "/mnt/config.ini"
-    scr_src = f"{current_dir}/src/"
+    scr_src = f"{cwd}/src/"
     scr_dst = "/mnt/temporary"
     chroot.copy_sources(scr_src, scr_dst, cfg_src, cfg_dst)
     chroot.chroot()
@@ -125,7 +121,7 @@ if __name__ == "__main__":
     )
     # }}}
 
-    # Initialize Global variables {{{
+    # Initialize Config {{{
     config = configparser.ConfigParser()
     config.read("config.ini")
 
@@ -139,9 +135,18 @@ if __name__ == "__main__":
     network_ip = config.get("network", "ip")
     network_port = config.get("network", "port")
     zone = config.get("timezone", "zone")
+    # }}}
 
+    # Initialize Global variables {{{
     user = getpass.getuser()
-    current_dir = os.getcwd()
+    cwd = os.getcwd()
+
+    # DMI table decoder
+    device, device_efi, device_root = dmi.disk()
+    dmidecode = dmi.check()
+
+    # Btrfs subvolumes
+    subvolumes = ["home", "var", "snapshots"]
     # }}}
 
     # Run {{{
