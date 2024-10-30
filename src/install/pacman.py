@@ -13,7 +13,7 @@ def config():
             lines = file.readlines()
     except Exception as err:
         logging.error(f"{config}\n{err}")
-        print(f":: [-] :: Read {config} :: ", err)
+        print(f":: [-] :: Read {config} ::", err)
         sys.exit(1)
     else:
         logging.info(config)
@@ -37,11 +37,11 @@ def config():
             file.writelines(lines)
     except Exception as err:
         logging.error(f"{config}\n{err}")
-        print(":: [-] :: PACMAN :: Write ", err)
+        print(":: [-] :: PACMAN :: Write", err)
         sys.exit(1)
     else:
         logging.info(config)
-        print(":: [+] :: PACMAN :: Write ", config)
+        print(":: [+] :: PACMAN :: Write", config)
 
 def mirrorlist():
     cmd = "reflector \
@@ -55,7 +55,7 @@ def mirrorlist():
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: PACMAN :: Mirrorlist :: ", err)
+        print(":: [-] :: PACMAN :: Mirrorlist ::", err)
         sys.exit(1)
     else:
         logging.info(cmd)
@@ -79,8 +79,8 @@ def keyring_init():
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: PACMAN :: Keyring :: ", err)
+            print(":: [-] :: PACMAN :: Keyring ::", err)
             pass
         else:
             logging.info(cmd)
-            print(":: [+] :: PACMAN :: ", cmd)
+            print(":: [+] :: PACMAN ::", cmd)

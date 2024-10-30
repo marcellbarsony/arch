@@ -22,7 +22,7 @@ def network(ip: str, port: str):
         s.connect((ip, int(port)))
     except socket.error:
         logging.error("Disconnected")
-        print(":: [-] :: CHECK :: Network connection", socket.error)
+        print(":: [-] :: CHECK :: Network connection ::", socket.error)
         sys.exit(1)
     else:
         logging.info("Connected")

@@ -35,10 +35,10 @@ def logind():
              f.writelines(lines)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] :: SYSTEMD :: ", err)
+        print(":: [-] :: SYSTEMD ::", err)
     else:
         logging.info(file)
-        print(":: [+] :: SYSTEMD :: ", file)
+        print(":: [+] :: SYSTEMD ::", file)
 
 def services(dmi: str):
     cmds = [
@@ -55,10 +55,10 @@ def services(dmi: str):
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: SYSTEMD :: ", err)
+            print(":: [-] :: SYSTEMD ::", err)
         else:
             logging.info(cmd)
-            print(":: [+] :: SYSTEMD :: ", cmd)
+            print(":: [+] :: SYSTEMD ::", cmd)
 
     if dmi == "vbox":
         cmd = "systemctl enable vboxservice.service"
@@ -66,11 +66,11 @@ def services(dmi: str):
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: SYSTEMD :: ", err)
+            print(":: [-] :: SYSTEMD ::", err)
             sys.exit(1)
         else:
             logging.info(cmd)
-            print(":: [+] :: SYSTEMD :: ", cmd)
+            print(":: [+] :: SYSTEMD ::", cmd)
 
 def watchdog():
     """https://man.archlinux.org/man/systemd-system.conf.5.en"""
@@ -79,7 +79,7 @@ def watchdog():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        print(f":: [-] :: SYSTEMD :: Read {file} :: ", err)
+        print(f":: [-] :: SYSTEMD :: Read {file} ::", err)
         logging.error(f"{file}\n{err}")
         sys.exit(1)
 
@@ -97,10 +97,10 @@ def watchdog():
             f.writelines(lines)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] :: SYSTEMD :: ", err)
+        print(":: [-] :: SYSTEMD ::", err)
     else:
         logging.info(file)
-        print(":: [+] :: SYSTEMD :: ", file)
+        print(":: [+] :: SYSTEMD ::", file)
 
 def pc_speaker():
     """https://wiki.archlinux.org/title/PC_speaker#Globally"""
@@ -114,7 +114,7 @@ def pc_speaker():
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] :: SYSTEMD :: ", err)
+        print(":: [-] :: SYSTEMD ::", err)
     else:
         logging.info(file)
-        print(":: [+] :: SYSTEMD :: ", file)
+        print(":: [+] :: SYSTEMD ::", file)

@@ -26,7 +26,7 @@ def update():
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        print(":: [-] :: REFLECTOR :: Mirorlist update :: ", err)
+        print(":: [-] :: REFLECTOR :: Mirorlist update ::", err)
         logging.error(f"{cmd}\n{err}")
     else:
         logging.info(cmd)
@@ -48,7 +48,7 @@ def systemd():
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] :: REFLECTOR :: ", err)
+        print(":: [-] :: REFLECTOR ::", err)
     else:
         logging.info(file)
-        print(":: [+] :: REFLECTOR :: ", file)
+        print(":: [+] :: REFLECTOR ::", file)

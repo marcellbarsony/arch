@@ -16,11 +16,11 @@ def bug():
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.warning(f"{cmd}\n{err}")
-        print(":: [W] :: PACSTRAP :: pacman-init.service :: ", err)
+        print(":: [W] :: PACSTRAP :: pacman-init.service ::", err)
         pass
     else:
         logging.info(cmd)
-        print(":: [+] :: PACSTRAP :: pacman-init.service")
+        print(":: [+] :: PACSTRAP :: pacman-init.servic")
 
 def get_pkgs():
     packages = ""
@@ -51,7 +51,7 @@ def install(packages: str):
         subprocess.run(cmd.rstrip(), shell=True, check=True)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: PACSTRAP :: Install :: ", err)
+        print(":: [-] :: PACSTRAP :: Install ::", err)
         sys.exit(1)
     else:
         logging.info(cmd)

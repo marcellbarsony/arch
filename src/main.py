@@ -83,8 +83,8 @@ def set_dns():
 
 # Btrfs {{{
 def set_btrfs():
-    snapper.config_init()
-    snapper.config_set()
+    snapper.config_init(btrfs_cfg)
+    snapper.config_set(btrfs_cfg)
     snapper.systemd_services()
 # }}}
 
@@ -125,6 +125,7 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read("/config.ini") # TODO: check dir location
 
+    btrfs_cfg = config.get("btrfs", "btrfs_cfg")
     efi_directory = config.get("grub", "efi_directory")
     grub_password = config.get("auth", "grub")
     hostname = config.get("network", "hostname")

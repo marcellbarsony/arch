@@ -11,11 +11,11 @@ def copy_sources(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
         shutil.copy(cfg_src, cfg_dst)
         os.chmod("/mnt/temporary/main.py", 0o755)
     except FileExistsError as err:
-        logging.warning("File already exists: ", err)
+        logging.warning("File already exists:", err)
         pass
     except Exception as err:
         logging.error(err)
-        print(":: [-] :: CHROOT :: Copy sources :: ", err)
+        print(":: [-] :: CHROOT :: Copy sources ::", err)
         sys.exit(1)
     else:
         logging.info(f"copytree: {scr_src} >> {scr_dst}")
@@ -30,7 +30,7 @@ def chroot():
         subprocess.run(cmd, shell=True, check=True)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: Chroot :: ", err)
+        print(":: [-] :: Chroot ::", err)
         sys.exit(1)
     else:
         logging.info(cmd)
@@ -42,7 +42,7 @@ def clear(scr_dst: str, cfg_dst: str):
         os.remove(cfg_dst)
     except Exception as err:
         logging.error(err)
-        print(":: [-] :: CLEAR-UP :: Copy sources :: ", err)
+        print(":: [-] :: CLEAR-UP :: Copy sources ::", err)
         sys.exit(1)
     else:
         logging.info(f"rmtree {scr_dst}")
