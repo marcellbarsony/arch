@@ -25,7 +25,7 @@ def keymaps():
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] X11 :: ", err)
+        print(":: [-] :: X11 :: ", err)
     else:
         logging.info(file)
-        print(":: [+] X11 :: ", file)
+        print(":: [+] :: X11 :: ", file)

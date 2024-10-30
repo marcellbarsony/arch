@@ -24,7 +24,7 @@ def setup(uuid: str):
             lines = f.readlines()
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] GRUB :: ", err)
+        print(":: [-] :: GRUB :: ", err)
         sys.exit(1)
 
     # Timeout
@@ -43,14 +43,14 @@ def setup(uuid: str):
             f.writelines(lines)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] GRUB :: Write ", err)
+        print(":: [-] :: GRUB :: Write ", err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] GRUB :: Write ", file)
+        print(":: [+] :: GRUB :: Write ", file)
 
 def install(secureboot: str, efi_directory: str):
-    if secureboot:
+    if secureboot is True:
         cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"  --modules="tpm" --disable-shim-lock'
     else:
         cmd = f"grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"
@@ -58,11 +58,11 @@ def install(secureboot: str, efi_directory: str):
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] GRUB :: Install ", err)
+        print(":: [-] :: GRUB :: Install ", err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] GRUB :: Install")
+        print(":: [+] :: GRUB :: Install")
 
 def password(grub_password: str, user: str):
     pbkdf2_hash = ""
@@ -73,10 +73,10 @@ def password(grub_password: str, user: str):
         pbkdf2_hash = out.stdout.decode("utf-8")[67:].strip()
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] GRUB :: Password :: ", err)
+        print(":: [-] :: GRUB :: Password :: ", err)
     else:
         logging.info(cmd)
-        print(":: [+] GRUB :: Password")
+        print(":: [+] :: GRUB :: Password")
 
     file = "/etc/grub.d/00_header"
     content = textwrap.dedent(
@@ -97,11 +97,11 @@ def mkconfig():
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] GRUB :: ", err)
+        print(":: [-] :: GRUB :: ", err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] GRUB :: ", cmd)
+        print(":: [+] :: GRUB :: ", cmd)
 
 def secure_boot():
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot

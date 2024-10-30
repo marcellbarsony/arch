@@ -8,10 +8,10 @@ def clone(user: str):
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] POST :: Script clone")
+        print(":: [-] :: POST :: Script clone")
     else:
         logging.info(cmd)
-        print(":: [+] POST :: Script clone")
+        print(":: [+] :: POST :: Script clone")
 
 def chown(user: str):
     cmd = f"sudo chown -R {user}:{user} /home/{user}/arch-post"
@@ -19,7 +19,7 @@ def chown(user: str):
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] POST :: Script chown")
+        print(":: [-] :: POST :: Script chown")
     else:
         logging.info(cmd)
-        print(":: [+] POST :: Script chown")
+        print(":: [+] :: POST :: Script chown")

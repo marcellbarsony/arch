@@ -13,10 +13,10 @@ def config_init():
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] BTRFS :: ", err)
+        print(":: [-] :: BTRFS :: ", err)
     else:
         logging.info(cmd)
-        print(":: [+] BTRFS :: ", cmd)
+        print(":: [+] :: BTRFS :: ", cmd)
 
 def config_set():
     cfgs = [
@@ -33,10 +33,10 @@ def config_set():
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
-            print(":: [-] BTRFS :: ", err)
+            print(":: [-] :: BTRFS :: ", err)
         else:
             logging.info(cmd)
-            print(":: [+] BTRFS :: ", cfg)
+            print(":: [+] :: BTRFS :: ", cfg)
 
 def systemd_services():
     cmds = [
@@ -47,7 +47,7 @@ def systemd_services():
         try:
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
             logging.info(cmd)
-            print(":: [+] BTRFS :: ", cmd)
+            print(":: [+] :: BTRFS :: ", cmd)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
-            print(":: [-] BTRFS :: ", err)
+            print(":: [-] :: BTRFS :: ", err)

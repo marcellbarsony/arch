@@ -23,11 +23,11 @@ def networkmanager():
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] DNS :: ", err)
+        print(":: [-] :: DNS :: ", err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] DNS :: ", file)
+        print(":: [+] :: DNS :: ", file)
 
 def resolvconf():
     file = "/etc/resolv.conf"
@@ -57,8 +57,8 @@ def resolvconf():
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] DNS :: ", err)
+        print(":: [-] :: DNS :: ", err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] DNS :: ", file)
+        print(":: [+] :: DNS :: ", file)

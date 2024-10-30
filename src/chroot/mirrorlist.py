@@ -16,7 +16,7 @@ def backup():
     logging.info(f"Copy {src} >> {dst}")
 
 def update():
-    print(":: [i] REFLECTOR :: Updating mirrorlist...")
+    print(":: [i] :: REFLECTOR :: Updating mirrorlist...")
     cmd = f"sudo reflector \
         --latest 25 \
         --protocol https \
@@ -26,11 +26,11 @@ def update():
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        print(":: [-] REFLECTOR :: Mirorlist update :: ", err)
+        print(":: [-] :: REFLECTOR :: Mirorlist update :: ", err)
         logging.error(f"{cmd}\n{err}")
     else:
         logging.info(cmd)
-        print(":: [+] REFLECTOR :: Mirrorlist update")
+        print(":: [+] :: REFLECTOR :: Mirrorlist update")
 
 def systemd():
     file = "/etc/xdg/reflector/reflector.conf"
@@ -48,7 +48,7 @@ def systemd():
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] REFLECTOR :: ", err)
+        print(":: [-] :: REFLECTOR :: ", err)
     else:
         logging.info(file)
-        print(":: [+] REFLECTOR :: ", file)
+        print(":: [+] :: REFLECTOR :: ", file)

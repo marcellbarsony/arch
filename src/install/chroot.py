@@ -15,13 +15,13 @@ def copy_sources(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
         pass
     except Exception as err:
         logging.error(err)
-        print(":: [-] CHROOT :: Copy sources :: ", err)
+        print(":: [-] :: CHROOT :: Copy sources :: ", err)
         sys.exit(1)
     else:
         logging.info(f"copytree: {scr_src} >> {scr_dst}")
         logging.info(f"copy: {scr_src} >> {scr_dst}")
         logging.info("chmod 0x755 /mnt/temporary/main.py")
-        print(":: [+] CHROOT :: Copy script")
+        print(":: [+] :: CHROOT :: Copy script")
 
 def chroot():
     os.system("clear")
@@ -30,11 +30,11 @@ def chroot():
         subprocess.run(cmd, shell=True, check=True)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] Chroot :: ", err)
+        print(":: [-] :: Chroot :: ", err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] Installation successful")
+        print(":: [+] :: Installation successful")
 
 def clear(scr_dst: str, cfg_dst: str):
     try:
@@ -42,7 +42,7 @@ def clear(scr_dst: str, cfg_dst: str):
         os.remove(cfg_dst)
     except Exception as err:
         logging.error(err)
-        print(":: [-] CLEAR-UP :: Copy sources :: ", err)
+        print(":: [-] :: CLEAR-UP :: Copy sources :: ", err)
         sys.exit(1)
     else:
         logging.info(f"rmtree {scr_dst}")

@@ -15,11 +15,11 @@ def hostname(hostname: str):
             f.write(hostname)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] HOST :: ", err)
+        print(":: [-] :: HOST :: ", err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] HOST :: ", file)
+        print(":: [+] :: HOST :: ", file)
 
 def hosts(hostname: str):
     file = "/etc/hosts"
@@ -35,8 +35,8 @@ def hosts(hostname: str):
             f.write(content)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] HOST :: ", err)
+        print(":: [-] :: HOST :: ", err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] HOST :: ", file)
+        print(":: [+] :: HOST :: ", file)

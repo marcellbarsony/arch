@@ -34,7 +34,7 @@ def initialize():
     init.keymaps(keymap)
 # }}}
 
-# Filesystem {{{
+# File system {{{
 def file_system():
     disk.wipe(device)
     disk.create_efi(device, efisize)
@@ -43,14 +43,14 @@ def file_system():
 # }}}
 
 # Encryption {{{
-def encryption():
+def set_encryption():
     encrypt.modprobe()
     encrypt.encrypt(device_root, cryptpassword)
     encrypt.open(device_root, cryptpassword)
 # }}}
 
 # BTRFS {{{
-def init_btrfs():
+def set_btrfs():
     btrfs.mkfs(rootdir)
     btrfs.mountfs(rootdir)
     btrfs.mksubvols()
@@ -61,7 +61,7 @@ def init_btrfs():
 # }}}
 
 # EFI {{{
-def init_efi():
+def set_efi():
     efi.mkdir(efidir)
     efi.format(device_efi)
     efi.mount(device_efi, efidir)
@@ -105,7 +105,7 @@ def arch_chroot():
 
 if __name__ == "__main__":
 
-    # Initialize Argparse {{{
+    # Argparse {{{
     parser = argparse.ArgumentParser(
         prog = "python3 setup.py",
         description = "Arch base system",
@@ -114,14 +114,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # }}}
 
-    # Initialize Logging {{{
+    # Logging {{{
     logging.basicConfig(
         level = logging.INFO, filename="logs.log", filemode="w",
         format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
 
-    # Initialize Config {{{
+    # Config {{{
     config = configparser.ConfigParser()
     config.read("config.ini")
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
     zone = config.get("timezone", "zone")
     # }}}
 
-    # Initialize Global variables {{{
+    # Global variables {{{
     user = getpass.getuser()
     cwd = os.getcwd()
 
@@ -153,9 +153,9 @@ if __name__ == "__main__":
     run_check()
     initialize()
     file_system()
-    encryption()
-    init_btrfs()
-    init_efi()
+    set_encryption()
+    set_btrfs()
+    set_efi()
     gen_fstab()
     packages()
     pacstrap()

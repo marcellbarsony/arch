@@ -9,11 +9,11 @@ def boot_mode():
     path = "/sys/firmware/efi/efivars/"
     if not os.path.exists(path):
         logging.error("BIOS")
-        print(":: [-] CHECK :: Boot mode [BIOS]")
+        print(":: [-] :: CHECK :: Boot mode [BIOS]")
         sys.exit(1)
     else:
         logging.info("UEFI")
-        print(":: [+] CHECK :: Boot mode [UEFI]")
+        print(":: [+] :: CHECK :: Boot mode [UEFI]")
 
 def network(ip: str, port: str):
     try:
@@ -22,8 +22,8 @@ def network(ip: str, port: str):
         s.connect((ip, int(port)))
     except socket.error:
         logging.error("Disconnected")
-        print(":: [-] CHECK :: Network connection", socket.error)
+        print(":: [-] :: CHECK :: Network connection", socket.error)
         sys.exit(1)
     else:
         logging.info("Connected")
-        print(":: [+] CHECK :: Network connection")
+        print(":: [+] :: CHECK :: Network connection")

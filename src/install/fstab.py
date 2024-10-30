@@ -15,11 +15,11 @@ def mkdir():
         os.mkdir(dir)
     except Exception as err:
         logging.error(f"{dir}\n{err}")
-        print(":: [-] FSTAB :: Mkdir :: ", err)
+        print(":: [-] :: FSTAB :: Mkdir :: ", err)
         sys.exit(1)
     else:
         logging.info(dir)
-        print(":: [+] FSTAB :: Mkdir :: ", dir)
+        print(":: [+] :: FSTAB :: Mkdir :: ", dir)
 
 def genfstab():
     cmd = "genfstab -U /mnt >> /mnt/etc/fstab"
@@ -27,8 +27,8 @@ def genfstab():
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] FSTAB :: ", err)
+        print(":: [-] :: FSTAB :: ", err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] FSTAB :: ", cmd)
+        print(":: [+] :: FSTAB :: ", cmd)

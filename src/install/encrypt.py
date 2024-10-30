@@ -16,11 +16,11 @@ def modprobe():
             subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
-            print(":: [-] CRYPTSETUP :: ", err)
+            print(":: [-] :: CRYPTSETUP :: ", err)
             pass
         else:
             logging.info(cmd)
-            print(":: [+] CRYPTSETUP :: ", cmd)
+            print(":: [+] :: CRYPTSETUP :: ", cmd)
 
 def encrypt(device_root: str, cryptpassword: str):
     """
@@ -41,11 +41,11 @@ def encrypt(device_root: str, cryptpassword: str):
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] CRYPTSETUP :: Encrypt :: ", err)
+        print(":: [-] :: CRYPTSETUP :: Encrypt :: ", err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] CRYPTSETUP :: Encrypt :: ", device_root)
+        print(":: [+] :: CRYPTSETUP :: Encrypt :: ", device_root)
 
 def open(device_root: str, cryptpassword: str):
     cmd = f"cryptsetup open --type luks2 {device_root} cryptroot"
@@ -53,8 +53,8 @@ def open(device_root: str, cryptpassword: str):
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] CRYPTSETUP :: Open :: ", err)
+        print(":: [-] :: CRYPTSETUP :: Open :: ", err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] CRYPTSETUP :: Open :: ", device_root)
+        print(":: [+] :: CRYPTSETUP :: Open :: ", device_root)

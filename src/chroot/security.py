@@ -17,7 +17,7 @@ def sudoers():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        print(":: [-] SUDOERS: Read", err)
+        print(":: [-] :: SUDOERS: Read", err)
         logging.error(f"Reading {file}\n{err}")
         sys.exit(1)
 
@@ -44,11 +44,11 @@ def sudoers():
             f.writelines(updated_lines)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] SUDOERS :: ", err)
+        print(":: [-] :: SUDOERS :: ", err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] SUDOERS :: ", file)
+        print(":: [+] :: SUDOERS :: ", file)
 
 def login_delay():
     """https://wiki.archlinux.org/title/security#Enforce_a_delay_after_a_failed_login_attempt"""
@@ -57,7 +57,7 @@ def login_delay():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        print(f":: [-] Read {file}", err)
+        print(f":: [-] :: Read {file}", err)
         logging.error(f"Reading {file}\n{err}")
         sys.exit(1)
 
@@ -67,8 +67,8 @@ def login_delay():
             f.writelines(lines)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(f":: [-] Writing {file}")
+        print(f":: [-] :: Writing {file}")
         sys.exit(1)
     else:
         logging.info(file)
-        print(f":: [+] Writing {file}")
+        print(f":: [+] :: Writing {file}")
