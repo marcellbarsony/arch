@@ -5,7 +5,7 @@ import subprocess
 import sys
 
 
-def copy_sources(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
+def copy(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
     try:
         shutil.copytree(scr_src, scr_dst)
         shutil.copy(cfg_src, cfg_dst)

@@ -75,10 +75,11 @@ def set_systemd():
     systemd.pc_speaker()
 # }}}
 
-# DNS {{{
+# DNS (DoH) {{{
 def set_dns():
     dns.networkmanager()
     dns.resolvconf()
+    dns.doh()
 # }}}
 
 # Btrfs {{{

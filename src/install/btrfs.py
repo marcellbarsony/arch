@@ -4,7 +4,7 @@ import subprocess
 import sys
 
 
-"""Docstring for Btrfs filesystem"""
+"""Docstring for Btrfs file system"""
 
 def mkfs(rootdir: str):
     cmd = f"mkfs.btrfs --quiet -L System {rootdir}"

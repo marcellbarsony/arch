@@ -49,6 +49,8 @@ def services(dmi: str):
         "systemctl enable ntpd.service",
         "systemctl enable ntpdate.service",
         "systemctl enable reflector.service"
+        # "systemctl enable doh-client.service"
+        "systemctl enable dnscrypt-proxy.service"
     ]
     for cmd in cmds:
         try:

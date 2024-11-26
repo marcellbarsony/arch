@@ -97,7 +97,7 @@ def arch_chroot():
     cfg_dst = "/mnt/config.ini"
     scr_src = f"{cwd}/src/"
     scr_dst = "/mnt/temporary"
-    chroot.copy_sources(scr_src, scr_dst, cfg_src, cfg_dst)
+    chroot.copy(scr_src, scr_dst, cfg_src, cfg_dst)
     chroot.chroot()
     chroot.clear(scr_dst, cfg_dst)
 # }}}
@@ -125,16 +125,16 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    efisize = config.get("disk", "efisize")
+    efisize       = config.get("disk", "efisize")
     cryptpassword = config.get("auth", "crypt")
-    rootdir = config.get("disk", "rootdir")
-    efidir = config.get("disk", "efidir")
-    font = config.get("keyset", "font")
-    keys = config.get("keyset", "keys")
-    keymap = config.get("keyset", "keymap")
-    network_ip = config.get("network", "ip")
-    network_port = config.get("network", "port")
-    zone = config.get("timezone", "zone")
+    rootdir       = config.get("disk", "rootdir")
+    efidir        = config.get("disk", "efidir")
+    font          = config.get("keyset", "font")
+    keys          = config.get("keyset", "keys")
+    keymap        = config.get("keyset", "keymap")
+    network_ip    = config.get("network", "ip")
+    network_port  = config.get("network", "port")
+    zone          = config.get("timezone", "zone")
     # }}}
 
     # Global variables {{{

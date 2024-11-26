@@ -12,8 +12,13 @@ https://wiki.archlinux.org/title/Reflector
 def backup():
     src = "/etc/pacman.d/mirrorlist"
     dst = "/etc/pacman.d/mirrorlist.bak"
-    shutil.copy2(src, dst)
-    logging.info(f"Copy {src} >> {dst}")
+    try:
+        shutil.copy2(src, dst)
+    except Exception as err:
+        print(f":: [W] :: Cannot create backup ::", err)
+        logging.warning(f"Copy {src} >> {dst}")
+    else:
+        logging.info(f"Copy {src} >> {dst}")
 
 def update():
     print(":: [i] :: REFLECTOR :: Updating mirrorlist...")

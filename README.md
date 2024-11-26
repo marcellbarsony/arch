@@ -7,6 +7,7 @@
 - dm-crypt (luks2)
 - Linux-hardened
 - Btrfs + Snapper
+- DNS over HTTPS
 - SSH service
 - Wayland
 
