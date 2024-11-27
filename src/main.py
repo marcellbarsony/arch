@@ -79,7 +79,7 @@ def set_systemd():
 def set_dns():
     dns.networkmanager()
     dns.resolvconf()
-    dns.doh()
+    dns.doh(nextdns_profile)
 # }}}
 
 # Btrfs {{{
@@ -124,17 +124,18 @@ if __name__ == "__main__":
 
     # Initialize Global variables {{{
     config = configparser.ConfigParser()
-    config.read("/config.ini") # TODO: check dir location
+    config.read("/config.ini")
 
-    btrfs_cfg = config.get("btrfs", "btrfs_cfg")
-    efi_directory = config.get("grub", "efi_directory")
-    grub_password = config.get("auth", "grub")
-    hostname = config.get("network", "hostname")
-    keys = config.get("keyset", "keys")
-    root_pw = config.get("auth", "root_pw")
-    secureboot = config.get("grub", "secureboot")
-    user = config.get("auth", "user")
-    user_pw = config.get("auth", "user_pw")
+    btrfs_cfg       = config.get("btrfs", "btrfs_cfg")
+    efi_directory   = config.get("grub", "efi_directory")
+    grub_password   = config.get("auth", "grub")
+    hostname        = config.get("network", "hostname")
+    keys            = config.get("keyset", "keys")
+    nextdns_profile = config.get("nextdns", "profile")
+    root_pw         = config.get("auth", "root_pw")
+    secureboot      = config.get("grub", "secureboot")
+    user            = config.get("auth", "user")
+    user_pw         = config.get("auth", "user_pw")
 
     # DMI table decoder
     device, device_efi, device_root = dmi.disk()
@@ -159,6 +160,6 @@ if __name__ == "__main__":
     set_btrfs()
     set_ssh()
     set_pacman()
-    set_xorg()
+    # set_xorg()
     set_finalize()
     # }}}

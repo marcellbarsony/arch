@@ -66,7 +66,7 @@ def resolvconf():
         logging.info(file)
         print(":: [+] :: DNS ::", file)
 
-def doh():
+def doh(nextdns_profile: str):
     file = "/etc/dnscrypt-proxy/dnscrypt-proxy.toml"
     pattern_1 = re.compile(r"^#\sserver_names\s=?")
     pattern_2 = re.compile(r"^bootstrap_resolvers\s=?")
@@ -81,9 +81,9 @@ def doh():
     updated_lines = []
     for line in lines:
         if pattern_1.match(line):
-            updated_lines.append("server_names = ['NextDNS-da5bdb']")
+            updated_lines.append(f"server_names = ['NextDNS-{nextdns_profile}']")
         elif pattern_2.match(line):
-            updated_lines.append("bootstrap_resolvers = ['45.90.28.25:53', '45.90.30.25:53']")
+            updated_lines.append("bootstrap_resolvers = ['9.9.9.11:53', '1.1.1.1:53']")
         elif pattern_3.match(line):
             updated_lines.append("netprobe_address = '45.90.28.25:53'")
         else:

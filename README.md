@@ -1,7 +1,5 @@
 **The Chad Stack installation script**
 
-## The Chad Stack
-
 - UEFI
 - GRUB2
 - dm-crypt (luks2)

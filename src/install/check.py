@@ -3,6 +3,11 @@ import os
 import socket
 import sys
 
+def variables(var):
+    if not var:
+        print("The variable is empty")
+    else:
+        print("The variable is not empty")
 
 def boot_mode():
     os.system("clear")

@@ -10,7 +10,6 @@ https://wiki.archlinux.org/title/Pacman
 
 def config():
     file = "/etc/pacman.conf"
-    file = "test.conf"
     try:
         with open(file, "r") as f:
             lines = f.readlines()

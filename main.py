@@ -29,7 +29,7 @@ def run_check():
 
 # Init {{{
 def initialize():
-    init.time_zone(zone)
+    init.time_zone(timezone)
     init.loadkeys(keys)
     init.keymaps(keymap)
 # }}}
@@ -125,16 +125,50 @@ if __name__ == "__main__":
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    efisize       = config.get("disk", "efisize")
+    # Auth
     cryptpassword = config.get("auth", "crypt")
+    auth_1        = config.get("auth", "grub")
+    auth_2        = config.get("auth", "root_pw")
+    auth_3        = config.get("auth", "user")
+    auth_4        = config.get("auth", "user_pw")
+
+    # Btrfs
+    subvolumes    = config.get("btrfs", "subvolumes").split(", ")
+    btfrs_1       = config.get("btrfs", "btrfs_cfg")
+
+    # Disk
+    efisize       = config.get("disk", "efisize")
     rootdir       = config.get("disk", "rootdir")
     efidir        = config.get("disk", "efidir")
+
+    # Grub
+    grub_1        = config.get("grub", "efi_directory")
+    grub_2        = config.get("grub", "secureboot")
+
+    # Keyset
     font          = config.get("keyset", "font")
     keys          = config.get("keyset", "keys")
     keymap        = config.get("keyset", "keymap")
+
+    # Network
     network_ip    = config.get("network", "ip")
     network_port  = config.get("network", "port")
-    zone          = config.get("timezone", "zone")
+    network_1     = config.get("network", "hostname")
+
+    # NextDNS
+    nextdns       = config.get("nextdns", "profile")
+
+    # Timezone
+    timezone      = config.get("timezone", "zone")
+
+    for section in config.sections():
+        for key, value in config.items(section):
+            if not key.strip():
+                print(":: [-] :: ConfigParser :: Empty key")
+                raise ValueError(f"Empty key found :: [{section}]")
+            if not value.strip():
+                print(":: [-] :: ConfigParser :: Empty value")
+                raise ValueError(f"Empty value '{key}' in section [{section}]")
     # }}}
 
     # Global variables {{{
@@ -144,9 +178,6 @@ if __name__ == "__main__":
     # DMI table decoder
     device, device_efi, device_root = dmi.disk()
     dmidecode = dmi.check()
-
-    # Btrfs subvolumes
-    subvolumes = ["home", "var", "snapshots"]
     # }}}
 
     # Run {{{
