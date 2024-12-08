@@ -26,7 +26,7 @@ def get_pkgs():
     packages = ""
     with open("packages.ini", "r") as file:
         for line in file:
-            if not line.startswith("[") and not line.startswith("#") and line.strip() != "":
+            if not line.startswith("[") and not line.startswith(";") and line.strip() != "":
                 packages += f"{line.rstrip()} "
     logging.info(packages)
     return packages
