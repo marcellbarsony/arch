@@ -85,7 +85,8 @@ def doh(nextdns_profile: str):
         elif pattern_2.match(line):
             updated_lines.append("bootstrap_resolvers = ['9.9.9.11:53', '1.1.1.1:53']")
         elif pattern_3.match(line):
-            updated_lines.append("netprobe_address = '45.90.28.25:53'")
+            updated_lines.append("netprobe_address = '45.90.28.61:53'") # '9.9.9.11:53'
+            # TODO: DNSCrypt static & stamp setup
         else:
             updated_lines.append(line)
 
