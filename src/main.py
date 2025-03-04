@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     # Logging {{{
     logging.basicConfig(
-        level = logging.INFO, filename="logs.log", filemode="w",
+        level = logging.INFO, filename = "logs.log", filemode = "w",
         format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}

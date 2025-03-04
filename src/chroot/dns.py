@@ -36,6 +36,11 @@ def resolvconf():
     file = "/etc/resolv.conf"
     content = textwrap.dedent(
         f"""\
+        # DNSCrypt
+        nameserver ::1
+        nameserver 127.0.0.1
+        options edns0
+
         # NextDNS
         # nameserver 45.90.28.25
         # nameserver 45.90.30.25
@@ -67,6 +72,7 @@ def resolvconf():
         print(":: [+] :: DNS ::", file)
 
 def doh(nextdns_profile: str):
+    """https://wiki.archlinux.org/title/Dnscrypt-proxy"""
     file = "/etc/dnscrypt-proxy/dnscrypt-proxy.toml"
     pattern_1 = re.compile(r"^#\sserver_names\s=?")
     pattern_2 = re.compile(r"^bootstrap_resolvers\s=?")

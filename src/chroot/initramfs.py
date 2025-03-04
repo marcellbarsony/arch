@@ -4,7 +4,7 @@ import subprocess
 
 
 """
-Docstring for Initramfs & KMS
+Initramfs & KMS config
 https://wiki.archlinux.org/mkinitcpio
 https://wiki.archlinux.org/Kernel_mode_setting
 """
@@ -19,12 +19,13 @@ def kernel_mode_setting() -> str:
                 kms = kms.strip()
                 logging.info(kms)
 
-    if "AuthenticAMD" in kms:
-        return "amdgpu"
-    if "GenuineIntel" in kms:
-        return "i915"
-    else:
-        return "vboxvideo"
+    match kms.lower():
+        case "authenticamd":
+            return "amdgpu"
+        case "genuineintel":
+            return "i915"
+        case _:
+            return "vboxvideo"
 
 def initramfs(kms: str):
     file = "/etc/mkinitcpio.conf"

@@ -4,7 +4,7 @@ import subprocess
 import sys
 
 
-"""Initialize Pacman config"""
+"""Docstring for Pacman config"""
 
 def config():
     config = "/etc/pacman.conf"

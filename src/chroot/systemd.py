@@ -84,7 +84,7 @@ def watchdog():
         logging.error(f"{file}\n{err}")
         sys.exit(1)
 
-    pattern_1 = re.compile(r"^#RebootWatchdogSec=0")
+    pattern_1 = re.compile(r"^#RebootWatchdogec=0")
 
     updated_lines = []
     for line in lines:

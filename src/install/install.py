@@ -31,18 +31,18 @@ def get_pkgs():
     logging.info(packages)
     return packages
 
-def get_pkgs_dmi(dmi: str):
-    packages = ""
-    if dmi == "vbox":
-        packages = "virtualbox-guest-utils"
-    if dmi == "vmware":
-        packages = "open-vm-tools"
-    if dmi == "intel":
-        packages = "intel-ucode xf86-video-intel"
-    if dmi == "AMD":
-        packages = "amd-ucode xf86-video-amdgpu"
-    logging.info(packages)
-    return packages
+def get_pkgs_dmi(dmi: str) -> str:
+    match dmi.lower():
+        case "vbox":
+            return "virtualbox-guest-utils"
+        case "vmware":
+            return "open-vm-tools"
+        case "intel":
+            return "intel-ucode xf86-video-intel"
+        case "amd":
+            return "amd-ucode xf86-video-amdgpu"
+        case _:
+            return ""
 
 def install(packages: str):
     os.system("clear")

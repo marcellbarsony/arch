@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     # Logging {{{
     logging.basicConfig(
-        level = logging.INFO, filename="logs.log", filemode="w",
+        level = logging.INFO, filename = "logs.log", filemode = "w",
         format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
@@ -58,29 +58,29 @@ if __name__ == "__main__":
     # }}}
 
     # Btrfs {{{
-    subvolumes    = config.get("btrfs", "subvolumes").split(", ")
+    subvolumes = config.get("btrfs", "subvolumes").split(", ")
     # }}}
 
     # Disk {{{
-    efisize       = config.get("disk", "efisize")
-    rootdir       = config.get("disk", "rootdir")
-    efidir        = config.get("disk", "efidir")
+    efisize = config.get("disk", "efisize")
+    rootdir = config.get("disk", "rootdir")
+    efidir  = config.get("disk", "efidir")
     # }}}
 
     # Keyset {{{
-    font          = config.get("keyset", "font")
-    keys          = config.get("keyset", "keys")
-    keymap        = config.get("keyset", "keymap")
+    font   = config.get("keyset", "font")
+    keys   = config.get("keyset", "keys")
+    keymap = config.get("keyset", "keymap")
     # }}}
 
     # Network {{{
-    network_ip    = config.get("network", "ip")
-    network_port  = config.get("network", "port")
-    network_host  = config.get("network", "hostname")
+    network_ip   = config.get("network", "ip")
+    network_port = config.get("network", "port")
+    network_host = config.get("network", "hostname")
     # }}}
 
     # Timezone {{{
-    timezone      = config.get("timezone", "zone")
+    timezone = config.get("timezone", "zone")
     # }}}
 
     for section in config.sections():

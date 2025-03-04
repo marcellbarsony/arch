@@ -46,7 +46,7 @@ def setup(uuid: str):
             f.writelines(lines)
     except Exception as err:
         logging.error(f"{file}\n{err}")
-        print(":: [-] :: GRUB :: Write", err)
+        print(":: [-] :: GRUB :: Write ::", err)
         sys.exit(1)
     else:
         logging.info(file)
@@ -61,7 +61,7 @@ def install(secureboot: str, efi_directory: str):
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: GRUB :: Install", err)
+        print(":: [-] :: GRUB :: Install ::", err)
         sys.exit(1)
     else:
         logging.info(cmd)
@@ -100,11 +100,11 @@ def mkconfig():
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: GRUB ::", err)
+        print(":: [-] :: GRUB :: Mkconfig ::", err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: GRUB ::", cmd)
+        print(":: [+] :: GRUB :: Mkconfig ::", cmd)
 
 def secure_boot():
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot

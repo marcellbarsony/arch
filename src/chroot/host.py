@@ -4,7 +4,7 @@ import textwrap
 
 
 """
-Docstring for host configuration
+Host & Hostname configuration
 https://wiki.archlinux.org/title/Network_configuration
 """
 
