@@ -4,9 +4,16 @@ import subprocess
 import sys
 
 
-"""Docstring for Btrfs file system"""
+"""
+Docstring for Btrfs file system
+https://wiki.archlinux.org/title/Btrfs
+"""
 
 def mkfs(rootdir: str):
+    """
+    Create BTRFS file system
+    https://wiki.archlinux.org/title/Btrfs#File_system_creation
+    """
     cmd = f"mkfs.btrfs --quiet -L System {rootdir}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -19,6 +26,9 @@ def mkfs(rootdir: str):
         print(":: [+] :: BTRFS ::", cmd)
 
 def mountfs(rootdir: str):
+    """
+    Mount file system
+    """
     cmd = f"mount {rootdir} /mnt"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -31,6 +41,10 @@ def mountfs(rootdir: str):
         print(":: [+] :: BTRFS ::", cmd)
 
 def mksubvols():
+    """
+    Create subvolumes
+    https://wiki.archlinux.org/title/Btrfs#Creating_a_subvolume
+    """
     subvolumes = [
         "/mnt/@",
         "/mnt/@home",

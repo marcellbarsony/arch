@@ -22,6 +22,9 @@ def mkdir():
         print(":: [+] :: FSTAB :: Mkdir ::", dir)
 
 def genfstab():
+    """
+    https://wiki.archlinux.org/title/Genfstab
+    """
     cmd = "genfstab -U /mnt >> /mnt/etc/fstab"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

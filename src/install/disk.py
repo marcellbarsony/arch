@@ -7,9 +7,9 @@ import sys
 
 def wipe(disk: str):
     cmds = [
-        f"sgdisk --zap-all --clear {disk}", # GUID table
-        f"wipefs -af {disk}", # Filesystem signature
-        f"sgdisk -o {disk}" # New GUID table
+        f"sgdisk --zap-all --clear {disk}",  # GUID table
+        f"wipefs -af {disk}",                # Filesystem signature
+        f"sgdisk -o {disk}"                  # New GUID table
     ]
     for cmd in cmds:
         try:
@@ -23,6 +23,9 @@ def wipe(disk: str):
             print(":: [+] :: FILESYSTEM :: Wipe ::", cmd)
 
 def create_efi(device: str, efisize: str):
+    """
+    Create new EFI GPT partition
+    """
     cmd = f"sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {device}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -35,6 +38,9 @@ def create_efi(device: str, efisize: str):
         print(":: [+] :: FILESYSTEM :: Create EFI")
 
 def create_system(device: str):
+    """
+    Create new LVM partition
+    """
     cmd = f"sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem {device}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

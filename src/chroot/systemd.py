@@ -42,14 +42,14 @@ def logind():
 
 def services(dmi: str):
     cmds = [
+        "systemctl enable dnscrypt-proxy.service",
         "systemctl enable earlyoom",
         "systemctl enable fstrim.timer",
         "systemctl enable NetworkManager.service",
         "systemctl enable nftables.service",
         "systemctl enable ntpd.service",
         "systemctl enable ntpdate.service",
-        "systemctl enable reflector.service",
-        "systemctl enable dnscrypt-proxy.service"
+        "systemctl enable reflector.service"
     ]
     for cmd in cmds:
         try:
@@ -106,10 +106,12 @@ def watchdog():
 def pc_speaker():
     """https://wiki.archlinux.org/title/PC_speaker#Globally"""
     file = "/etc/modprobe.d/nobeep.conf"
-    content = textwrap.dedent( """\
+    content = textwrap.dedent(
+        """\
         blacklist pcspkr
-        blacklist snd_pcsp"
-    """ )
+        blacklist snd_pcsp
+        """
+    )
     try:
         with open(file, "w") as f:
             f.write(content)

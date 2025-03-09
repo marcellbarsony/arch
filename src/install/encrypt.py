@@ -7,8 +7,12 @@ import sys
 
 
 def modprobe():
+    """
+    Load kernel modules
+    https://wiki.archlinux.org/title/Dm-crypt/Device_encryption#Preparation
+    """
     cmds = [
-        "modprobe dm-crypt"
+        "modprobe dm-crypt",
         "modprobe dm-mod"
     ]
     for cmd in cmds:
@@ -25,6 +29,7 @@ def modprobe():
 def encrypt(device_root: str, cryptpassword: str):
     """
     Device encryption
+    https://wiki.archlinux.org/title/Dm-crypt/Device_encryption#Encryption_options
     https://wiki.archlinux.org/title/dm-crypt/Device_encryption#Encryption_options_for_LUKS_mode
     """
     cmd = f"cryptsetup \
@@ -48,6 +53,10 @@ def encrypt(device_root: str, cryptpassword: str):
         print(":: [+] :: CRYPTSETUP :: Encrypt ::", device_root)
 
 def open(device_root: str, cryptpassword: str):
+    """
+    Unlock/Map LUKS partition
+    https://wiki.archlinux.org/title/Dm-crypt/Device_encryption#Unlocking/Mapping_LUKS_partitions_with_the_device_mapper
+    """
     cmd = f"cryptsetup open --type luks2 {device_root} cryptroot"
     try:
         subprocess.run(cmd, shell=True, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)

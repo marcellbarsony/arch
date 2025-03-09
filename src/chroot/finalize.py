@@ -7,8 +7,8 @@ import shutil
 
 def change_ownership(user: str):
     target = f"/home/{user}/"
-    uid = pwd.getpwnam(user).pw_uid # Owner
-    gid = grp.getgrnam(user).gr_gid # Group
+    uid = pwd.getpwnam(user).pw_uid  # Owner
+    gid = grp.getgrnam(user).gr_gid  # Group
     for dirpath, dirnames, filenames in os.walk(target):
         for dirname in dirnames:
             dir_path = os.path.join(dirpath, dirname)

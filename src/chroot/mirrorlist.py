@@ -39,7 +39,8 @@ def update():
 
 def systemd():
     file = "/etc/xdg/reflector/reflector.conf"
-    content = textwrap.dedent( """\
+    content = textwrap.dedent(
+        """\
         # Reflector systemd service
         # https://wiki.archlinux.org/title/Reflector#systemd_service
         --save /etc/pacman.d/mirrorlist
@@ -47,7 +48,8 @@ def systemd():
         --protocol https
         --sort rate
         --latest 25
-    """ )
+        """
+    )
     try:
         with open(file, "w") as f:
             f.write(content)
