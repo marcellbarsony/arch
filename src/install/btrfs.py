@@ -28,6 +28,7 @@ def mkfs(rootdir: str):
 def mountfs(rootdir: str):
     """
     Mount file system
+    https://wiki.archlinux.org/title/Installation_guide#Mount_the_file_systems
     """
     cmd = f"mount {rootdir} /mnt"
     try:
@@ -100,6 +101,10 @@ def mkdir(subvolumes: list):
             print(":: [+] :: BTRFS :: mkdir ::", path)
 
 def mount_subvolumes(subvolumes: list, rootdir: str):
+    """
+    Mounting subvolumes
+    https://wiki.archlinux.org/title/Btrfs#Mounting_subvolumes
+    """
     for subvolume in subvolumes:
         cmd = f"mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@{subvolume} {rootdir} /mnt/{subvolume}"
         try:

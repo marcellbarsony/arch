@@ -17,6 +17,10 @@ def mkdir(efidir: str):
         sys.exit(1)
 
 def format(device_efi: str):
+    """
+    Format the EFI partition
+    https://wiki.archlinux.org/title/Installation_guide#Format_the_partitions
+    """
     cmd = f"mkfs.fat -F32 {device_efi}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
@@ -29,6 +33,10 @@ def format(device_efi: str):
         print(":: [+] :: EFI :: ", cmd)
 
 def mount(device_efi: str, efidir: str):
+    """
+    Mount the EFI partition
+    https://wiki.archlinux.org/title/Installation_guide#Mount_the_file_systems
+    """
     cmd = f"mount {device_efi} {efidir}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)

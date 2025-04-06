@@ -5,7 +5,6 @@ import sys
 
 """Docstring for Encryption"""
 
-
 def modprobe():
     """
     Load kernel modules

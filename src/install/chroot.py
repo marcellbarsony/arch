@@ -24,6 +24,10 @@ def copy(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
         print(":: [+] :: CHROOT :: Copy script")
 
 def chroot():
+    """
+    Chroot into the new system
+    https://wiki.archlinux.org/title/Installation_guide#Chroot
+    """
     os.system("clear")
     cmd = "arch-chroot /mnt ./temporary/main.py"
     try:

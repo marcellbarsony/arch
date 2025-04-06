@@ -5,6 +5,10 @@ import sys
 
 
 def boot_mode():
+    """
+    Verify the boot mode
+    https://wiki.archlinux.org/title/Installation_guide#Verify_the_boot_mode
+    """
     os.system("clear")
     path = "/sys/firmware/efi/efivars/"
     if not os.path.exists(path):

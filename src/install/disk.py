@@ -6,10 +6,15 @@ import sys
 """Docstring for Disk"""
 
 def wipe(disk: str):
+    """
+    Wipe GPT header data
+    https://man.archlinux.org/man/sgdisk.8.en
+    https://man.archlinux.org/man/wipefs.8.en
+    """
     cmds = [
-        f"sgdisk --zap-all --clear {disk}",  # GUID table
-        f"wipefs -af {disk}",                # Filesystem signature
-        f"sgdisk -o {disk}"                  # New GUID table
+        f"sgdisk --zap-all {disk}",  # Wipe GUID table
+        f"wipefs -af {disk}",        # Wipe filesystem signature
+        f"sgdisk --clear {disk}"     # Clear GUID table
     ]
     for cmd in cmds:
         try:
@@ -25,6 +30,7 @@ def wipe(disk: str):
 def create_efi(device: str, efisize: str):
     """
     Create new EFI GPT partition
+    https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks
     """
     cmd = f"sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {device}"
     try:
@@ -40,6 +46,7 @@ def create_efi(device: str, efisize: str):
 def create_system(device: str):
     """
     Create new LVM partition
+    https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks
     """
     cmd = f"sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem {device}"
     try:

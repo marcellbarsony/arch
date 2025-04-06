@@ -23,6 +23,7 @@ def mkdir():
 
 def genfstab():
     """
+    Generate fstab file
     https://wiki.archlinux.org/title/Genfstab
     """
     cmd = "genfstab -U /mnt >> /mnt/etc/fstab"
