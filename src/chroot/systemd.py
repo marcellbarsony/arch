@@ -12,9 +12,9 @@ https://wiki.archlinux.org/title/systemd
 
 def logind():
     file = "/etc/systemd/logind.conf"
-    pattern_1 = re.compile(r"^#HandleLidSwitch=ignore")
-    pattern_2 = re.compile(r"^#HandleLidSwitchExternalPower=ignore")
-    pattern_3 = re.compile(r"^#HandleLidSwitchDocked=ignore")
+    pattern_1 = re.compile(r"^#HandleLidSwitch=.*")
+    pattern_2 = re.compile(r"^#HandleLidSwitchExternalPower=.*")
+    pattern_3 = re.compile(r"^#HandleLidSwitchDocked=.*")
 
     with open(file, "r") as f:
         lines = f.readlines()
