@@ -68,7 +68,8 @@ if __name__ == "__main__":
     users.root_password(root_pw)
     users.user_add(user)
     users.user_password(user, user_pw)
-    users.user_group(user)
+    users.user_group_create()
+    users.user_group_add(user)
     # }}}
 
     # Security {{{
