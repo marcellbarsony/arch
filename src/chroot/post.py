@@ -3,9 +3,14 @@ import subprocess
 
 
 def clone(user: str):
-    cmd = f"git clone https://github.com/marcellbarsony/arch-post /home/{user}/arch-post"
+    cmd = [
+        "git",
+        "clone",
+        "https://github.com/marcellbarsony/arch-post",
+        f"/home/{user}/arch-post"
+    ]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: POST :: Script clone")
@@ -14,9 +19,13 @@ def clone(user: str):
         print(":: [+] :: POST :: Script clone")
 
 def chown(user: str):
-    cmd = f"sudo chown -R {user}:{user} /home/{user}/arch-post"
+    cmd = [
+        "chown",
+        "-R", f"{user}:{user}",
+        f"/home/{user}/arch-post"
+    ]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: POST :: Script chown")

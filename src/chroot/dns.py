@@ -12,7 +12,10 @@ https://wiki.archlinux.org/title/DNS-over-HTTPS
 """
 
 def networkmanager():
-    """https://wiki.archlinux.org/title/NetworkManager#Unmanaged_/etc/resolv.conf"""
+    """
+    https://wiki.archlinux.org/title/NetworkManager#Unmanaged_/etc/resolv.conf
+    Stop NetworkManager from touching `/etc/resolv.conf`
+    """
     file = "/etc/NetworkManager/conf.d/dns.conf"
     content = textwrap.dedent(
         """\
@@ -76,7 +79,6 @@ def doh(nextdns_profile: str):
     file = "/etc/dnscrypt-proxy/dnscrypt-proxy.toml"
     pattern_1 = re.compile(r"^#\sserver_names\s=?")
     pattern_2 = re.compile(r"^bootstrap_resolvers\s=?")
-    pattern_3 = re.compile(r"^netprobe_address\s=?")
     try:
         with open(file, "r") as f:
             lines = f.readlines()
@@ -90,8 +92,6 @@ def doh(nextdns_profile: str):
             updated_lines.append(f"server_names = ['NextDNS-{nextdns_profile}']")
         elif pattern_2.match(line):
             updated_lines.append("bootstrap_resolvers = ['9.9.9.11:53', '1.1.1.1:53']")
-        elif pattern_3.match(line):
-            updated_lines.append("netprobe_address = '45.90.28.61:53'") # '9.9.9.11:53'
             # TODO: DNSCrypt static & stamp setup
         else:
             updated_lines.append(line)

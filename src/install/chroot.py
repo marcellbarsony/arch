@@ -29,9 +29,9 @@ def chroot():
     https://wiki.archlinux.org/title/Installation_guide#Chroot
     """
     os.system("clear")
-    cmd = "arch-chroot /mnt ./temporary/main.py"
+    cmd = ["arch-chroot", "/mnt", "./temporary/main.py"]
     try:
-        subprocess.run(cmd, shell=True, check=True)
+        subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: CHROOT ::", err)

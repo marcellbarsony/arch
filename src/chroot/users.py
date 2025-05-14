@@ -4,14 +4,14 @@ import sys
 
 
 """
-Docstring for root user setup
+Root user setup
 https://man.archlinux.org/man/chpasswd.8.en
 """
 
 def root_password(root_pw: str):
-    cmd = f"chpasswd --crypt-method SHA512"
+    cmd = ["chpasswd", "--crypt-method", "SHA512"]
     try:
-        subprocess.run(cmd, shell=True, check=True, input=f"root:{root_pw}".encode())
+        subprocess.run(cmd, check=True, input=f"root:{root_pw}".encode())
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: ROOT ::", err)
@@ -22,14 +22,14 @@ def root_password(root_pw: str):
 
 
 """
-Docstring for user setup
+User setup
 https://wiki.archlinux.org/title/users_and_groups
 """
 
 def user_add(user: str):
-    cmd = f"useradd -m {user}"
+    cmd = ["useradd", "-m", user]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: USER ::", err)
@@ -39,9 +39,9 @@ def user_add(user: str):
         print(":: [+] :: USER ::", cmd)
 
 def user_password(user: str, user_pw: str):
-    cmd = "chpasswd --crypt-method SHA512"
+    cmd = ["chpasswd", "--crypt-method", "SHA512"]
     try:
-        subprocess.run(cmd, shell=True, check=True, input=f"{user}:{user_pw}".encode())
+        subprocess.run(cmd, check=True, input=f"{user}:{user_pw}".encode())
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: USER ::", err)
@@ -56,9 +56,9 @@ def user_group_create():
         "vboxsf"
     ]
     for group in groups:
-        cmd = f"groupadd {group}"
+        cmd = ["groupadd", group]
         try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
             print(":: [-] :: USER ::", err)
@@ -69,9 +69,9 @@ def user_group_create():
 
 def user_group_add(user: str):
     groups = "wheel,audio,video,optical,storage,vboxusers,vboxsf"
-    cmd = f"usermod -aG {groups} {user}"
+    cmd = ["usermod", "-aG", groups, user]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: USER ::", err)

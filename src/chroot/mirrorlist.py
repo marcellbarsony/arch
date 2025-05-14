@@ -22,14 +22,16 @@ def backup():
 
 def update():
     print(":: [i] :: REFLECTOR :: Updating mirrorlist...")
-    cmd = f"sudo reflector \
-        --latest 25 \
-        --protocol https \
-        --connection-timeout 5 \
-        --sort rate \
-        --save /etc/pacman.d/mirrorlist"
+    cmd = [
+        "reflector",
+        "--latest", "25",
+        "--protocol", "https",
+        "--connection-timeout", "5",
+        "--sort", "rate",
+        "--save", "/etc/pacman.d/mirrorlist"
+    ]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         print(":: [-] :: REFLECTOR :: Mirorlist update ::", err)
         logging.error(f"{cmd}\n{err}")

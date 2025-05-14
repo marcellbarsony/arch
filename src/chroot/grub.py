@@ -54,11 +54,11 @@ def setup(uuid: str):
 
 def install(secureboot: str, efi_directory: str):
     if secureboot == True:
-        cmd = f'grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"  --modules="tpm" --disable-shim-lock'
+        cmd = ["grub-install", "--target=x86_64-efi", "--bootloader-id=GRUB", f"--efi-directory={efi_directory}", '--modules="tpm"', "--disable-shim-lock"]
     else:
-        cmd = f"grub-install --target=x86_64-efi --bootloader-id=GRUB --efi-directory={efi_directory}"
+        cmd = ["grub-install", "--target=x86_64-efi", "--bootloader-id=GRUB", f"--efi-directory={efi_directory}"]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: GRUB :: Install ::", err)
@@ -69,10 +69,11 @@ def install(secureboot: str, efi_directory: str):
 
 def password(grub_password: str, user: str):
     pbkdf2_hash = ""
-    cmd = f"grub-mkpasswd-pbkdf2"
+
+    cmd = ["grub-mkpasswd-pbkdf2"]
     stdin = f"{grub_password}\n{grub_password}"
     try:
-        out = subprocess.run(cmd, shell=True, check=True, input=stdin.encode(), stdout=subprocess.PIPE)
+        out = subprocess.run(cmd, check=True, input=stdin.encode(), stdout=subprocess.PIPE)
         pbkdf2_hash = out.stdout.decode("utf-8")[67:].strip()
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
@@ -90,14 +91,15 @@ def password(grub_password: str, user: str):
         EOF
         """
     )
+
     with open(file, "a") as f:
         f.write(content)
     logging.info(f"{file}\n{content}")
 
 def mkconfig():
-    cmd = "grub-mkconfig -o /boot/grub/grub.cfg"
+    cmd = ["grub-mkconfig", "-o", "/boot/grub/grub.cfg"]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: GRUB :: Mkconfig ::", err)

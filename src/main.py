@@ -52,7 +52,6 @@ if __name__ == "__main__":
     device, device_efi, device_root = dmi.disk()
     # }}}
 
-    # Run {{{
     # Locale {{{
     locale.locale()
     locale.conf()
@@ -108,7 +107,6 @@ if __name__ == "__main__":
     # Btrfs {{{
     snapper.config_init(btrfs_cfg)
     snapper.config_set(btrfs_cfg)
-    snapper.systemd_services()
     # }}}
 
     # SSH {{{
@@ -134,5 +132,4 @@ if __name__ == "__main__":
     # Finalize {{{
     finalize.change_ownership(user)
     finalize.remove_xdg_dirs(user)
-    # }}}
     # }}}

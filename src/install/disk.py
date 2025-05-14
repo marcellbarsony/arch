@@ -12,13 +12,13 @@ def wipe(disk: str):
     https://man.archlinux.org/man/wipefs.8.en
     """
     cmds = [
-        f"sgdisk --zap-all {disk}",  # Wipe GUID table
-        f"wipefs -af {disk}",        # Wipe filesystem signature
-        f"sgdisk --clear {disk}"     # Clear GUID table
+        ["sgdisk", "--zap-all", disk],  # Wipe GPT and MBR data (GUID table)
+        ["wipefs", "-af", disk],        # Wipe filesystem signatures
+        ["sgdisk", "--clear", disk]     # Clear GPT partition table (GUID table)
     ]
     for cmd in cmds:
         try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
             print(":: [-] :: FILESYSTEM :: Wipe ::", err)
@@ -32,9 +32,15 @@ def create_efi(device: str, efisize: str):
     Create new EFI GPT partition
     https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks
     """
-    cmd = f"sgdisk -n 0:0:+{efisize}MiB -t 0:ef00 -c 0:efi {device}"
+    cmd = [
+        "sgdisk",
+        "-n", f"0:0:+{efisize}MiB", # New partition
+        "-t", "0:ef00",  # Type
+        "-c", "0:efi",  # Name
+        device
+    ]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: FILESYSTEM :: Create EFI ::", err)
@@ -48,9 +54,15 @@ def create_system(device: str):
     Create new LVM partition
     https://wiki.archlinux.org/title/Installation_guide#Partition_the_disks
     """
-    cmd = f"sgdisk -n 0:0:0 -t 0:8e00 -c 0:cryptsystem {device}"
+    cmd = [
+        "sgdisk",
+        "-n", "0:0:0",  # New partition
+        "-t", "0:8e00",  # Type
+        "-c", "0:cryptsystem",  # Name
+        device
+    ]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: FILESYSTEM :: Create cryptsystem ::", err)
@@ -60,9 +72,13 @@ def create_system(device: str):
         print(":: [+] :: FILESYSTEM :: Create cryptsystem")
 
 def partprobe(device: str):
-    cmd = f"partprobe {device}"
+    """
+    Inform the OS of partition table changes
+    https://man.archlinux.org/man/partprobe.8.en
+    """
+    cmd = ["partprobe",  device]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: FILESYSTEM :: Partprobe ::", err)

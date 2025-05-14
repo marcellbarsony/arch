@@ -7,6 +7,7 @@ import configparser
 import getpass
 import logging
 import os
+import threading
 
 from src.install import check
 from src.install import init
@@ -45,8 +46,8 @@ if __name__ == "__main__":
     cwd = os.getcwd()
 
     # DMI table decoder
-    device, device_efi, device_root = dmi.disk()
     dmidecode = dmi.check()
+    device, device_efi, device_root = dmi.disk(dmidecode)
     # }}}
 
     # Config {{{
@@ -62,9 +63,9 @@ if __name__ == "__main__":
     # }}}
 
     # Disk {{{
-    efisize = config.get("disk", "efisize")
-    rootdir = config.get("disk", "rootdir")
-    efidir  = config.get("disk", "efidir")
+    efi_dir  = config.get("disk", "efidir")
+    efi_size = config.get("disk", "efisize")
+    root_dir = config.get("disk", "rootdir")
     # }}}
 
     # Keyset {{{
@@ -93,7 +94,6 @@ if __name__ == "__main__":
                 raise ValueError(f"Empty value '{key}' in section [{section}]")
     # }}}
 
-    # Run {{{
     # Check {{{
     check.boot_mode()
     check.network(network_ip, network_port)
@@ -105,9 +105,14 @@ if __name__ == "__main__":
     init.keymaps(keymap)
     # }}}
 
+    # Mirrorlist {{{
+    # mirrorlist_thread = threading.Thread(target=pacman.mirrorlist)
+    # mirrorlist_thread.start()
+    # }}}
+
     # File system {{{
     disk.wipe(device)
-    disk.create_efi(device, efisize)
+    disk.create_efi(device, efi_size)
     disk.create_system(device)
     disk.partprobe(device)
     # }}}
@@ -119,19 +124,19 @@ if __name__ == "__main__":
     # }}}
 
     # BTRFS {{{
-    btrfs.mkfs(rootdir)
-    btrfs.mountfs(rootdir)
+    btrfs.mkfs(root_dir)
+    btrfs.mountfs(root_dir)
     btrfs.mksubvols()
     btrfs.unmount()
-    btrfs.mount_root(rootdir)
+    btrfs.mount_root(root_dir)
     btrfs.mkdir(subvolumes)
-    btrfs.mount_subvolumes(subvolumes, rootdir)
+    btrfs.mount_subvolumes(subvolumes, root_dir)
     # }}}
 
     # EFI {{{
-    efi.mkdir(efidir)
+    efi.mkdir(efi_dir)
     efi.format(device_efi)
-    efi.mount(device_efi, efidir)
+    efi.mount(device_efi, efi_dir)
     # }}}
 
     # Fstab {{{
@@ -140,15 +145,17 @@ if __name__ == "__main__":
     # }}}
 
     # Pacman {{{
+    # mirrorlist_thread.join()
     pacman.config()
-    pacman.mirrorlist()
     pacman.keyring_init()
     # }}}
 
     # Pacstrap {{{
     install.bug()
+
     pkgs = install.get_pkgs()
     install.install(pkgs)
+
     pkgs_dmi = install.get_pkgs_dmi(dmidecode)
     install.install(pkgs_dmi)
     # }}}
@@ -161,5 +168,4 @@ if __name__ == "__main__":
     chroot.copy(scr_src, scr_dst, cfg_src, cfg_dst)
     chroot.chroot()
     chroot.clear(scr_dst, cfg_dst)
-    # }}}
     # }}}

@@ -4,7 +4,10 @@ import subprocess
 import sys
 
 
-"""Docstring for EFI partition"""
+"""
+EFI partition
+https://wiki.archlinux.org/title/EFI_system_partition
+"""
 
 def mkdir(efidir: str):
     if not os.path.exists(efidir):
@@ -21,9 +24,9 @@ def format(device_efi: str):
     Format the EFI partition
     https://wiki.archlinux.org/title/Installation_guide#Format_the_partitions
     """
-    cmd = f"mkfs.fat -F32 {device_efi}"
+    cmd = ["mkfs.fat", "-F32", device_efi]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(f":: [-] :: EFI :: {cmd} ::", err)
@@ -37,9 +40,9 @@ def mount(device_efi: str, efidir: str):
     Mount the EFI partition
     https://wiki.archlinux.org/title/Installation_guide#Mount_the_file_systems
     """
-    cmd = f"mount {device_efi} {efidir}"
+    cmd = ["mount", device_efi, efidir]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(f":: [-] :: EFI :: Mount {device_efi} >> {efidir} ::", err)

@@ -4,7 +4,10 @@ import subprocess
 import sys
 
 
-"""Docstring for Pacman config"""
+"""
+Pacman config
+https://wiki.archlinux.org/title/Pacman
+"""
 
 def config():
     config = "/etc/pacman.conf"
@@ -44,15 +47,17 @@ def config():
         print(":: [+] :: PACMAN :: Write", config)
 
 def mirrorlist():
-    cmd = "reflector \
-        --latest 25 \
-        --protocol https \
-        --connection-timeout 5 \
-        --sort rate \
-        --save /etc/pacman.d/mirrorlist"
+    cmd = [
+        "reflector",
+        "--latest", "25",
+        "--protocol", "https",
+        "--connection-timeout", "5",
+        "--sort", "rate",
+        "--save", "/etc/pacman.d/mirrorlist"
+    ]
     try:
         print(":: [i] :: PACMAN :: Updating mirrorlist...")
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: PACMAN :: Mirrorlist ::", err)
@@ -69,14 +74,14 @@ https://wiki.archlinux.org/title/Pacman/
 
 def keyring_init():
     cmds = [
-        "pacman -Sy",
-        "pacman -Sy --noconfirm archlinux-keyring",
-        "pacman-key --init",
-        "pacman-key --populate"
+        ["pacman", "-Sy"],
+        ["pacman", "-Sy", "--noconfirm", "archlinux-keyring"],
+        ["pacman-key", "--init"],
+        ["pacman-key", "--populate"]
     ]
     for cmd in cmds:
         try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
             print(":: [-] :: PACMAN :: Keyring ::", err)

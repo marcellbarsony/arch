@@ -9,10 +9,10 @@ Docstring for Snapper
 https://wiki.archlinux.org/title/snapper
 """
 
-def config_init(config: str):
-    cmd = f"snapper --no-dbus -c {config} create-config /{config}"
+def config_init(btrfs_cfg: str):
+    cmd = ["snapper", "--no-dbus", "-c", btrfs_cfg, "create-config", f"/{btrfs_cfg}"]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: BTRFS ::", err)
@@ -67,17 +67,3 @@ def config_set(btrfs_cfg: str):
     else:
         logging.info(file)
         print(":: [+] :: BTRFS ::", file)
-
-def systemd_services():
-    cmds = [
-        "systemctl enable snapper-timeline.timer",
-        "systemctl enable snapper-cleanup.timer"
-    ]
-    for cmd in cmds:
-        try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
-            logging.info(cmd)
-            print(":: [+] :: BTRFS ::", cmd)
-        except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: BTRFS ::", err)

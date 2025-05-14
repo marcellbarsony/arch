@@ -42,18 +42,20 @@ def logind():
 
 def services(dmi: str):
     cmds = [
-        "systemctl enable dnscrypt-proxy.service",
-        "systemctl enable earlyoom",
-        "systemctl enable fstrim.timer",
-        "systemctl enable NetworkManager.service",
-        "systemctl enable nftables.service",
-        "systemctl enable ntpd.service",
-        "systemctl enable ntpdate.service",
-        "systemctl enable reflector.service"
+        ["systemctl", "enable", "dnscrypt-proxy.service"],
+        ["systemctl", "enable", "earlyoom"],
+        ["systemctl", "enable", "fstrim.timer"],
+        ["systemctl", "enable", "NetworkManager.service"],
+        ["systemctl", "enable", "nftables.service"],
+        ["systemctl", "enable", "ntpd.service"],
+        ["systemctl", "enable", "ntpdate.service"],
+        ["systemctl", "enable", "reflector.service"],
+        ["systemctl", "enable", "snapper-cleanup.timer"],
+        ["systemctl", "enable", "snapper-timeline.timer"]
     ]
     for cmd in cmds:
         try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
             print(":: [-] :: SYSTEMD ::", err)
@@ -62,9 +64,9 @@ def services(dmi: str):
             print(":: [+] :: SYSTEMD ::", cmd)
 
     if dmi == "vbox":
-        cmd = "systemctl enable vboxservice.service"
+        cmd = ["systemctl", "enable", "vboxservice.service"]
         try:
-            subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
             print(":: [-] :: SYSTEMD ::", err)

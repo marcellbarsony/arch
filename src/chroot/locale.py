@@ -59,9 +59,9 @@ def conf():
         print(":: [+] :: LOCALE ::", file)
 
 def gen():
-    cmd = "locale-gen"
+    cmd = ["locale-gen"]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: LOCALE ::", err)

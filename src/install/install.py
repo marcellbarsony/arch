@@ -11,9 +11,15 @@ def bug():
     Pacstrap doesn't work properly until pacman-init.service in the live system is done
     https://bbs.archlinux.org/viewtopic.php?pid=2081392#p2081392
     """
-    cmd = "systemctl --no-pager status -n0 pacman-init.service"
+    cmd = [
+        "systemctl",
+        "--no-pager",  # Prevent output from being piped
+        "status",  # Status of systemd unit
+        "-n0",  # 0 journal lines
+        "pacman-init.service",
+    ]
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.warning(f"{cmd}\n{err}")
         print(":: [W] :: PACSTRAP :: pacman-init.service ::", err)
@@ -31,8 +37,8 @@ def get_pkgs():
     logging.info(packages)
     return packages
 
-def get_pkgs_dmi(dmi: str) -> str:
-    match dmi.lower():
+def get_pkgs_dmi(dmidecode: str) -> str:
+    match dmidecode.lower():
         case "vbox":
             return "virtualbox-guest-utils"
         case "vmware":
@@ -46,9 +52,10 @@ def get_pkgs_dmi(dmi: str) -> str:
 
 def install(packages: str):
     os.system("clear")
-    cmd = f"pacstrap -K /mnt {packages}"
+    package_list = packages.split()
+    cmd = ["pacstrap", "-K", "/mnt"] + package_list
     try:
-        subprocess.run(cmd.rstrip(), shell=True, check=True)
+        subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: PACSTRAP :: Install ::", err)

@@ -1,11 +1,14 @@
 import subprocess
 
 
-"""Docstring for DMI"""
+"""
+DMI table decoder
+https://man.archlinux.org/man/dmidecode.8.en
+"""
 
 def check() -> str:
-    cmd = "sudo dmidecode -s system-product-name"
-    out = subprocess.run(cmd, shell=True, check=True, capture_output=True)
+    cmd = ["dmidecode", "-s", "system-product-name"]
+    out = subprocess.run(cmd, check=True, capture_output=True)
     if "VirtualBox" in str(out.stdout):
         return "vbox"
     if "VMware Virtual Platform" in str(out.stdout):
