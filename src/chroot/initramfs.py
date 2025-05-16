@@ -5,7 +5,7 @@ import subprocess
 
 """
 Initramfs & KMS config
-https://wiki.archlinux.org/mkinitcpio
+https://wiki.archlinux.org/title/Mkinitcpio
 https://wiki.archlinux.org/Kernel_mode_setting
 """
 
@@ -52,7 +52,7 @@ def initramfs(kms: str):
         print(":: [+] :: INITRAMFS ::", file)
 
 def mkinitcpio():
-    cmd = ["mkinitcpio", "-p", "linux"]
+    cmd = ["mkinitcpio", "-p", "linux-hardened"]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:

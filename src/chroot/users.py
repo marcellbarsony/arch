@@ -51,24 +51,19 @@ def user_password(user: str, user_pw: str):
         print(":: [+] :: USER ::", cmd)
 
 def user_group_create():
-    groups = [
-        "vboxusers",
-        "vboxsf"
-    ]
-    for group in groups:
-        cmd = ["groupadd", group]
-        try:
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: USER ::", err)
-            sys.exit(1)
-        else:
-            logging.info(cmd)
-            print(":: [+] :: USER ::", cmd)
+    cmd = ["groupadd", "vboxusers"]
+    try:
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as err:
+        logging.error(f"{cmd}\n{err}")
+        print(":: [-] :: USER ::", err)
+        sys.exit(1)
+    else:
+        logging.info(cmd)
+        print(":: [+] :: USER ::", cmd)
 
 def user_group_add(user: str):
-    groups = "wheel,audio,video,optical,storage,vboxusers,vboxsf"
+    groups = "wheel,audio,video,optical,storage,vboxusers"
     cmd = ["usermod", "-aG", groups, user]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)

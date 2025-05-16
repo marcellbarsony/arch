@@ -4,7 +4,7 @@ import sys
 
 
 """
-Docstring for Security
+Security
 https://wiki.archlinux.org/title/security
 """
 
@@ -51,7 +51,10 @@ def sudoers():
         print(":: [+] :: SUDOERS ::", file)
 
 def login_delay():
-    """https://wiki.archlinux.org/title/security#Enforce_a_delay_after_a_failed_login_attempt"""
+    """
+    Enforce a delay after a failed login attempt
+    https://wiki.archlinux.org/title/security#Enforce_a_delay_after_a_failed_login_attempt
+    """
     file = "/etc/pam.d/system-login"
     try:
         with open(file, "r") as f:
@@ -62,6 +65,7 @@ def login_delay():
         sys.exit(1)
 
     lines.insert(5, f"auth optional pam_faildelay.so delay=5000000")
+
     try:
         with open(file, "w") as f:
             f.writelines(lines)

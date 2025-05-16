@@ -4,6 +4,7 @@
 # Imports {{{
 import configparser
 import logging
+import threading
 
 from chroot import snapper
 from chroot import dmi
@@ -50,6 +51,14 @@ if __name__ == "__main__":
 
     # DMI table decoder
     device, device_efi, device_root = dmi.disk()
+    # }}}
+
+    # Pacman {{{
+    mirrorlist.backup()
+    mirrorlist.systemd()
+    mirrorlist_thread = threading.Thread(target=mirrorlist.update)
+    mirrorlist_thread.start()
+    pacman.config()
     # }}}
 
     # Locale {{{
@@ -113,13 +122,6 @@ if __name__ == "__main__":
     ssh.bashrc(user)
     # }}}
 
-    # Pacman {{{
-    mirrorlist.backup()
-    mirrorlist.update()
-    mirrorlist.systemd()
-    pacman.config()
-    # }}}
-
     # X11 {{{
     x11.keymaps()
     # }}}
@@ -132,4 +134,5 @@ if __name__ == "__main__":
     # Finalize {{{
     finalize.change_ownership(user)
     finalize.remove_xdg_dirs(user)
+    mirrorlist_thread.join()
     # }}}
