@@ -26,6 +26,7 @@ def sudoers():
         "##\n",
         "## Enable insults\n",
         "Defaults:%wheel insults\n",
+        "##\n",
         "## Disable sudo password timeout\n",
         "Defaults passwd_timeout=0\n"
     ]

@@ -40,6 +40,10 @@ def update():
         print(":: [+] :: REFLECTOR :: Mirrorlist update")
 
 def systemd():
+    """
+    Systemd service
+    https://wiki.archlinux.org/title/Reflector#systemd_service
+    """
     file = "/etc/xdg/reflector/reflector.conf"
     content = textwrap.dedent(
         """\

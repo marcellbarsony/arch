@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     # GRUB {{{
     uuid = grub.get_uuid(device_root)
-    grub.setup(uuid)
+    grub.config(uuid)
     grub.install(secureboot, efi_directory)
     # grub.password(grub_password, user)
     grub.mkconfig()
@@ -126,13 +126,13 @@ if __name__ == "__main__":
     x11.keymaps()
     # }}}
 
-    # Post script {{{
+    # Finalize {{{
     post.clone(user)
     post.chown(user)
-    # }}}
 
-    # Finalize {{{
     finalize.change_ownership(user)
     finalize.remove_xdg_dirs(user)
+
+    print(":: [i] :: Mirrorlist :: Waiting for update")
     mirrorlist_thread.join()
     # }}}

@@ -5,7 +5,10 @@ import subprocess
 import textwrap
 
 
-"""Docstring for GRUB"""
+"""
+GRUB
+https://wiki.archlinux.org/title/GRUB
+"""
 
 def get_uuid(device_root: str) -> str:
     out = subprocess.check_output(["blkid"]).decode("utf-8")
@@ -20,7 +23,11 @@ def get_uuid(device_root: str) -> str:
     print(":: [W] :: GRUB :: No UUID found")
     return ""
 
-def setup(uuid: str):
+def config(uuid: str):
+    """
+    Configuration
+    https://wiki.archlinux.org/title/GRUB#Configuration
+    """
     file = "/etc/default/grub"
     try:
         with open(file, "r") as f:
@@ -53,6 +60,10 @@ def setup(uuid: str):
         print(":: [+] :: GRUB :: Write", file)
 
 def install(secureboot: str, efi_directory: str):
+    """
+    UEFI Installation
+    https://wiki.archlinux.org/title/GRUB#Installation
+    """
     if secureboot == True:
         cmd = ["grub-install", "--target=x86_64-efi", "--bootloader-id=GRUB", f"--efi-directory={efi_directory}", '--modules="tpm"', "--disable-shim-lock"]
     else:

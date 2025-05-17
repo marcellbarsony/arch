@@ -3,7 +3,7 @@ import shutil
 
 
 """
-Docstring for SSH setup
+OpenSSH setup
 https://wiki.archlinux.org/title/OpenSSH
 """
 

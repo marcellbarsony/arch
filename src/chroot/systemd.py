@@ -6,7 +6,7 @@ import textwrap
 
 
 """
-Docstring for Systemd
+Systemd
 https://wiki.archlinux.org/title/systemd
 """
 

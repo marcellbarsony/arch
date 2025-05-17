@@ -13,11 +13,9 @@ def change_ownership(user: str):
         for dirname in dirnames:
             dir_path = os.path.join(dirpath, dirname)
             os.chown(dir_path, uid, gid)
-            logging.info(dir_path, uid, gid)
         for filename in filenames:
             file_path = os.path.join(dirpath, filename)
             os.chown(file_path, uid, gid)
-            # logging.info(file_path, uid, gid) # TODO: Fix
 
 def remove_xdg_dirs(user: str):
     home_dir = f"/home/{user}"

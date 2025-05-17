@@ -13,8 +13,8 @@ https://wiki.archlinux.org/title/DNS-over-HTTPS
 
 def networkmanager():
     """
-    https://wiki.archlinux.org/title/NetworkManager#Unmanaged_/etc/resolv.conf
     Stop NetworkManager from touching `/etc/resolv.conf`
+    https://wiki.archlinux.org/title/NetworkManager#Unmanaged_/etc/resolv.conf
     """
     file = "/etc/NetworkManager/conf.d/dns.conf"
     content = textwrap.dedent(
