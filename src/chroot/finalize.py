@@ -1,21 +1,34 @@
 import logging
 import os
-import grp
-import pwd
+# import grp
+# import pwd
 import shutil
 
 
 def change_ownership(user: str):
     target = f"/home/{user}/"
-    uid = pwd.getpwnam(user).pw_uid  # Owner
-    gid = grp.getgrnam(user).gr_gid  # Group
-    for dirpath, dirnames, filenames in os.walk(target):
-        for dirname in dirnames:
-            dir_path = os.path.join(dirpath, dirname)
-            os.chown(dir_path, uid, gid)
-        for filename in filenames:
-            file_path = os.path.join(dirpath, filename)
-            os.chown(file_path, uid, gid)
+    # uid = pwd.getpwnam(user).pw_uid  # Owner
+    # gid = grp.getgrnam(user).gr_gid  # Group
+    shutil.chown(target, user=user, group=user)
+    for dirpath, dirnames, filenames in os.walk(target, followlinks=False):
+        # for dirname in dirnames:
+        #     dir_path = os.path.join(dirpath, dirname)
+        #     os.chown(dir_path, uid, gid)
+        # for filename in filenames:
+        #     file_path = os.path.join(dirpath, filename)
+        #     os.chown(file_path, uid, gid)
+        for name in dirnames + filenames:
+            path = os.path.join(dirpath, name)
+
+            # Skip symlinks
+            if os.path.islink(path):
+                logging.debug(f"Skipping symlink: {path}")
+                continue
+
+            try:
+                shutil.chown(path, user=user, group=user)
+            except Exception as err:
+                logging.warning(f"Failed to change ownership of {path}: {err}")
 
 def remove_xdg_dirs(user: str):
     home_dir = f"/home/{user}"

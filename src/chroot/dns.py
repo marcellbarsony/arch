@@ -5,7 +5,7 @@ import textwrap
 
 
 """
-Docstring for DNS (DoH with DNSCrypt proxy)
+DNS (DoH with DNSCrypt proxy)
 https://wiki.archlinux.org/title/Domain_name_resolution
 https://wiki.archlinux.org/title/Dnscrypt-proxy
 https://wiki.archlinux.org/title/DNS-over-HTTPS

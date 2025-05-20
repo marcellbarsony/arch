@@ -5,7 +5,7 @@ import sys
 
 
 """
-Docstring for Snapper
+Snapper
 https://wiki.archlinux.org/title/snapper
 """
 

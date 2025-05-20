@@ -25,7 +25,7 @@ def copy(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
 
 def chroot():
     """
-    Chroot into the new system
+    Chroot into the new system & Launch chroot script
     https://wiki.archlinux.org/title/Installation_guide#Chroot
     """
     os.system("clear")

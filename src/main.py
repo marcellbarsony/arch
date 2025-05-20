@@ -56,8 +56,10 @@ if __name__ == "__main__":
     # Pacman {{{
     mirrorlist.backup()
     mirrorlist.systemd()
+
     mirrorlist_thread = threading.Thread(target=mirrorlist.update)
     mirrorlist_thread.start()
+
     pacman.config()
     # }}}
 

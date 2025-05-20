@@ -3,7 +3,10 @@ import subprocess
 import sys
 
 
-"""Docstring for Encryption"""
+"""
+Encryption
+https://wiki.archlinux.org/title/Dm-crypt/Device_encryption
+"""
 
 def modprobe():
     """

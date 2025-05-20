@@ -5,7 +5,7 @@ import sys
 
 
 """
-Docstring for Locale
+Locale
 https://wiki.archlinux.org/title/locale
 """
 

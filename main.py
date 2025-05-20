@@ -7,7 +7,7 @@ import configparser
 import getpass
 import logging
 import os
-import threading
+# import threading
 
 from src.install import check
 from src.install import init
@@ -36,7 +36,9 @@ if __name__ == "__main__":
 
     # Logging {{{
     logging.basicConfig(
-        level = logging.INFO, filename = "logs.log", filemode = "w",
+        level = logging.INFO,
+        filename = "logs.log",
+        filemode = "w",
         format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
@@ -69,13 +71,13 @@ if __name__ == "__main__":
     # }}}
 
     # Keyset {{{
-    font   = config.get("keyset", "font")
-    keys   = config.get("keyset", "keys")
+    font = config.get("keyset", "font")
+    keys = config.get("keyset", "keys")
     keymap = config.get("keyset", "keymap")
     # }}}
 
     # Network {{{
-    network_ip   = config.get("network", "ip")
+    network_ip = config.get("network", "ip")
     network_port = config.get("network", "port")
     network_host = config.get("network", "hostname")
     # }}}
@@ -92,6 +94,7 @@ if __name__ == "__main__":
             if not value.strip():
                 print(":: [-] :: ConfigParser :: Empty value")
                 raise ValueError(f"Empty value '{key}' in section [{section}]")
+    print(":: [+] :: CONFIG :: Parse")
     # }}}
 
     # Check {{{
