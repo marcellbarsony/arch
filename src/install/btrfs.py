@@ -5,7 +5,7 @@ import sys
 
 
 """
-Docstring for Btrfs file system
+Btrfs file system
 https://wiki.archlinux.org/title/Btrfs
 """
 

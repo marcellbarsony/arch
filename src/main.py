@@ -29,7 +29,9 @@ if __name__ == "__main__":
 
     # Logging {{{
     logging.basicConfig(
-        level = logging.INFO, filename = "logs.log", filemode = "w",
+        level = logging.INFO,
+        filename = "logs.log",
+        filemode = "w",
         format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
     )
     # }}}
@@ -57,8 +59,8 @@ if __name__ == "__main__":
     mirrorlist.backup()
     mirrorlist.systemd()
 
-    mirrorlist_thread = threading.Thread(target=mirrorlist.update)
-    mirrorlist_thread.start()
+    # mirrorlist_thread = threading.Thread(target=mirrorlist.update)
+    # mirrorlist_thread.start()
 
     pacman.config()
     # }}}
@@ -101,40 +103,40 @@ if __name__ == "__main__":
     grub.mkconfig()
     # }}}
 
-    # Systemd {{{
-    systemd.logind()
-    dmi_res = dmi.check()
-    systemd.services(dmi_res)
-    systemd.watchdog()
-    systemd.pc_speaker()
-    # }}}
-
-    # DNS (DoH) {{{
-    dns.networkmanager()
-    dns.resolvconf()
-    dns.doh(nextdns_profile)
-    # }}}
-
-    # Btrfs {{{
-    snapper.config_init(btrfs_cfg)
-    snapper.config_set(btrfs_cfg)
-    # }}}
-
-    # SSH {{{
-    ssh.bashrc(user)
-    # }}}
-
-    # X11 {{{
-    x11.keymaps()
-    # }}}
-
-    # Finalize {{{
-    post.clone(user)
-    post.chown(user)
-
-    finalize.change_ownership(user)
-    finalize.remove_xdg_dirs(user)
-
-    print(":: [i] :: Mirrorlist :: Waiting for update")
-    mirrorlist_thread.join()
-    # }}}
+    # # Systemd {{{
+    # systemd.logind()
+    # dmi_res = dmi.check()
+    # systemd.services(dmi_res)
+    # systemd.watchdog()
+    # systemd.pc_speaker()
+    # # }}}
+    #
+    # # DNS (DoH) {{{
+    # dns.networkmanager()
+    # dns.resolvconf()
+    # dns.doh(nextdns_profile)
+    # # }}}
+    #
+    # # Btrfs {{{
+    # snapper.config_init(btrfs_cfg)
+    # snapper.config_set(btrfs_cfg)
+    # # }}}
+    #
+    # # SSH {{{
+    # ssh.bashrc(user)
+    # # }}}
+    #
+    # # X11 {{{
+    # x11.keymaps()
+    # # }}}
+    #
+    # # Finalize {{{
+    # post.clone(user)
+    # post.chown(user)
+    #
+    # finalize.change_ownership(user)
+    # finalize.remove_xdg_dirs(user)
+    #
+    # print(":: [i] :: Mirrorlist :: Waiting for update")
+    # # mirrorlist_thread.join()
+    # # }}}

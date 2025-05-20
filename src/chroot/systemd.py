@@ -36,6 +36,7 @@ def logind():
     except Exception as err:
         logging.error(f"{file}\n{err}")
         print(":: [-] :: SYSTEMD ::", err)
+        pass
     else:
         logging.info(file)
         print(":: [+] :: SYSTEMD ::", file)
@@ -59,6 +60,7 @@ def services(dmi: str):
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
             print(":: [-] :: SYSTEMD ::", err)
+            pass
         else:
             logging.info(cmd)
             print(":: [+] :: SYSTEMD ::", cmd)
@@ -70,7 +72,7 @@ def services(dmi: str):
         except subprocess.CalledProcessError as err:
             logging.error(f"{cmd}\n{err}")
             print(":: [-] :: SYSTEMD ::", err)
-            sys.exit(1)
+            pass
         else:
             logging.info(cmd)
             print(":: [+] :: SYSTEMD ::", cmd)
@@ -101,6 +103,7 @@ def watchdog():
     except Exception as err:
         logging.error(f"{file}\n{err}")
         print(":: [-] :: SYSTEMD ::", err)
+        pass
     else:
         logging.info(file)
         print(":: [+] :: SYSTEMD ::", file)
@@ -120,6 +123,7 @@ def pc_speaker():
     except Exception as err:
         logging.error(f"{file}\n{err}")
         print(":: [-] :: SYSTEMD ::", err)
+        pass
     else:
         logging.info(file)
         print(":: [+] :: SYSTEMD ::", file)

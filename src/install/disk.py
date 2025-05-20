@@ -3,7 +3,10 @@ import subprocess
 import sys
 
 
-"""Docstring for Disk"""
+"""
+Disk partitioning
+https://wiki.archlinux.org/title/Partitioning
+"""
 
 def wipe(disk: str):
     """

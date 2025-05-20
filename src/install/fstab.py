@@ -5,7 +5,7 @@ import subprocess
 
 
 """
-Docstring for Fstab
+Fstab
 https://wiki.archlinux.org/title/Fstab
 """
 

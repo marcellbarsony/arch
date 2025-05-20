@@ -5,7 +5,7 @@ import textwrap
 
 def keymaps():
     """
-    Docstring for X11 Keymaps
+    X11 Keymaps
     https://wiki.archlinux.org/title/Linux_console/Keyboard_configuration
     """
     file = "/etc/X11/xorg.conf.d/00-keyboard.conf"
@@ -29,6 +29,7 @@ def keymaps():
     except Exception as err:
         logging.warning(f"{file}\n{err}")
         print(":: [W] :: X11 ::", err)
+        pass
     else:
         logging.info(file)
         print(":: [+] :: X11 ::", file)

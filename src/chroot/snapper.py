@@ -16,6 +16,7 @@ def config_init(btrfs_cfg: str):
     except subprocess.CalledProcessError as err:
         logging.error(f"{cmd}\n{err}")
         print(":: [-] :: BTRFS ::", err)
+        pass
     else:
         logging.info(cmd)
         print(":: [+] :: BTRFS ::", cmd)
@@ -36,7 +37,7 @@ def config_set(btrfs_cfg: str):
     except Exception as err:
         logging.error(f"Reading {file}\n{err}")
         print(f":: [-] :: BTRFS :: Reading {file} ::", err)
-        sys.exit(1)
+        return
 
     updated_lines = []
     for line in lines:
@@ -63,7 +64,7 @@ def config_set(btrfs_cfg: str):
     except Exception as err:
         logging.error(f"{file}\n{err}")
         print(":: [-] :: BTRFS ::", err)
-        sys.exit(1)
+        return
     else:
         logging.info(file)
         print(":: [+] :: BTRFS ::", file)
