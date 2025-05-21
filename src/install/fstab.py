@@ -24,11 +24,11 @@ def genfstab():
     Generate fstab file
     https://wiki.archlinux.org/title/Genfstab
     """
-    cmd = ["genfstab", "-U", "/mnt",  ">>", "/mnt/etc/fstab"]
     try:
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
+        with open("/mnt/etc/fstab", "a") as fstab:
+            subprocess.run(["genfstab", "-U", "/mnt"], stdout=fstab, check=True)
     except subprocess.CalledProcessError as err:
-        logging.error("%s\n%s", cmd, err)
+        logging.error("\n%s", err)
         sys.exit(1)
     else:
-        logging.info(cmd)
+        logging.info("fstab")

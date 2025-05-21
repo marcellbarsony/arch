@@ -66,7 +66,7 @@ def services(dmi: str):
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
-            logging.error("%s\n%s", cmd, err)
+            logging.warning("%s\n%s", cmd, err)
             pass
         else:
             logging.info(cmd)

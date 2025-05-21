@@ -26,9 +26,8 @@ https://wiki.archlinux.org/title/users_and_groups
 
 def user_add(user: str):
     cmd = ["useradd", "-m", user]
-    cmd = f"useradd -m {user}"
     try:
-        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error("%s\n%s", cmd, err)
         sys.exit(1)
