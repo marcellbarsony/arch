@@ -17,8 +17,7 @@ def sudoers():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        print(":: [-] :: SUDOERS :: Read ::", err)
-        logging.error(f"Reading {file}\n{err}")
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
 
     updated_lines = []
@@ -44,12 +43,10 @@ def sudoers():
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: SUDOERS ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: SUDOERS ::", file)
 
 def login_delay():
     """
@@ -61,8 +58,7 @@ def login_delay():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        print(f":: [-] :: Read {file} ::", err)
-        logging.error(f"Reading {file}\n{err}")
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
 
     lines.insert(5, f"auth optional pam_faildelay.so delay=5000000")
@@ -71,9 +67,7 @@ def login_delay():
         with open(file, "w") as f:
             f.writelines(lines)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(f":: [-] :: Writing {file}")
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(f":: [+] :: Writing {file}")

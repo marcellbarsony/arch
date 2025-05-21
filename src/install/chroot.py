@@ -11,17 +11,15 @@ def copy(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
         shutil.copy(cfg_src, cfg_dst)
         os.chmod("/mnt/temporary/main.py", 0o755)
     except FileExistsError as err:
-        logging.warning("File already exists:", err)
+        logging.warning(err)
         pass
     except Exception as err:
         logging.error(err)
-        print(":: [-] :: CHROOT :: Copy sources ::", err)
         sys.exit(1)
     else:
         logging.info(f"copytree: {scr_src} >> {scr_dst}")
         logging.info(f"copy: {scr_src} >> {scr_dst}")
         logging.info("chmod 0x755 /mnt/temporary/main.py")
-        print(":: [+] :: CHROOT :: Copy script")
 
 def chroot():
     """
@@ -33,12 +31,10 @@ def chroot():
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: CHROOT ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: Installation successful")
 
 def clear(scr_dst: str, cfg_dst: str):
     try:
@@ -46,7 +42,6 @@ def clear(scr_dst: str, cfg_dst: str):
         os.remove(cfg_dst)
     except Exception as err:
         logging.error(err)
-        print(":: [-] :: CLEAR-UP :: Copy sources ::", err)
         sys.exit(1)
     else:
         logging.info(f"rmtree {scr_dst}")

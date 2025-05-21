@@ -15,13 +15,12 @@ def backup():
     try:
         shutil.copy2(src, dst)
     except Exception as err:
-        print(f":: [W] :: Cannot create backup ::", err)
-        logging.warning(f"Copy {src} >> {dst}")
+        logging.warning("Copy %s >> %s", src, dst)
     else:
         logging.info(f"Copy {src} >> {dst}")
 
 def update():
-    print(":: [i] :: REFLECTOR :: Updating mirrorlist...")
+    logging.info("updating mirrorlist ...")
     cmd = [
         "reflector",
         "--latest", "25",
@@ -33,11 +32,9 @@ def update():
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        print(":: [-] :: REFLECTOR :: Mirorlist update ::", err)
-        logging.error(f"{cmd}\n{err}")
+        logging.error("%s\n%s", cmd, err)
     else:
         logging.info(cmd)
-        print(":: [+] :: REFLECTOR :: Mirrorlist update")
 
 def systemd():
     """
@@ -60,8 +57,6 @@ def systemd():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: REFLECTOR ::", err)
+        logging.error("%s\n%s", file, err)
     else:
         logging.info(file)
-        print(":: [+] :: REFLECTOR ::", file)

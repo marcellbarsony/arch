@@ -12,12 +12,10 @@ def time_zone(zone: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [+] :: INIT ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: INIT ::", cmd)
 
 def loadkeys(keys: str):
     """
@@ -28,21 +26,17 @@ def loadkeys(keys: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: INIT ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: INIT ::", cmd)
 
 def keymaps(keymap: str):
     cmd = ["localectl", "set-keymap", "--no-convert", keymap]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: INIT ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: INIT ::", cmd)

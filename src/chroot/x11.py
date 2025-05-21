@@ -1,5 +1,4 @@
 import logging
-import sys
 import textwrap
 
 
@@ -27,9 +26,7 @@ def keymaps():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.warning(f"{file}\n{err}")
-        print(":: [W] :: X11 ::", err)
+        logging.warning("%s\n%s", file, err)
         pass
     else:
         logging.info(file)
-        print(":: [+] :: X11 ::", file)

@@ -13,12 +13,10 @@ def root_password(root_pw: str):
     try:
         subprocess.run(cmd, check=True, input=f"root:{root_pw}".encode())
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: ROOT ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(f"root:{root_pw} | {cmd}")
-        print(":: [+] :: ROOT ::", cmd)
 
 
 """
@@ -28,39 +26,34 @@ https://wiki.archlinux.org/title/users_and_groups
 
 def user_add(user: str):
     cmd = ["useradd", "-m", user]
+    cmd = f"useradd -m user"
     try:
-        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
+        subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: USER ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: USER ::", cmd)
 
 def user_password(user: str, user_pw: str):
     cmd = ["chpasswd", "--crypt-method", "SHA512"]
     try:
         subprocess.run(cmd, check=True, input=f"{user}:{user_pw}".encode())
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: USER ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(f"{user}:{user_pw} | {cmd}")
-        print(":: [+] :: USER ::", cmd)
 
 def user_group_create():
     cmd = ["groupadd", "vboxusers"]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: USER ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: USER ::", cmd)
 
 def user_group_add(user: str):
     groups = "wheel,audio,video,optical,storage,vboxusers"
@@ -68,9 +61,7 @@ def user_group_add(user: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: USER ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: USER ::", cmd)

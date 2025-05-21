@@ -2,6 +2,7 @@
 
 
 # Imports {{{
+import sys
 import argparse
 import configparser
 import getpass
@@ -39,8 +40,16 @@ if __name__ == "__main__":
         level = logging.INFO,
         filename = "logs.log",
         filemode = "w",
-        format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
+        format = ":: %(levelname)s :: %(module)s :: %(funcName)s :: %(lineno)d\n%(message)-1s"
     )
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(logging.Formatter(
+        ":: %(levelname)s :: %(module)s :: %(funcName)s :: %(message)-1s"
+    ))
+
+    logging.getLogger().addHandler(console_handler)
     # }}}
 
     # Global variables {{{
@@ -89,16 +98,13 @@ if __name__ == "__main__":
     for section in config.sections():
         for key, value in config.items(section):
             if not key.strip():
-                print(":: [-] :: ConfigParser :: Empty key")
                 raise ValueError(f"Empty key found :: [{section}]")
             if not value.strip():
-                print(":: [-] :: ConfigParser :: Empty value")
                 raise ValueError(f"Empty value '{key}' in section [{section}]")
-    print(":: [+] :: CONFIG :: Parse")
     # }}}
 
     # Check {{{
-    check.boot_mode()
+    # check.boot_mode()
     check.network(network_ip, network_port)
     # }}}
 

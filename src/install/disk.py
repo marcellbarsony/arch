@@ -23,12 +23,10 @@ def wipe(disk: str):
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: FILESYSTEM :: Wipe ::", err)
+            logging.error("%s\n%s", cmd, err)
             sys.exit(1)
         else:
             logging.info(cmd)
-            print(":: [+] :: FILESYSTEM :: Wipe ::", cmd)
 
 def create_efi(device: str, efisize: str):
     """
@@ -45,12 +43,10 @@ def create_efi(device: str, efisize: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: FILESYSTEM :: Create EFI ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: FILESYSTEM :: Create EFI")
 
 def create_system(device: str):
     """
@@ -67,12 +63,10 @@ def create_system(device: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: FILESYSTEM :: Create cryptsystem ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: FILESYSTEM :: Create cryptsystem")
 
 def partprobe(device: str):
     """
@@ -83,9 +77,7 @@ def partprobe(device: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: FILESYSTEM :: Partprobe ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: FILESYSTEM :: Partprobe")

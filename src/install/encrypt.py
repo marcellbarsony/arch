@@ -21,12 +21,10 @@ def modprobe():
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: CRYPTSETUP ::", err)
+            logging.error("%s\n%s", cmd, err)
             pass
         else:
             logging.info(cmd)
-            print(":: [+] :: CRYPTSETUP ::", cmd)
 
 def encrypt(device_root: str, cryptpassword: str):
     """
@@ -49,12 +47,10 @@ def encrypt(device_root: str, cryptpassword: str):
     try:
         subprocess.run(cmd, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: CRYPTSETUP :: Encrypt ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: CRYPTSETUP :: Encrypt ::", device_root)
 
 def open(device_root: str, cryptpassword: str):
     """
@@ -69,9 +65,7 @@ def open(device_root: str, cryptpassword: str):
     try:
         subprocess.run(cmd, check=True, input=cryptpassword.encode(), stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: CRYPTSETUP :: Open ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: CRYPTSETUP :: Open ::", device_root)

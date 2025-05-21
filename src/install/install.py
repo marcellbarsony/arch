@@ -21,12 +21,10 @@ def bug():
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.warning(f"{cmd}\n{err}")
-        print(":: [W] :: PACSTRAP :: pacman-init.service ::", err)
+        logging.warning("%s\n%s", cmd, err)
         pass
     else:
         logging.info(cmd)
-        print(":: [+] :: PACSTRAP :: pacman-init.servic")
 
 def get_pkgs():
     packages = ""
@@ -34,7 +32,6 @@ def get_pkgs():
         for line in file:
             if not line.startswith("[") and not line.startswith(";") and line.strip() != "":
                 packages += f"{line.rstrip()} "
-    logging.info(packages)
     return packages
 
 def get_pkgs_dmi(dmidecode: str) -> str:
@@ -57,9 +54,7 @@ def install(packages: str):
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: PACSTRAP :: Install ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: PACSTRAP :: Install")

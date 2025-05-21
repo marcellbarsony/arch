@@ -19,8 +19,7 @@ def get_uuid(device_root: str) -> str:
                 uuid = match.group(1)
                 logging.info(uuid)
                 return uuid
-    logging.warning("No UUID found")
-    print(":: [W] :: GRUB :: No UUID found")
+    logging.warning("not found")
     return ""
 
 def config(uuid: str):
@@ -33,8 +32,7 @@ def config(uuid: str):
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: GRUB ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
 
     # Timeout
@@ -52,12 +50,10 @@ def config(uuid: str):
         with open(file, "w") as f:
             f.writelines(lines)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: GRUB :: Write ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: GRUB :: Write", file)
 
 def install(secureboot: str, efi_directory: str):
     """
@@ -68,15 +64,14 @@ def install(secureboot: str, efi_directory: str):
         cmd = ["grub-install", "--target=x86_64-efi", "--bootloader-id=GRUB", f"--efi-directory={efi_directory}", '--modules="tpm"', "--disable-shim-lock"]
     else:
         cmd = ["grub-install", "--target=x86_64-efi", "--bootloader-id=GRUB", f"--efi-directory={efi_directory}"]
+
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: GRUB :: Install ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: GRUB :: Install")
 
 def password(grub_password: str, user: str):
     pbkdf2_hash = ""
@@ -87,11 +82,9 @@ def password(grub_password: str, user: str):
         out = subprocess.run(cmd, check=True, input=stdin.encode(), stdout=subprocess.PIPE)
         pbkdf2_hash = out.stdout.decode("utf-8")[67:].strip()
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: GRUB :: Password ::", err)
+        logging.error("%s\n%s", cmd, err)
     else:
         logging.info(cmd)
-        print(":: [+] :: GRUB :: Password")
 
     file = "/etc/grub.d/00_header"
     content = textwrap.dedent(
@@ -105,19 +98,16 @@ def password(grub_password: str, user: str):
 
     with open(file, "a") as f:
         f.write(content)
-    logging.info(f"{file}\n{content}")
 
 def mkconfig():
     cmd = ["grub-mkconfig", "-o", "/boot/grub/grub.cfg"]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: GRUB :: Mkconfig ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: GRUB :: Mkconfig ::", cmd)
 
 def secure_boot():
     # https://wiki.archlinux.org/title/Unified_Extensible_Firmware_Interface/Secure_Boot

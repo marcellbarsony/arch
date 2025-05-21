@@ -4,6 +4,7 @@
 # Imports {{{
 import configparser
 import logging
+import sys
 import threading
 
 from chroot import snapper
@@ -16,7 +17,6 @@ from chroot import initramfs
 from chroot import locale
 from chroot import mirrorlist
 from chroot import pacman
-from chroot import post
 from chroot import ssh
 from chroot import security
 from chroot import systemd
@@ -32,8 +32,16 @@ if __name__ == "__main__":
         level = logging.INFO,
         filename = "logs.log",
         filemode = "w",
-        format = ":: %(levelname)s :: %(module)s - %(funcName)s: %(lineno)d\n%(message)-1s\n"
+        format = ":: %(levelname)s :: %(module)s :: %(funcName)s :: %(lineno)d\n%(message)-1s"
     )
+
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_handler.setFormatter(logging.Formatter(
+        ":: %(levelname)s :: %(module)s :: %(funcName)s :: %(message)-1s"
+    ))
+
+    logging.getLogger().addHandler(console_handler)
     # }}}
 
     # Global variables {{{
@@ -59,8 +67,8 @@ if __name__ == "__main__":
     mirrorlist.backup()
     mirrorlist.systemd()
 
-    # mirrorlist_thread = threading.Thread(target=mirrorlist.update)
-    # mirrorlist_thread.start()
+    mirrorlist_thread = threading.Thread(target=mirrorlist.update)
+    mirrorlist_thread.start()
 
     pacman.config()
     # }}}
@@ -103,40 +111,36 @@ if __name__ == "__main__":
     grub.mkconfig()
     # }}}
 
-    # # Systemd {{{
-    # systemd.logind()
-    # dmi_res = dmi.check()
-    # systemd.services(dmi_res)
-    # systemd.watchdog()
-    # systemd.pc_speaker()
-    # # }}}
-    #
-    # # DNS (DoH) {{{
-    # dns.networkmanager()
-    # dns.resolvconf()
-    # dns.doh(nextdns_profile)
-    # # }}}
-    #
-    # # Btrfs {{{
-    # snapper.config_init(btrfs_cfg)
-    # snapper.config_set(btrfs_cfg)
-    # # }}}
-    #
-    # # SSH {{{
-    # ssh.bashrc(user)
-    # # }}}
-    #
-    # # X11 {{{
-    # x11.keymaps()
-    # # }}}
-    #
-    # # Finalize {{{
-    # post.clone(user)
-    # post.chown(user)
-    #
-    # finalize.change_ownership(user)
-    # finalize.remove_xdg_dirs(user)
-    #
-    # print(":: [i] :: Mirrorlist :: Waiting for update")
-    # # mirrorlist_thread.join()
-    # # }}}
+    # Systemd {{{
+    systemd.logind()
+    dmi_res = dmi.check()
+    systemd.services(dmi_res)
+    systemd.watchdog()
+    systemd.pc_speaker()
+    # }}}
+
+    # DNS (DoH) {{{
+    dns.networkmanager()
+    dns.resolvconf()
+    dns.doh(nextdns_profile)
+    # }}}
+
+    # Btrfs {{{
+    snapper.config_init(btrfs_cfg)
+    snapper.config_set(btrfs_cfg)
+    # }}}
+
+    # SSH {{{
+    ssh.bashrc(user)
+    # }}}
+
+    # X11 {{{
+    x11.keymaps()
+    # }}}
+
+    # Finalize {{{
+    mirrorlist_thread.join()
+
+    finalize.change_ownership(user)
+    finalize.remove_xdg_dirs(user)
+    # }}}

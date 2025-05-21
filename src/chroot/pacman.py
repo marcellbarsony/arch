@@ -14,8 +14,7 @@ def config():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: PACMAN :: Read ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
 
     pattern_1 = re.compile(r"^#\sMisc\soptions")
@@ -48,9 +47,7 @@ def config():
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: PACMAN :: Write ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: PACMAN :: Write ::", file)

@@ -23,12 +23,10 @@ def mkfs(rootdir: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: BTRFS ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: BTRFS ::", cmd)
 
 def mountfs(rootdir: str):
     """
@@ -39,12 +37,10 @@ def mountfs(rootdir: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: BTRFS ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: BTRFS ::", cmd)
 
 def mksubvols():
     """
@@ -62,24 +58,20 @@ def mksubvols():
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}\n{err}")
-            print(":: [-] :: BTRFS ::", err)
+            logging.error("%s\n%s", cmd, err)
             sys.exit(1)
         else:
             logging.info(cmd)
-            print(":: [+] :: BTRFS ::", cmd)
 
 def unmount():
     cmd = ["umount", "-R", "/mnt"]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: BTRFS ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: BTRFS ::", cmd)
 
 def mount_root(rootdir: str):
     cmd = [
@@ -91,24 +83,20 @@ def mount_root(rootdir: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: BTRFS :: Mount @/ >> /mnt ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: BTRFS :: Mount @/ >> /mn")
 
 def mkdir(subvolumes: list):
     for subvolume in subvolumes:
         path = "/mnt/" + subvolume
         if os.path.exists(path):
             logging.error(path)
-            print(":: [-] :: BTRFS :: mkdir ::", path)
             sys.exit(1)
         else:
             os.makedirs(path)
             logging.info(path)
-            print(":: [+] :: BTRFS :: mkdir ::", path)
 
 def mount_subvolumes(subvolumes: list, rootdir: str):
     """
@@ -125,9 +113,7 @@ def mount_subvolumes(subvolumes: list, rootdir: str):
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
-            logging.error(f"{cmd}\n{err}")
-            print(f":: [-] :: BTRFS :: Mount @{subvolume} >> /mnt/{subvolume} ::", err)
+            logging.error("%s\n%s", cmd, err)
             sys.exit(1)
         else:
             logging.info(cmd)
-            print(f":: [+] :: BTRFS :: Mount @{subvolume} >> /mnt/{subvolume}")

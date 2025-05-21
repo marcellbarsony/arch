@@ -18,8 +18,7 @@ def locale():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error(f"Reading {file}\n{err}")
-        print(f":: [-] :: LOCALE :: Reading {file} ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
 
     updated_lines = []
@@ -37,12 +36,10 @@ def locale():
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: LOCALE ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: LOCALE ::", file)
 
 def conf():
     locale = "LANG=en_US.UTF-8"
@@ -51,21 +48,17 @@ def conf():
         with open(file, "a") as f:
             f.write(f"{locale}\n")
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: LOCALE ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: LOCALE ::", file)
 
 def gen():
     cmd = ["locale-gen"]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: LOCALE ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: LOCALE ::", cmd)

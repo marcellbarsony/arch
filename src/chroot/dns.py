@@ -28,12 +28,10 @@ def networkmanager():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: DNS ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: DNS ::", file)
 
 def resolvconf():
     file = "/etc/resolv.conf"
@@ -67,12 +65,10 @@ def resolvconf():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: DNS ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: DNS ::", file)
 
 def doh(nextdns_profile: str):
     """https://wiki.archlinux.org/title/Dnscrypt-proxy"""
@@ -83,7 +79,6 @@ def doh(nextdns_profile: str):
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        print(f":: [-] :: DNS :: Reading {file} ::", err)
         sys.exit(1)
 
     updated_lines = []
@@ -100,7 +95,6 @@ def doh(nextdns_profile: str):
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        print(":: [-] :: DNS ::", err)
         sys.exit(1)
     else:
-        print(":: [+] :: DNS ::", file)
+        logging.info(file)

@@ -33,8 +33,7 @@ def initramfs(kms: str):
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error(f"Reading {file}\n{err}")
-        print(":: [-] :: INITRAMFS ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
 
     lines[6] = f"MODULES=(btrfs {kms})\n"
@@ -44,21 +43,17 @@ def initramfs(kms: str):
         with open(file, "w") as f:
             f.writelines(lines)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: INITRAMFS ::", err)
+        logging.error("%s\n%s", file, err)
         sys.exit(1)
     else:
         logging.info(file)
-        print(":: [+] :: INITRAMFS ::", file)
 
 def mkinitcpio():
     cmd = ["mkinitcpio", "-p", "linux-hardened"]
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: INITRAMFS ::", err)
+        logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
         logging.info(cmd)
-        print(":: [+] :: INITRAMFS ::", cmd)

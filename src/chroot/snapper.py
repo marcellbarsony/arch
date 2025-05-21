@@ -1,7 +1,6 @@
 import logging
 import re
 import subprocess
-import sys
 
 
 """
@@ -14,12 +13,10 @@ def config_init(btrfs_cfg: str):
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error(f"{cmd}\n{err}")
-        print(":: [-] :: BTRFS ::", err)
+        logging.error("%s\n%s", cmd, err)
         pass
     else:
         logging.info(cmd)
-        print(":: [+] :: BTRFS ::", cmd)
 
 def config_set(btrfs_cfg: str):
     file = f"/etc/snapper/configs/{btrfs_cfg}"
@@ -35,8 +32,7 @@ def config_set(btrfs_cfg: str):
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error(f"Reading {file}\n{err}")
-        print(f":: [-] :: BTRFS :: Reading {file} ::", err)
+        logging.error("%s\n%s", file, err)
         return
 
     updated_lines = []
@@ -62,9 +58,7 @@ def config_set(btrfs_cfg: str):
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        logging.error(f"{file}\n{err}")
-        print(":: [-] :: BTRFS ::", err)
+        logging.error("%s\n%s", file, err)
         return
     else:
         logging.info(file)
-        print(":: [+] :: BTRFS ::", file)

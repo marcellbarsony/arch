@@ -22,13 +22,13 @@ def change_ownership(user: str):
 
             # Skip symlinks
             if os.path.islink(path):
-                logging.debug(f"Skipping symlink: {path}")
+                logging.info("skipping symlink :: %s", path)
                 continue
 
             try:
                 shutil.chown(path, user=user, group=user)
             except Exception as err:
-                logging.warning(f"Failed to change ownership of {path}: {err}")
+                logging.error(err)
 
 def remove_xdg_dirs(user: str):
     home_dir = f"/home/{user}"
