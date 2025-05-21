@@ -27,6 +27,6 @@ def keymaps():
             f.write(content)
     except Exception as err:
         logging.warning("%s\n%s", file, err)
-        pass
+        return
     else:
         logging.info(file)

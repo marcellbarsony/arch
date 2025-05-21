@@ -1,7 +1,6 @@
 import logging
 import re
 import subprocess
-import sys
 
 
 """
@@ -18,8 +17,8 @@ def locale():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
 
     updated_lines = []
     for line in lines:
@@ -36,8 +35,8 @@ def locale():
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)
 
@@ -48,8 +47,8 @@ def conf():
         with open(file, "a") as f:
             f.write(f"{locale}\n")
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)
 
@@ -58,7 +57,7 @@ def gen():
     try:
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
-        logging.error("%s\n%s", cmd, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", cmd, err)
+        return
     else:
         logging.info(cmd)

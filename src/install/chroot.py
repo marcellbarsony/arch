@@ -6,6 +6,9 @@ import sys
 
 
 def copy(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
+    """
+    Copy files for chroot phrase
+    """
     try:
         shutil.copytree(scr_src, scr_dst)
         shutil.copy(cfg_src, cfg_dst)
@@ -17,8 +20,8 @@ def copy(scr_src: str, scr_dst: str, cfg_src: str, cfg_dst: str):
         logging.error(err)
         sys.exit(1)
     else:
-        logging.info(f"copytree: {scr_src} >> {scr_dst}")
-        logging.info(f"copy: {scr_src} >> {scr_dst}")
+        logging.info(f"copytree: %s >> %s", scr_src, scr_dst)
+        logging.info(f"copy: %s >> %s", scr_src, scr_dst)
         logging.info("chmod 0x755 /mnt/temporary/main.py")
 
 def chroot():
@@ -41,8 +44,8 @@ def clear(scr_dst: str, cfg_dst: str):
         shutil.rmtree(scr_dst)
         os.remove(cfg_dst)
     except Exception as err:
-        logging.error(err)
-        sys.exit(1)
+        logging.warning(err)
+        return
     else:
         logging.info(f"rmtree {scr_dst}")
         logging.info(f"remove {cfg_dst}")

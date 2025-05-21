@@ -17,8 +17,8 @@ def sudoers():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
 
     updated_lines = []
     insert_lines = [
@@ -67,7 +67,7 @@ def login_delay():
         with open(file, "w") as f:
             f.writelines(lines)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)

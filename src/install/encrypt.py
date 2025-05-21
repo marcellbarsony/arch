@@ -21,7 +21,7 @@ def modprobe():
         try:
             subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
         except subprocess.CalledProcessError as err:
-            logging.error("%s\n%s", cmd, err)
+            logging.warning("%s\n%s", cmd, err)
             pass
         else:
             logging.info(cmd)
@@ -54,7 +54,7 @@ def encrypt(device_root: str, cryptpassword: str):
 
 def open(device_root: str, cryptpassword: str):
     """
-    Unlock/Map LUKS partition
+    Unlock & Map LUKS partition
     https://wiki.archlinux.org/title/Dm-crypt/Device_encryption#Unlocking/Mapping_LUKS_partitions_with_the_device_mapper
     """
     cmd = [

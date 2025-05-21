@@ -8,7 +8,6 @@ import configparser
 import getpass
 import logging
 import os
-# import threading
 
 from src.install import check
 from src.install import init
@@ -104,7 +103,7 @@ if __name__ == "__main__":
     # }}}
 
     # Check {{{
-    # check.boot_mode()
+    check.boot_mode()
     check.network(network_ip, network_port)
     # }}}
 
@@ -112,11 +111,6 @@ if __name__ == "__main__":
     init.time_zone(timezone)
     init.loadkeys(keys)
     init.keymaps(keymap)
-    # }}}
-
-    # Mirrorlist {{{
-    # mirrorlist_thread = threading.Thread(target=pacman.mirrorlist)
-    # mirrorlist_thread.start()
     # }}}
 
     # File system {{{
@@ -154,7 +148,6 @@ if __name__ == "__main__":
     # }}}
 
     # Pacman {{{
-    # mirrorlist_thread.join()
     pacman.config()
     pacman.keyring_init()
     # }}}

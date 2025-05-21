@@ -28,8 +28,8 @@ def networkmanager():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)
 
@@ -65,13 +65,16 @@ def resolvconf():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)
 
 def doh(nextdns_profile: str):
-    """https://wiki.archlinux.org/title/Dnscrypt-proxy"""
+    """
+    DNSCrypt-proxy configuration
+    https://wiki.archlinux.org/title/Dnscrypt-proxy#Configuration
+    """
     file = "/etc/dnscrypt-proxy/dnscrypt-proxy.toml"
     pattern_1 = re.compile(r"^#\sserver_names\s=?")
     pattern_2 = re.compile(r"^bootstrap_resolvers\s=?")
@@ -79,7 +82,8 @@ def doh(nextdns_profile: str):
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
 
     updated_lines = []
     for line in lines:
@@ -87,7 +91,6 @@ def doh(nextdns_profile: str):
             updated_lines.append(f"server_names = ['NextDNS-{nextdns_profile}']")
         elif pattern_2.match(line):
             updated_lines.append("bootstrap_resolvers = ['9.9.9.11:53', '1.1.1.1:53']")
-            # TODO: DNSCrypt static & stamp setup
         else:
             updated_lines.append(line)
 
@@ -95,6 +98,7 @@ def doh(nextdns_profile: str):
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)

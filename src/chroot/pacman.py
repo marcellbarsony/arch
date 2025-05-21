@@ -14,8 +14,8 @@ def config():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
 
     pattern_1 = re.compile(r"^#\sMisc\soptions")
     pattern_2 = re.compile(r"^#\[multilib\]")
@@ -47,7 +47,7 @@ def config():
         with open(file, "w") as f:
             f.writelines(updated_lines)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)

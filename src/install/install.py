@@ -22,7 +22,7 @@ def bug():
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.warning("%s\n%s", cmd, err)
-        pass
+        return
     else:
         logging.info(cmd)
 
@@ -49,8 +49,7 @@ def get_pkgs_dmi(dmidecode: str) -> str:
 
 def install(packages: str):
     os.system("clear")
-    package_list = packages.split()
-    cmd = ["pacstrap", "-K", "/mnt"] + package_list
+    cmd = ["pacstrap", "-K", "/mnt"] + packages.split()
     try:
         subprocess.run(cmd, check=True)
     except subprocess.CalledProcessError as err:

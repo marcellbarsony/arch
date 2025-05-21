@@ -83,6 +83,7 @@ def password(grub_password: str, user: str):
         pbkdf2_hash = out.stdout.decode("utf-8")[67:].strip()
     except subprocess.CalledProcessError as err:
         logging.error("%s\n%s", cmd, err)
+        sys.exit(1)
     else:
         logging.info(cmd)
 

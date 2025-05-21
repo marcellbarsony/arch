@@ -15,7 +15,8 @@ def backup():
     try:
         shutil.copy2(src, dst)
     except Exception as err:
-        logging.warning("Copy %s >> %s", src, dst)
+        logging.warning("Copy %s >> %s\n%s", src, dst, err)
+        return
     else:
         logging.info(f"Copy {src} >> {dst}")
 
@@ -33,6 +34,7 @@ def update():
         subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
         logging.error("%s\n%s", cmd, err)
+        return
     else:
         logging.info(cmd)
 
@@ -57,6 +59,7 @@ def systemd():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)

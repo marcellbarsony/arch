@@ -1,5 +1,4 @@
 import logging
-import sys
 import textwrap
 
 
@@ -14,8 +13,8 @@ def hostname(hostname: str):
         with open(file, "w") as f:
             f.write(hostname)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)
 
@@ -32,7 +31,7 @@ def hosts(hostname: str):
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)

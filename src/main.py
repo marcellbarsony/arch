@@ -64,9 +64,8 @@ if __name__ == "__main__":
     # }}}
 
     # Pacman {{{
-    mirrorlist.backup()
     mirrorlist.systemd()
-
+    mirrorlist.backup()
     mirrorlist_thread = threading.Thread(target=mirrorlist.update)
     mirrorlist_thread.start()
 
@@ -113,10 +112,11 @@ if __name__ == "__main__":
 
     # Systemd {{{
     systemd.logind()
-    dmi_res = dmi.check()
-    systemd.services(dmi_res)
     systemd.watchdog()
     systemd.pc_speaker()
+    systemd.services()
+    if dmi.check() == "vbox":
+        systemd.services_dmi()
     # }}}
 
     # DNS (DoH) {{{

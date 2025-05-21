@@ -1,7 +1,6 @@
 import logging
 import re
 import subprocess
-import sys
 import textwrap
 
 
@@ -16,8 +15,12 @@ def logind():
     pattern_2 = re.compile(r"^#HandleLidSwitchExternalPower=.*")
     pattern_3 = re.compile(r"^#HandleLidSwitchDocked=.*")
 
-    with open(file, "r") as f:
-        lines = f.readlines()
+    try:
+        with open(file, "r") as f:
+            lines = f.readlines()
+    except Exception as err:
+        logging.warning("%s\n%s", file, err)
+        return
 
     updated_lines = []
     for line in lines:
@@ -39,38 +42,6 @@ def logind():
     else:
         logging.info(file)
 
-def services(dmi: str):
-    cmds = [
-        ["systemctl", "enable", "dnscrypt-proxy.service"],
-        ["systemctl", "enable", "earlyoom"],
-        ["systemctl", "enable", "fstrim.timer"],
-        ["systemctl", "enable", "NetworkManager.service"],
-        ["systemctl", "enable", "nftables.service"],
-        ["systemctl", "enable", "ntpd.service"],
-        ["systemctl", "enable", "ntpdate.service"],
-        ["systemctl", "enable", "reflector.service"],
-        ["systemctl", "enable", "snapper-cleanup.timer"],
-        ["systemctl", "enable", "snapper-timeline.timer"]
-    ]
-    for cmd in cmds:
-        try:
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as err:
-            logging.error("%s\n%s", cmd, err)
-            pass
-        else:
-            logging.info(cmd)
-
-    if dmi == "vbox":
-        cmd = ["systemctl", "enable", "vboxservice.service"]
-        try:
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
-        except subprocess.CalledProcessError as err:
-            logging.warning("%s\n%s", cmd, err)
-            pass
-        else:
-            logging.info(cmd)
-
 def watchdog():
     """https://man.archlinux.org/man/systemd-system.conf.5.en"""
     file = "/etc/systemd/system.conf"
@@ -78,10 +49,10 @@ def watchdog():
         with open(file, "r") as f:
             lines = f.readlines()
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        sys.exit(1)
+        logging.warning("%s\n%s", file, err)
+        return
 
-    pattern_1 = re.compile(r"^#RebootWatchdogec=0")
+    pattern_1 = re.compile(r"^#RebootWatchdogec=.*")
 
     updated_lines = []
     for line in lines:
@@ -95,7 +66,7 @@ def watchdog():
             f.writelines(lines)
     except Exception as err:
         logging.error("%s\n%s", file, err)
-        pass
+        return
     else:
         logging.info(file)
 
@@ -112,7 +83,39 @@ def pc_speaker():
         with open(file, "w") as f:
             f.write(content)
     except Exception as err:
-        logging.error("%s\n%s", file, err)
-        pass
+        logging.warning("%s\n%s", file, err)
+        return
     else:
         logging.info(file)
+
+def services():
+    cmds = [
+        ["systemctl", "enable", "dnscrypt-proxy.service"],
+        ["systemctl", "enable", "earlyoom"],
+        ["systemctl", "enable", "fstrim.timer"],
+        ["systemctl", "enable", "NetworkManager.service"],
+        ["systemctl", "enable", "nftables.service"],
+        ["systemctl", "enable", "ntpd.service"],
+        ["systemctl", "enable", "ntpdate.service"],
+        ["systemctl", "enable", "reflector.service"],
+        ["systemctl", "enable", "snapper-cleanup.timer"],
+        ["systemctl", "enable", "snapper-timeline.timer"]
+    ]
+    for cmd in cmds:
+        try:
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except subprocess.CalledProcessError as err:
+            logging.warning("%s\n%s", cmd, err)
+            pass
+        else:
+            logging.info(cmd)
+
+def services_dmi():
+    cmd = ["systemctl", "enable", "vboxservice.service"]
+    try:
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL)
+    except subprocess.CalledProcessError as err:
+        logging.warning("%s\n%s", cmd, err)
+        return
+    else:
+        logging.info(cmd)
