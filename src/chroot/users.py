@@ -16,7 +16,7 @@ def root_password(root_pw: str):
         logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
-        logging.info(f"root:{root_pw} | {cmd}")
+        logging.info(f"root:%s | %s ", root_pw, cmd)
 
 
 """
@@ -26,7 +26,7 @@ https://wiki.archlinux.org/title/users_and_groups
 
 def user_add(user: str):
     cmd = ["useradd", "-m", user]
-    cmd = f"useradd -m user"
+    cmd = f"useradd -m {user}"
     try:
         subprocess.run(cmd, shell=True, check=True, stdout=subprocess.DEVNULL)
     except subprocess.CalledProcessError as err:
@@ -43,7 +43,7 @@ def user_password(user: str, user_pw: str):
         logging.error("%s\n%s", cmd, err)
         sys.exit(1)
     else:
-        logging.info(f"{user}:{user_pw} | {cmd}")
+        logging.info("%s:%s | %s", user, user_pw, cmd)
 
 def user_group_create():
     cmd = ["groupadd", "vboxusers"]
