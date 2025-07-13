@@ -26,12 +26,19 @@ def bug():
     else:
         logging.info(cmd)
 
-def get_pkgs():
+def get_pkgs(extra: str):
     packages = ""
     with open("packages.ini", "r") as file:
         for line in file:
             if not line.startswith("[") and not line.startswith(";") and line.strip() != "":
                 packages += f"{line.rstrip()} "
+
+    if extra == "True":
+        with open("packages-extra.ini", "r") as file:
+            for line in file:
+                if not line.startswith("[") and not line.startswith(";") and line.strip() != "":
+                    packages += f"{line.rstrip()} "
+
     return packages
 
 def get_pkgs_dmi(dmidecode: str) -> str:

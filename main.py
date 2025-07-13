@@ -89,6 +89,10 @@ if __name__ == "__main__":
     network_host = config.get("network", "hostname")
     # }}}
 
+    # Packages {{{
+    extra = config.get("packages", "extra")
+    # }}}
+
     # Timezone {{{
     timezone = config.get("timezone", "zone")
     # }}}
@@ -154,7 +158,7 @@ if __name__ == "__main__":
     # Pacstrap {{{
     install.bug()
 
-    pkgs = install.get_pkgs()
+    pkgs = install.get_pkgs(extra)
     install.install(pkgs)
 
     pkgs_dmi = install.get_pkgs_dmi(dmidecode)
