@@ -1,4 +1,4 @@
-**The Chad Stack installation script**
+**Arch Linux installation script**
 
 - UEFI
 - GRUB2
